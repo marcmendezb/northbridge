@@ -258,22 +258,15 @@ const posterFile = await getImage({ src: heroPoster, format: 'webp', width: 1920
     height: 100%;
     animation: hero-down 2.4s var(--ease-in-out) infinite;
   }
-  /* Baja, se desvanece y vuelve a aparecer arriba: indica «hacia abajo» sin ruido. */
+  /* Impulso corto hacia abajo y vuelta: la flecha siempre está visible y la dirección se entiende. */
   @keyframes hero-down {
-    0% {
-      transform: translateY(-5px);
-      opacity: 0;
-    }
-    30% {
-      opacity: 1;
-    }
-    70% {
-      transform: translateY(4px);
-      opacity: 1;
-    }
+    0%,
+    55%,
     100% {
-      transform: translateY(8px);
-      opacity: 0;
+      transform: translateY(0);
+    }
+    25% {
+      transform: translateY(5px);
     }
   }
 
