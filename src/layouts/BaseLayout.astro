@@ -90,13 +90,17 @@ const alternateLinks = alternates(parsePath(Astro.url.pathname).canonical).map((
     <script>
       // Smooth scroll en todas las páginas; GSAP solo donde hay escenas. Nada de esto con reduced-motion.
       if (!matchMedia('(prefers-reduced-motion: reduce)').matches) {
-        import('../components/animations/smoothScroll')
-          .then(async (m) => {
-            m.startSmoothScroll();
-            if (document.querySelector('[data-hero],[data-reveal],[data-count],[data-connector]')) {
-              const { initPage } = await import('../components/animations/init');
-              await initPage();
-            }
+        // Ambos módulos se piden a la vez: el hero no espera a que llegue el scroll suave.
+        const hasScenes = document.querySelector(
+          '[data-hero],[data-reveal],[data-count],[data-split],[data-viaduct],[data-reveal-media]',
+        );
+        Promise.all([
+          import('../components/animations/smoothScroll'),
+          hasScenes ? import('../components/animations/init') : null,
+        ])
+          .then(async ([smooth, scenes]) => {
+            smooth.startSmoothScroll();
+            await scenes?.initPage();
           })
           .catch(() => document.documentElement.classList.add('anim-fail'));
       }

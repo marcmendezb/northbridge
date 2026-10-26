@@ -1,6 +1,6 @@
 import type { AnimationKit } from './types';
 
-/** `[data-reveal]`: fade + desplazamiento de 20 px, escalonado por lotes. Una sola vez. */
+/** `[data-reveal]`: fade + desplazamiento de 28 px, escalonado por lotes, con frenada exponencial. Una sola vez. */
 export function revealOnScroll({ gsap, ScrollTrigger }: AnimationKit, root: ParentNode = document) {
   const items = root.querySelectorAll<HTMLElement>('[data-reveal]');
   if (!items.length) return;
@@ -11,9 +11,9 @@ export function revealOnScroll({ gsap, ScrollTrigger }: AnimationKit, root: Pare
       gsap.to(batch, {
         opacity: 1,
         y: 0,
-        duration: 1,
-        ease: 'power3.out',
-        stagger: 0.1,
+        duration: 1.2,
+        ease: 'expo.out',
+        stagger: 0.08,
         overwrite: true,
       }),
   });

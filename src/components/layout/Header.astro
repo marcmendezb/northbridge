@@ -146,20 +146,8 @@ const isCurrent = (href: string) => path === href || (href !== '/' && path.start
           </div>
         )}
         <a href={bookingCta.href} class:list={['nb-cta', minimal && 'nb-cta--always']}>
-          <span class="nb-cta__icon" aria-hidden="true">
-            <svg
-              viewBox="0 0 24 24"
-              width="18"
-              height="18"
-              fill="none"
-              stroke="currentColor"
-              stroke-width="1.5"
-            >
-              <rect x="4" y="5" width="16" height="15" />
-              <path d="M4 10h16M9 3v4M15 3v4" />
-            </svg>
-          </span>
           <span>{t('nav.freeConsultation')}</span>
+          <Arrow />
         </a>
         {!minimal && (
           <button
@@ -338,20 +326,8 @@ const isCurrent = (href: string) => path === href || (href !== '/' && path.start
             ))}
           </ul>
           <a href={bookingCta.href} class="nb-cta nb-cta--block mt-5">
-            <span class="nb-cta__icon" aria-hidden="true">
-              <svg
-                viewBox="0 0 24 24"
-                width="18"
-                height="18"
-                fill="none"
-                stroke="currentColor"
-                stroke-width="1.5"
-              >
-                <rect x="4" y="5" width="16" height="15" />
-                <path d="M4 10h16M9 3v4M15 3v4" />
-              </svg>
-            </span>
             <span>{bookingCta.label}</span>
+            <Arrow />
           </a>
           <ul class="nb-mobile__langs" aria-label={t('lang.label')}>
             {langOptions.map((o) => (
@@ -732,12 +708,13 @@ const isCurrent = (href: string) => path === href || (href !== '/' && path.start
     box-shadow: 0 10px 32px rgb(21 39 66 / 0.1);
   }
 
+  /* CTA: botón primario Navy, texto blanco y la flecha de la marca. */
   .nb-cta {
     display: inline-flex;
     align-items: center;
     gap: 10px;
-    min-height: 52px;
-    padding: 8px 22px 8px 8px;
+    min-height: 48px;
+    padding: 0 20px 0 22px;
     border-radius: var(--radius-button, 4px);
     background: var(--navy-800);
     color: var(--white);
@@ -750,20 +727,6 @@ const isCurrent = (href: string) => path === href || (href !== '/' && path.start
   }
   .nb-cta:hover {
     background: var(--navy-700);
-  }
-  .nb-cta__icon {
-    display: inline-flex;
-    width: 36px;
-    height: 36px;
-    align-items: center;
-    justify-content: center;
-    border-radius: var(--radius-tag, 2px);
-    background: var(--salvia-400);
-    color: var(--navy-800);
-    transition: transform var(--dur-base) var(--ease-out);
-  }
-  .nb-cta:hover .nb-cta__icon {
-    transform: translateX(-2px);
   }
   .nb-bar__end > .nb-cta {
     display: none;
@@ -783,9 +746,6 @@ const isCurrent = (href: string) => path === href || (href !== '/' && path.start
     display: flex;
     width: 100%;
     justify-content: center;
-  }
-  .nb-cta--block .nb-cta__icon {
-    margin-right: 0;
   }
 
   /* Menú móvil: sin JS, los enlaces quedan visibles dentro de la barra; con JS se abre y se cierra. */

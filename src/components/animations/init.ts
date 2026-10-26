@@ -1,7 +1,9 @@
 import { countUp } from './countUp';
-import { drawConnector } from './drawConnector';
+import { drawViaduct } from './drawViaduct';
 import { heroScene } from './heroScene';
+import { mediaReveal } from './mediaReveal';
 import { revealOnScroll } from './revealOnScroll';
+import { splitReveal } from './splitReveal';
 import { getSmoothScroll } from './smoothScroll';
 
 /**
@@ -23,7 +25,9 @@ export async function initPage() {
     heroScene(kit);
     revealOnScroll(kit);
     countUp(kit);
-    drawConnector(kit);
+    drawViaduct(kit);
+    mediaReveal(kit);
+    void splitReveal(kit);
   });
 
   // Limpieza antes de cambiar de página (View Transitions, fase 7).

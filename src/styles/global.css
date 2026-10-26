@@ -36,25 +36,32 @@
 @media (prefers-reduced-motion: no-preference) {
   .js:not(.anim-fail) [data-reveal] {
     opacity: 0;
-    transform: translateY(20px);
+    transform: translateY(28px);
+  }
+  .js:not(.anim-fail) [data-split] {
+    visibility: hidden;
+  }
+  .js:not(.anim-fail) [data-reveal-media] {
+    clip-path: inset(100% 0 0 0);
+  }
+  .js:not(.anim-fail) [data-viaduct-deck] {
+    transform: scaleX(0);
+  }
+  .js:not(.anim-fail) [data-viaduct-arch] path {
+    stroke-dasharray: 1;
+    stroke-dashoffset: 1;
+  }
+  .js:not(.anim-fail) [data-viaduct-text] > * {
+    opacity: 0;
   }
   .js:not(.anim-fail) [data-hero-fade] {
     opacity: 0;
   }
   .js:not(.anim-fail) [data-hero-line] {
-    transform: translateY(105%);
+    opacity: 0;
+    transform: translateY(110%);
   }
   .js:not(.anim-fail) [data-hero-mark] path {
-    stroke-dasharray: 1;
-    stroke-dashoffset: 1;
-  }
-  .js:not(.anim-fail) [data-connector-line='h'] {
-    transform: scaleX(0);
-  }
-  .js:not(.anim-fail) [data-connector-line='v'] {
-    transform: scaleY(0);
-  }
-  .js:not(.anim-fail) [data-connector-arch] path {
     stroke-dasharray: 1;
     stroke-dashoffset: 1;
   }

@@ -1,62 +1,154 @@
 ---
-/** Pasos con línea conectora que se dibuja con el scroll y remata en arco (docs/06, momento 2). */
+/**
+ * Pasos como viaducto: el tablero y un arco por paso, el motivo del símbolo repetido.
+ * Cada paso vive dentro de su arco. Con el scroll se traza el tablero y después cada arco (drawViaduct).
+ * Sin JS o con movimiento reducido, todo está dibujado.
+ */
 interface Step {
   title: string;
   text: string;
 }
 interface Props {
   steps: Step[];
+  /** Fondo de la sección: cambia el color del trazo. */
+  tone?: 'light' | 'dark';
 }
-const { steps } = Astro.props;
-const cols = steps.length === 4 ? 'md:grid-cols-2 lg:grid-cols-4' : 'md:grid-cols-3';
-const horizontal = steps.length === 4 ? 'lg' : 'md';
+const { steps, tone = 'light' } = Astro.props;
+const four = steps.length === 4;
+// Arco alto (escritorio) y bajo (móvil): mismo radio relativo, círculo perfecto con trazo uniforme.
+const tall = 'M1 520V200A199 199 0 0 1 399 200V520';
+const low = 'M1 300V200A199 199 0 0 1 399 200V300';
 ---
 
-<div data-connector class="relative">
-  <div
-    data-connector-line="h"
-    class:list={[
-      'absolute top-0 right-6 left-0 hidden h-[1.5px] origin-left bg-navy-800',
-      horizontal === 'lg' ? 'lg:block' : 'md:block',
-    ]}
-  ></div>
-  <div
-    data-connector-line="v"
-    class:list={[
-      'absolute top-2 bottom-0 left-[4px] block w-[1.5px] origin-top bg-navy-800',
-      horizontal === 'lg' ? 'lg:hidden' : 'md:hidden',
-    ]}
-  ></div>
-  <svg
-    data-connector-arch
-    class:list={[
-      'absolute top-0 right-0 hidden h-[14px] w-6 -translate-y-px text-navy-800',
-      horizontal === 'lg' ? 'lg:block' : 'md:block',
-    ]}
-    viewBox="0 0 24 14"
-    fill="none"
-    stroke="currentColor"
-    stroke-width="1.5"
-    aria-hidden="true"
-  >
-    <path d="M1 14V10A11 11 0 0 1 23 10V14" pathLength="1"></path>
-  </svg>
-  <ol class:list={['m-0 grid list-none gap-12 p-0 md:gap-10', cols]}>
+<div
+  data-viaduct
+  class:list={['nb-viaduct', four && 'nb-viaduct--4', tone === 'dark' && 'nb-viaduct--dark']}
+>
+  <ol class="nb-viaduct__steps">
     {steps.map((step) => (
-      <li
-        data-reveal
-        class:list={['relative pl-10 md:pl-0', horizontal === 'lg' ? 'lg:pt-10' : 'md:pt-10']}
-      >
-        <span
-          class:list={[
-            'absolute top-[0.35rem] left-0 block h-[9px] w-[9px] rounded-full border-[1.5px] border-navy-800 bg-white',
-            horizontal === 'lg' ? 'lg:top-0 lg:-translate-y-1/2' : 'md:top-0 md:-translate-y-1/2',
-          ]}
+      <li class="nb-viaduct__step" data-viaduct-step>
+        <span class="nb-viaduct__deck" data-viaduct-deck aria-hidden="true" />
+        <svg
+          class="nb-viaduct__arch nb-viaduct__arch--tall"
+          data-viaduct-arch
+          viewBox="0 0 400 520"
+          fill="none"
           aria-hidden="true"
-        ></span>
-        <h3 class="m-0 mb-3">{step.title}</h3>
-        <p class="t-body m-0">{step.text}</p>
+        >
+          <path d={tall} pathLength="1" vector-effect="non-scaling-stroke" />
+        </svg>
+        <svg
+          class="nb-viaduct__arch nb-viaduct__arch--low"
+          data-viaduct-arch
+          viewBox="0 0 400 300"
+          fill="none"
+          aria-hidden="true"
+        >
+          <path d={low} pathLength="1" vector-effect="non-scaling-stroke" />
+        </svg>
+        <div class="nb-viaduct__text" data-viaduct-text>
+          <h3 class="nb-viaduct__title">{step.title}</h3>
+          <p class="nb-viaduct__body">{step.text}</p>
+        </div>
       </li>
     ))}
   </ol>
 </div>
+
+<style is:global>
+  .nb-viaduct {
+    --nb-gap: clamp(16px, 2.2vw, 32px);
+    --nb-stroke: var(--navy-800);
+  }
+  .nb-viaduct--dark {
+    --nb-stroke: var(--piedra-50);
+  }
+  .nb-viaduct__steps {
+    display: grid;
+    gap: 48px var(--nb-gap);
+    margin: 0;
+    padding: 0;
+    list-style: none;
+    /* Los tramos del tablero sobresalen medio hueco: en cada fila se unen y aquí se recortan. */
+    overflow: clip;
+    overflow-clip-margin: 2px;
+  }
+  @media (min-width: 768px) {
+    .nb-viaduct__steps {
+      grid-template-columns: repeat(3, minmax(0, 1fr));
+    }
+    .nb-viaduct--4 .nb-viaduct__steps {
+      grid-template-columns: repeat(2, minmax(0, 1fr));
+    }
+  }
+  @media (min-width: 1100px) {
+    .nb-viaduct--4 .nb-viaduct__steps {
+      grid-template-columns: repeat(4, minmax(0, 1fr));
+    }
+  }
+  .nb-viaduct__step {
+    position: relative;
+    aspect-ratio: 400 / 300;
+  }
+  .nb-viaduct__deck {
+    position: absolute;
+    top: 0;
+    left: calc(var(--nb-gap) / -2);
+    right: calc(var(--nb-gap) / -2);
+    height: 1.5px;
+    background: var(--nb-stroke);
+    transform-origin: left center;
+  }
+  .nb-viaduct__arch {
+    position: absolute;
+    inset: 0;
+    width: 100%;
+    height: 100%;
+    overflow: visible;
+    stroke: var(--nb-stroke);
+    stroke-width: 1.5px;
+    stroke-linecap: butt;
+  }
+  .nb-viaduct__arch--tall {
+    display: none;
+  }
+  .nb-viaduct__text {
+    position: absolute;
+    inset: auto 0 0;
+    display: grid;
+    gap: 10px;
+    padding: 0 clamp(20px, 2.6vw, 40px) clamp(20px, 2.6vw, 36px);
+  }
+  .nb-viaduct__title {
+    margin: 0;
+    font-family: var(--font-display);
+    font-optical-sizing: auto;
+    font-size: clamp(1.375rem, 1rem + 1vw, 1.875rem);
+    font-weight: 400;
+    line-height: 1.12;
+    letter-spacing: -0.01em;
+    text-wrap: balance;
+    color: var(--nb-stroke);
+  }
+  .nb-viaduct__body {
+    margin: 0;
+    font-size: 1rem;
+    line-height: 1.55;
+    color: var(--piedra-700);
+    text-wrap: pretty;
+  }
+  .nb-viaduct--dark .nb-viaduct__body {
+    color: var(--navy-100);
+  }
+  @media (min-width: 768px) {
+    .nb-viaduct__step {
+      aspect-ratio: 400 / 520;
+    }
+    .nb-viaduct__arch--tall {
+      display: block;
+    }
+    .nb-viaduct__arch--low {
+      display: none;
+    }
+  }
+</style>

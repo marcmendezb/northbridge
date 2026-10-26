@@ -13,32 +13,28 @@ export function heroScene({ gsap, ScrollTrigger }: AnimationKit) {
   const q = <T extends Element>(sel: string) => Array.from(hero.querySelectorAll<T>(sel));
 
   // ── Entrada ──
-  const intro = gsap.timeline();
+  const intro = gsap.timeline({ defaults: { ease: 'expo.out' } });
   const mark = hero.querySelector('[data-hero-mark]');
-  if (mark) intro.add(drawBridge(gsap, mark), 0);
+  if (mark) intro.add(drawBridge(gsap, mark, { speed: 1.6 }), 0);
 
   const lines = q('[data-hero-line]');
   if (lines.length) {
     intro.fromTo(
       lines,
-      { yPercent: 105, y: 0 },
-      { yPercent: 0, y: 0, duration: 0.9, stagger: 0.12, ease: 'power3.out' },
-      1.0,
+      // y: 0 anula la traslación inicial del CSS (GSAP la leería como píxeles).
+      { yPercent: 110, y: 0, opacity: 0 },
+      { yPercent: 0, y: 0, opacity: 1, duration: 1.2, stagger: 0.09 },
+      0.12,
     );
   }
   q<HTMLElement>('[data-hero-fade]').forEach((el) => {
     const at = Number(el.dataset.heroFade);
-    intro.fromTo(
-      el,
-      { opacity: 0, y: 12 },
-      { opacity: 1, y: 0, duration: 0.8, ease: 'power3.out' },
-      at,
-    );
+    intro.fromTo(el, { opacity: 0, y: 16 }, { opacity: 1, y: 0, duration: 1 }, at);
   });
 
   // La foto «respira» al cargar: de 1,06 a 1 (solo transform).
   const img = hero.querySelector('[data-hero-media]');
-  if (img) gsap.fromTo(img, { scale: 1.06 }, { scale: 1, duration: 2.2, ease: 'power2.out' });
+  if (img) gsap.fromTo(img, { scale: 1.08 }, { scale: 1, duration: 2.4, ease: 'expo.out' });
 
   // ── Arco-portal ──
   const photo = hero.querySelector<HTMLElement>('[data-hero-photo]');
@@ -85,7 +81,7 @@ export function heroScene({ gsap, ScrollTrigger }: AnimationKit) {
         trigger: hero,
         start: 'top top',
         end: 'bottom bottom',
-        scrub: 0.6,
+        scrub: 0.9,
         invalidateOnRefresh: true,
       },
     });

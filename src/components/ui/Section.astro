@@ -52,8 +52,16 @@ const hasHeader = Boolean(label || title || lead);
           </p>
         )}
         <div class="flex min-w-0 flex-1 basis-[520px] flex-col gap-4">
-          {title && <Heading class="t-h2-lg m-0">{title}</Heading>}
-          {lead && <p class:list={['t-lead m-0', tone === 'navy' && '!text-navy-100']}>{lead}</p>}
+          {title && (
+            <Heading class="t-h2-lg m-0" data-split>
+              {title}
+            </Heading>
+          )}
+          {lead && (
+            <p data-reveal class:list={['t-lead m-0', tone === 'navy' && '!text-navy-100']}>
+              {lead}
+            </p>
+          )}
         </div>
       </div>
     )}
