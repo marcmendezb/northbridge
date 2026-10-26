@@ -1,5 +1,6 @@
 import { calcPreview } from './calcPreview';
 import { countUp } from './countUp';
+import { finalScene } from './finalScene';
 import { drawViaduct } from './drawViaduct';
 import { heroScene } from './heroScene';
 import { journeyScene } from './journeyScene';
@@ -30,6 +31,7 @@ export async function initPage() {
     drawViaduct(kit);
     journeyScene(kit);
     calcPreview(kit);
+    finalScene(kit);
     mediaReveal(kit);
     void splitReveal(kit);
   });

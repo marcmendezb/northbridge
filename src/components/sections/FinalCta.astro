@@ -1,0 +1,239 @@
+---
+/**
+ * Cierre de la Home: el reverso del hero. El vídeo asoma dentro del arco y, con el scroll,
+ * el arco se abre hasta volver a pantalla completa (escritorio con movimiento: finalScene.ts).
+ * En móvil, sin JS o con movimiento reducido: titular, CTA y la foto dentro del arco.
+ */
+import { Picture, getImage } from 'astro:assets';
+import poster from '../../assets/img/home/hero-poster.jpg';
+import Button from '../ui/Button.astro';
+import { useI18n } from '../../i18n';
+import { getBookingCta, site } from '../../lib/site';
+const { t, locale } = useI18n(Astro.currentLocale);
+const bookingCta = getBookingCta(locale);
+const posterFile = await getImage({ src: poster, format: 'webp', width: 1920, quality: 76 });
+---
+
+<section class="nb-final" data-final data-surface="dark" aria-labelledby="final-title">
+  <div class="nb-final__stage">
+    <div class="nb-final__media" data-final-media>
+      <Picture
+        src={poster}
+        formats={['avif', 'webp']}
+        widths={[480, 960, 1920]}
+        sizes="(min-width: 768px) 100vw, 22rem"
+        alt=""
+        loading="lazy"
+        quality={74}
+        class="nb-final__img"
+      />
+      <video
+        class="nb-final__video"
+        data-final-video
+        poster={posterFile.src}
+        muted
+        loop
+        playsinline
+        preload="none"
+        tabindex="-1"
+        aria-hidden="true"
+        disablepictureinpicture
+        disableRemotePlayback
+      >
+        <source src="/video/hero-home.webm" type="video/webm" />
+        <source src="/video/hero-home.mp4" type="video/mp4" />
+      </video>
+    </div>
+
+    <div class="nb-final__content nb-container">
+      <h2 id="final-title" class="nb-final__title" data-split>
+        {t('home.cta.title')}
+      </h2>
+      <div class="nb-final__aside" data-final-aside>
+        <p class="nb-final__text">{t('home.cta.text')}</p>
+        <Button href={bookingCta.href} on="dark" arrow>
+          {bookingCta.label}
+        </Button>
+        <p class="nb-final__direct">
+          <a href={`tel:${site.phone.replace(/\s/g, '')}`}>{site.phone}</a>
+          <span aria-hidden="true">/</span>
+          <a href={`mailto:${site.email}`}>{site.email}</a>
+        </p>
+      </div>
+    </div>
+  </div>
+</section>
+
+<style is:global>
+  .nb-final {
+    position: relative;
+    background: var(--navy-800);
+    color: var(--navy-100);
+  }
+  .nb-final__stage {
+    position: relative;
+    display: grid;
+    gap: 48px;
+    padding-block: var(--section-y);
+  }
+  .nb-final__content {
+    position: relative;
+    z-index: 1;
+    display: grid;
+    gap: 40px;
+  }
+  .nb-final__title {
+    margin: 0;
+    max-width: 11ch;
+    font-family: var(--font-display);
+    font-optical-sizing: auto;
+    font-size: clamp(3rem, 1rem + 5.4vw, 6.5rem);
+    font-weight: 300;
+    line-height: 0.98;
+    letter-spacing: -0.03em;
+    color: var(--white);
+    text-wrap: balance;
+  }
+  .nb-final__aside {
+    display: grid;
+    justify-items: start;
+    gap: 24px;
+    max-width: 26rem;
+  }
+  .nb-final__text {
+    margin: 0;
+    font-family: var(--font-display);
+    font-size: 1.375rem;
+    font-weight: 300;
+    line-height: 1.35;
+    color: var(--navy-100);
+  }
+  .nb-final__direct {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 6px 12px;
+    margin: 0;
+    font-size: 0.9375rem;
+    color: var(--navy-200);
+  }
+  .nb-final__direct a {
+    color: var(--white);
+    text-decoration: none;
+    transition: color var(--dur-fast) var(--ease-out);
+  }
+  .nb-final__direct a:hover {
+    color: var(--salvia-300);
+  }
+  .nb-final__direct span {
+    color: var(--navy-400);
+  }
+  /* Base: la foto dentro del arco, después del texto. */
+  .nb-final__media {
+    position: relative;
+    order: 2;
+    width: min(22rem, calc(100% - 2 * var(--header-gutter)));
+    margin-inline: var(--header-gutter);
+    aspect-ratio: 3 / 4;
+    overflow: hidden;
+    border-radius: 999px 999px 0 0;
+    background: var(--navy-700);
+  }
+  .nb-final__img,
+  .nb-final__video {
+    position: absolute;
+    inset: 0;
+    width: 100%;
+    height: 100%;
+    object-fit: cover;
+    /* En el arco solo se ve la pared iluminada, sin el borde oscuro del vídeo. */
+    object-position: 82% 50%;
+  }
+  .nb-final__video {
+    display: none;
+  }
+
+  /* ── Escritorio con movimiento: el arco se abre hasta el vídeo a pantalla completa ── */
+  @media (min-width: 768px) {
+    .js.motion:not(.anim-fail) .nb-final {
+      height: 220svh;
+    }
+    .js.motion:not(.anim-fail) .nb-final__stage {
+      position: sticky;
+      top: 0;
+      display: flex;
+      align-items: center;
+      height: 100svh;
+      padding-block: calc(var(--header-h) + 24px) 48px;
+      overflow: hidden;
+    }
+    .js.motion:not(.anim-fail) .nb-final__media {
+      position: absolute;
+      inset: 0;
+      width: auto;
+      margin: 0;
+      aspect-ratio: auto;
+      border-radius: 0;
+      background: transparent;
+      will-change: clip-path;
+    }
+    .js.motion:not(.anim-fail) .nb-final__img,
+    .js.motion:not(.anim-fail) .nb-final__video {
+      object-position: 18% 50%;
+      /* Escala anclada a la izquierda: el borde navy del vídeo se aleja del titular al abrirse. */
+      transform-origin: 0% 50%;
+    }
+    .js.motion:not(.anim-fail) .nb-final__video {
+      display: block;
+    }
+    .js.motion:not(.anim-fail) .nb-final__content {
+      width: 100%;
+      grid-template-columns: minmax(0, 1fr);
+      align-content: center;
+    }
+    .js.motion:not(.anim-fail) .nb-final__aside {
+      opacity: 0;
+    }
+  }
+  /* Escritorio sin movimiento (o sin JS): texto a la izquierda y el arco a la derecha, ambos
+     alineados con los bordes de la barra del header. */
+  @media (min-width: 768px) {
+    html:not(.motion) .nb-final__stage,
+    .anim-fail .nb-final__stage {
+      grid-template-columns: minmax(0, 1fr) auto;
+      align-items: center;
+      gap: clamp(32px, 5vw, 96px);
+      padding-inline: max(var(--header-gutter), (100% - var(--header-max)) / 2);
+    }
+    html:not(.motion) .nb-final__content,
+    .anim-fail .nb-final__content {
+      padding-inline: 0;
+    }
+    html:not(.motion) .nb-final__media,
+    .anim-fail .nb-final__media {
+      width: clamp(16rem, 28vw, 24rem);
+      margin: 0;
+    }
+  }
+</style>
+
+<script>
+  // El vídeo solo se reproduce con movimiento permitido, en escritorio y mientras la sección está en pantalla.
+  const video = document.querySelector<HTMLVideoElement>('[data-final-video]');
+  const section = document.querySelector<HTMLElement>('[data-final]');
+  if (
+    video &&
+    section &&
+    !matchMedia('(prefers-reduced-motion: reduce)').matches &&
+    matchMedia('(min-width: 768px)').matches
+  ) {
+    new IntersectionObserver(
+      ([entry]) => {
+        if (entry.isIntersecting) {
+          video.preload = 'auto';
+          void video.play().catch(() => undefined);
+        } else video.pause();
+      },
+      { rootMargin: '200px 0px' },
+    ).observe(section);
+  }
+</script>
