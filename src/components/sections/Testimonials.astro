@@ -6,7 +6,7 @@ import { t } from '../../i18n';
 const items = (await getCollection('testimonios')).sort((a, b) => a.data.order - b.data.order);
 ---
 
-<Section tone="piedra" title={t('home.testimonials.title')}>
+<Section tone="base" title={t('home.testimonials.title')}>
   <div
     data-carousel
     role="region"

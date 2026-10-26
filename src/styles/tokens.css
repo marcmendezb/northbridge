@@ -57,7 +57,7 @@
   --info-icon: #2a4469;
 
   /* Roles */
-  --bg: var(--piedra-50);
+  --bg: var(--white);
   --fg: var(--navy-800);
   --fg-body: var(--piedra-800);
   --fg-muted: var(--piedra-600);

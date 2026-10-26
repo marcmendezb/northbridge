@@ -1,6 +1,5 @@
 ---
 import Container from './Container.astro';
-import Pattern from '../brand/Pattern.astro';
 
 /** Sección con padding vertical de marca y, opcionalmente, cabecera al estilo del manual. */
 interface Props {
@@ -11,7 +10,6 @@ interface Props {
   lead?: string;
   /** Filete superior de 1,5 px en azul marino (estructura). */
   rule?: boolean;
-  pattern?: boolean;
   id?: string;
   headingLevel?: 'h1' | 'h2';
   class?: string;
@@ -22,14 +20,13 @@ const {
   title,
   lead,
   rule = false,
-  pattern = false,
   id,
   headingLevel = 'h2',
   class: className = '',
 } = Astro.props;
 const Heading = headingLevel;
 const toneClass = {
-  base: 'bg-piedra-50 text-navy-800',
+  base: 'bg-white text-navy-800',
   piedra: 'bg-piedra-100 text-navy-800',
   navy: 'bg-navy-800 text-piedra-50',
 }[tone];
@@ -41,13 +38,6 @@ const hasHeader = Boolean(label || title || lead);
   data-surface={tone === 'navy' ? 'dark' : undefined}
   class:list={['relative overflow-hidden py-[var(--section-y)]', toneClass, className]}
 >
-  {pattern && (
-    <Pattern
-      tone={tone === 'navy' ? 'dark' : 'light'}
-      mask="left"
-      class="absolute inset-0 -z-0 opacity-60"
-    />
-  )}
   <Container class="relative">
     {hasHeader && (
       <div

@@ -38,6 +38,7 @@ export const es = {
   footer: {
     services: 'Servicios',
     resources: 'Recursos',
+    company: 'Empresa',
     legal: 'Legal',
     contact: 'Contacto',
     privacy: 'Privacidad',

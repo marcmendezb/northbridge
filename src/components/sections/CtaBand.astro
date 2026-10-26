@@ -16,7 +16,7 @@ interface Props {
 const { title = t('home.cta.title'), text = t('home.cta.text'), photo = false } = Astro.props;
 ---
 
-<Section tone="navy" pattern>
+<Section tone="navy">
   <div class:list={['grid items-center gap-12', photo && 'md:grid-cols-[1.3fr_1fr] md:gap-20']}>
     <div data-reveal class="flex flex-col items-start gap-6">
       <h2 class="t-h2-lg m-0 max-w-[16ch] text-white">{title}</h2>
