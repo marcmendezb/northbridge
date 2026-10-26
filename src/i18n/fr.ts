@@ -573,6 +573,51 @@ export const fr: Messages = {
     directions: 'À 6 minutes à pied de la gare de Stadelhofen.',
     bookTitle: 'Vous préférez en parler ?',
     bookText: 'Réservez une consultation gratuite de 20 minutes. Sans engagement.',
+    promiseLabel: 'Écrivez-nous maintenant, nous vous répondons',
+    promiseDate: 'avant 12:00, le {when}.',
+    promiseFallback: 'avant 12:00, le jour ouvrable suivant.',
+    openNow: 'Bureau ouvert en ce moment, jusqu’à 17:30.',
+    closedToday: 'Bureau fermé en ce moment. Nous ouvrons aujourd’hui à 08:30.',
+    closedNow: 'Bureau fermé en ce moment. Nous ouvrons {when} à 08:30.',
+    waysTitle: 'Trois façons de commencer',
+    ways: [
+      {
+        title: 'Écrivez-nous',
+        text: 'Décrivez votre situation en quelques lignes. Une personne de l’équipe vous répond.',
+        cta: 'Aller au formulaire',
+      },
+      {
+        title: 'Appelez-nous',
+        text: 'Une personne de l’équipe vous répond directement.',
+        cta: 'Appeler',
+      },
+      {
+        title: 'Réservez 20 minutes',
+        text: 'Un appel vidéo gratuit. Ensuite, un prix fixe par écrit.',
+        cta: 'Choisir un créneau',
+      },
+    ],
+    readerTitle: 'Qui lit votre message',
+    readerText:
+      '{name} le lit et vous répond. S’il s’agit de salaires, de TVA ou de startups, elle le transmet à la personne de l’équipe qui s’en charge.',
+    steps: [
+      { when: 'Maintenant', text: 'Vous nous dites ce dont vous avez besoin, en quelques lignes.' },
+      {
+        when: 'Jour ouvrable suivant',
+        text: 'Une personne vous répond avant 12:00, pas un système automatique.',
+      },
+      {
+        when: 'Si cela convient',
+        text: 'Nous parlons 20 minutes et vous envoyons un prix fixe par écrit.',
+      },
+    ],
+    letterTo: 'À',
+    letterDate: 'Date',
+    visitLabel: 'Bureau',
+    visitTitle: 'Venez nous voir à Seefeld.',
+    walk: '6 min à pied',
+    closed: 'Fermé',
+    today: 'Aujourd’hui',
   },
   booking: {
     seoTitle: 'Consultation gratuite de 20 minutes',

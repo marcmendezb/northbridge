@@ -175,6 +175,32 @@ html.lenis body {
   }
 }
 
+/* Contacto (contactScene.ts): estados iniciales solo con JS y movimiento permitido. */
+@media (prefers-reduced-motion: no-preference) {
+  .js.motion:not(.anim-fail) [data-cx-arch] {
+    clip-path: inset(100% 0 0 0);
+  }
+  .js.motion:not(.anim-fail) [data-map-route] {
+    stroke-dasharray: 1;
+    stroke-dashoffset: 1;
+  }
+  .js.motion:not(.anim-fail) [data-way-rule],
+  .js.motion:not(.anim-fail) [data-sheet-rule] {
+    transform: scaleX(0);
+  }
+  .js.motion:not(.anim-fail) [data-cx-outline],
+  .js.motion:not(.anim-fail) [data-way] a > *,
+  .js.motion:not(.anim-fail) [data-sheet],
+  .js.motion:not(.anim-fail) [data-map-pin],
+  .js.motion:not(.anim-fail) [data-map-walk],
+  .js.motion:not(.anim-fail) [data-map-streets] path {
+    opacity: 0;
+  }
+  .js.motion:not(.anim-fail) [data-steps-line] {
+    transform: scaleY(0);
+  }
+}
+
 /* Nosotros (aboutScene.ts): estados iniciales solo con JS y movimiento permitido. */
 @media (prefers-reduced-motion: no-preference) {
   .js.motion:not(.anim-fail) [data-year] .nb-hist__digit > span,

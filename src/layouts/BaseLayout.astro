@@ -149,7 +149,7 @@ const alternateLinks = alternates(parsePath(Astro.url.pathname).canonical).map((
       if (!matchMedia('(prefers-reduced-motion: reduce)').matches) {
         // Ambos módulos se piden a la vez: el hero no espera a que llegue el scroll suave.
         const hasScenes = document.querySelector(
-          '[data-hero],[data-reveal],[data-count],[data-split],[data-viaduct],[data-reveal-media],[data-journey],[data-calc-preview],[data-final],[data-price-deck],[data-pricing],[data-about-hero]',
+          '[data-hero],[data-reveal],[data-count],[data-split],[data-viaduct],[data-reveal-media],[data-journey],[data-calc-preview],[data-final],[data-price-deck],[data-pricing],[data-about-hero],[data-contact-hero]',
         );
         Promise.all([
           import('../components/animations/smoothScroll'),

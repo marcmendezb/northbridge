@@ -573,6 +573,51 @@ export const it: Messages = {
     directions: 'A 6 minuti a piedi dalla stazione di Stadelhofen.',
     bookTitle: 'Preferisci parlarne a voce?',
     bookText: 'Prenota una consulenza gratuita di 20 minuti. Senza impegno.',
+    promiseLabel: 'Se ci scrivi ora, ti rispondiamo',
+    promiseDate: 'entro le 12:00 di {when}.',
+    promiseFallback: 'entro le 12:00 del giorno lavorativo successivo.',
+    openNow: 'Ufficio aperto ora, fino alle 17:30.',
+    closedToday: 'Ufficio chiuso ora. Apriamo oggi alle 08:30.',
+    closedNow: 'Ufficio chiuso ora. Apriamo {when} alle 08:30.',
+    waysTitle: 'Tre modi per iniziare',
+    ways: [
+      {
+        title: 'Scrivici',
+        text: 'Raccontaci il tuo caso in poche righe. Ti risponde una persona del team.',
+        cta: 'Vai al modulo',
+      },
+      {
+        title: 'Chiamaci',
+        text: 'Ti risponde direttamente una persona del team.',
+        cta: 'Chiama',
+      },
+      {
+        title: 'Prenota 20 minuti',
+        text: 'Una videochiamata gratuita. Poi un prezzo fisso per iscritto.',
+        cta: 'Scegli un orario',
+      },
+    ],
+    readerTitle: 'Chi legge il tuo messaggio',
+    readerText:
+      '{name} lo legge e ti risponde. Se il tuo caso riguarda stipendi, IVA o startup, lo passa a chi se ne occupa nel team.',
+    steps: [
+      { when: 'Ora', text: 'Ci dici in poche righe di cosa hai bisogno.' },
+      {
+        when: 'Giorno lavorativo successivo',
+        text: 'Ti risponde una persona entro le 12:00, non un sistema automatico.',
+      },
+      {
+        when: 'Se fa al caso tuo',
+        text: 'Parliamo 20 minuti e ti inviamo un prezzo fisso per iscritto.',
+      },
+    ],
+    letterTo: 'A',
+    letterDate: 'Data',
+    visitLabel: 'Ufficio',
+    visitTitle: 'Vieni a trovarci a Seefeld.',
+    walk: '6 min a piedi',
+    closed: 'Chiuso',
+    today: 'Oggi',
   },
   booking: {
     seoTitle: 'Consulenza gratuita di 20 minuti',

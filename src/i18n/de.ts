@@ -573,6 +573,51 @@ export const de: Messages = {
     directions: '6 Minuten zu Fuss vom Bahnhof Stadelhofen.',
     bookTitle: 'Lieber reden?',
     bookText: 'Buche ein kostenloses Erstgespräch von 20 Minuten. Unverbindlich.',
+    promiseLabel: 'Schreibst du uns jetzt, antworten wir',
+    promiseDate: 'bis 12:00 Uhr am {when}.',
+    promiseFallback: 'bis 12:00 Uhr am nächsten Arbeitstag.',
+    openNow: 'Büro jetzt geöffnet, bis 17:30 Uhr.',
+    closedToday: 'Büro jetzt geschlossen. Wir öffnen heute um 08:30 Uhr.',
+    closedNow: 'Büro jetzt geschlossen. Wir öffnen am {when} um 08:30 Uhr.',
+    waysTitle: 'Drei Wege zum Start',
+    ways: [
+      {
+        title: 'Schreib uns',
+        text: 'Beschreib deinen Fall in wenigen Zeilen. Eine Person aus dem Team antwortet.',
+        cta: 'Zum Formular',
+      },
+      {
+        title: 'Ruf uns an',
+        text: 'Eine Person aus dem Team nimmt direkt ab.',
+        cta: 'Anrufen',
+      },
+      {
+        title: '20 Minuten buchen',
+        text: 'Ein kostenloser Videocall. Danach ein Fixpreis, schriftlich.',
+        cta: 'Termin wählen',
+      },
+    ],
+    readerTitle: 'Wer deine Nachricht liest',
+    readerText:
+      '{name} liest sie und antwortet dir. Geht es um Lohn, MWST oder Startups, gibt sie sie an die zuständige Person im Team weiter.',
+    steps: [
+      { when: 'Jetzt', text: 'Du schreibst uns in wenigen Zeilen, was du brauchst.' },
+      {
+        when: 'Nächster Arbeitstag',
+        text: 'Ein Mensch antwortet bis 12:00 Uhr, kein automatisches System.',
+      },
+      {
+        when: 'Wenn es passt',
+        text: 'Wir sprechen 20 Minuten und schicken dir einen Fixpreis, schriftlich.',
+      },
+    ],
+    letterTo: 'An',
+    letterDate: 'Datum',
+    visitLabel: 'Büro',
+    visitTitle: 'Besuch uns im Seefeld.',
+    walk: '6 Min. zu Fuss',
+    closed: 'Geschlossen',
+    today: 'Heute',
   },
   booking: {
     seoTitle: 'Kostenloses Erstgespräch von 20 Minuten',

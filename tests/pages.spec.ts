@@ -38,6 +38,29 @@ test('contacto: valida con mensajes claros y, completo, lleva a gracias', async 
   await expect(page.getByRole('heading', { level: 1 })).toHaveText('Recibido. Nos encargamos.');
 });
 
+test('contacto: plazo de respuesta real según la hora de Zúrich', async ({ page }) => {
+  // Viernes 30 de octubre de 2026, 16:00 en Zúrich: oficina abierta, respuesta el lunes 2.
+  await page.clock.setFixedTime(new Date('2026-10-30T16:00:00+01:00'));
+  await page.goto('/contacto');
+  await expect(page.locator('[data-promise-text]')).toHaveText(
+    'antes de las 12:00 del lunes 2 de noviembre.',
+  );
+  await expect(page.locator('[data-status]')).toHaveText('Oficina abierta ahora, hasta las 17:30.');
+  await expect(page.locator('[data-week] [aria-current="date"]')).toContainText('vie');
+});
+
+test('contacto: sin JS, el plazo general y el formulario alternativo', async ({ browser }) => {
+  const context = await browser.newContext({ javaScriptEnabled: false });
+  const page = await context.newPage();
+  await page.goto('/contacto');
+  await expect(page.locator('[data-promise-text]')).toHaveText(
+    'antes de las 12:00 del siguiente día laborable.',
+  );
+  await expect(page.locator('[data-status]')).toBeHidden();
+  await expect(page.locator('.nb-contact__noscript')).toBeVisible();
+  await context.close();
+});
+
 test('consulta gratuita: el calendario de demostración lleva a gracias con la cita', async ({
   page,
 }) => {

@@ -573,6 +573,48 @@ export const en: Messages = {
     directions: 'A 6-minute walk from Stadelhofen station.',
     bookTitle: 'Would you rather talk?',
     bookText: 'Book a free 20-minute consultation. No commitment.',
+    promiseLabel: 'Write to us now and we reply',
+    promiseDate: 'by 12:00 on {when}.',
+    promiseFallback: 'by 12:00 on the next working day.',
+    openNow: 'Office open now, until 17:30.',
+    closedToday: 'Office closed now. We open today at 08:30.',
+    closedNow: 'Office closed now. We open on {when} at 08:30.',
+    waysTitle: 'Three ways to start',
+    ways: [
+      {
+        title: 'Write to us',
+        text: 'Tell us about your case in a few lines. A person on the team replies.',
+        cta: 'Go to the form',
+      },
+      {
+        title: 'Call us',
+        text: 'A person on the team answers directly.',
+        cta: 'Call',
+      },
+      {
+        title: 'Book 20 minutes',
+        text: 'A free video call. Then a fixed price in writing.',
+        cta: 'Pick a time',
+      },
+    ],
+    readerTitle: 'Who reads your message',
+    readerText:
+      '{name} reads it and replies. If your case is about payroll, VAT or startups, she passes it to the person on the team who handles it.',
+    steps: [
+      { when: 'Now', text: 'You tell us what you need, in a few lines.' },
+      {
+        when: 'Next working day',
+        text: 'A person replies before 12:00, not an automated system.',
+      },
+      { when: 'If it fits', text: 'We talk for 20 minutes and send you a fixed price in writing.' },
+    ],
+    letterTo: 'To',
+    letterDate: 'Date',
+    visitLabel: 'Office',
+    visitTitle: 'Visit us in Seefeld.',
+    walk: '6 min walk',
+    closed: 'Closed',
+    today: 'Today',
   },
   booking: {
     seoTitle: 'Free 20-minute consultation',

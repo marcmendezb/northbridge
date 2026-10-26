@@ -1,5 +1,6 @@
 import { aboutScene } from './aboutScene';
 import { calcPreview } from './calcPreview';
+import { contactScene } from './contactScene';
 import { countUp } from './countUp';
 import { finalScene } from './finalScene';
 import { drawViaduct } from './drawViaduct';
@@ -39,6 +40,7 @@ export async function initPage() {
     priceDeck(kit);
     pricingScene(kit);
     aboutScene(kit);
+    contactScene(kit);
     void splitReveal(kit);
   });
 
