@@ -264,8 +264,8 @@ export const de: Messages = {
       label: 'Kunden',
       title: 'Das sagen unsere Kunden',
       region: 'Kundenstimmen',
-      pause: 'Wechsel pausieren',
-      play: 'Wechsel fortsetzen',
+      prev: 'Vorherige Stimme',
+      next: 'Nächste Stimme',
       goTo: 'Kundenstimme anzeigen',
     },
     cta: {

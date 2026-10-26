@@ -264,8 +264,8 @@ export const en: Messages = {
       label: 'Clients',
       title: 'What our clients say',
       region: 'Client testimonials',
-      pause: 'Pause rotation',
-      play: 'Resume rotation',
+      prev: 'Previous testimonial',
+      next: 'Next testimonial',
       goTo: 'Show testimonial',
     },
     cta: {

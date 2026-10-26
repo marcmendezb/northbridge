@@ -25,19 +25,21 @@ test('home: las cifras llegan a su valor final y son accesibles', async ({ page 
   await expect(page.getByText('200+ Clientes activos')).toHaveCount(1);
 });
 
-test('home: botón de pausa del carrusel detiene la rotación', async ({ page }) => {
+test('home: testimonios sin rotación automática; líneas, flechas y teclado cambian la cita', async ({
+  page,
+}) => {
   await page.goto('/');
-  const pause = page.getByRole('button', { name: 'Pausar rotación' });
-  await pause.scrollIntoViewIfNeeded();
-  await pause.click();
-  await expect(page.getByRole('button', { name: 'Reanudar rotación' })).toHaveAttribute(
-    'aria-pressed',
-    'true',
-  );
+  const region = page.getByRole('region', { name: 'Testimonios de clientes' });
+  await region.scrollIntoViewIfNeeded();
   const first = await page.locator('.nb-slide[data-active]').innerText();
-  await page.mouse.move(0, 0);
-  await page.waitForTimeout(8600);
+  await page.waitForTimeout(7000);
   expect(await page.locator('.nb-slide[data-active]').innerText()).toBe(first);
+  await page.getByRole('button', { name: 'Testimonio siguiente' }).click();
+  await expect(page.locator('.nb-slide[data-active]')).not.toHaveText(first);
+  await expect(page.locator('.nb-tst__line[aria-current]')).toHaveAttribute('data-index', '1');
+  await page.keyboard.press('ArrowLeft');
+  await expect(page.locator('.nb-tst__line[aria-current]')).toHaveAttribute('data-index', '0');
+  await expect(page.locator('.nb-slide:visible')).toHaveCount(1);
 });
 
 test.describe('sin JS', () => {
@@ -58,7 +60,7 @@ test.describe('sin JS', () => {
 
 test.describe('reduced motion', () => {
   test.use({ reducedMotion: 'reduce' });
-  test('todo visible de inmediato, sin carrusel automático', async ({ page }) => {
+  test('todo visible de inmediato y la cita no cambia sola', async ({ page }) => {
     await page.goto('/');
     for (const sel of ['[data-hero-fade]', '[data-reveal]', '.hero__promise-inner > *']) {
       expect(
@@ -74,7 +76,6 @@ test.describe('reduced motion', () => {
         .first()
         .evaluate((el) => getComputedStyle(el).transform),
     ).toBe('none');
-    await expect(page.getByRole('button', { name: 'Pausar rotación' })).toBeHidden();
     const first = await page.locator('.nb-slide[data-active]').innerText();
     await page.waitForTimeout(8600);
     expect(await page.locator('.nb-slide[data-active]').innerText()).toBe(first);

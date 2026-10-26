@@ -259,8 +259,8 @@ export const es = {
       label: 'Clientes',
       title: 'Lo que dicen quienes trabajan con nosotros',
       region: 'Testimonios de clientes',
-      pause: 'Pausar rotación',
-      play: 'Reanudar rotación',
+      prev: 'Testimonio anterior',
+      next: 'Testimonio siguiente',
       goTo: 'Ver testimonio',
     },
     cta: {

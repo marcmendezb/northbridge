@@ -263,8 +263,8 @@ export const fr: Messages = {
       label: 'Clients',
       title: 'Ce qu’en disent nos clients',
       region: 'Témoignages de clients',
-      pause: 'Mettre le défilement en pause',
-      play: 'Reprendre le défilement',
+      prev: 'Témoignage précédent',
+      next: 'Témoignage suivant',
       goTo: 'Voir le témoignage',
     },
     cta: {

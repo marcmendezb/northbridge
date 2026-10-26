@@ -261,8 +261,8 @@ export const it: Messages = {
       label: 'Clienti',
       title: 'Cosa dice chi lavora con noi',
       region: 'Testimonianze dei clienti',
-      pause: 'Metti in pausa la rotazione',
-      play: 'Riprendi la rotazione',
+      prev: 'Testimonianza precedente',
+      next: 'Testimonianza successiva',
       goTo: 'Vedi la testimonianza',
     },
     cta: {
