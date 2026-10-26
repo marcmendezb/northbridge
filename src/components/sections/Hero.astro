@@ -6,7 +6,7 @@ import Container from '../ui/Container.astro';
 import { useI18n } from '../../i18n';
 import { getBookingCta } from '../../lib/site';
 const { t, lp, locale } = useI18n(Astro.currentLocale);
-const facts = t('home.hero.proof').split(' · ');
+const facts = t('home.hero.proof').split(' / ');
 const bookingCta = getBookingCta(locale);
 const posterFile = await getImage({ src: heroPoster, format: 'webp', width: 1920, quality: 76 });
 ---

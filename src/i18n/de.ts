@@ -208,7 +208,7 @@ export const de: Messages = {
     hero: {
       line1: 'Deine Zahlen',
       line2: 'im Griff.',
-      proof: 'Über 10 Jahre in Zürich · 200+ Kunden',
+      proof: 'Über 10 Jahre in Zürich / 200+ Kunden',
       scroll: 'Scrollen',
     },
     proposal: {

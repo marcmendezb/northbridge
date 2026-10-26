@@ -206,7 +206,7 @@ export const es = {
     hero: {
       line1: 'Tus números,',
       line2: 'bajo control.',
-      proof: '+10 años en Zúrich · 200+ clientes',
+      proof: '+10 años en Zúrich / 200+ clientes',
       scroll: 'Desliza',
     },
     proposal: {

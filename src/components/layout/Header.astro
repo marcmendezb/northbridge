@@ -29,7 +29,7 @@ const langOptions = alternates(parsePath(Astro.url.pathname).canonical).map((a) 
 const countryOptions = COUNTRIES.map((code) => ({
   code,
   name: countryName(code, locale),
-  meta: `${currencyOf(code)} · ${legalForm(code, 'gmbh')}, ${legalForm(code, 'ag')}`,
+  meta: `${currencyOf(code)} / ${legalForm(code, 'gmbh')}, ${legalForm(code, 'ag')}`,
   current: code === DEFAULT_COUNTRY,
 }));
 
@@ -60,6 +60,10 @@ const isCurrent = (href: string) => path === href || (href !== '/' && path.start
           decoding="async"
           aria-hidden="true"
         />
+        <span class="nb-bar__wordmark" aria-hidden="true">
+          <span class="nb-bar__name">Northbridge</span>
+          <span class="nb-bar__sub">Advisory</span>
+        </span>
       </a>
 
       {!minimal && (
@@ -136,7 +140,7 @@ const isCurrent = (href: string) => path === href || (href !== '/' && path.start
               </span>
               <span aria-hidden="true" class="nb-lang__codes">
                 <Fragment set:html={byCountry((c) => c)} />
-                <span class="nb-lang__sep">·</span>
+                <span class="nb-lang__sep">/</span>
                 {localeMeta[locale].short}
               </span>
               <svg
@@ -443,10 +447,60 @@ const isCurrent = (href: string) => path === href || (href !== '/' && path.start
     min-height: 44px;
     padding: 4px 0;
   }
+  /* Lockup horizontal (docs/02): símbolo ≈ 1,09 × el cuerpo de «Northbridge», separación 0,3 ×. */
+  .nb-bar__logo {
+    --wm: 29px;
+    gap: calc(var(--wm) * 0.34);
+    color: var(--navy-800);
+    text-decoration: none;
+  }
   .nb-bar__logo-img {
     display: block;
-    height: 40px;
+    height: calc(var(--wm) * 1.09);
     width: auto;
+  }
+  .nb-bar__wordmark {
+    display: flex;
+    flex-direction: column;
+    gap: calc(var(--wm) * 0.16);
+    white-space: nowrap;
+  }
+  .nb-bar__name {
+    font-family: var(--font-display);
+    font-optical-sizing: auto;
+    font-size: var(--wm);
+    font-weight: 500;
+    line-height: 0.9;
+    letter-spacing: -0.015em;
+  }
+  .nb-bar__sub {
+    font-family: var(--font-sans);
+    font-size: calc(var(--wm) * 0.27);
+    font-weight: 600;
+    line-height: 1;
+    letter-spacing: 0.36em;
+    text-transform: uppercase;
+  }
+  @media (max-width: 479px) {
+    .nb-bar__logo {
+      --wm: 24px;
+    }
+  }
+  /* Escritorio estrecho: el lockup y la navegación se compactan para que quepa el alemán. */
+  @media (min-width: 1200px) and (max-width: 1439px) {
+    .nb-bar__logo {
+      --wm: 24px;
+    }
+    .nb-nav .nb-nav__link {
+      padding-inline: 0.5rem;
+      font-size: 0.9375rem;
+    }
+    .nb-bar__row {
+      gap: 12px;
+    }
+    .nb-bar__end > .nb-cta {
+      padding-inline: 16px 14px;
+    }
   }
   .nb-bar__end {
     display: flex;
