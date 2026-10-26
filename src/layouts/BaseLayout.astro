@@ -50,14 +50,35 @@ const alternateLinks = alternates(parsePath(Astro.url.pathname).canonical).map((
       document.documentElement.classList.add('js');
       if (!matchMedia('(prefers-reduced-motion: reduce)').matches)
         document.documentElement.classList.add('motion');
-      // País elegido en el header (moneda y formas jurídicas), antes de pintar: sin saltos.
-      try {
-        const nbCountry = localStorage.getItem('nb-country');
-        if (/^(CH|ES|DE|FR|IT)$/.test(nbCountry || ''))
-          document.documentElement.dataset.country = nbCountry;
-      } catch {
-        // Sin almacenamiento: se queda el país por defecto.
-      }
+      // País (moneda y formas jurídicas), antes de pintar: el elegido en el header o, si no hay,
+      // el que sugiere el navegador (zona horaria y región del idioma). Sin servicios externos.
+      (() => {
+        const valid = /^(CH|ES|DE|FR|IT)$/;
+        let country = null;
+        try {
+          country = localStorage.getItem('nb-country');
+        } catch {
+          // Sin almacenamiento: se deduce.
+        }
+        if (!valid.test(country || '')) {
+          const zones = {
+            'Europe/Zurich': 'CH',
+            'Europe/Madrid': 'ES',
+            'Atlantic/Canary': 'ES',
+            'Africa/Ceuta': 'ES',
+            'Europe/Berlin': 'DE',
+            'Europe/Busingen': 'DE',
+            'Europe/Paris': 'FR',
+            'Europe/Rome': 'IT',
+          };
+          const zone = Intl.DateTimeFormat().resolvedOptions().timeZone || '';
+          const regions = (navigator.languages || [navigator.language])
+            .map((l) => (l.split('-')[1] || '').toUpperCase())
+            .filter((r) => valid.test(r));
+          country = zones[zone] || regions[0] || null;
+        }
+        if (country) document.documentElement.dataset.country = country;
+      })();
     </script>
     <title>{fullTitle}</title>
     <meta name="description" content={description} />
@@ -72,6 +93,33 @@ const alternateLinks = alternates(parsePath(Astro.url.pathname).canonical).map((
       <link rel="alternate" hreflang={localeMeta[a.locale].htmlLang} href={a.href} />
     ))}
     <link rel="alternate" hreflang="x-default" href={alternateLinks[0].href} />
+    <script is:inline>
+      // Idioma del navegador: solo al entrar desde fuera, si no se eligió antes uno en el selector
+      // y nunca para robots ni navegadores automatizados (SEO y tests). DECISIONES.md.
+      (() => {
+        try {
+          if (localStorage.getItem('nb-lang')) return;
+          if (navigator.webdriver || /bot|crawl|spider|slurp|lighthouse/i.test(navigator.userAgent))
+            return;
+          if (document.referrer && new URL(document.referrer).origin === location.origin) return;
+          const supported = ['es', 'en', 'de', 'fr', 'it'];
+          const wanted = (navigator.languages || [navigator.language])
+            .map((l) => l.split('-')[0].toLowerCase())
+            .find((l) => supported.includes(l));
+          const current = document.documentElement.lang.split('-')[0];
+          if (!wanted || wanted === current) return;
+          const link = [...document.querySelectorAll('link[rel="alternate"][hreflang]')].find(
+            (l) => l.getAttribute('hreflang').split('-')[0] === wanted,
+          );
+          if (!link) return;
+          const target = new URL(link.href).pathname + location.search + location.hash;
+          if (target !== location.pathname + location.search + location.hash)
+            location.replace(target);
+        } catch {
+          // Sin almacenamiento o sin URL: se queda el idioma de la página.
+        }
+      })();
+    </script>
     <meta property="og:title" content={fullTitle} />
     <meta property="og:description" content={description} />
     <meta property="og:url" content={canonical} />

@@ -1052,6 +1052,17 @@ const isCurrent = (href: string) => path === href || (href !== '/' && path.start
       desktop.addEventListener('change', () => setMega(null));
     }
 
+    // ── Idioma elegido a mano: se recuerda y ya no se sigue el del navegador ──
+    document.querySelectorAll<HTMLAnchorElement>('.nb-header a[hreflang]').forEach((a) =>
+      a.addEventListener('click', () => {
+        try {
+          localStorage.setItem('nb-lang', (a.getAttribute('hreflang') ?? '').split('-')[0]);
+        } catch {
+          // Sin almacenamiento: la elección vale para esta visita.
+        }
+      }),
+    );
+
     // ── País: cambia moneda y formas jurídicas en toda la página (CSS de [data-cc]) y se recuerda ──
     const root = document.documentElement;
     const countryButtons = [

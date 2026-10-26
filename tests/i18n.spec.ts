@@ -95,3 +95,31 @@ test('país: cambia moneda y formas jurídicas, independiente del idioma, y se r
   await expect(page.locator('html')).toHaveAttribute('data-country', 'ES');
   await expect(page.locator('.nb-pk .t-price').nth(1)).toHaveText('490', { useInnerText: true });
 });
+
+test.describe('país e idioma del navegador', () => {
+  test.use({ locale: 'de-CH', timezoneId: 'Europe/Zurich' });
+  test('al entrar, lleva al idioma del navegador y aplica el país de la zona horaria', async ({
+    page,
+  }) => {
+    // Playwright marca navigator.webdriver; aquí se simula una visita normal.
+    await page.addInitScript(() =>
+      Object.defineProperty(Navigator.prototype, 'webdriver', { get: () => false }),
+    );
+    await page.goto('/precios');
+    await expect(page).toHaveURL(/\/de\/preise$/);
+    await expect(page.locator('html')).toHaveAttribute('data-country', 'CH');
+    // Elegido a mano otro idioma, se respeta.
+    await page.evaluate(() => localStorage.setItem('nb-lang', 'es'));
+    await page.goto('/precios');
+    await expect(page).toHaveURL(/\/precios$/);
+  });
+});
+
+test.describe('país por zona horaria', () => {
+  test.use({ locale: 'es-ES', timezoneId: 'Europe/Madrid' });
+  test('Madrid → España: euros y SL', async ({ page }) => {
+    await page.goto('/precios');
+    await expect(page.locator('html')).toHaveAttribute('data-country', 'ES');
+    await expect(page.locator('.nb-pk .t-price').nth(1)).toHaveText('490', { useInnerText: true });
+  });
+});
