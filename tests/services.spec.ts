@@ -60,13 +60,17 @@ test('precios: importes desde config, Growth único destacado, tabla accesible',
   // En un país con euro se ven los importes de config.ts tal cual (Suiza los convierte a CHF).
   await page.addInitScript(() => localStorage.setItem('nb-country', 'ES'));
   await page.goto('/precios');
-  await expect(page.getByText('Precios sin IVA (MWST)')).toHaveCount(1);
-  await expect(page.getByText('Recomendado')).toHaveCount(2); // tarjeta + cabecera de tabla
+  await expect(page.locator('.nb-pk').getByText('Recomendado')).toHaveCount(1);
+  await expect(page.locator('.nb-pk__item--featured')).toHaveAttribute('data-pkg', 'growth');
   const table = page.getByRole('table', { name: /Comparativa de los paquetes/ });
-  await expect(table.getByRole('columnheader')).toHaveCount(4);
+  await expect(table.locator('thead th')).toHaveCount(4);
   await expect(page.getByText('SL desde 1 490 €', { exact: false }).first()).toBeVisible();
+  // Tarjeta del paquete y cabecera de la tabla: el mismo importe de config.ts.
   for (const n of ['190', '490', '990'])
-    await expect(page.locator('.t-price:visible', { hasText: n })).toHaveCount(1);
+    await expect(page.locator('.t-price:visible', { hasText: n })).toHaveCount(2);
+  // «¿Qué te describe mejor?»: el foco pasa al paquete que encaja.
+  await page.getByRole('button', { name: 'Trabajo por mi cuenta' }).click();
+  await expect(page.locator('[data-pkg="essential"]')).toHaveAttribute('data-fit', '');
 });
 
 test('acordeón de FAQ: abre con teclado y actualiza aria-expanded', async ({ page }) => {

@@ -17,3 +17,26 @@ export async function getTestimonials(locale: Locale): Promise<CollectionEntry<'
     (a, b) => a.data.order - b.data.order,
   );
 }
+
+export async function getTeam(locale: Locale): Promise<CollectionEntry<'equipo'>[]> {
+  return (await getCollection('equipo', (e) => ofLocale(e, locale))).sort(
+    (a, b) => a.data.order - b.data.order,
+  );
+}
+
+/** Artículos publicados del idioma, el destacado primero y después por fecha (más reciente antes). */
+export async function getArticles(locale: Locale): Promise<CollectionEntry<'blog'>[]> {
+  return (await getCollection('blog', (e) => ofLocale(e, locale) && !e.data.draft)).sort(
+    (a, b) =>
+      Number(b.data.featured) - Number(a.data.featured) ||
+      b.data.publishedAt.getTime() - a.data.publishedAt.getTime(),
+  );
+}
+
+export async function getLegalPages(locale: Locale): Promise<CollectionEntry<'legal'>[]> {
+  return getCollection('legal', (e) => ofLocale(e, locale));
+}
+
+/** Minutos de lectura (230 palabras por minuto, mínimo 1). */
+export const readingMinutes = (body = '') =>
+  Math.max(1, Math.round(body.split(/\s+/).filter(Boolean).length / 230));

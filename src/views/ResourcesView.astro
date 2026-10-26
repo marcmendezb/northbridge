@@ -1,0 +1,257 @@
+---
+import BaseLayout from '../layouts/BaseLayout.astro';
+import PageHeader from '../components/layout/PageHeader.astro';
+import CtaBand from '../components/sections/CtaBand.astro';
+import Arrow from '../components/brand/Arrow.astro';
+import { blogCategories } from '../content.config';
+import { useI18n, type MessageKey } from '../i18n';
+import { entryKey, getArticles, getTeam, readingMinutes } from '../lib/content';
+import { formatDate } from '../lib/format';
+
+const { t, lp, locale } = useI18n(Astro.currentLocale);
+const articles = await getArticles(locale);
+const team = await getTeam(locale);
+const authorName = (key: string) => team.find((m) => entryKey(m) === key)?.data.name ?? '';
+/** Solo las categorías que tienen artículos (docs/09). */
+const categories = blogCategories.filter((c) => articles.some((a) => a.data.category === c));
+const catLabel = (c: string) => t(`resources.categories.${c}` as MessageKey);
+---
+
+<BaseLayout title={t('resources.seoTitle')} description={t('resources.seoDescription')}>
+  <PageHeader
+    title={t('resources.title')}
+    lead={t('resources.lead')}
+    crumbs={[{ label: t('nav.resources') }]}
+  />
+
+  <section class="nb-res nb-container" data-filter-scope>
+    <div class="nb-res__filters" role="group" aria-label={t('resources.filterLabel')} data-filters>
+      <button type="button" class="nb-res__chip" aria-pressed="true" data-filter="all">
+        {t('resources.all')}
+      </button>
+      {categories.map((c) => (
+        <button type="button" class="nb-res__chip" aria-pressed="false" data-filter={c}>
+          {catLabel(c)}
+        </button>
+      ))}
+    </div>
+
+    <ul class="nb-res__grid">
+      {articles.map((a, i) => (
+        <li
+          class:list={['nb-res__item', i === 0 && 'nb-res__item--featured']}
+          data-category={a.data.category}
+          data-reveal
+        >
+          <a href={lp(`/recursos/${entryKey(a)}`)} class="nb-res__card">
+            <span class="nb-res__meta">
+              <span class="nb-res__cat">{catLabel(a.data.category)}</span>
+              {a.data.featured && <span class="nb-res__featured">{t('resources.featured')}</span>}
+            </span>
+            <span class="nb-res__title">{a.data.title}</span>
+            <span class="nb-res__desc">{a.data.description}</span>
+            <span class="nb-res__foot">
+              <span>
+                {authorName(a.data.author)} / {formatDate(a.data.publishedAt, locale)} /{' '}
+                {t('resources.readingTime', { n: readingMinutes(a.body) })}
+              </span>
+              <span class="nb-res__read">
+                {t('resources.read')} <Arrow />
+              </span>
+            </span>
+          </a>
+        </li>
+      ))}
+    </ul>
+    <p class="sr-only" aria-live="polite" data-filter-status></p>
+  </section>
+
+  <CtaBand title={t('resources.ctaTitle')} text={t('resources.ctaText')} />
+</BaseLayout>
+
+<style is:global>
+  .nb-res {
+    display: grid;
+    gap: 32px;
+    padding-block: clamp(32px, 5vw, 64px) var(--section-y);
+  }
+  /* Sin JS no hay filtro: se ven todas las guías. */
+  .nb-res__filters {
+    display: none;
+    flex-wrap: wrap;
+    gap: 8px;
+  }
+  .js .nb-res__filters {
+    display: flex;
+  }
+  .nb-res__chip {
+    min-height: 44px;
+    padding: 0 18px;
+    border: 1px solid var(--piedra-300);
+    border-radius: var(--radius-button, 4px);
+    background: var(--white);
+    font: inherit;
+    font-size: 0.9375rem;
+    font-weight: 600;
+    color: var(--navy-800);
+    cursor: pointer;
+    transition:
+      border-color var(--dur-fast) var(--ease-out),
+      background-color var(--dur-fast) var(--ease-out),
+      color var(--dur-fast) var(--ease-out);
+  }
+  .nb-res__chip:hover {
+    border-color: var(--navy-800);
+  }
+  .nb-res__chip[aria-pressed='true'] {
+    border-color: var(--navy-800);
+    background: var(--navy-800);
+    color: var(--white);
+  }
+  .nb-res__chip:focus-visible {
+    outline: 2px solid var(--navy-600);
+    outline-offset: 3px;
+  }
+  .nb-res__grid {
+    display: grid;
+    gap: 16px;
+    margin: 0;
+    padding: 0;
+    list-style: none;
+  }
+  @media (min-width: 768px) {
+    .nb-res__grid {
+      grid-template-columns: repeat(2, minmax(0, 1fr));
+    }
+    .nb-res__item--featured {
+      grid-column: 1 / -1;
+    }
+  }
+  .nb-res__item[hidden] {
+    display: none;
+  }
+  .nb-res__card {
+    display: grid;
+    align-content: start;
+    gap: 16px;
+    height: 100%;
+    padding: clamp(24px, 3vw, 40px);
+    border: 1px solid var(--piedra-200);
+    border-radius: var(--radius-card, 8px);
+    background: var(--white);
+    color: var(--navy-800);
+    text-decoration: none;
+    transition:
+      border-color var(--dur-base) var(--ease-out),
+      background-color var(--dur-base) var(--ease-out);
+  }
+  .nb-res__card:hover {
+    border-color: var(--navy-800);
+  }
+  .nb-res__item--featured .nb-res__card {
+    grid-template-columns: minmax(0, 1fr);
+    min-height: 320px;
+    border-color: var(--navy-800);
+    background: var(--navy-800);
+    color: var(--white);
+  }
+  .nb-res__item--featured .nb-res__card:hover {
+    background: var(--navy-700);
+  }
+  .nb-res__meta {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 8px;
+  }
+  .nb-res__cat,
+  .nb-res__featured {
+    padding: 4px 8px;
+    border-radius: var(--radius-tag, 2px);
+    font-size: 0.6875rem;
+    font-weight: 600;
+    letter-spacing: 0.12em;
+    text-transform: uppercase;
+  }
+  .nb-res__cat {
+    background: var(--piedra-100);
+    color: var(--piedra-700);
+  }
+  .nb-res__featured {
+    background: var(--salvia-400);
+    color: var(--navy-800);
+  }
+  .nb-res__item--featured .nb-res__cat {
+    background: var(--navy-700);
+    color: var(--navy-100);
+  }
+  .nb-res__title {
+    font-family: var(--font-display);
+    font-optical-sizing: auto;
+    font-size: clamp(1.625rem, 1rem + 1.6vw, 2.25rem);
+    font-weight: 400;
+    line-height: 1.12;
+    letter-spacing: -0.01em;
+  }
+  .nb-res__item--featured .nb-res__title {
+    max-width: 18ch;
+    font-size: clamp(2rem, 1rem + 3vw, 3.75rem);
+    font-weight: 300;
+  }
+  .nb-res__desc {
+    max-width: 44rem;
+    font-size: 1rem;
+    line-height: 1.6;
+    color: var(--piedra-700);
+  }
+  .nb-res__item--featured .nb-res__desc {
+    color: var(--navy-100);
+  }
+  .nb-res__foot {
+    display: flex;
+    flex-wrap: wrap;
+    align-items: center;
+    justify-content: space-between;
+    gap: 12px 24px;
+    margin-top: auto;
+    padding-top: 16px;
+    border-top: 1px solid var(--piedra-200);
+    font-size: 0.875rem;
+    color: var(--piedra-600);
+  }
+  .nb-res__item--featured .nb-res__foot {
+    border-color: var(--navy-600);
+    color: var(--navy-200);
+  }
+  .nb-res__read {
+    display: inline-flex;
+    align-items: center;
+    gap: 8px;
+    font-weight: 600;
+    color: var(--navy-800);
+  }
+  .nb-res__item--featured .nb-res__read {
+    color: var(--white);
+  }
+</style>
+
+<script>
+  // Filtro por tema con JS mínimo. Sin JS, los botones no se muestran y se ven todas las guías.
+  document.querySelectorAll<HTMLElement>('[data-filter-scope]').forEach((scope) => {
+    const buttons = [...scope.querySelectorAll<HTMLButtonElement>('[data-filter]')];
+    const items = [...scope.querySelectorAll<HTMLElement>('[data-category]')];
+    const status = scope.querySelector<HTMLElement>('[data-filter-status]');
+    for (const btn of buttons) {
+      btn.addEventListener('click', () => {
+        const value = btn.dataset.filter;
+        for (const b of buttons) b.setAttribute('aria-pressed', String(b === btn));
+        let shown = 0;
+        for (const item of items) {
+          const visible = value === 'all' || item.dataset.category === value;
+          item.hidden = !visible;
+          if (visible) shown++;
+        }
+        if (status) status.textContent = `${btn.textContent?.trim()}: ${shown}`;
+      });
+    }
+  });
+</script>

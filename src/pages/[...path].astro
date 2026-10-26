@@ -4,8 +4,16 @@ import HomeView from '../views/HomeView.astro';
 import ServicesView from '../views/ServicesView.astro';
 import ServiceDetailView from '../views/ServiceDetailView.astro';
 import PricingView from '../views/PricingView.astro';
+import CalculatorView from '../views/CalculatorView.astro';
+import AboutView from '../views/AboutView.astro';
+import ResourcesView from '../views/ResourcesView.astro';
+import ArticleView from '../views/ArticleView.astro';
+import ContactView from '../views/ContactView.astro';
+import BookingView from '../views/BookingView.astro';
+import ThanksView from '../views/ThanksView.astro';
+import LegalView from '../views/LegalView.astro';
 import { locales, localizedPath, type Locale } from '../i18n';
-import { entryKey, getServices } from '../lib/content';
+import { entryKey, getArticles, getLegalPages, getServices } from '../lib/content';
 
 /**
  * Todas las páginas en todos los idiomas. La ruta pública sale de la ruta canónica (española)
@@ -14,14 +22,28 @@ import { entryKey, getServices } from '../lib/content';
 export async function getStaticPaths() {
   const toParam = (canonical: string, locale: Locale) =>
     localizedPath(canonical, locale).replace(/^\//, '') || undefined;
+  const simple = [
+    ['/', 'home'],
+    ['/servicios', 'services'],
+    ['/precios', 'pricing'],
+    ['/calculadora', 'calculator'],
+    ['/nosotros', 'about'],
+    ['/recursos', 'resources'],
+    ['/contacto', 'contact'],
+    ['/consulta-gratuita', 'booking'],
+    ['/gracias', 'thanks'],
+  ] as const;
 
   const paths = [];
   for (const locale of locales) {
     const services = await getServices(locale);
+    const articles = await getArticles(locale);
+    const legal = await getLegalPages(locale);
     paths.push(
-      { params: { path: toParam('/', locale) }, props: { view: 'home' as const } },
-      { params: { path: toParam('/servicios', locale) }, props: { view: 'services' as const } },
-      { params: { path: toParam('/precios', locale) }, props: { view: 'pricing' as const } },
+      ...simple.map(([canonical, view]) => ({
+        params: { path: toParam(canonical, locale) },
+        props: { view },
+      })),
       ...services.map((entry, i) => ({
         params: { path: toParam(`/servicios/${entryKey(entry)}`, locale) },
         props: {
@@ -30,22 +52,55 @@ export async function getStaticPaths() {
           related: [1, 2].map((n) => services[(i + n) % services.length]),
         },
       })),
+      ...articles.map((entry) => ({
+        params: { path: toParam(`/recursos/${entryKey(entry)}`, locale) },
+        props: {
+          view: 'article' as const,
+          entry,
+          related: articles.filter((a) => a.id !== entry.id).slice(0, 2),
+        },
+      })),
+      ...legal.map((entry) => ({
+        params: { path: toParam(`/${entryKey(entry)}`, locale) },
+        props: { view: 'legal' as const, entry },
+      })),
     );
   }
   return paths;
 }
 
 type Props =
-  | { view: 'home' | 'services' | 'pricing' }
+  | {
+      view:
+        | 'home'
+        | 'services'
+        | 'pricing'
+        | 'calculator'
+        | 'about'
+        | 'resources'
+        | 'contact'
+        | 'booking'
+        | 'thanks';
+    }
   | {
       view: 'service';
       entry: CollectionEntry<'servicios'>;
       related: CollectionEntry<'servicios'>[];
-    };
+    }
+  | { view: 'article'; entry: CollectionEntry<'blog'>; related: CollectionEntry<'blog'>[] }
+  | { view: 'legal'; entry: CollectionEntry<'legal'> };
 const props = Astro.props;
 ---
 
 {props.view === 'home' && <HomeView />}
 {props.view === 'services' && <ServicesView />}
 {props.view === 'pricing' && <PricingView />}
+{props.view === 'calculator' && <CalculatorView />}
+{props.view === 'about' && <AboutView />}
+{props.view === 'resources' && <ResourcesView />}
+{props.view === 'contact' && <ContactView />}
+{props.view === 'booking' && <BookingView />}
+{props.view === 'thanks' && <ThanksView />}
 {props.view === 'service' && <ServiceDetailView entry={props.entry} related={props.related} />}
+{props.view === 'article' && <ArticleView entry={props.entry} related={props.related} />}
+{props.view === 'legal' && <LegalView entry={props.entry} />}

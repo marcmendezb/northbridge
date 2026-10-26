@@ -1,14 +1,15 @@
 ---
 import BaseLayout from '../layouts/BaseLayout.astro';
-import PageHeader from '../components/layout/PageHeader.astro';
+import Breadcrumbs from '../components/layout/Breadcrumbs.astro';
 import Section from '../components/ui/Section.astro';
-import Card from '../components/ui/Card.astro';
 import Tag from '../components/ui/Tag.astro';
 import Button from '../components/ui/Button.astro';
-import CheckList from '../components/ui/CheckList.astro';
 import PriceTag from '../components/ui/PriceTag.astro';
 import Accordion from '../components/ui/Accordion.astro';
 import ComparisonCell from '../components/ui/ComparisonCell.astro';
+import CalculatorTeaser from '../components/sections/CalculatorTeaser.astro';
+import FinalCta from '../components/sections/FinalCta.astro';
+import Arrow from '../components/brand/Arrow.astro';
 import { useI18n, type MessageKey } from '../i18n';
 import { getBookingCta } from '../lib/site';
 import { byCountry, currencyOf, legalForm } from '../lib/country';
@@ -18,7 +19,7 @@ import {
   FIXED_PRICES,
   PACKAGES,
   SEPARATE_QUOTE,
-  type Cell,
+  type ComparisonRow,
   type PackageId,
 } from '../lib/pricing/config';
 
@@ -26,163 +27,833 @@ const { t, tRaw, lp, locale } = useI18n(Astro.currentLocale);
 const bookingCta = getBookingCta(locale);
 const ids = Object.keys(PACKAGES) as PackageId[];
 const rowLabel = (id: string) => t(`pricing.rows.${id}` as MessageKey);
-const cellText = (c: Cell) =>
+const cellText = (c: ComparisonRow[PackageId]) =>
   typeof c === 'object' ? t(`pricing.cells.${'note' in c ? c.note : c.text}` as MessageKey) : '';
 /** En alemán los sustantivos van en mayúscula: no se fuerza la minúscula tras los dos puntos. */
 const lowerFirst = (s: string) =>
   locale === 'de' ? s : `${s.charAt(0).toLowerCase()}${s.slice(1)}`;
-/** Cada paquete lista lo que incluye, tomado de la tabla comparativa. */
+/** Lo que incluye cada paquete, tomado de la tabla comparativa. */
 const highlights = (id: PackageId) =>
   COMPARISON.filter((r) => r[id] !== false).map((r) => {
     const note = cellText(r[id]);
     return note ? `${rowLabel(r.id)}: ${lowerFirst(note)}` : rowLabel(r.id);
   });
-/** Formas jurídicas e importes según el país elegido (HTML con una variante por país). */
-const separate = SEPARATE_QUOTE.map((key) => {
-  const label = t(`pricing.separate.${key}` as MessageKey);
-  if (key !== 'constitution') return byCountry(() => label);
-  return byCountry((c) => {
-    const currency = currencyOf(c);
-    return `${label}. ${t('pricing.separateConstitution', {
-      gmbhName: legalForm(c, 'gmbh'),
-      agName: legalForm(c, 'ag'),
-      gmbh: formatMoney(FIXED_PRICES.gmbh.from, currency, locale),
-      ag: formatMoney(FIXED_PRICES.ag.from, currency, locale),
-    })}`;
-  });
-});
 const forWhom = (id: PackageId) =>
   byCountry((c) => t(`pricing.packages.${id}.forWhom` as MessageKey, { ag: legalForm(c, 'ag') }));
+
+/** Grupos de la comparativa (las filas salen de config.ts). */
+const groups: { key: string; rows: ComparisonRow['id'][] }[] = [
+  { key: 'books', rows: ['accounting', 'vat', 'report'] },
+  { key: 'team', rows: ['payroll'] },
+  { key: 'support', rows: ['contact', 'meeting', 'taxPlanning', 'taxRequests'] },
+  { key: 'startups', rows: ['capTable', 'valuation'] },
+];
+const rowById = Object.fromEntries(COMPARISON.map((r) => [r.id, r])) as Record<
+  ComparisonRow['id'],
+  ComparisonRow
+>;
+
+/** Perfil → paquete que le encaja (las mismas reglas que la calculadora, simplificadas). */
+const profiles = [
+  { key: 'autonomo', pkg: 'essential' },
+  { key: 'startup', pkg: 'growth' },
+  { key: 'pyme', pkg: 'growth' },
+  { key: 'estructura', pkg: 'full' },
+] as const;
+
+const separate = SEPARATE_QUOTE.map((key) => ({
+  key,
+  label: t(`pricing.separate.${key}` as MessageKey),
+  price:
+    key === 'constitution'
+      ? byCountry((c) =>
+          t('pricing.separateConstitution', {
+            gmbhName: legalForm(c, 'gmbh'),
+            agName: legalForm(c, 'ag'),
+            gmbh: formatMoney(FIXED_PRICES.gmbh.from, currencyOf(c), locale),
+            ag: formatMoney(FIXED_PRICES.ag.from, currencyOf(c), locale),
+          }),
+        )
+      : t('pricing.separateFixed'),
+}));
+const facts = tRaw<string[]>('pricing.facts');
+const guarantees = tRaw<{ title: string; text: string }[]>('pricing.guarantees');
 const faq = tRaw<{ q: string; a: string }[]>('pricing.faq');
 ---
 
-<BaseLayout title={t('pricing.seoTitle')} description={t('pricing.seoDescription')}>
-  <PageHeader
-    title={t('pricing.title')}
-    lead={t('pricing.lead')}
-    crumbs={[{ label: t('pricing.title') }]}
-  />
+<BaseLayout title={t('pricing.seoTitle')} description={t('pricing.seoDescription')} overlayHeader>
+  <header class="nb-ph" data-surface="dark" data-pricing>
+    <div class="nb-container nb-ph__inner">
+      <Breadcrumbs items={[{ label: t('pricing.title') }]} tone="dark" />
+      <h1 class="nb-ph__title" data-split data-pr-drift>
+        {t('pricing.heroTitle')}
+      </h1>
+      <div class="nb-ph__aside" data-reveal>
+        <p class="nb-ph__lead">{t('pricing.heroLead')}</p>
+        <ul class="nb-ph__facts" data-pr-stagger>
+          {facts.map((f) => (
+            <li>
+              <svg viewBox="0 0 16 16" aria-hidden="true">
+                <path d="M2.5 8.5l3.5 3.5 7.5-8" pathLength="1" data-pr-check />
+              </svg>
+              {f}
+            </li>
+          ))}
+        </ul>
+        <div class="nb-ph__actions">
+          <Button href={lp('/calculadora')} on="dark" arrow>
+            {t('cta.calculate')}
+          </Button>
+          <Button href="#comparativa" variant="ghost" on="dark">
+            {t('pricing.compareCta')}
+          </Button>
+        </div>
+      </div>
+    </div>
+  </header>
 
-  <Section>
-    <ul class="m-0 grid list-none items-stretch gap-6 p-0 lg:grid-cols-3">
-      {ids.map((id, i) => {
-        const p = PACKAGES[id];
-        return (
-          <li data-reveal class="flex">
-            <Card
-              as="div"
-              class:list={[
-                'flex w-full flex-col gap-6 p-8',
-                p.recommended && 'border-[1.5px] border-navy-800',
-              ]}
-            >
-              <div class="flex flex-col gap-3">
-                <div class="flex items-center justify-between gap-3">
-                  <h2 class="m-0 text-[1.75rem] font-medium">{p.name}</h2>
-                  {p.recommended && <Tag tone="salvia">{t('pricing.recommended')}</Tag>}
-                </div>
-                <p class="t-small m-0 min-h-[3em] !text-piedra-700">
-                  <span class="t-label mr-2 !text-[0.6875rem] text-piedra-600">
-                    {t('pricing.forWhom')}
-                  </span>
-                  <Fragment set:html={forWhom(id)} />
-                </p>
-              </div>
-              <PriceTag amount={p.from} firstVat={i === 0} />
-              <CheckList items={highlights(id)} class="flex-1 [&_.t-body]:!text-[0.9375rem]" />
-              <Button
-                href={bookingCta.href}
-                variant={p.recommended ? 'primary' : 'ghost'}
-                arrow
-                class="self-start"
+  <section class="nb-pk-sec" aria-labelledby="packages-title">
+    <div class="nb-container">
+      <h2 id="packages-title" class="sr-only">
+        {t('pricing.compareTitle')}
+      </h2>
+      <div class="nb-chooser" data-chooser>
+        <p class="nb-chooser__title" id="chooser-title">
+          {t('pricing.chooserTitle')}
+        </p>
+        <div class="nb-chooser__chips" role="group" aria-labelledby="chooser-title" data-pr-stagger>
+          {profiles.map((p) => (
+            <button type="button" class="nb-chooser__chip" aria-pressed="false" data-pick={p.pkg}>
+              {t(`pricing.chooser.${p.key}` as MessageKey)}
+            </button>
+          ))}
+        </div>
+      </div>
+
+      <div class="nb-deck" data-price-deck>
+        <span class="nb-deck__line" aria-hidden="true" data-deck-line></span>
+        <ul class="nb-pk">
+          {ids.map((id) => {
+            const p = PACKAGES[id];
+            return (
+              <li
+                class:list={['nb-pk__item', p.recommended && 'nb-pk__item--featured']}
+                data-pkg={id}
+                data-deck-card
               >
-                {bookingCta.label}
-              </Button>
-            </Card>
-          </li>
-        );
-      })}
-    </ul>
-  </Section>
+                <span class="nb-pk__pillar" aria-hidden="true" data-deck-pillar />
+                <article class="nb-pk__card" aria-labelledby={`pkg-${id}`}>
+                  <div class="nb-pk__head">
+                    <h3 class="nb-pk__name" id={`pkg-${id}`}>
+                      {p.name}
+                    </h3>
+                    {p.recommended && (
+                      <Tag tone="salvia" class="nb-pk__rec">
+                        {t('pricing.recommended')}
+                      </Tag>
+                    )}
+                    <span class="nb-pk__fits">{t('pricing.fits')}</span>
+                  </div>
+                  <p class="nb-pk__for">
+                    <span class="nb-pk__for-label">{t('pricing.forWhom')}</span>
+                    <Fragment set:html={forWhom(id)} />
+                  </p>
+                  <PriceTag amount={p.from} size="lg" hideVatNote class="nb-pk__price" />
+                  <p class="nb-pk__inc-title">{t('pricing.includes')}</p>
+                  <ul class="nb-pk__inc" data-pr-stagger>
+                    {highlights(id).map((h) => (
+                      <li>
+                        <svg viewBox="0 0 16 16" aria-hidden="true">
+                          <path d="M2.5 8.5l3.5 3.5 7.5-8" pathLength="1" data-pr-check />
+                        </svg>
+                        {h}
+                      </li>
+                    ))}
+                  </ul>
+                  <a href={bookingCta.href} class="nb-pk__cta">
+                    <span>{bookingCta.label}</span>
+                    <Arrow />
+                  </a>
+                </article>
+              </li>
+            );
+          })}
+        </ul>
+      </div>
+      <p class="nb-pk__vat">{t('price.vatNoteFirst')}</p>
+    </div>
+  </section>
 
-  <Section tone="piedra" label={t('pricing.compareLabel')} title={t('pricing.compareTitle')} rule>
-    <div class="overflow-x-auto rounded-card border border-piedra-200 bg-white">
-      <table class="t-tabular w-full min-w-[760px] border-collapse text-left text-[0.9375rem]">
+  <Section
+    tone="piedra"
+    label={t('pricing.compareLabel')}
+    title={t('pricing.compareTitle')}
+    id="comparativa"
+  >
+    <div class="nb-cmp-wrap">
+      <table class="nb-cmp">
         <caption class="sr-only">{t('pricing.compareCaption')}</caption>
         <thead>
-          <tr class="border-b border-piedra-200">
-            <th scope="col" class="p-4 text-piedra-600">
-              <span class="t-label">{t('pricing.feature')}</span>
+          <tr>
+            <th scope="col" class="nb-cmp__corner">
+              <span class="sr-only">{t('pricing.feature')}</span>
             </th>
             {ids.map((id) => (
               <th
                 scope="col"
-                class:list={[
-                  'p-4 align-bottom',
-                  PACKAGES[id].recommended && 'border-t-[1.5px] border-t-navy-800 bg-piedra-50',
-                ]}
+                class:list={['nb-cmp__pkg', PACKAGES[id].recommended && 'nb-cmp__pkg--featured']}
               >
-                <span class="block font-serif text-[1.25rem] font-medium text-navy-800">
-                  {PACKAGES[id].name}
-                </span>
-                {PACKAGES[id].recommended && (
-                  <span class="t-label text-salvia-600">{t('pricing.recommended')}</span>
-                )}
+                <span class="nb-cmp__pkg-name">{PACKAGES[id].name}</span>
+                <PriceTag amount={PACKAGES[id].from} hideVatNote class="nb-cmp__price" />
               </th>
             ))}
           </tr>
         </thead>
-        <tbody>
-          {COMPARISON.map((row) => (
-            <tr class="border-b border-piedra-200 align-top last:border-0">
-              <th scope="row" class="p-4 font-medium text-navy-800">
-                {rowLabel(row.id)}
+        {groups.map((g) => (
+          <tbody data-pr-stagger>
+            <tr class="nb-cmp__group">
+              <th scope="colgroup" colspan={ids.length + 1}>
+                {t(`pricing.groups.${g.key}` as MessageKey)}
               </th>
-              {ids.map((id) => (
-                <td
-                  class:list={['p-4 text-piedra-800', PACKAGES[id].recommended && 'bg-piedra-50']}
-                >
-                  <ComparisonCell cell={row[id]} />
-                </td>
-              ))}
             </tr>
-          ))}
-        </tbody>
+            {g.rows.map((rid) => (
+              <tr>
+                <th scope="row">{rowLabel(rid)}</th>
+                {ids.map((id) => (
+                  <td class:list={[PACKAGES[id].recommended && 'nb-cmp__cell--featured']}>
+                    <ComparisonCell cell={rowById[rid][id]} />
+                  </td>
+                ))}
+              </tr>
+            ))}
+          </tbody>
+        ))}
       </table>
     </div>
-    <p class="t-small mt-4">{t('price.vatNote')}</p>
+    <p class="nb-cmp__note">{t('price.vatNote')}</p>
+  </Section>
+
+  <Section label={t('pricing.guaranteesLabel')} title={t('pricing.guaranteesTitle')}>
+    <ul class="nb-guar">
+      {guarantees.map((g) => (
+        <li data-reveal class="nb-guar__item">
+          <svg class="nb-guar__mark" viewBox="4 11 40 26" aria-hidden="true" data-pr-draw>
+            <path d="M4 13H44" pathLength="1" />
+            <path d="M10 37V29A14 14 0 0 1 38 29V37" pathLength="1" />
+          </svg>
+          <h3 class="nb-guar__title">{g.title}</h3>
+          <p class="nb-guar__text">{g.text}</p>
+        </li>
+      ))}
+    </ul>
   </Section>
 
   <Section
+    tone="piedra"
     label={t('pricing.separateLabel')}
     title={t('pricing.separateTitle')}
     lead={t('pricing.separateLead')}
-    rule
   >
-    <Card class="max-w-[760px] p-8">
-      <CheckList items={separate} html />
-    </Card>
+    <dl class="nb-ledger">
+      {separate.map((s) => (
+        <div class="nb-ledger__row" data-pr-row>
+          <span class="nb-ledger__rule" aria-hidden="true" data-pr-rule></span>
+          <dt>{s.label}</dt>
+          <dd set:html={s.price} />
+        </div>
+      ))}
+    </dl>
   </Section>
 
-  <Section tone="piedra" label={t('pricing.faqLabel')} rule>
-    <div class="grid gap-10 md:grid-cols-[1fr_1.6fr] md:gap-16">
+  <CalculatorTeaser />
+
+  <Section tone="piedra" label={t('pricing.faqLabel')}>
+    <div class="nb-pfaq">
       <h2 class="m-0">{t('pricing.faqTitle')}</h2>
       <Accordion items={faq} level="h3" openFirst />
     </div>
   </Section>
 
-  <Section tone="navy">
-    <div data-reveal class="flex flex-col items-start gap-6 md:max-w-[40rem]">
-      <h2 class="m-0 text-white">{t('pricing.ctaTitle')}</h2>
-      <p class="m-0 text-lg text-navy-100">{t('pricing.ctaText')}</p>
-      <div class="flex flex-wrap items-center gap-4">
-        <Button href={bookingCta.href} on="dark" arrow>
-          {bookingCta.label}
-        </Button>
-        <Button href={lp('/calculadora')} variant="ghost" on="dark">
-          {t('cta.calculate')}
-        </Button>
-      </div>
-    </div>
-  </Section>
+  <FinalCta />
 </BaseLayout>
+
+<style is:global>
+  /* ── Cabecera navy ── */
+  .nb-ph {
+    background: var(--navy-800);
+    color: var(--navy-100);
+  }
+  .nb-ph__inner {
+    display: grid;
+    gap: 32px;
+    /* El fondo navy sube por detrás del header flotante, como en el hero de la Home. */
+    padding-block: calc(var(--header-h) + clamp(40px, 6vw, 88px)) clamp(56px, 8vw, 120px);
+  }
+  @media (min-width: 1024px) {
+    .nb-ph__inner {
+      grid-template-columns: minmax(0, 1.3fr) minmax(0, 1fr);
+      align-items: end;
+      column-gap: 80px;
+    }
+    .nb-ph__inner > nav {
+      grid-column: 1 / -1;
+    }
+  }
+  .nb-ph__title {
+    margin: 0;
+    max-width: 13ch;
+    font-size: clamp(2.75rem, 1rem + 5.4vw, 6.25rem);
+    font-weight: 300;
+    line-height: 0.98;
+    letter-spacing: -0.03em;
+    color: var(--white);
+  }
+  .nb-ph__aside {
+    display: grid;
+    gap: 24px;
+  }
+  .nb-ph__lead {
+    margin: 0;
+    font-size: 1.1875rem;
+    line-height: 1.55;
+  }
+  .nb-ph__facts {
+    display: grid;
+    gap: 10px;
+    margin: 0;
+    padding: 20px 0 0;
+    list-style: none;
+    border-top: 1px solid var(--navy-600);
+    font-weight: 600;
+    color: var(--white);
+  }
+  .nb-ph__facts li {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+  }
+  .nb-ph__facts svg {
+    width: 16px;
+    height: 16px;
+    flex: none;
+    fill: none;
+    stroke: var(--salvia-300);
+    stroke-width: 1.5;
+  }
+  .nb-ph__actions {
+    display: flex;
+    flex-wrap: wrap;
+    align-items: center;
+    gap: 12px 24px;
+  }
+
+  /* ── Paquetes colgados del tablero (el viaducto de la marca) ── */
+  .nb-pk-sec {
+    padding-block: clamp(40px, 6vw, 80px) var(--section-y);
+    background: var(--white);
+  }
+  .nb-chooser {
+    display: none;
+    flex-wrap: wrap;
+    align-items: center;
+    gap: 12px 20px;
+    margin-bottom: clamp(32px, 4vw, 56px);
+  }
+  .js .nb-chooser {
+    display: flex;
+  }
+  .nb-chooser__title {
+    margin: 0;
+    font-family: var(--font-display);
+    font-size: 1.375rem;
+    color: var(--navy-800);
+  }
+  .nb-chooser__chips {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 8px;
+  }
+  .nb-chooser__chip {
+    min-height: 44px;
+    padding: 0 16px;
+    border: 1px solid var(--piedra-300);
+    border-radius: var(--radius-button, 4px);
+    background: var(--white);
+    font: inherit;
+    font-size: 0.9375rem;
+    font-weight: 600;
+    color: var(--navy-800);
+    cursor: pointer;
+    transition:
+      border-color var(--dur-fast) var(--ease-out),
+      background-color var(--dur-fast) var(--ease-out),
+      color var(--dur-fast) var(--ease-out);
+  }
+  .nb-chooser__chip:hover {
+    border-color: var(--navy-800);
+  }
+  .nb-chooser__chip[aria-pressed='true'] {
+    border-color: var(--navy-800);
+    background: var(--navy-800);
+    color: var(--white);
+  }
+  .nb-chooser__chip:focus-visible {
+    outline: 2px solid var(--navy-600);
+    outline-offset: 3px;
+  }
+
+  .nb-deck {
+    position: relative;
+  }
+  /* Tablero: filete navy de 1,5 px del que cuelgan los paquetes. */
+  .nb-deck__line {
+    position: absolute;
+    inset: 0 0 auto;
+    height: 1.5px;
+    background: var(--navy-800);
+    transform-origin: left;
+  }
+  .nb-pk {
+    display: grid;
+    gap: 16px;
+    margin: 0;
+    padding: 0;
+    list-style: none;
+  }
+  @media (min-width: 1024px) {
+    .nb-pk {
+      grid-template-columns: repeat(3, minmax(0, 1fr));
+      align-items: start;
+    }
+  }
+  .nb-pk__item {
+    display: grid;
+    transition: opacity var(--dur-base) var(--ease-out);
+  }
+  .nb-pk__pillar {
+    justify-self: center;
+    width: 1.5px;
+    height: 32px;
+    background: var(--navy-800);
+    transform-origin: top;
+  }
+  /* El destacado cuelga más arriba, con el pilar corto, y llega más abajo: el centro del arco. */
+  @media (min-width: 1024px) {
+    .nb-pk__pillar {
+      height: 56px;
+    }
+    .nb-pk__item--featured .nb-pk__pillar {
+      height: 24px;
+    }
+  }
+  .nb-pk__card {
+    display: grid;
+    align-content: start;
+    gap: 20px;
+    padding: clamp(28px, 3vw, 40px);
+    border: 1px solid var(--piedra-200);
+    border-radius: var(--radius-card, 8px);
+    background: var(--white);
+    color: var(--navy-800);
+    transition:
+      border-color var(--dur-base) var(--ease-out),
+      background-color var(--dur-base) var(--ease-out),
+      color var(--dur-base) var(--ease-out);
+  }
+  .nb-pk__item:hover .nb-pk__card {
+    border-color: var(--navy-800);
+  }
+  :is(.nb-pk:not([data-picked]) .nb-pk__item--featured, .nb-pk[data-picked] .nb-pk__item[data-fit])
+    .nb-pk__card {
+    border-color: var(--navy-800);
+    background: var(--navy-800);
+    color: var(--navy-100);
+  }
+  @media (min-width: 1024px) {
+    .nb-pk__item--featured .nb-pk__card {
+      padding-bottom: calc(clamp(28px, 3vw, 40px) + 32px);
+    }
+  }
+  .nb-pk__head {
+    display: flex;
+    flex-wrap: wrap;
+    align-items: center;
+    justify-content: space-between;
+    gap: 8px 12px;
+    min-height: 2.75rem;
+  }
+  .nb-pk__name {
+    margin: 0;
+    font-size: clamp(1.75rem, 1rem + 1.4vw, 2.25rem);
+    font-weight: 400;
+  }
+  :is(.nb-pk:not([data-picked]) .nb-pk__item--featured, .nb-pk[data-picked] .nb-pk__item[data-fit])
+    .nb-pk__name {
+    color: var(--white);
+  }
+  .nb-pk__fits {
+    display: none;
+    padding: 4px 8px;
+    border-radius: var(--radius-tag, 2px);
+    background: var(--salvia-400);
+    font-size: 0.6875rem;
+    font-weight: 600;
+    letter-spacing: 0.12em;
+    text-transform: uppercase;
+    color: var(--navy-800);
+  }
+  .nb-pk__for {
+    min-height: 4.6em;
+    margin: 0;
+    font-size: 0.9375rem;
+    line-height: 1.55;
+    color: var(--piedra-700);
+  }
+  :is(.nb-pk:not([data-picked]) .nb-pk__item--featured, .nb-pk[data-picked] .nb-pk__item[data-fit])
+    .nb-pk__for {
+    color: var(--navy-100);
+  }
+  .nb-pk__for-label {
+    display: block;
+    margin-bottom: 2px;
+    font-size: 0.6875rem;
+    font-weight: 600;
+    letter-spacing: 0.14em;
+    text-transform: uppercase;
+    color: var(--piedra-600);
+  }
+  :is(.nb-pk:not([data-picked]) .nb-pk__item--featured, .nb-pk[data-picked] .nb-pk__item[data-fit])
+    .nb-pk__for-label {
+    color: var(--navy-200);
+  }
+  .nb-pk__price {
+    padding-block: 18px;
+    border-block: 1px solid var(--piedra-200);
+  }
+  :is(.nb-pk:not([data-picked]) .nb-pk__item--featured, .nb-pk[data-picked] .nb-pk__item[data-fit])
+    .nb-pk__price {
+    border-color: var(--navy-600);
+  }
+  :is(.nb-pk:not([data-picked]) .nb-pk__item--featured, .nb-pk[data-picked] .nb-pk__item[data-fit])
+    .nb-pk__price
+    .t-price {
+    color: var(--white);
+  }
+  :is(.nb-pk:not([data-picked]) .nb-pk__item--featured, .nb-pk[data-picked] .nb-pk__item[data-fit])
+    .nb-pk__price
+    .text-piedra-600 {
+    color: var(--navy-200);
+  }
+  .nb-pk__inc-title {
+    margin: 0;
+    font-size: 0.75rem;
+    font-weight: 600;
+    letter-spacing: 0.14em;
+    text-transform: uppercase;
+    color: var(--piedra-600);
+  }
+  :is(.nb-pk:not([data-picked]) .nb-pk__item--featured, .nb-pk[data-picked] .nb-pk__item[data-fit])
+    .nb-pk__inc-title {
+    color: var(--navy-200);
+  }
+  .nb-pk__inc {
+    display: grid;
+    gap: 10px;
+    margin: -8px 0 8px;
+    padding: 0;
+    list-style: none;
+    font-size: 0.9375rem;
+    line-height: 1.45;
+    color: var(--piedra-800);
+  }
+  :is(.nb-pk:not([data-picked]) .nb-pk__item--featured, .nb-pk[data-picked] .nb-pk__item[data-fit])
+    .nb-pk__inc {
+    color: var(--white);
+  }
+  .nb-pk__inc li {
+    display: flex;
+    gap: 10px;
+  }
+  .nb-pk__inc svg {
+    width: 16px;
+    height: 16px;
+    flex: none;
+    margin-top: 2px;
+    fill: none;
+    stroke: var(--salvia-600);
+    stroke-width: 1.5;
+  }
+  :is(.nb-pk:not([data-picked]) .nb-pk__item--featured, .nb-pk[data-picked] .nb-pk__item[data-fit])
+    .nb-pk__inc
+    svg {
+    stroke: var(--salvia-300);
+  }
+  .nb-pk__cta {
+    display: inline-flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: 12px;
+    min-height: 48px;
+    padding: 0 18px 0 20px;
+    border: 1px solid var(--navy-800);
+    border-radius: var(--radius-button, 4px);
+    font-size: 0.9375rem;
+    font-weight: 600;
+    color: var(--navy-800);
+    text-decoration: none;
+    transition:
+      background-color var(--dur-fast) var(--ease-out),
+      color var(--dur-fast) var(--ease-out);
+  }
+  .nb-pk__cta:hover {
+    background: var(--navy-800);
+    color: var(--white);
+  }
+  :is(.nb-pk:not([data-picked]) .nb-pk__item--featured, .nb-pk[data-picked] .nb-pk__item[data-fit])
+    .nb-pk__cta {
+    border-color: var(--white);
+    background: var(--white);
+    color: var(--navy-800);
+  }
+  :is(.nb-pk:not([data-picked]) .nb-pk__item--featured, .nb-pk[data-picked] .nb-pk__item[data-fit])
+    .nb-pk__cta:hover {
+    background: var(--piedra-100);
+  }
+  .nb-pk__vat {
+    margin: 24px 0 0;
+    font-size: 0.875rem;
+    color: var(--piedra-600);
+  }
+
+  /* Perfil elegido: el tratamiento navy pasa del recomendado al paquete que encaja. */
+  .nb-pk__card :is(h3, p, span, li, a, svg) {
+    transition:
+      color var(--dur-base) var(--ease-out),
+      border-color var(--dur-base) var(--ease-out),
+      background-color var(--dur-base) var(--ease-out),
+      stroke var(--dur-base) var(--ease-out);
+  }
+  .nb-pk__item {
+    transition: transform var(--dur-slow) var(--ease-out);
+  }
+  .nb-pk[data-picked] .nb-pk__item[data-fit] {
+    transform: translateY(-8px);
+  }
+  .nb-pk[data-picked] .nb-pk__item[data-fit] .nb-pk__fits {
+    display: inline-block;
+  }
+  .nb-pk[data-picked] .nb-pk__rec {
+    display: none;
+  }
+
+  /* ── Comparativa: cabecera fija mientras recorres las filas ── */
+  .nb-cmp-wrap {
+    border: 1px solid var(--piedra-200);
+    border-radius: var(--radius-card, 8px);
+    background: var(--white);
+  }
+  @media (max-width: 1023px) {
+    .nb-cmp-wrap {
+      overflow-x: auto;
+    }
+    /* Móvil: la columna de servicios se queda fija al desplazar la tabla. */
+    .nb-cmp tbody th[scope='row'],
+    .nb-cmp__corner {
+      position: sticky;
+      left: 0;
+      z-index: 1;
+      background: var(--white);
+      box-shadow: 1px 0 0 var(--piedra-200);
+    }
+    .nb-cmp .nb-cmp__corner {
+      width: 150px;
+    }
+    .nb-cmp {
+      min-width: 680px;
+    }
+  }
+  .nb-cmp {
+    width: 100%;
+    min-width: 760px;
+    border-collapse: separate;
+    border-spacing: 0;
+    font-size: 0.9375rem;
+    text-align: left;
+  }
+  .nb-cmp thead th {
+    padding: 20px 16px;
+    border-bottom: 1.5px solid var(--navy-800);
+    background: var(--white);
+    vertical-align: bottom;
+  }
+  @media (min-width: 1024px) {
+    .nb-cmp thead th {
+      position: sticky;
+      top: calc(var(--header-h) - 1px);
+      z-index: 2;
+    }
+  }
+  .nb-cmp thead th:first-child {
+    border-top-left-radius: var(--radius-card, 8px);
+  }
+  .nb-cmp thead th:last-child {
+    border-top-right-radius: var(--radius-card, 8px);
+  }
+  .nb-cmp__corner {
+    width: 34%;
+  }
+  .nb-cmp__pkg-name {
+    display: block;
+    margin-bottom: 4px;
+    font-family: var(--font-display);
+    font-size: 1.375rem;
+    font-weight: 400;
+    color: var(--navy-800);
+  }
+  .nb-cmp__price .t-price {
+    font-size: 1.75rem !important;
+  }
+  .nb-cmp thead .nb-cmp__pkg--featured,
+  .nb-cmp .nb-cmp__cell--featured {
+    background: var(--piedra-50);
+  }
+  .nb-cmp__pkg--featured {
+    box-shadow: inset 0 1.5px 0 var(--navy-800);
+  }
+  .nb-cmp tbody th,
+  .nb-cmp tbody td {
+    padding: 14px 16px;
+    border-bottom: 1px solid var(--piedra-200);
+    vertical-align: top;
+  }
+  .nb-cmp tbody th {
+    font-weight: 500;
+    color: var(--navy-800);
+  }
+  .nb-cmp tbody td {
+    color: var(--piedra-800);
+  }
+  .nb-cmp .nb-cmp__group th {
+    padding-top: 28px;
+    border-bottom-color: var(--piedra-300);
+    font-size: 0.75rem;
+    font-weight: 600;
+    letter-spacing: 0.14em;
+    text-transform: uppercase;
+    color: var(--salvia-600);
+  }
+  .nb-cmp tbody:last-of-type tr:last-child > * {
+    border-bottom: 0;
+  }
+  .nb-cmp__note {
+    margin: 16px 0 0;
+    font-size: 0.875rem;
+    color: var(--piedra-600);
+  }
+
+  /* ── Garantías ── */
+  .nb-guar {
+    display: grid;
+    gap: 40px;
+    margin: 0;
+    padding: 0;
+    list-style: none;
+  }
+  @media (min-width: 768px) {
+    .nb-guar {
+      grid-template-columns: repeat(3, minmax(0, 1fr));
+      gap: 56px;
+    }
+  }
+  .nb-guar__item {
+    display: grid;
+    align-content: start;
+    gap: 14px;
+    padding-top: 24px;
+    border-top: 1.5px solid var(--navy-800);
+  }
+  .nb-guar__mark {
+    width: 40px;
+    height: 26px;
+    fill: none;
+    stroke: var(--navy-800);
+    stroke-width: 4;
+  }
+  .nb-guar__title {
+    margin: 0;
+    font-size: clamp(1.5rem, 1rem + 1vw, 2rem);
+    font-weight: 400;
+  }
+  .nb-guar__text {
+    margin: 0;
+    color: var(--piedra-700);
+  }
+
+  /* ── Aparte: como un libro de cuentas ── */
+  .nb-ledger {
+    margin: 0;
+    border-top: 1.5px solid var(--navy-800);
+  }
+  .nb-ledger__row {
+    position: relative;
+    display: grid;
+    gap: 6px 40px;
+    padding-block: 22px;
+  }
+  /* El filete de cada fila se dibuja de izquierda a derecha (pricingScene.ts). */
+  .nb-ledger__rule {
+    position: absolute;
+    inset: auto 0 0;
+    height: 1px;
+    background: var(--piedra-300);
+    transform-origin: left;
+  }
+  @media (min-width: 768px) {
+    .nb-ledger__row {
+      grid-template-columns: minmax(0, 1fr) minmax(0, 1fr);
+      align-items: baseline;
+    }
+  }
+  .nb-ledger__row dt {
+    font-family: var(--font-display);
+    font-size: clamp(1.25rem, 1rem + 0.8vw, 1.625rem);
+    line-height: 1.25;
+    color: var(--navy-800);
+  }
+  .nb-ledger__row dd {
+    margin: 0;
+    font-size: 0.9375rem;
+    line-height: 1.55;
+    color: var(--piedra-700);
+  }
+
+  .nb-pfaq {
+    display: grid;
+    gap: 32px;
+  }
+  @media (min-width: 768px) {
+    .nb-pfaq {
+      grid-template-columns: minmax(0, 1fr) minmax(0, 1.6fr);
+      gap: 64px;
+    }
+  }
+</style>
+
+<script>
+  // «¿Qué te describe mejor?»: marca el paquete que encaja. Solo con JS (sin JS no se muestra).
+  const chooser = document.querySelector<HTMLElement>('[data-chooser]');
+  const list = document.querySelector<HTMLElement>('.nb-pk');
+  if (chooser && list) {
+    const chips = [...chooser.querySelectorAll<HTMLButtonElement>('[data-pick]')];
+    const items = [...list.querySelectorAll<HTMLElement>('[data-pkg]')];
+    for (const chip of chips) {
+      chip.addEventListener('click', () => {
+        const active = chip.getAttribute('aria-pressed') !== 'true';
+        for (const c of chips) c.setAttribute('aria-pressed', String(active && c === chip));
+        list.toggleAttribute('data-picked', active);
+        for (const item of items)
+          item.toggleAttribute('data-fit', active && item.dataset.pkg === chip.dataset.pick);
+      });
+    }
+  }
+</script>

@@ -20,6 +20,7 @@ const segments: Record<string, Partial<Record<Locale, string>>> = {
   privacidad: { en: 'privacy', de: 'datenschutz', fr: 'confidentialite', it: 'privacy' },
   'aviso-legal': { en: 'legal-notice', de: 'impressum', fr: 'mentions-legales', it: 'note-legali' },
   cookies: { it: 'cookie' },
+  gracias: { en: 'thank-you', de: 'danke', fr: 'merci', it: 'grazie' },
   // Servicios
   'contabilidad-y-cierres': {
     en: 'accounting-and-year-end',

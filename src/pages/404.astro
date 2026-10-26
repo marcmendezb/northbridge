@@ -1,0 +1,156 @@
+---
+import BaseLayout from '../layouts/BaseLayout.astro';
+import { dictionaries, locales, localizedPath, localeMeta, t } from '../i18n';
+
+/**
+ * 404 única para todos los idiomas (Astro genera un solo 404.html). Trae los cinco textos y un
+ * script elige el del idioma de la URL; sin JS, español. El arco llega desplazado y se coloca.
+ */
+const blocks = locales.map((locale) => ({
+  locale,
+  lang: localeMeta[locale].htmlLang,
+  code: dictionaries[locale].notFound.code,
+  title: t('notFound.title', locale),
+  text: t('notFound.text', locale),
+  links: [
+    { href: localizedPath('/', locale), label: t('notFound.home', locale) },
+    { href: localizedPath('/servicios', locale), label: t('nav.services', locale) },
+    { href: localizedPath('/contacto', locale), label: t('nav.contact', locale) },
+  ],
+}));
+---
+
+<BaseLayout title={t('notFound.seoTitle')} noindex overlayHeader>
+  <section class="nb-404" data-surface="dark">
+    <div class="nb-container nb-404__inner">
+      <svg class="nb-404__mark" viewBox="0 7 48 34" aria-hidden="true">
+        <path class="nb-404__deck" d="M4 13H44"></path>
+        <path class="nb-404__arch" d="M10 37V29A14 14 0 0 1 38 29V37"></path>
+      </svg>
+      {blocks.map((b) => (
+        <div class="nb-404__block" data-404={b.locale} lang={b.lang}>
+          <p class="nb-404__code">{b.code}</p>
+          <h1 class="nb-404__title">{b.title}</h1>
+          <p class="nb-404__text">{b.text}</p>
+          <ul class="nb-404__links">
+            {b.links.map((l) => (
+              <li>
+                <a href={l.href}>{l.label}</a>
+              </li>
+            ))}
+          </ul>
+        </div>
+      ))}
+    </div>
+  </section>
+</BaseLayout>
+
+<style is:global>
+  .nb-404 {
+    display: grid;
+    align-items: center;
+    min-height: 100svh;
+    padding-top: var(--header-h);
+    background: var(--navy-800);
+    color: var(--navy-100);
+  }
+  .nb-404__inner {
+    display: grid;
+    justify-items: start;
+    gap: 32px;
+    padding-block: clamp(48px, 8vw, 120px);
+  }
+  .nb-404__mark {
+    width: clamp(140px, 16vw, 220px);
+    overflow: visible;
+    fill: none;
+    stroke: var(--white);
+    stroke-width: 2.5;
+  }
+  /* El arco no encaja (desplazado y girado) y después se coloca, tangente al tablero. */
+  .nb-404__arch {
+    transform-box: fill-box;
+    transform-origin: 50% 100%;
+    transform: translate(9px, 5px) rotate(7deg);
+  }
+  @media (prefers-reduced-motion: no-preference) {
+    .js .nb-404__arch {
+      animation: nb-404-settle 1400ms var(--ease-in-out) 900ms forwards;
+    }
+  }
+  @media (prefers-reduced-motion: reduce) {
+    .nb-404__arch {
+      transform: none;
+    }
+  }
+  html:not(.js) .nb-404__arch {
+    transform: none;
+  }
+  @keyframes nb-404-settle {
+    to {
+      transform: none;
+    }
+  }
+  .nb-404__block {
+    display: none;
+    gap: 20px;
+  }
+  .nb-404__block[data-404='es'],
+  .nb-404[data-locale] .nb-404__block[data-active] {
+    display: grid;
+  }
+  .nb-404[data-locale] .nb-404__block[data-404='es']:not([data-active]) {
+    display: none;
+  }
+  .nb-404__code {
+    margin: 0;
+    font-size: 0.75rem;
+    font-weight: 600;
+    letter-spacing: 0.16em;
+    text-transform: uppercase;
+    color: var(--navy-200);
+  }
+  .nb-404__title {
+    margin: 0;
+    font-size: clamp(2.5rem, 1rem + 5vw, 5.5rem);
+    font-weight: 300;
+    line-height: 1;
+    letter-spacing: -0.025em;
+    color: var(--white);
+  }
+  .nb-404__text {
+    margin: 0;
+    font-size: 1.25rem;
+  }
+  .nb-404__links {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 8px 32px;
+    margin: 8px 0 0;
+    padding: 0;
+    list-style: none;
+  }
+  .nb-404__links a {
+    display: inline-flex;
+    align-items: center;
+    min-height: 44px;
+    font-weight: 600;
+    color: var(--white);
+    text-decoration: none;
+  }
+  .nb-404__links a:hover {
+    color: var(--salvia-300);
+  }
+</style>
+
+<script>
+  // Idioma según la URL pedida (/en/…, /de/…); el resto, español.
+  const code = location.pathname.split('/')[1];
+  const section = document.querySelector<HTMLElement>('.nb-404');
+  const block = document.querySelector<HTMLElement>(`[data-404="${code}"]`);
+  if (section && block) {
+    section.dataset.locale = code;
+    block.setAttribute('data-active', '');
+    document.documentElement.lang = block.lang;
+  }
+</script>

@@ -1,0 +1,366 @@
+---
+import { Picture } from 'astro:assets';
+import type { ImageMetadata } from 'astro';
+import { render, type CollectionEntry } from 'astro:content';
+import BaseLayout from '../layouts/BaseLayout.astro';
+import Breadcrumbs from '../components/layout/Breadcrumbs.astro';
+import Arrow from '../components/brand/Arrow.astro';
+import Note from '../components/content/Note.astro';
+import FiscalCalendar from '../components/content/FiscalCalendar.astro';
+import CtaBand from '../components/sections/CtaBand.astro';
+import lea from '../assets/img/about/team/lea-brunner.jpeg';
+import tobias from '../assets/img/about/team/tobias-vogel.jpeg';
+import nora from '../assets/img/about/team/nora-steiner.jpeg';
+import marc from '../assets/img/about/team/marc-bernasconi.jpeg';
+import { useI18n, type MessageKey } from '../i18n';
+import { entryKey, getTeam, readingMinutes } from '../lib/content';
+import { formatDate } from '../lib/format';
+import { site } from '../lib/site';
+
+interface Props {
+  entry: CollectionEntry<'blog'>;
+  related: CollectionEntry<'blog'>[];
+}
+const { entry, related } = Astro.props;
+const { t, lp, locale } = useI18n(Astro.currentLocale);
+const d = entry.data;
+const { Content, headings } = await render(entry);
+const toc = headings.filter((h) => h.depth === 2);
+const team = await getTeam(locale);
+const author = team.find((m) => entryKey(m) === d.author);
+const portraits: Record<string, ImageMetadata> = {
+  'lea-brunner': lea,
+  'tobias-vogel': tobias,
+  'nora-steiner': nora,
+  'marc-bernasconi': marc,
+};
+const minutes = readingMinutes(entry.body);
+const url = new URL(lp(`/recursos/${entryKey(entry)}`), Astro.site ?? site.url).toString();
+const jsonLd = {
+  '@context': 'https://schema.org',
+  '@type': 'Article',
+  headline: d.title,
+  description: d.description,
+  inLanguage: locale,
+  datePublished: d.publishedAt.toISOString(),
+  dateModified: (d.updatedAt ?? d.publishedAt).toISOString(),
+  author: author
+    ? { '@type': 'Person', name: author.data.name, jobTitle: author.data.role }
+    : undefined,
+  publisher: { '@type': 'Organization', name: site.name, url: site.url },
+  mainEntityOfPage: url,
+};
+---
+
+<BaseLayout title={d.title} description={d.description}>
+  <script slot="head" type="application/ld+json" set:html={JSON.stringify(jsonLd)} />
+  <header class="nb-art-head">
+    <div class="nb-container nb-art-head__inner">
+      <Breadcrumbs
+        items={[{ label: t('nav.resources'), href: lp('/recursos') }, { label: d.title }]}
+      />
+      <p class="nb-art-head__cat">{t(`resources.categories.${d.category}` as MessageKey)}</p>
+      <h1 class="nb-art-head__title" data-split>
+        {d.title}
+      </h1>
+      <p class="nb-art-head__lead" data-reveal>
+        {d.description}
+      </p>
+      <div class="nb-art-head__meta" data-reveal>
+        {author && (
+          <span class="nb-art-head__author">
+            <span class="nb-art-head__avatar">
+              <Picture
+                src={portraits[d.author]}
+                formats={['avif', 'webp']}
+                widths={[96, 160]}
+                sizes="48px"
+                alt=""
+                quality={70}
+              />
+            </span>
+            <span>
+              <span class="nb-art-head__name">{t('article.by', { name: author.data.name })}</span>
+              <span class="nb-art-head__role">{author.data.role}</span>
+            </span>
+          </span>
+        )}
+        <span class="nb-art-head__facts">
+          <span>{t('article.published', { date: formatDate(d.publishedAt, locale) })}</span>
+          {d.updatedAt && (
+            <span>{t('article.updated', { date: formatDate(d.updatedAt, locale) })}</span>
+          )}
+          <span>{t('resources.readingTime', { n: minutes })}</span>
+        </span>
+      </div>
+    </div>
+  </header>
+
+  <div class="nb-container nb-art">
+    {toc.length > 0 && (
+      <nav class="nb-art__toc" aria-labelledby="toc-title">
+        <p class="nb-art__toc-title" id="toc-title">
+          {t('article.toc')}
+        </p>
+        <ol>
+          {toc.map((h) => (
+            <li>
+              <a href={`#${h.slug}`} data-toc-link={h.slug}>
+                {h.text}
+              </a>
+            </li>
+          ))}
+        </ol>
+      </nav>
+    )}
+
+    <article class="nb-prose" data-article>
+      <Content components={{ Note, FiscalCalendar }} />
+
+      <p class="nb-art__checked">
+        {t('article.checked', { date: formatDate(d.checkedAt, locale) })}
+      </p>
+
+      {d.sources.length > 0 && (
+        <section class="nb-art__sources" aria-labelledby="sources-title">
+          <h2 id="sources-title">{t('article.sources')}</h2>
+          <ul>
+            {d.sources.map((src) => (
+              <li>
+                <a href={src.url} rel="noopener" target="_blank">
+                  {src.label}
+                </a>
+              </li>
+            ))}
+          </ul>
+        </section>
+      )}
+    </article>
+  </div>
+
+  {related.length > 0 && (
+    <section class="nb-art-related" aria-labelledby="related-title">
+      <div class="nb-container">
+        <div class="nb-art-related__head">
+          <h2 id="related-title">{t('article.related')}</h2>
+          <a href={lp('/recursos')} class="nb-art-related__all">
+            {t('article.allGuides')} <Arrow />
+          </a>
+        </div>
+        <ul class="nb-art-related__grid">
+          {related.map((r) => (
+            <li>
+              <a href={lp(`/recursos/${entryKey(r)}`)} class="nb-art-related__card">
+                <span class="nb-art-related__cat">
+                  {t(`resources.categories.${r.data.category}` as MessageKey)}
+                </span>
+                <span class="nb-art-related__title">{r.data.title}</span>
+                <span class="nb-art-related__desc">{r.data.description}</span>
+                <span class="nb-art-related__read">
+                  {t('resources.read')} <Arrow />
+                </span>
+              </a>
+            </li>
+          ))}
+        </ul>
+      </div>
+    </section>
+  )}
+
+  <CtaBand title={t('article.ctaTitle')} text={t('article.ctaText')} />
+</BaseLayout>
+
+<style is:global>
+  .nb-art-head {
+    border-bottom: 1px solid var(--piedra-200);
+    background: var(--piedra-50);
+  }
+  .nb-art-head__inner {
+    display: grid;
+    gap: 20px;
+    padding-block: clamp(40px, 6vw, 80px);
+  }
+  .nb-art-head__cat {
+    margin: 12px 0 0;
+    font-size: 0.75rem;
+    font-weight: 600;
+    letter-spacing: 0.16em;
+    text-transform: uppercase;
+    color: var(--salvia-600);
+  }
+  .nb-art-head__title {
+    margin: 0;
+    max-width: 20ch;
+    font-size: clamp(2.25rem, 1rem + 4vw, 4.5rem);
+    font-weight: 300;
+    line-height: 1.04;
+    letter-spacing: -0.02em;
+  }
+  .nb-art-head__lead {
+    margin: 0;
+    max-width: 44rem;
+    font-family: var(--font-display);
+    font-size: clamp(1.25rem, 1rem + 0.8vw, 1.625rem);
+    line-height: 1.4;
+    color: var(--piedra-800);
+  }
+  .nb-art-head__meta {
+    display: flex;
+    flex-wrap: wrap;
+    align-items: center;
+    gap: 16px 40px;
+    padding-top: 20px;
+    border-top: 1px solid var(--piedra-200);
+  }
+  .nb-art-head__author {
+    display: flex;
+    align-items: center;
+    gap: 12px;
+  }
+  .nb-art-head__avatar {
+    width: 48px;
+    height: 60px;
+    overflow: hidden;
+    border-radius: 9999px 9999px 0 0;
+    background: var(--piedra-200);
+  }
+  .nb-art-head__avatar img {
+    width: 100%;
+    height: 100%;
+    object-fit: cover;
+    object-position: 50% 25%;
+  }
+  .nb-art-head__name {
+    display: block;
+    font-weight: 600;
+    color: var(--navy-800);
+  }
+  .nb-art-head__role {
+    display: block;
+    font-size: 0.875rem;
+    color: var(--piedra-600);
+  }
+  .nb-art-head__facts {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 4px 20px;
+    font-size: 0.875rem;
+    color: var(--piedra-600);
+  }
+
+  .nb-art__checked {
+    margin-top: 48px !important;
+    padding-top: 16px;
+    border-top: 1px solid var(--piedra-200);
+    font-size: 0.875rem;
+    line-height: 1.55;
+    color: var(--piedra-600);
+  }
+  .nb-art__sources h2 {
+    margin-top: 24px;
+    font-family: var(--font-sans);
+    font-size: 0.75rem;
+    font-weight: 600;
+    letter-spacing: 0.16em;
+    text-transform: uppercase;
+    color: var(--piedra-600);
+  }
+  .nb-art__sources ul {
+    font-size: 0.9375rem;
+  }
+
+  .nb-art-related {
+    padding-block: var(--section-y);
+    background: var(--piedra-100);
+  }
+  .nb-art-related__head {
+    display: flex;
+    flex-wrap: wrap;
+    align-items: baseline;
+    justify-content: space-between;
+    gap: 16px;
+    margin-bottom: 32px;
+  }
+  .nb-art-related__head h2 {
+    margin: 0;
+  }
+  .nb-art-related__all {
+    display: inline-flex;
+    align-items: center;
+    gap: 8px;
+    font-weight: 600;
+    color: var(--navy-600);
+    text-decoration: none;
+  }
+  .nb-art-related__all:hover {
+    color: var(--salvia-600);
+  }
+  .nb-art-related__grid {
+    display: grid;
+    gap: 16px;
+    margin: 0;
+    padding: 0;
+    list-style: none;
+  }
+  @media (min-width: 768px) {
+    .nb-art-related__grid {
+      grid-template-columns: repeat(2, minmax(0, 1fr));
+    }
+  }
+  .nb-art-related__card {
+    display: grid;
+    gap: 12px;
+    height: 100%;
+    padding: 32px;
+    border: 1px solid var(--piedra-200);
+    border-radius: var(--radius-card, 8px);
+    background: var(--white);
+    color: var(--navy-800);
+    text-decoration: none;
+    transition: border-color var(--dur-base) var(--ease-out);
+  }
+  .nb-art-related__card:hover {
+    border-color: var(--navy-800);
+  }
+  .nb-art-related__cat {
+    font-size: 0.6875rem;
+    font-weight: 600;
+    letter-spacing: 0.14em;
+    text-transform: uppercase;
+    color: var(--salvia-600);
+  }
+  .nb-art-related__title {
+    font-family: var(--font-display);
+    font-size: 1.75rem;
+    line-height: 1.15;
+  }
+  .nb-art-related__desc {
+    color: var(--piedra-700);
+  }
+  .nb-art-related__read {
+    display: inline-flex;
+    align-items: center;
+    gap: 8px;
+    margin-top: 8px;
+    font-weight: 600;
+  }
+</style>
+
+<script>
+  // Índice: marca la sección que se está leyendo.
+  const links = [...document.querySelectorAll<HTMLAnchorElement>('[data-toc-link]')];
+  if (links.length) {
+    const byId = new Map(links.map((a) => [a.dataset.tocLink, a]));
+    const observer = new IntersectionObserver(
+      (entries) => {
+        for (const e of entries) {
+          if (!e.isIntersecting) continue;
+          links.forEach((a) => a.removeAttribute('aria-current'));
+          byId.get(e.target.id)?.setAttribute('aria-current', 'true');
+        }
+      },
+      { rootMargin: '-20% 0px -70% 0px' },
+    );
+    document.querySelectorAll('[data-article] h2[id]').forEach((h) => observer.observe(h));
+  }
+</script>

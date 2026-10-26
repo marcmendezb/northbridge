@@ -36,7 +36,7 @@ const hasHeader = Boolean(label || title || lead);
 <section
   id={id}
   data-surface={tone === 'navy' ? 'dark' : undefined}
-  class:list={['relative overflow-hidden py-[var(--section-y)]', toneClass, className]}
+  class:list={['relative overflow-clip py-[var(--section-y)]', toneClass, className]}
 >
   <Container class="relative">
     {hasHeader && (

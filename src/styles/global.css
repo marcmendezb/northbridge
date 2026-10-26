@@ -1,6 +1,7 @@
 @import 'tailwindcss';
 @import './tokens.css';
 @import './typography.css';
+@import './prose.css';
 
 @layer base {
   /* Sin JS todo es visible. Los estados iniciales ocultos cuelgan de .js y de no-preference. */
@@ -116,4 +117,25 @@ html.lenis body {
 :root[data-country='FR'] [data-cc]:not([data-cc~='FR']),
 :root[data-country='IT'] [data-cc]:not([data-cc~='IT']) {
   display: none !important;
+}
+
+/* Precios (pricingScene.ts): estados iniciales solo con JS y movimiento permitido. */
+@media (prefers-reduced-motion: no-preference) {
+  .js.motion:not(.anim-fail) [data-pr-stagger] > *,
+  .js.motion:not(.anim-fail) [data-pr-row] :is(dt, dd),
+  .js.motion:not(.anim-fail) [data-price-deck] .nb-pk__card {
+    opacity: 0;
+  }
+  .js.motion:not(.anim-fail) [data-pr-check],
+  .js.motion:not(.anim-fail) [data-pr-draw] path {
+    stroke-dasharray: 1;
+    stroke-dashoffset: 1;
+  }
+  .js.motion:not(.anim-fail) [data-pr-rule],
+  .js.motion:not(.anim-fail) [data-deck-line] {
+    transform: scaleX(0);
+  }
+  .js.motion:not(.anim-fail) [data-deck-pillar] {
+    transform: scaleY(0);
+  }
 }

@@ -5,6 +5,8 @@ import { drawViaduct } from './drawViaduct';
 import { heroScene } from './heroScene';
 import { journeyScene } from './journeyScene';
 import { mediaReveal } from './mediaReveal';
+import { priceDeck } from './priceDeck';
+import { pricingScene } from './pricingScene';
 import { revealOnScroll } from './revealOnScroll';
 import { splitReveal } from './splitReveal';
 import { getSmoothScroll } from './smoothScroll';
@@ -33,6 +35,8 @@ export async function initPage() {
     calcPreview(kit);
     finalScene(kit);
     mediaReveal(kit);
+    priceDeck(kit);
+    pricingScene(kit);
     void splitReveal(kit);
   });
 

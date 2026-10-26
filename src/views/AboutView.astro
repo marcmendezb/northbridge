@@ -1,0 +1,407 @@
+---
+import { Picture } from 'astro:assets';
+import type { ImageMetadata } from 'astro';
+import BaseLayout from '../layouts/BaseLayout.astro';
+import Breadcrumbs from '../components/layout/Breadcrumbs.astro';
+import Section from '../components/ui/Section.astro';
+import CtaBand from '../components/sections/CtaBand.astro';
+import office from '../assets/img/about/office/oficina.jpeg';
+import lea from '../assets/img/about/team/lea-brunner.jpeg';
+import tobias from '../assets/img/about/team/tobias-vogel.jpeg';
+import nora from '../assets/img/about/team/nora-steiner.jpeg';
+import marc from '../assets/img/about/team/marc-bernasconi.jpeg';
+import { useI18n } from '../i18n';
+import { entryKey, getTeam } from '../lib/content';
+import { site } from '../lib/site';
+
+const { t, tRaw, locale } = useI18n(Astro.currentLocale);
+const team = await getTeam(locale);
+const portraits: Record<string, ImageMetadata> = {
+  'lea-brunner': lea,
+  'tobias-vogel': tobias,
+  'nora-steiner': nora,
+  'marc-bernasconi': marc,
+};
+const story = tRaw<string[]>('about.story');
+const method = tRaw<{ title: string; text: string }[]>('about.method');
+const principles = tRaw<{ title: string; text: string }[]>('about.principles');
+---
+
+<BaseLayout title={t('about.seoTitle')} description={t('about.seoDescription')} overlayHeader>
+  <header class="nb-about-hero" data-surface="dark">
+    <Picture
+      src={office}
+      formats={['avif', 'webp']}
+      widths={[768, 1280, 1920, 2560]}
+      sizes="100vw"
+      alt=""
+      loading="eager"
+      fetchpriority="high"
+      quality={74}
+      class="nb-about-hero__img"
+      data-reveal-media
+    />
+    <div class="nb-about-hero__content nb-container">
+      <Breadcrumbs items={[{ label: t('nav.about') }]} tone="dark" />
+      <h1 class="nb-about-hero__title" data-split>
+        {t('about.title')}
+      </h1>
+      <p class="nb-about-hero__lead" data-reveal>
+        {t('about.lead')}
+      </p>
+    </div>
+  </header>
+
+  <Section label={t('about.storyLabel')}>
+    <div class="nb-story">
+      <h2 class="nb-story__title" data-split>
+        {t('about.storyTitle')}
+      </h2>
+      <div class="nb-story__body">
+        {story.map((p, i) => (
+          <p data-reveal class:list={['nb-story__p', i === 0 && 'nb-story__p--lead']}>
+            {p}
+          </p>
+        ))}
+        <p data-reveal class="nb-story__since">
+          <span class="nb-story__year">{site.founded}</span>
+          <span>{site.address.city}</span>
+        </p>
+      </div>
+    </div>
+  </Section>
+
+  <Section tone="navy" label={t('about.methodLabel')} title={t('about.methodTitle')}>
+    <ol class="nb-method">
+      {method.map((m) => (
+        <li data-reveal class="nb-method__item">
+          <svg class="nb-method__mark" viewBox="4 11 40 26" aria-hidden="true">
+            <path d="M4 13H44" />
+            <path d="M10 37V29A14 14 0 0 1 38 29V37" />
+          </svg>
+          <h3 class="nb-method__title">{m.title}</h3>
+          <p class="nb-method__text">{m.text}</p>
+        </li>
+      ))}
+    </ol>
+  </Section>
+
+  <Section label={t('about.principlesLabel')} title={t('about.principlesTitle')}>
+    <dl class="nb-principles">
+      {principles.map((p) => (
+        <div data-reveal class="nb-principles__row">
+          <dt class="nb-principles__word">{p.title}</dt>
+          <dd class="nb-principles__text">{p.text}</dd>
+        </div>
+      ))}
+    </dl>
+  </Section>
+
+  <Section
+    tone="piedra"
+    label={t('about.teamLabel')}
+    title={t('about.teamTitle')}
+    lead={t('about.teamLead')}
+  >
+    <ul class="nb-team">
+      {team.map((m) => (
+        <li data-reveal class="nb-team__member">
+          <div class="nb-team__arch">
+            <Picture
+              src={portraits[entryKey(m)]}
+              formats={['avif', 'webp']}
+              widths={[320, 480, 720]}
+              sizes="(min-width: 1024px) 22vw, (min-width: 640px) 45vw, 90vw"
+              alt={m.data.name}
+              loading="lazy"
+              quality={74}
+              class="nb-team__img"
+            />
+          </div>
+          <div class="nb-team__body">
+            <h3 class="nb-team__name">{m.data.name}</h3>
+            <p class="nb-team__role">{m.data.role}</p>
+            <p class="nb-team__spec">
+              <span class="nb-team__label">{t('about.specialty')}</span>
+              {m.data.specialty}
+            </p>
+            <blockquote class="nb-team__quote">
+              <p>{m.data.quote}</p>
+            </blockquote>
+          </div>
+        </li>
+      ))}
+    </ul>
+  </Section>
+
+  <CtaBand title={t('about.ctaTitle')} text={t('about.ctaText')} />
+</BaseLayout>
+
+<style is:global>
+  /* Cabecera: la foto de la oficina a sangre; el texto sobre su mitad navy. */
+  .nb-about-hero {
+    position: relative;
+    display: flex;
+    align-items: flex-end;
+    min-height: min(88svh, 860px);
+    overflow: hidden;
+    background: var(--navy-800);
+    color: var(--white);
+  }
+  .nb-about-hero__img {
+    position: absolute;
+    inset: 0;
+    width: 100%;
+    height: 100%;
+    object-fit: cover;
+    object-position: 30% 50%;
+  }
+  .nb-about-hero__content {
+    position: relative;
+    display: grid;
+    gap: 24px;
+    width: 100%;
+    padding-block: calc(var(--header-h) + 64px) clamp(48px, 7vw, 96px);
+  }
+  .nb-about-hero__title {
+    margin: 0;
+    max-width: 13ch;
+    font-family: var(--font-display);
+    font-optical-sizing: auto;
+    font-size: clamp(2.5rem, 1rem + 4.6vw, 5.25rem);
+    font-weight: 300;
+    line-height: 1;
+    letter-spacing: -0.025em;
+    color: var(--white);
+  }
+  .nb-about-hero__lead {
+    margin: 0;
+    max-width: 34rem;
+    font-size: 1.1875rem;
+    line-height: 1.55;
+    color: var(--navy-100);
+  }
+  @media (max-width: 767px) {
+    .nb-about-hero__img {
+      object-position: 70% 50%;
+    }
+    .nb-about-hero::after {
+      content: '';
+      position: absolute;
+      inset: 0;
+      background: color-mix(in srgb, var(--navy-800) 72%, transparent);
+    }
+    .nb-about-hero__content {
+      z-index: 1;
+    }
+  }
+
+  .nb-story {
+    display: grid;
+    gap: 32px;
+  }
+  @media (min-width: 1024px) {
+    .nb-story {
+      grid-template-columns: minmax(0, 1fr) minmax(0, 1.25fr);
+      gap: 96px;
+    }
+  }
+  .nb-story__title {
+    margin: 0;
+    max-width: 12ch;
+    font-size: clamp(2.25rem, 1rem + 3vw, 3.75rem);
+    font-weight: 300;
+    line-height: 1.05;
+  }
+  .nb-story__body {
+    display: grid;
+    gap: 20px;
+    max-width: 40rem;
+  }
+  .nb-story__p {
+    margin: 0;
+    font-size: 1.0625rem;
+    line-height: 1.7;
+    color: var(--piedra-800);
+  }
+  .nb-story__p--lead {
+    font-family: var(--font-display);
+    font-size: clamp(1.375rem, 1rem + 1vw, 1.75rem);
+    line-height: 1.35;
+    color: var(--navy-800);
+  }
+  .nb-story__since {
+    display: flex;
+    align-items: baseline;
+    gap: 16px;
+    margin: 16px 0 0;
+    padding-top: 20px;
+    border-top: 1.5px solid var(--navy-800);
+    font-size: 0.8125rem;
+    font-weight: 600;
+    letter-spacing: 0.16em;
+    text-transform: uppercase;
+    color: var(--piedra-600);
+  }
+  .nb-story__year {
+    font-family: var(--font-display);
+    font-size: 3rem;
+    font-weight: 300;
+    letter-spacing: -0.02em;
+    color: var(--navy-800);
+  }
+
+  .nb-method {
+    display: grid;
+    gap: 40px;
+    margin: 0;
+    padding: 0;
+    list-style: none;
+  }
+  @media (min-width: 768px) {
+    .nb-method {
+      grid-template-columns: repeat(2, minmax(0, 1fr));
+      gap: 56px 64px;
+    }
+  }
+  @media (min-width: 1200px) {
+    .nb-method {
+      grid-template-columns: repeat(4, minmax(0, 1fr));
+    }
+  }
+  .nb-method__item {
+    display: grid;
+    align-content: start;
+    gap: 14px;
+  }
+  .nb-method__mark {
+    width: 40px;
+    height: 26px;
+    fill: none;
+    stroke: var(--salvia-300);
+    stroke-width: 4;
+  }
+  .nb-method__title {
+    margin: 0;
+    font-size: 1.5rem;
+    line-height: 1.2;
+    color: var(--white);
+  }
+  .nb-method__text {
+    margin: 0;
+    color: var(--navy-100);
+  }
+
+  .nb-principles {
+    margin: 0;
+    border-top: 1.5px solid var(--navy-800);
+  }
+  .nb-principles__row {
+    display: grid;
+    gap: 8px 48px;
+    padding-block: clamp(20px, 3vw, 36px);
+    border-bottom: 1px solid var(--piedra-200);
+  }
+  @media (min-width: 768px) {
+    .nb-principles__row {
+      grid-template-columns: minmax(0, 1fr) minmax(0, 1.4fr);
+      align-items: baseline;
+    }
+  }
+  .nb-principles__word {
+    font-family: var(--font-display);
+    font-optical-sizing: auto;
+    font-size: clamp(2.25rem, 1rem + 4vw, 4.5rem);
+    font-weight: 300;
+    line-height: 1;
+    letter-spacing: -0.02em;
+    color: var(--navy-800);
+  }
+  .nb-principles__text {
+    margin: 0;
+    max-width: 34rem;
+    font-size: 1.125rem;
+    line-height: 1.6;
+    color: var(--piedra-700);
+  }
+
+  .nb-team {
+    display: grid;
+    gap: 48px 24px;
+    margin: 0;
+    padding: 0;
+    list-style: none;
+  }
+  @media (min-width: 640px) {
+    .nb-team {
+      grid-template-columns: repeat(2, minmax(0, 1fr));
+    }
+  }
+  @media (min-width: 1024px) {
+    .nb-team {
+      grid-template-columns: repeat(4, minmax(0, 1fr));
+    }
+  }
+  .nb-team__member {
+    display: grid;
+    align-content: start;
+    gap: 20px;
+  }
+  /* Marco de arco (docs/02): semicírculo arriba, base recta. */
+  .nb-team__arch {
+    aspect-ratio: 3 / 4;
+    overflow: hidden;
+    border-radius: 9999px 9999px 0 0;
+    background: var(--piedra-200);
+  }
+  .nb-team__img {
+    width: 100%;
+    height: 100%;
+    object-fit: cover;
+    object-position: 50% 30%;
+    transition: transform 1200ms var(--ease-out);
+  }
+  .nb-team__member:hover .nb-team__img {
+    transform: scale(1.03);
+  }
+  .nb-team__body {
+    display: grid;
+    gap: 6px;
+  }
+  .nb-team__name {
+    margin: 0;
+    font-size: 1.5rem;
+  }
+  .nb-team__role {
+    margin: 0;
+    font-size: 0.9375rem;
+    color: var(--piedra-700);
+  }
+  .nb-team__spec {
+    margin: 8px 0 0;
+    font-size: 0.9375rem;
+    color: var(--navy-800);
+  }
+  .nb-team__label {
+    display: block;
+    margin-bottom: 2px;
+    font-size: 0.6875rem;
+    font-weight: 600;
+    letter-spacing: 0.14em;
+    text-transform: uppercase;
+    color: var(--piedra-600);
+  }
+  .nb-team__quote {
+    margin: 12px 0 0;
+    padding-top: 14px;
+    border-top: 1px solid var(--piedra-300);
+    font-family: var(--font-display);
+    font-style: italic;
+    font-size: 1.125rem;
+    line-height: 1.4;
+    color: var(--navy-800);
+  }
+  .nb-team__quote p {
+    margin: 0;
+  }
+</style>

@@ -25,7 +25,9 @@ export default defineConfig({
     mdx(),
     brandGuide,
     sitemap({
-      filter: (page) => !page.includes('/_brand'),
+      // Gracias es noindex: fuera del sitemap en todos los idiomas.
+      filter: (page) =>
+        !page.includes('/_brand') && !/\/(gracias|thank-you|danke|merci|grazie)\/?$/.test(page),
       i18n: {
         defaultLocale: 'es',
         locales: { es: 'es', en: 'en', de: 'de-CH', fr: 'fr-CH', it: 'it-CH' },

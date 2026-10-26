@@ -9,9 +9,11 @@ interface Crumb {
 }
 interface Props {
   items: Crumb[];
+  /** Sobre fondo oscuro (cabeceras con foto). */
+  tone?: 'light' | 'dark';
   class?: string;
 }
-const { items, class: className = '' } = Astro.props;
+const { items, tone = 'light', class: className = '' } = Astro.props;
 const all: Crumb[] = [{ label: t('nav.home'), href: lp('/') }, ...items];
 const jsonLd = {
   '@context': 'https://schema.org',
@@ -25,7 +27,10 @@ const jsonLd = {
 };
 ---
 
-<nav aria-label={t('nav.breadcrumbs')} class:list={['t-small', className]}>
+<nav
+  aria-label={t('nav.breadcrumbs')}
+  class:list={['t-small', tone === 'dark' && 'nb-crumbs--dark', className]}
+>
   <ol class="m-0 flex list-none flex-wrap items-center gap-x-2 gap-y-1 p-0">
     {all.map((c, i) => (
       <li class="flex items-center gap-2">
@@ -46,3 +51,15 @@ const jsonLd = {
   </ol>
 </nav>
 <script type="application/ld+json" set:html={JSON.stringify(jsonLd)} />
+<style is:global>
+  .nb-crumbs--dark,
+  .nb-crumbs--dark a {
+    color: var(--navy-100);
+  }
+  .nb-crumbs--dark a:hover {
+    color: var(--salvia-300);
+  }
+  .nb-crumbs--dark [aria-current] {
+    color: var(--white);
+  }
+</style>

@@ -1,0 +1,45 @@
+---
+/** Tabla del calendario fiscal (src/data/fiscal-calendar.ts) en el idioma de la página. */
+import { FISCAL_CALENDAR } from '../../data/fiscal-calendar';
+import { useI18n } from '../../i18n';
+interface Props {
+  when: string;
+  what: string;
+  need: string;
+  caption: string;
+}
+const { when, what, need, caption } = Astro.props;
+const { locale } = useI18n(Astro.currentLocale);
+const rows = [...FISCAL_CALENDAR].sort((a, b) => a.month - b.month);
+---
+
+<div class="nb-table">
+  <table>
+    <caption class="sr-only">{caption}</caption>
+    <thead>
+      <tr>
+        <th scope="col">{when}</th>
+        <th scope="col">{what}</th>
+        <th scope="col">{need}</th>
+      </tr>
+    </thead>
+    <tbody>
+      {rows.map((r) => (
+        <tr>
+          <th scope="row">{r.when[locale]}</th>
+          <td>{r.what[locale]}</td>
+          <td>{r.need[locale]}</td>
+        </tr>
+      ))}
+    </tbody>
+  </table>
+</div>
+
+<style is:global>
+  .nb-prose tbody th {
+    border-bottom: 1px solid var(--piedra-200);
+    font-weight: 600;
+    white-space: normal;
+    min-width: 9rem;
+  }
+</style>

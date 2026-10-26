@@ -1,0 +1,370 @@
+---
+import BaseLayout from '../layouts/BaseLayout.astro';
+import PageHeader from '../components/layout/PageHeader.astro';
+import Button from '../components/ui/Button.astro';
+import ContactForm from '../components/islands/ContactForm.tsx';
+import { useI18n, type Messages } from '../i18n';
+import { getBookingCta, site } from '../lib/site';
+
+const { t, tRaw, lp, locale } = useI18n(Astro.currentLocale);
+const bookingCta = getBookingCta(locale);
+const s = tRaw<Messages['form']>('form');
+const tel = `tel:${site.phone.replace(/\s/g, '')}`;
+---
+
+<BaseLayout title={t('contact.seoTitle')} description={t('contact.seoDescription')}>
+  <PageHeader
+    title={t('contact.title')}
+    lead={t('contact.lead')}
+    crumbs={[{ label: t('nav.contact') }]}
+  />
+
+  <section class="nb-contact nb-container">
+    <div class="nb-contact__form">
+      <h2 class="nb-contact__h">{t('contact.formTitle')}</h2>
+      <noscript>
+        <p class="nb-contact__noscript">
+          {t('form.noscript', { email: site.email, phone: site.phone })}
+        </p>
+      </noscript>
+      <ContactForm
+        client:visible
+        s={s}
+        privacyHref={lp('/privacidad')}
+        thanksHref={lp('/gracias')}
+        email={site.email}
+      />
+    </div>
+
+    <aside class="nb-contact__aside" data-surface="dark">
+      <h2 class="nb-contact__h nb-contact__h--light">{t('contact.dataTitle')}</h2>
+      <dl class="nb-contact__data">
+        <div>
+          <dt>{t('contact.address')}</dt>
+          <dd>
+            {site.legalName}
+            <br />
+            {site.address.street}
+            <br />
+            {site.address.postalCode} {site.address.city}
+          </dd>
+        </div>
+        <div>
+          <dt>{t('contact.phone')}</dt>
+          <dd>
+            <a href={tel}>{site.phone}</a>
+          </dd>
+        </div>
+        <div>
+          <dt>{t('contact.email')}</dt>
+          <dd>
+            <a href={`mailto:${site.email}`}>{site.email}</a>
+          </dd>
+        </div>
+        <div>
+          <dt>{t('contact.hours')}</dt>
+          <dd>{t('footer.hours')}</dd>
+        </div>
+      </dl>
+
+      <figure class="nb-map">
+        <svg viewBox="0 0 400 260" role="img" aria-label={t('contact.mapLabel')}>
+          <rect width="400" height="260" class="nb-map__land"></rect>
+          <path
+            class="nb-map__lake"
+            d="M0 150 C 60 140 110 165 150 190 C 190 215 215 238 240 260 L 0 260 Z"
+          ></path>
+          <g class="nb-map__streets">
+            <path d="M40 0 C 90 60 160 110 250 170 S 360 230 400 240"></path>
+            <path d="M120 0 C 160 50 220 95 300 140 S 380 180 400 190"></path>
+            <path d="M210 0 C 240 40 290 75 400 120"></path>
+            <path d="M0 70 L 400 70"></path>
+            <path d="M260 0 L 180 260"></path>
+            <path d="M340 0 L 300 260"></path>
+          </g>
+          <g class="nb-map__station">
+            <rect x="118" y="38" width="44" height="10" rx="1"></rect>
+          </g>
+          <text x="140" y="30" class="nb-map__label" text-anchor="middle">
+            {t('contact.mapStation')}
+          </text>
+          <text x="70" y="228" class="nb-map__label nb-map__label--lake">
+            {t('contact.mapLake')}
+          </text>
+          <g class="nb-map__pin" transform="translate(262 128)">
+            <circle r="22" class="nb-map__halo"></circle>
+            <path d="M-12 -7H12M-8.5 7V3A8.5 8.5 0 0 1 8.5 3V7"></path>
+          </g>
+        </svg>
+        <figcaption>{t('contact.directions')}</figcaption>
+      </figure>
+
+      <div class="nb-contact__book">
+        <p class="nb-contact__book-title">{t('contact.bookTitle')}</p>
+        <p class="nb-contact__book-text">{t('contact.bookText')}</p>
+        <Button href={bookingCta.href} on="dark" arrow>
+          {bookingCta.label}
+        </Button>
+      </div>
+    </aside>
+  </section>
+</BaseLayout>
+
+<style is:global>
+  .nb-contact {
+    display: grid;
+    gap: 16px;
+    align-items: start;
+    padding-block: clamp(32px, 5vw, 72px) var(--section-y);
+  }
+  @media (min-width: 1024px) {
+    .nb-contact {
+      grid-template-columns: minmax(0, 1.25fr) minmax(0, 1fr);
+    }
+  }
+  .nb-contact__form,
+  .nb-contact__aside {
+    display: grid;
+    gap: 24px;
+    padding: clamp(24px, 3.5vw, 48px);
+    border-radius: var(--radius-card, 8px);
+  }
+  .nb-contact__form {
+    background: var(--piedra-100);
+  }
+  .nb-contact__aside {
+    background: var(--navy-800);
+    color: var(--navy-100);
+  }
+  .nb-contact__h {
+    margin: 0;
+    font-size: clamp(1.75rem, 1rem + 1.5vw, 2.5rem);
+    font-weight: 300;
+  }
+  .nb-contact__h--light {
+    color: var(--white);
+  }
+  .nb-contact__noscript {
+    margin: 0;
+    padding: 16px;
+    border: 1px solid var(--info-icon);
+    border-radius: var(--radius-button, 4px);
+    background: var(--info-bg);
+    color: var(--info-text);
+  }
+  .nb-contact__data {
+    display: grid;
+    gap: 18px;
+    margin: 0;
+  }
+  .nb-contact__data dt {
+    font-size: 0.6875rem;
+    font-weight: 600;
+    letter-spacing: 0.14em;
+    text-transform: uppercase;
+    color: var(--navy-200);
+  }
+  .nb-contact__data dd {
+    margin: 4px 0 0;
+    font-size: 1.0625rem;
+    line-height: 1.5;
+    color: var(--white);
+  }
+  .nb-contact__data a {
+    color: var(--white);
+    text-decoration: none;
+  }
+  .nb-contact__data a:hover {
+    color: var(--salvia-300);
+  }
+  .nb-contact__book {
+    display: grid;
+    justify-items: start;
+    gap: 8px;
+    padding-top: 24px;
+    border-top: 1px solid var(--navy-600);
+  }
+  .nb-contact__book-title {
+    margin: 0;
+    font-family: var(--font-display);
+    font-size: 1.5rem;
+    color: var(--white);
+  }
+  .nb-contact__book-text {
+    margin: 0 0 8px;
+  }
+
+  /* Mapa estático estilizado: sin proveedores externos. */
+  .nb-map {
+    margin: 0;
+  }
+  .nb-map svg {
+    display: block;
+    width: 100%;
+    height: auto;
+    border-radius: var(--radius-button, 4px);
+  }
+  .nb-map__land {
+    fill: var(--navy-700);
+  }
+  .nb-map__lake {
+    fill: var(--navy-900);
+  }
+  .nb-map__streets path {
+    fill: none;
+    stroke: var(--navy-600);
+    stroke-width: 1.5;
+  }
+  .nb-map__station rect {
+    fill: var(--navy-400);
+  }
+  .nb-map__label {
+    font-family: var(--font-sans);
+    font-size: 11px;
+    font-weight: 600;
+    letter-spacing: 0.08em;
+    text-transform: uppercase;
+    fill: var(--navy-200);
+  }
+  .nb-map__label--lake {
+    fill: var(--navy-300);
+  }
+  .nb-map__halo {
+    fill: var(--white);
+  }
+  .nb-map__pin path {
+    fill: none;
+    stroke: var(--navy-800);
+    stroke-width: 2.5;
+  }
+  .nb-map figcaption {
+    margin-top: 10px;
+    font-size: 0.875rem;
+    color: var(--navy-200);
+  }
+
+  /* Formulario (isla ContactForm). */
+  .nb-form {
+    display: grid;
+    gap: 20px;
+  }
+  .nb-form__grid {
+    display: grid;
+    gap: 20px;
+  }
+  @media (min-width: 640px) {
+    .nb-form__grid {
+      grid-template-columns: repeat(2, minmax(0, 1fr));
+    }
+  }
+  .nb-form__field {
+    display: grid;
+    gap: 6px;
+  }
+  .nb-form__field > label {
+    font-size: 0.9375rem;
+    font-weight: 600;
+    color: var(--navy-800);
+  }
+  .nb-form__optional {
+    font-weight: 400;
+    color: var(--piedra-600);
+  }
+  .nb-form__hint {
+    margin: 0;
+    font-size: 0.875rem;
+    color: var(--piedra-600);
+  }
+  .nb-form input:not([type='checkbox']),
+  .nb-form select,
+  .nb-form textarea {
+    width: 100%;
+    min-height: 48px;
+    padding: 10px 14px;
+    border: 1px solid var(--piedra-300);
+    border-radius: var(--radius-button, 4px);
+    background: var(--white);
+    font: inherit;
+    font-size: 1rem;
+    color: var(--navy-800);
+    transition: border-color var(--dur-fast) var(--ease-out);
+  }
+  .nb-form textarea {
+    resize: vertical;
+  }
+  .nb-form input:hover,
+  .nb-form select:hover,
+  .nb-form textarea:hover {
+    border-color: var(--piedra-500);
+  }
+  .nb-form :is(input, select, textarea):focus-visible {
+    border-color: var(--navy-800);
+    outline: 2px solid var(--navy-600);
+    outline-offset: 2px;
+  }
+  .nb-form [aria-invalid='true'] {
+    border-color: var(--error-icon);
+  }
+  .nb-form__error {
+    margin: 0;
+    font-size: 0.875rem;
+    color: var(--error-text);
+  }
+  .nb-form__summary {
+    margin: 0;
+    padding: 14px 16px;
+    border: 1px solid var(--error-icon);
+    border-radius: var(--radius-button, 4px);
+    background: var(--error-bg);
+    color: var(--error-text);
+    font-size: 0.9375rem;
+  }
+  .nb-form__check {
+    display: flex;
+    gap: 12px;
+    align-items: flex-start;
+    font-size: 0.9375rem;
+    line-height: 1.5;
+    color: var(--piedra-800);
+    cursor: pointer;
+  }
+  .nb-form__check input {
+    flex: none;
+    width: 20px;
+    height: 20px;
+    margin-top: 2px;
+    accent-color: var(--navy-800);
+  }
+  .nb-form__check a {
+    color: var(--navy-600);
+    font-weight: 600;
+  }
+  .nb-form__submit {
+    display: inline-flex;
+    align-items: center;
+    justify-self: start;
+    gap: 10px;
+    min-height: 48px;
+    padding: 0 22px;
+    border: 0;
+    border-radius: var(--radius-button, 4px);
+    background: var(--navy-800);
+    font: inherit;
+    font-size: 0.9375rem;
+    font-weight: 600;
+    color: var(--white);
+    cursor: pointer;
+    transition: background-color var(--dur-fast) var(--ease-out);
+  }
+  .nb-form__submit:hover {
+    background: var(--navy-700);
+  }
+  .nb-form__submit:disabled {
+    opacity: 0.6;
+    cursor: progress;
+  }
+  .nb-form__submit:focus-visible {
+    outline: 2px solid var(--navy-600);
+    outline-offset: 3px;
+  }
+</style>

@@ -69,11 +69,13 @@ test('país: cambia moneda y formas jurídicas, independiente del idioma, y se r
 }) => {
   await page.setViewportSize({ width: 1440, height: 900 });
   await page.goto('/precios', { waitUntil: 'networkidle' });
-  const growth = page.locator('ul li .t-price').nth(1);
-  const constitution = page.locator('main li').filter({ hasText: 'Constitución de empresa.' });
+  const growth = page.locator('.nb-pk .t-price').nth(1);
+  const constitution = page
+    .locator('.nb-ledger__row')
+    .filter({ hasText: 'Constitución de empresa' });
   // Por defecto, Suiza: francos convertidos desde el euro, GmbH y AG.
   await expect(
-    page.locator('ul li .font-sans').filter({ hasText: 'CHF/mes' }).first(),
+    page.locator('.nb-pk .font-sans').filter({ hasText: 'CHF/mes' }).first(),
   ).toBeVisible();
   await expect(constitution).toContainText('GmbH', { useInnerText: true });
   const chf = Number((await growth.innerText()).replace(/\D/g, ''));
@@ -91,5 +93,5 @@ test('país: cambia moneda y formas jurídicas, independiente del idioma, y se r
   // Al cambiar de idioma se mantiene el país.
   await page.goto('/en/pricing');
   await expect(page.locator('html')).toHaveAttribute('data-country', 'ES');
-  await expect(page.locator('ul li .t-price').nth(1)).toHaveText('490', { useInnerText: true });
+  await expect(page.locator('.nb-pk .t-price').nth(1)).toHaveText('490', { useInnerText: true });
 });

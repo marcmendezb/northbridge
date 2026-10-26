@@ -1,0 +1,244 @@
+import type { Locale } from '../i18n/locales';
+
+/**
+ * Calendario fiscal de una pyme de Zúrich con ejercicio igual al año natural (docs/09).
+ * Datos estructurados para reutilizarlos en el calendario interactivo de la fase 2.
+ * Fuentes y fecha de comprobación: DECISIONES.md y el artículo «calendario-fiscal-para-pymes».
+ */
+type Text = Record<Locale, string>;
+export interface FiscalEvent {
+  id: string;
+  /** Mes (1–12) en que vence, para ordenar y agrupar. */
+  month: number;
+  when: Text;
+  what: Text;
+  need: Text;
+}
+
+export const FISCAL_CALENDAR: FiscalEvent[] = [
+  {
+    id: 'ahv-salaries',
+    month: 1,
+    when: {
+      es: '30 de enero',
+      en: '30 January',
+      de: '30. Januar',
+      fr: '30 janvier',
+      it: '30 gennaio',
+    },
+    what: {
+      es: 'Declaración anual de salarios a la caja de compensación (AVS)',
+      en: 'Annual salary declaration to the compensation fund (AHV)',
+      de: 'Jährliche Lohnbescheinigung an die Ausgleichskasse (AHV)',
+      fr: 'Déclaration annuelle des salaires à la caisse de compensation (AVS)',
+      it: 'Dichiarazione annuale dei salari alla cassa di compensazione (AVS)',
+    },
+    need: {
+      es: 'Las nóminas del año cerradas y los cambios de personal.',
+      en: 'The year’s payroll closed and any staff changes.',
+      de: 'Die abgeschlossenen Löhne des Jahres und Personalwechsel.',
+      fr: 'Les salaires de l’année clôturés et les changements de personnel.',
+      it: 'Le buste paga dell’anno chiuse e i cambi di personale.',
+    },
+  },
+  {
+    id: 'salary-certificates',
+    month: 2,
+    when: {
+      es: 'Enero o febrero',
+      en: 'January or February',
+      de: 'Januar oder Februar',
+      fr: 'Janvier ou février',
+      it: 'Gennaio o febbraio',
+    },
+    what: {
+      es: 'Certificados de salario (Lohnausweis) a cada empleado',
+      en: 'Salary certificates (Lohnausweis) for each employee',
+      de: 'Lohnausweise an alle Mitarbeitenden',
+      fr: 'Certificats de salaire (Lohnausweis) à chaque employé',
+      it: 'Certificati di salario (Lohnausweis) a ogni dipendente',
+    },
+    need: {
+      es: 'Nada nuevo: salen de las nóminas que ya llevamos.',
+      en: 'Nothing new: they come from the payroll we already run.',
+      de: 'Nichts Neues: Sie entstehen aus den Löhnen, die wir schon führen.',
+      fr: 'Rien de nouveau : ils découlent des salaires que nous gérons déjà.',
+      it: 'Niente di nuovo: derivano dalle paghe che già gestiamo.',
+    },
+  },
+  {
+    id: 'vat-q4',
+    month: 3,
+    when: {
+      es: '60 días tras el 31 de diciembre (finales de febrero)',
+      en: '60 days after 31 December (end of February)',
+      de: '60 Tage nach dem 31. Dezember (Ende Februar)',
+      fr: '60 jours après le 31 décembre (fin février)',
+      it: '60 giorni dopo il 31 dicembre (fine febbraio)',
+    },
+    what: {
+      es: 'IVA del 4.º trimestre o del 2.º semestre (tipo de saldo)',
+      en: 'VAT for Q4, or for the second half (net tax rate)',
+      de: 'MWST 4. Quartal oder 2. Semester (Saldosteuersatz)',
+      fr: 'TVA du 4e trimestre ou du 2e semestre (taux de la dette fiscale nette)',
+      it: 'IVA del 4° trimestre o del 2° semestre (aliquota saldo)',
+    },
+    need: {
+      es: 'Facturas y extractos de octubre a diciembre antes del 15 de enero.',
+      en: 'Invoices and statements for October to December by 15 January.',
+      de: 'Rechnungen und Auszüge Oktober bis Dezember bis 15. Januar.',
+      fr: 'Factures et relevés d’octobre à décembre avant le 15 janvier.',
+      it: 'Fatture ed estratti da ottobre a dicembre entro il 15 gennaio.',
+    },
+  },
+  {
+    id: 'individuals',
+    month: 3,
+    when: {
+      es: '31 de marzo',
+      en: '31 March',
+      de: '31. März',
+      fr: '31 mars',
+      it: '31 marzo',
+    },
+    what: {
+      es: 'Declaración de impuestos de personas físicas (también autónomos)',
+      en: 'Tax return for individuals (including the self-employed)',
+      de: 'Steuererklärung natürliche Personen (auch Selbstständige)',
+      fr: 'Déclaration d’impôt des personnes physiques (indépendants compris)',
+      it: 'Dichiarazione d’imposta delle persone fisiche (anche indipendenti)',
+    },
+    need: {
+      es: 'Si eres autónomo, el cierre de tu año contable.',
+      en: 'If you are self-employed, your closed accounts for the year.',
+      de: 'Wenn du selbstständig bist: dein Jahresabschluss.',
+      fr: 'Si vous êtes indépendant, la clôture de votre exercice.',
+      it: 'Se sei indipendente, la chiusura del tuo anno contabile.',
+    },
+  },
+  {
+    id: 'vat-q1',
+    month: 5,
+    when: {
+      es: '60 días tras el 31 de marzo (finales de mayo)',
+      en: '60 days after 31 March (end of May)',
+      de: '60 Tage nach dem 31. März (Ende Mai)',
+      fr: '60 jours après le 31 mars (fin mai)',
+      it: '60 giorni dopo il 31 marzo (fine maggio)',
+    },
+    what: {
+      es: 'IVA del 1.er trimestre',
+      en: 'VAT for Q1',
+      de: 'MWST 1. Quartal',
+      fr: 'TVA du 1er trimestre',
+      it: 'IVA del 1° trimestre',
+    },
+    need: {
+      es: 'Facturas y extractos de enero a marzo antes del 15 de abril.',
+      en: 'Invoices and statements for January to March by 15 April.',
+      de: 'Rechnungen und Auszüge Januar bis März bis 15. April.',
+      fr: 'Factures et relevés de janvier à mars avant le 15 avril.',
+      it: 'Fatture ed estratti da gennaio a marzo entro il 15 aprile.',
+    },
+  },
+  {
+    id: 'vat-q2',
+    month: 8,
+    when: {
+      es: '60 días tras el 30 de junio (finales de agosto)',
+      en: '60 days after 30 June (end of August)',
+      de: '60 Tage nach dem 30. Juni (Ende August)',
+      fr: '60 jours après le 30 juin (fin août)',
+      it: '60 giorni dopo il 30 giugno (fine agosto)',
+    },
+    what: {
+      es: 'IVA del 2.º trimestre o del 1.er semestre (tipo de saldo)',
+      en: 'VAT for Q2, or for the first half (net tax rate)',
+      de: 'MWST 2. Quartal oder 1. Semester (Saldosteuersatz)',
+      fr: 'TVA du 2e trimestre ou du 1er semestre (taux de la dette fiscale nette)',
+      it: 'IVA del 2° trimestre o del 1° semestre (aliquota saldo)',
+    },
+    need: {
+      es: 'Facturas y extractos de abril a junio antes del 15 de julio.',
+      en: 'Invoices and statements for April to June by 15 July.',
+      de: 'Rechnungen und Auszüge April bis Juni bis 15. Juli.',
+      fr: 'Factures et relevés d’avril à juin avant le 15 juillet.',
+      it: 'Fatture ed estratti da aprile a giugno entro il 15 luglio.',
+    },
+  },
+  {
+    id: 'companies',
+    month: 9,
+    when: {
+      es: '30 de septiembre',
+      en: '30 September',
+      de: '30. September',
+      fr: '30 septembre',
+      it: '30 settembre',
+    },
+    what: {
+      es: 'Declaración de impuestos de la sociedad (GmbH, AG) y vencimiento de los impuestos cantonales y municipales',
+      en: 'Company tax return (GmbH, AG) and due date of cantonal and communal taxes',
+      de: 'Steuererklärung der Gesellschaft (GmbH, AG) und Fälligkeit der Staats- und Gemeindesteuern',
+      fr: 'Déclaration d’impôt de la société (GmbH, AG) et échéance des impôts cantonaux et communaux',
+      it: 'Dichiarazione d’imposta della società (GmbH, AG) e scadenza delle imposte cantonali e comunali',
+    },
+    need: {
+      es: 'Las cuentas anuales aprobadas. Si no llegas, pedimos la prórroga a tiempo.',
+      en: 'The approved annual accounts. If you need more time, we request the extension in time.',
+      de: 'Die genehmigte Jahresrechnung. Reicht die Zeit nicht, beantragen wir rechtzeitig die Fristerstreckung.',
+      fr: 'Les comptes annuels approuvés. S’il faut plus de temps, nous demandons la prolongation à temps.',
+      it: 'I conti annuali approvati. Se serve più tempo, chiediamo la proroga per tempo.',
+    },
+  },
+  {
+    id: 'vat-q3',
+    month: 11,
+    when: {
+      es: '60 días tras el 30 de septiembre (finales de noviembre)',
+      en: '60 days after 30 September (end of November)',
+      de: '60 Tage nach dem 30. September (Ende November)',
+      fr: '60 jours après le 30 septembre (fin novembre)',
+      it: '60 giorni dopo il 30 settembre (fine novembre)',
+    },
+    what: {
+      es: 'IVA del 3.er trimestre',
+      en: 'VAT for Q3',
+      de: 'MWST 3. Quartal',
+      fr: 'TVA du 3e trimestre',
+      it: 'IVA del 3° trimestre',
+    },
+    need: {
+      es: 'Facturas y extractos de julio a septiembre antes del 15 de octubre.',
+      en: 'Invoices and statements for July to September by 15 October.',
+      de: 'Rechnungen und Auszüge Juli bis September bis 15. Oktober.',
+      fr: 'Factures et relevés de juillet à septembre avant le 15 octobre.',
+      it: 'Fatture ed estratti da luglio a settembre entro il 15 ottobre.',
+    },
+  },
+  {
+    id: 'companies-extension',
+    month: 11,
+    when: {
+      es: '30 de noviembre',
+      en: '30 November',
+      de: '30. November',
+      fr: '30 novembre',
+      it: '30 novembre',
+    },
+    what: {
+      es: 'Último día de la prórroga ordinaria para la declaración de la sociedad',
+      en: 'Last day of the ordinary extension for the company tax return',
+      de: 'Letzter Tag der ordentlichen Fristerstreckung für die Steuererklärung der Gesellschaft',
+      fr: 'Dernier jour de la prolongation ordinaire pour la déclaration de la société',
+      it: 'Ultimo giorno della proroga ordinaria per la dichiarazione della società',
+    },
+    need: {
+      es: 'Solo si pediste prórroga: el cierre definitivo.',
+      en: 'Only if you asked for an extension: the final accounts.',
+      de: 'Nur bei Fristerstreckung: der definitive Abschluss.',
+      fr: 'Seulement si vous avez demandé une prolongation : la clôture définitive.',
+      it: 'Solo se hai chiesto la proroga: la chiusura definitiva.',
+    },
+  },
+];

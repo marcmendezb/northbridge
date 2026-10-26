@@ -1,0 +1,52 @@
+---
+import { render, type CollectionEntry } from 'astro:content';
+import BaseLayout from '../layouts/BaseLayout.astro';
+import PageHeader from '../components/layout/PageHeader.astro';
+import { useI18n } from '../i18n';
+import { formatDate } from '../lib/format';
+
+/** Privacidad, aviso legal y cookies: plantillas ficticias (src/content/legal/README.md). */
+interface Props {
+  entry: CollectionEntry<'legal'>;
+}
+const { entry } = Astro.props;
+const { t, locale } = useI18n(Astro.currentLocale);
+const { Content, headings } = await render(entry);
+const toc = headings.filter((h) => h.depth === 2);
+---
+
+<BaseLayout title={entry.data.title} description={entry.data.description}>
+  <PageHeader
+    title={entry.data.title}
+    lead={t('legal.updated', { date: formatDate(entry.data.updatedAt, locale) })}
+    crumbs={[{ label: entry.data.title }]}
+  />
+  <div class="nb-container nb-art nb-legal">
+    {toc.length > 2 && (
+      <nav class="nb-art__toc" aria-labelledby="legal-toc">
+        <p class="nb-art__toc-title" id="legal-toc">
+          {t('legal.onThisPage')}
+        </p>
+        <ol>
+          {toc.map((h) => (
+            <li>
+              <a href={`#${h.slug}`}>{h.text}</a>
+            </li>
+          ))}
+        </ol>
+      </nav>
+    )}
+    <article class="nb-prose nb-legal__body">
+      <Content />
+    </article>
+  </div>
+</BaseLayout>
+
+<style is:global>
+  .nb-legal .nb-prose {
+    font-size: 1.0625rem;
+  }
+  .nb-legal .nb-prose h2 {
+    font-size: clamp(1.5rem, 1rem + 1vw, 1.875rem);
+  }
+</style>

@@ -50,4 +50,48 @@ const testimonios = defineCollection({
   }),
 });
 
-export const collections = { servicios, testimonios };
+/** Equipo (docs/09): ficticio. La clave del archivo es la misma en todos los idiomas y nombra la foto. */
+const equipo = defineCollection({
+  loader: glob({ pattern: '*/*.json', base: './src/content/equipo' }),
+  schema: z.object({
+    name: z.string(),
+    role: z.string(),
+    specialty: z.string(),
+    quote: z.string(),
+    order: z.number(),
+    email: z.string().optional(),
+    fictional: z.literal(true),
+  }),
+});
+
+export const blogCategories = ['constitucion', 'fiscal', 'startups', 'contabilidad'] as const;
+
+/** Artículos de Recursos (docs/09). `author` es la clave del archivo de equipo (sin idioma). */
+const blog = defineCollection({
+  loader: glob({ pattern: '*/*.{md,mdx}', base: './src/content/blog' }),
+  schema: z.object({
+    title: z.string(),
+    description: z.string(),
+    category: z.enum(blogCategories),
+    publishedAt: z.coerce.date(),
+    updatedAt: z.coerce.date().optional(),
+    /** Fecha en que se comprobaron los datos legales y fiscales (DECISIONES.md). */
+    checkedAt: z.coerce.date(),
+    author: z.string(),
+    featured: z.boolean().default(false),
+    draft: z.boolean().default(false),
+    sources: z.array(z.object({ label: z.string(), url: z.url() })).default([]),
+  }),
+});
+
+/** Páginas legales: plantillas ficticias, ver src/content/legal/README.md. */
+const legal = defineCollection({
+  loader: glob({ pattern: '*/*.md', base: './src/content/legal' }),
+  schema: z.object({
+    title: z.string(),
+    description: z.string(),
+    updatedAt: z.coerce.date(),
+  }),
+});
+
+export const collections = { servicios, testimonios, equipo, blog, legal };
