@@ -1,0 +1,72 @@
+---
+import Container from './Container.astro';
+import Pattern from '../brand/Pattern.astro';
+
+/** Sección con padding vertical de marca y, opcionalmente, cabecera al estilo del manual. */
+interface Props {
+  tone?: 'base' | 'piedra' | 'navy';
+  /** Etiqueta de sección (Salvia 600). */
+  label?: string;
+  title?: string;
+  lead?: string;
+  /** Filete superior de 1,5 px en azul marino (estructura). */
+  rule?: boolean;
+  pattern?: boolean;
+  id?: string;
+  headingLevel?: 'h1' | 'h2';
+  class?: string;
+}
+const {
+  tone = 'base',
+  label,
+  title,
+  lead,
+  rule = false,
+  pattern = false,
+  id,
+  headingLevel = 'h2',
+  class: className = '',
+} = Astro.props;
+const Heading = headingLevel;
+const toneClass = {
+  base: 'bg-piedra-50 text-navy-800',
+  piedra: 'bg-piedra-100 text-navy-800',
+  navy: 'bg-navy-800 text-piedra-50',
+}[tone];
+const hasHeader = Boolean(label || title || lead);
+---
+
+<section
+  id={id}
+  data-surface={tone === 'navy' ? 'dark' : undefined}
+  class:list={['relative overflow-hidden py-[var(--section-y)]', toneClass, className]}
+>
+  {pattern && (
+    <Pattern
+      tone={tone === 'navy' ? 'dark' : 'light'}
+      mask="left"
+      class="absolute inset-0 -z-0 opacity-60"
+    />
+  )}
+  <Container class="relative">
+    {hasHeader && (
+      <div
+        class:list={[
+          'mb-14 flex flex-wrap items-baseline gap-x-16 gap-y-4',
+          rule && 'border-t-[1.5px] border-navy-800 pt-5',
+        ]}
+      >
+        {label && (
+          <p class:list={['t-eyebrow m-0 md:basis-44', tone === 'navy' && '!text-salvia-300']}>
+            {label}
+          </p>
+        )}
+        <div class="flex min-w-0 flex-1 basis-[520px] flex-col gap-4">
+          {title && <Heading class="t-h2-lg m-0">{title}</Heading>}
+          {lead && <p class:list={['t-lead m-0', tone === 'navy' && '!text-navy-100']}>{lead}</p>}
+        </div>
+      </div>
+    )}
+    <slot />
+  </Container>
+</section>

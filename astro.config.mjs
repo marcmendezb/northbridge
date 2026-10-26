@@ -5,10 +5,27 @@ import mdx from '@astrojs/mdx';
 import sitemap from '@astrojs/sitemap';
 import tailwindcss from '@tailwindcss/vite';
 
+/** Ruta interna /_brand (guía viva): solo en desarrollo; Astro ignora los archivos con prefijo _ en pages/. */
+/** @type {import('astro').AstroIntegration} */
+const brandGuide = {
+  name: 'brand-guide',
+  hooks: {
+    'astro:config:setup': ({ command, injectRoute }) => {
+      if (command === 'dev')
+        injectRoute({ pattern: '/_brand', entrypoint: './src/dev/brand.astro' });
+    },
+  },
+};
+
 export default defineConfig({
   site: process.env.PUBLIC_SITE_URL ?? 'https://northbridge.ch',
   output: 'static',
-  integrations: [react(), mdx(), sitemap({ filter: (page) => !page.includes('/_brand') })],
+  integrations: [
+    react(),
+    mdx(),
+    brandGuide,
+    sitemap({ filter: (page) => !page.includes('/_brand') }),
+  ],
   i18n: {
     defaultLocale: 'es',
     locales: ['es'],

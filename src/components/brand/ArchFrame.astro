@@ -1,0 +1,19 @@
+---
+import Pattern from './Pattern.astro';
+
+/** Marco de arco para retratos: contenedor más alto que ancho, semicírculo arriba, base recta. */
+interface Props {
+  ratio?: string;
+  class?: string;
+}
+const { ratio = '3 / 4', class: className = '' } = Astro.props;
+---
+
+<div
+  class:list={['relative overflow-hidden rounded-arch bg-piedra-100', className]}
+  style={`aspect-ratio:${ratio}`}
+>
+  <slot>
+    <Pattern tone="light" class="absolute inset-0" mask="bottom" />
+  </slot>
+</div>

@@ -1,0 +1,19 @@
+---
+/** Etiqueta (radio 2 px). */
+interface Props {
+  tone?: 'neutral' | 'navy' | 'salvia';
+  class?: string;
+}
+const { tone = 'neutral', class: className = '' } = Astro.props;
+const tones = {
+  neutral: 'bg-piedra-100 text-piedra-700',
+  navy: 'bg-navy-800 text-white',
+  salvia: 'bg-salvia-400 text-navy-800',
+};
+---
+
+<span
+  class:list={['t-label inline-flex items-center rounded-tag px-2 py-1', tones[tone], className]}
+>
+  <slot />
+</span>

@@ -1,0 +1,117 @@
+---
+import { uid as makeUid } from '../../lib/uid';
+
+/** Acordeón accesible. Sin JS, todo el contenido queda visible; con JS se pliega con grid-template-rows (0fr → 1fr). */
+interface Item {
+  q: string;
+  a: string;
+}
+interface Props {
+  items: Item[];
+  /** Nivel del encabezado de cada pregunta. */
+  level?: 'h3' | 'h4';
+  openFirst?: boolean;
+  class?: string;
+}
+const { items, level = 'h3', openFirst = false, class: className = '' } = Astro.props;
+const Heading = level;
+const uid = makeUid('acc');
+---
+
+<div
+  class:list={['nb-acc divide-y divide-piedra-200 border-y border-piedra-200', className]}
+  data-accordion
+>
+  {items.map((item, i) => {
+    const open = openFirst && i === 0;
+    return (
+      <div class="nb-acc__item">
+        <Heading class="m-0 font-sans text-[1.0625rem] font-semibold leading-snug">
+          <button
+            type="button"
+            class="nb-acc__btn flex min-h-11 w-full items-center justify-between gap-4 py-4 text-left"
+            aria-expanded={open ? 'true' : 'false'}
+            aria-controls={`acc-${uid}-${i}`}
+            id={`acc-${uid}-${i}-btn`}
+          >
+            <span>{item.q}</span>
+            <svg
+              class="nb-acc__chev h-4 w-4 flex-none"
+              viewBox="0 0 16 16"
+              fill="none"
+              stroke="currentColor"
+              stroke-width="1.5"
+              aria-hidden="true"
+            >
+              <path d="M2 6l6 6 6-6" />
+            </svg>
+          </button>
+        </Heading>
+        <div
+          class="nb-acc__panel"
+          id={`acc-${uid}-${i}`}
+          role="region"
+          aria-labelledby={`acc-${uid}-${i}-btn`}
+          data-open={open ? 'true' : 'false'}
+        >
+          <div class="nb-acc__inner">
+            <p class="t-body m-0 pb-5">{item.a}</p>
+          </div>
+        </div>
+      </div>
+    );
+  })}
+</div>
+
+<style is:global>
+  .nb-acc__chev {
+    display: none;
+  }
+  .nb-acc__btn {
+    cursor: default;
+  }
+  .js .nb-acc__chev {
+    display: block;
+    transition: transform var(--dur-fast) var(--ease-out);
+  }
+  .js .nb-acc__btn {
+    cursor: pointer;
+  }
+  .js .nb-acc__btn[aria-expanded='true'] .nb-acc__chev {
+    transform: rotate(180deg);
+  }
+  .js .nb-acc__panel {
+    display: grid;
+    grid-template-rows: 0fr;
+    visibility: hidden;
+    transition:
+      grid-template-rows var(--dur-base) var(--ease-out),
+      visibility 0s linear var(--dur-base);
+  }
+  .js .nb-acc__panel[data-open='true'] {
+    grid-template-rows: 1fr;
+    visibility: visible;
+    transition:
+      grid-template-rows var(--dur-base) var(--ease-out),
+      visibility 0s;
+  }
+  .nb-acc__inner {
+    min-height: 0;
+    overflow: hidden;
+  }
+</style>
+
+<script>
+  function setup(root: HTMLElement) {
+    root.querySelectorAll<HTMLButtonElement>('.nb-acc__btn').forEach((btn) => {
+      btn.addEventListener('click', () => {
+        const panel = document.getElementById(btn.getAttribute('aria-controls') ?? '');
+        if (!panel) return;
+        const open = btn.getAttribute('aria-expanded') !== 'true';
+        btn.setAttribute('aria-expanded', String(open));
+        panel.dataset.open = String(open);
+      });
+    });
+  }
+  document.querySelectorAll<HTMLElement>('[data-accordion]').forEach(setup);
+</script>

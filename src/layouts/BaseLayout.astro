@@ -1,0 +1,75 @@
+---
+import '@fontsource-variable/newsreader/opsz.css';
+import '@fontsource-variable/instrument-sans/wght.css';
+import '../styles/global.css';
+import newsreaderLatin from '@fontsource-variable/newsreader/files/newsreader-latin-opsz-normal.woff2?url';
+import instrumentLatin from '@fontsource-variable/instrument-sans/files/instrument-sans-latin-wght-normal.woff2?url';
+import Header from '../components/layout/Header.astro';
+import Footer from '../components/layout/Footer.astro';
+import { t } from '../i18n';
+import { site } from '../lib/site';
+import { readTokens } from '../lib/contrast';
+
+const themeColor = readTokens()['navy-800'];
+
+interface Props {
+  title?: string;
+  description?: string;
+  noindex?: boolean;
+  transparentHeader?: boolean;
+  minimalHeader?: boolean;
+  /** Pantallas sin pie (p. ej. herramientas internas). */
+  hideFooter?: boolean;
+}
+const {
+  title,
+  description = t('brand.descriptor'),
+  noindex = false,
+  transparentHeader = false,
+  minimalHeader = false,
+  hideFooter = false,
+} = Astro.props;
+
+const fullTitle = title ? `${title} · ${site.name}` : `${site.name} · ${t('brand.claim')}`;
+const canonical = new URL(Astro.url.pathname, Astro.site ?? site.url);
+---
+
+<!doctype html>
+<html lang="es">
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <script is:inline>
+      document.documentElement.classList.add('js');
+    </script>
+    <title>{fullTitle}</title>
+    <meta name="description" content={description} />
+    <link rel="canonical" href={canonical} />
+    {noindex && <meta name="robots" content="noindex, nofollow" />}
+    <link rel="icon" type="image/svg+xml" href="/favicon.svg" />
+    <meta name="theme-color" content={themeColor} />
+    <meta property="og:type" content="website" />
+    <meta property="og:site_name" content={site.name} />
+    <meta property="og:locale" content="es_ES" />
+    <meta property="og:title" content={fullTitle} />
+    <meta property="og:description" content={description} />
+    <meta property="og:url" content={canonical} />
+    <meta name="twitter:card" content="summary" />
+    <link rel="preload" as="font" type="font/woff2" href={newsreaderLatin} crossorigin />
+    <link rel="preload" as="font" type="font/woff2" href={instrumentLatin} crossorigin />
+    <slot name="head" />
+  </head>
+  <body class="flex min-h-dvh flex-col">
+    <a
+      href="#contenido"
+      class="sr-only-focusable fixed top-3 left-3 z-50 rounded-button bg-navy-800 px-4 py-3 text-sm font-semibold text-white no-underline"
+    >
+      {t('nav.skipToContent')}
+    </a>
+    <Header transparent={transparentHeader} minimal={minimalHeader} />
+    <main id="contenido" tabindex="-1" class="flex-1 outline-none">
+      <slot />
+    </main>
+    {!hideFooter && <Footer />}
+  </body>
+</html>

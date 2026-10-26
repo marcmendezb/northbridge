@@ -1,0 +1,282 @@
+---
+import Logo from '../brand/Logo.astro';
+import Button from '../ui/Button.astro';
+import Container from '../ui/Container.astro';
+import { t } from '../../i18n';
+import { bookingCta, mainNav } from '../../lib/site';
+
+interface Props {
+  /** Transparente sobre el hero (se solidifica tras 24 px de scroll). */
+  transparent?: boolean;
+  /** Cabecera reducida (landing de consulta): solo logo y CTA. */
+  minimal?: boolean;
+}
+const { transparent = false, minimal = false } = Astro.props;
+const path = Astro.url.pathname.replace(/\/$/, '') || '/';
+const isCurrent = (href: string) => path === href || (href !== '/' && path.startsWith(`${href}/`));
+---
+
+<header
+  class="nb-header"
+  data-transparent={transparent ? '' : undefined}
+  data-minimal={minimal ? '' : undefined}
+>
+  <Container class="flex h-[var(--header-h)] items-center justify-between gap-6">
+    <a href="/" class="nb-header__logo -m-2 block p-2 no-underline">
+      <Logo size={24} />
+    </a>
+
+    {!minimal && (
+      <nav aria-label={t('nav.main')} class="nb-nav hidden items-center gap-8 md:flex">
+        <ul class="m-0 flex list-none items-center gap-7 p-0">
+          {mainNav.map((l) => (
+            <li>
+              <a
+                href={l.href}
+                class="nb-nav__link"
+                aria-current={isCurrent(l.href) ? 'page' : undefined}
+              >
+                {l.label}
+              </a>
+            </li>
+          ))}
+        </ul>
+        <Button href={bookingCta.href} size="sm" class="nb-cta">
+          {t('nav.freeConsultation')}
+        </Button>
+      </nav>
+    )}
+    {minimal && (
+      <Button href={bookingCta.href} size="sm" class="nb-cta hidden sm:inline-flex">
+        {t('nav.freeConsultation')}
+      </Button>
+    )}
+
+    {!minimal && (
+      <button
+        type="button"
+        class="nb-menu-btn -mr-2 h-11 w-11 items-center justify-center"
+        aria-expanded="false"
+        aria-controls="mobile-menu"
+        aria-label={t('nav.openMenu')}
+        data-label-open={t('nav.openMenu')}
+        data-label-close={t('nav.closeMenu')}
+      >
+        <svg
+          viewBox="0 0 24 24"
+          width="24"
+          height="24"
+          fill="none"
+          stroke="currentColor"
+          stroke-width="1.5"
+          aria-hidden="true"
+        >
+          <path class="nb-menu-btn__open" d="M3 7h18M3 12h18M3 17h18" />
+          <path class="nb-menu-btn__close" d="M5 5l14 14M19 5L5 19" />
+        </svg>
+      </button>
+    )}
+  </Container>
+
+  {!minimal && (
+    <div id="mobile-menu" class="nb-mobile md:hidden" data-open="false">
+      <Container>
+        <nav aria-label={t('nav.main')} class="py-4">
+          <ul class="m-0 flex list-none flex-col p-0">
+            {mainNav.map((l) => (
+              <li class="border-b border-piedra-200">
+                <a
+                  href={l.href}
+                  class="nb-mobile__link"
+                  aria-current={isCurrent(l.href) ? 'page' : undefined}
+                >
+                  {l.label}
+                </a>
+              </li>
+            ))}
+          </ul>
+          <Button href={bookingCta.href} class="mt-5 w-full">
+            {bookingCta.label}
+          </Button>
+        </nav>
+      </Container>
+    </div>
+  )}
+</header>
+
+<style is:global>
+  :root {
+    --header-h: 72px;
+  }
+
+  .nb-header {
+    position: sticky;
+    top: 0;
+    z-index: 40;
+    background: var(--piedra-50);
+    color: var(--navy-800);
+    border-bottom: 1px solid var(--rule);
+    transition:
+      background-color var(--dur-fast) var(--ease-out),
+      border-color var(--dur-fast) var(--ease-out);
+  }
+  .nb-header[data-transparent] {
+    margin-bottom: calc(var(--header-h) * -1);
+  }
+  .nb-header[data-transparent]:not([data-scrolled]):not([data-menu-open]) {
+    background: transparent;
+    border-bottom-color: transparent;
+    color: var(--piedra-50);
+  }
+  .nb-header[data-transparent]:not([data-scrolled]):not([data-menu-open]) .nb-logo {
+    color: var(--white);
+  }
+  .nb-header[data-transparent]:not([data-scrolled]):not([data-menu-open]) .nb-nav__link:hover {
+    color: var(--salvia-300);
+  }
+  .nb-header[data-transparent]:not([data-scrolled]):not([data-menu-open]) :focus-visible {
+    outline-color: var(--salvia-300);
+  }
+  .nb-header[data-transparent]:not([data-scrolled]):not([data-menu-open]) .nb-cta {
+    background: var(--white);
+    color: var(--navy-800);
+  }
+
+  .nb-nav__link {
+    font-size: 0.9375rem;
+    font-weight: 500;
+    color: inherit;
+    text-decoration: none;
+    padding: 0.5rem 0;
+    border-bottom: 1.5px solid transparent;
+    transition:
+      color var(--dur-fast) var(--ease-out),
+      border-color var(--dur-fast) var(--ease-out);
+  }
+  .nb-nav__link:hover {
+    color: var(--salvia-600);
+  }
+  .nb-nav__link[aria-current='page'] {
+    border-bottom-color: currentColor;
+  }
+
+  /* Menú móvil: sin JS, los enlaces quedan visibles bajo la cabecera; con JS se abre y se cierra. */
+  .nb-menu-btn {
+    display: none;
+  }
+  .nb-menu-btn__close {
+    display: none;
+  }
+  .js .nb-menu-btn {
+    display: inline-flex;
+  }
+  @media (min-width: 768px) {
+    .js .nb-menu-btn {
+      display: none;
+    }
+  }
+  .nb-menu-btn[aria-expanded='true'] .nb-menu-btn__open {
+    display: none;
+  }
+  .nb-menu-btn[aria-expanded='true'] .nb-menu-btn__close {
+    display: inline;
+  }
+  .js .nb-mobile {
+    display: none;
+  }
+  .js .nb-mobile[data-open='true'] {
+    display: block;
+    animation: nb-menu-in var(--dur-base) var(--ease-out);
+  }
+  .nb-mobile {
+    background: var(--piedra-50);
+    color: var(--navy-800);
+  }
+  .nb-mobile__link {
+    display: block;
+    padding: 0.875rem 0;
+    min-height: 44px;
+    font-family: var(--font-display);
+    font-size: 1.5rem;
+    color: inherit;
+    text-decoration: none;
+  }
+  .nb-mobile__link[aria-current='page'] {
+    text-decoration: underline;
+    text-underline-offset: 6px;
+    text-decoration-thickness: 1.5px;
+  }
+  @keyframes nb-menu-in {
+    from {
+      opacity: 0;
+      transform: translateY(-8px);
+    }
+    to {
+      opacity: 1;
+      transform: none;
+    }
+  }
+</style>
+
+<script>
+  const header = document.querySelector<HTMLElement>('.nb-header');
+  if (header) {
+    const btn = header.querySelector<HTMLButtonElement>('.nb-menu-btn');
+    const panel = header.querySelector<HTMLElement>('#mobile-menu');
+
+    // Solidificar tras 24 px de scroll.
+    const onScroll = () => header.toggleAttribute('data-scrolled', window.scrollY > 24);
+    onScroll();
+    window.addEventListener('scroll', onScroll, { passive: true });
+
+    if (btn && panel) {
+      const focusables = () =>
+        [btn, ...panel.querySelectorAll<HTMLElement>('a[href], button:not([disabled])')].filter(
+          (el) => el.offsetParent !== null,
+        );
+
+      const setOpen = (open: boolean, returnFocus = true) => {
+        btn.setAttribute('aria-expanded', String(open));
+        btn.setAttribute(
+          'aria-label',
+          (open ? btn.dataset.labelClose : btn.dataset.labelOpen) ?? '',
+        );
+        panel.dataset.open = String(open);
+        header.toggleAttribute('data-menu-open', open);
+        document.documentElement.style.overflow = open ? 'hidden' : '';
+        if (open) panel.querySelector<HTMLElement>('a')?.focus();
+        else if (returnFocus) btn.focus();
+      };
+
+      btn.addEventListener('click', () => setOpen(btn.getAttribute('aria-expanded') !== 'true'));
+      panel.addEventListener('click', (e) => {
+        if ((e.target as HTMLElement).closest('a')) setOpen(false, false);
+      });
+
+      header.addEventListener('keydown', (e) => {
+        if (btn.getAttribute('aria-expanded') !== 'true') return;
+        if (e.key === 'Escape') {
+          e.preventDefault();
+          setOpen(false);
+        } else if (e.key === 'Tab') {
+          const items = focusables();
+          const first = items[0];
+          const last = items[items.length - 1];
+          const active = document.activeElement;
+          if (e.shiftKey && active === first) {
+            e.preventDefault();
+            last.focus();
+          } else if (!e.shiftKey && active === last) {
+            e.preventDefault();
+            first.focus();
+          }
+        }
+      });
+
+      // Al pasar a escritorio, cerrar el menú.
+      window.matchMedia('(min-width: 768px)').addEventListener('change', (m) => {
+        if (m.matches) setOpen(false, false);
+      });
+    }
+  }
+</script>

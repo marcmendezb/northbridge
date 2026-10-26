@@ -1,0 +1,48 @@
+---
+import Contabilidad from '../../assets/icons/contabilidad.svg';
+import Iva from '../../assets/icons/iva.svg';
+import Nominas from '../../assets/icons/nominas.svg';
+import Constitucion from '../../assets/icons/constitucion.svg';
+import Startups from '../../assets/icons/startups.svg';
+import EstadoExito from '../../assets/icons/estado-exito.svg';
+import EstadoAviso from '../../assets/icons/estado-aviso.svg';
+import EstadoError from '../../assets/icons/estado-error.svg';
+import EstadoInfo from '../../assets/icons/estado-info.svg';
+
+const icons = {
+  contabilidad: Contabilidad,
+  iva: Iva,
+  nominas: Nominas,
+  constitucion: Constitucion,
+  startups: Startups,
+  'estado-exito': EstadoExito,
+  'estado-aviso': EstadoAviso,
+  'estado-error': EstadoError,
+  'estado-info': EstadoInfo,
+} as const;
+
+export type IconName = keyof typeof icons;
+
+interface Props {
+  name: IconName;
+  /** Tamaño en px; el trazo escala con el icono. */
+  size?: number;
+  /** Salvia 600 solo para icono activo o seleccionado. */
+  active?: boolean;
+  /** Si se indica, el icono es informativo; si no, decorativo. */
+  label?: string;
+  class?: string;
+}
+const { name, size = 24, active = false, label, class: className = '' } = Astro.props;
+const Svg = icons[name];
+---
+
+<Svg
+  width={size}
+  height={size}
+  class:list={['nb-icon inline-block flex-none', active ? 'text-salvia-600' : '', className]}
+  role={label ? 'img' : undefined}
+  aria-label={label}
+  aria-hidden={label ? undefined : 'true'}
+  focusable="false"
+/>

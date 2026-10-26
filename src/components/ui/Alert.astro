@@ -1,0 +1,53 @@
+---
+import Icon from '../brand/Icon.astro';
+import { t } from '../../i18n';
+
+/** Alerta semántica: texto en la columna «Texto» (AA); icono y filete en la columna «Icono / borde». */
+interface Props {
+  variant?: 'success' | 'warning' | 'error' | 'info';
+  title?: string;
+  class?: string;
+}
+const { variant = 'info', title, class: className = '' } = Astro.props;
+const styles = {
+  success: {
+    box: 'bg-success-bg text-success-text border-success-icon',
+    icon: 'text-success-icon',
+    name: 'estado-exito',
+  },
+  warning: {
+    box: 'bg-warning-bg text-warning-text border-warning-icon',
+    icon: 'text-warning-icon',
+    name: 'estado-aviso',
+  },
+  error: {
+    box: 'bg-error-bg text-error-text border-error-icon',
+    icon: 'text-error-icon',
+    name: 'estado-error',
+  },
+  info: {
+    box: 'bg-info-bg text-info-text border-info-icon',
+    icon: 'text-info-icon',
+    name: 'estado-info',
+  },
+} as const;
+const s = styles[variant];
+const role = variant === 'error' ? 'alert' : 'status';
+---
+
+<div
+  role={role}
+  class:list={[
+    'flex gap-3 rounded-button border-l-[3px] p-4 text-[0.9375rem] leading-normal',
+    s.box,
+    className,
+  ]}
+>
+  <Icon name={s.name} class:list={['mt-0.5', s.icon]} label={t(`alert.${variant}`)} />
+  <div class="min-w-0">
+    {title && <p class="m-0 font-semibold">{title}</p>}
+    <div>
+      <slot />
+    </div>
+  </div>
+</div>

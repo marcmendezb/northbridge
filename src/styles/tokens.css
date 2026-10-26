@@ -1,0 +1,178 @@
+/* Tokens de marca · Northbridge Brand Book v1.0 (docs/02-marca.md y docs/06-animacion.md).
+   Única fuente de verdad: aquí viven todos los hex del proyecto. */
+
+:root {
+  /* Azul Limmat (navy) */
+  --navy-50: #eef2f7;
+  --navy-100: #d5deea;
+  --navy-200: #abbcd4;
+  --navy-300: #7d96b9;
+  --navy-400: #557399;
+  --navy-500: #3a5880;
+  --navy-600: #2a4469;
+  --navy-700: #1e3454;
+  --navy-800: #152742;
+  --navy-900: #0d1a2e;
+
+  /* Gris Molasa (piedra) */
+  --piedra-50: #f8f6f3;
+  --piedra-100: #efece7;
+  --piedra-200: #e2ddd5;
+  --piedra-300: #ccc5ba;
+  --piedra-400: #ada497;
+  --piedra-500: #8c8376;
+  --piedra-600: #6e665b;
+  --piedra-700: #554f46;
+  --piedra-800: #3c3832;
+  --piedra-900: #26231f;
+
+  /* Verde Salvia */
+  --salvia-50: #f2f6f2;
+  --salvia-100: #e1eae1;
+  --salvia-200: #c5d6c6;
+  --salvia-300: #a3bea5;
+  --salvia-400: #84a587;
+  --salvia-500: #688b6c;
+  --salvia-600: #527156;
+  --salvia-700: #405943;
+  --salvia-800: #2f4232;
+  --salvia-900: #1f2c21;
+
+  /* Superficies elevadas y logo monocromo */
+  --white: #ffffff;
+  --black: #000000;
+
+  /* Semánticos: fondo · texto (AA) · icono/borde */
+  --success-bg: #e6f0e8;
+  --success-text: #2f5a3d;
+  --success-icon: #3e7350;
+  --warning-bg: #faf0dc;
+  --warning-text: #7a4f12;
+  --warning-icon: #94621a;
+  --error-bg: #f9e8e5;
+  --error-text: #8e3128;
+  --error-icon: #a63b30;
+  --info-bg: #eef2f7;
+  --info-text: #1e3454;
+  --info-icon: #2a4469;
+
+  /* Roles */
+  --bg: var(--piedra-50);
+  --fg: var(--navy-800);
+  --fg-body: var(--piedra-800);
+  --fg-muted: var(--piedra-600);
+  --rule: var(--piedra-200);
+  --rule-strong: var(--navy-800);
+  --focus: var(--navy-600);
+
+  /* Espaciado (base 4 px) */
+  --space-1: 4px;
+  --space-2: 8px;
+  --space-3: 16px;
+  --space-4: 24px;
+  --space-5: 40px;
+  --space-6: 64px;
+  --space-7: 112px;
+
+  /* Layout */
+  --content-max: 1200px;
+  --gutter: 24px;
+  --section-y: 64px;
+  --measure-body: 640px;
+  --measure-article: 680px;
+
+  /* Tipografía */
+  --font-display: 'Newsreader Variable', 'Newsreader', Georgia, 'Times New Roman', serif;
+  --font-text:
+    'Instrument Sans Variable', 'Instrument Sans', system-ui, -apple-system, 'Segoe UI', Arial,
+    sans-serif;
+
+  /* Movimiento */
+  --ease-out: cubic-bezier(0.22, 1, 0.36, 1);
+  --ease-in-out: cubic-bezier(0.65, 0, 0.35, 1);
+  --dur-fast: 200ms;
+  --dur-base: 500ms;
+  --dur-slow: 900ms;
+  --dur-scene: 1600ms;
+
+  /* Línea */
+  --hairline: 1px;
+  --stroke-structure: 1.5px;
+}
+
+@media (min-width: 768px) {
+  :root {
+    --gutter: 40px;
+    --section-y: 112px;
+  }
+}
+
+/* Tailwind v4: solo existen los colores de la marca (sin paleta por defecto). */
+@theme inline {
+  --color-*: initial;
+  --color-transparent: transparent;
+  --color-current: currentColor;
+  --color-white: var(--white);
+  --color-black: var(--black);
+
+  --color-navy-50: var(--navy-50);
+  --color-navy-100: var(--navy-100);
+  --color-navy-200: var(--navy-200);
+  --color-navy-300: var(--navy-300);
+  --color-navy-400: var(--navy-400);
+  --color-navy-500: var(--navy-500);
+  --color-navy-600: var(--navy-600);
+  --color-navy-700: var(--navy-700);
+  --color-navy-800: var(--navy-800);
+  --color-navy-900: var(--navy-900);
+
+  --color-piedra-50: var(--piedra-50);
+  --color-piedra-100: var(--piedra-100);
+  --color-piedra-200: var(--piedra-200);
+  --color-piedra-300: var(--piedra-300);
+  --color-piedra-400: var(--piedra-400);
+  --color-piedra-500: var(--piedra-500);
+  --color-piedra-600: var(--piedra-600);
+  --color-piedra-700: var(--piedra-700);
+  --color-piedra-800: var(--piedra-800);
+  --color-piedra-900: var(--piedra-900);
+
+  --color-salvia-50: var(--salvia-50);
+  --color-salvia-100: var(--salvia-100);
+  --color-salvia-200: var(--salvia-200);
+  --color-salvia-300: var(--salvia-300);
+  --color-salvia-400: var(--salvia-400);
+  --color-salvia-500: var(--salvia-500);
+  --color-salvia-600: var(--salvia-600);
+  --color-salvia-700: var(--salvia-700);
+  --color-salvia-800: var(--salvia-800);
+  --color-salvia-900: var(--salvia-900);
+
+  --color-success-bg: var(--success-bg);
+  --color-success-text: var(--success-text);
+  --color-success-icon: var(--success-icon);
+  --color-warning-bg: var(--warning-bg);
+  --color-warning-text: var(--warning-text);
+  --color-warning-icon: var(--warning-icon);
+  --color-error-bg: var(--error-bg);
+  --color-error-text: var(--error-text);
+  --color-error-icon: var(--error-icon);
+  --color-info-bg: var(--info-bg);
+  --color-info-text: var(--info-text);
+  --color-info-icon: var(--info-icon);
+
+  --radius-*: initial;
+  --radius-tag: 2px;
+  --radius-button: 4px;
+  --radius-card: 8px;
+  --radius-arch: 9999px 9999px 0 0;
+
+  --font-*: initial;
+  --font-serif: var(--font-display);
+  --font-sans: var(--font-text);
+
+  --ease-*: initial;
+
+  --shadow-*: initial;
+  --shadow-card: 0 1px 2px rgb(21 39 66 / 0.06);
+}

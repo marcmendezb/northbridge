@@ -1,13 +1,12 @@
 ---
+import BaseLayout from '../layouts/BaseLayout.astro';
+import Container from '../components/ui/Container.astro';
+import { t } from '../i18n';
 ---
 
-<html lang="es">
-  <head>
-    <meta charset="utf-8" />
-    <meta name="viewport" content="width=device-width, initial-scale=1" />
-    <title>Northbridge Advisory</title>
-  </head>
-  <body>
-    <main><h1>Northbridge Advisory</h1></main>
-  </body>
-</html>
+<BaseLayout>
+  <Container class="py-24">
+    <h1>{t('brand.claim')}</h1>
+    <p class="t-lead mt-4">{t('brand.descriptor')}</p>
+  </Container>
+</BaseLayout>

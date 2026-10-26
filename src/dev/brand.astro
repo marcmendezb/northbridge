@@ -1,0 +1,955 @@
+---
+/** /_brand · guía viva del brand book v1.0. Solo desarrollo, noindex. Los hex se leen de tokens.css. */
+import BaseLayout from '../layouts/BaseLayout.astro';
+import Logo from '../components/brand/Logo.astro';
+import BridgeMark from '../components/brand/BridgeMark.astro';
+import ArchFrame from '../components/brand/ArchFrame.astro';
+import BoardLine from '../components/brand/BoardLine.astro';
+import Pattern from '../components/brand/Pattern.astro';
+import Icon from '../components/brand/Icon.astro';
+import type { IconName } from '../components/brand/Icon.astro';
+import Button from '../components/ui/Button.astro';
+import Card from '../components/ui/Card.astro';
+import Tag from '../components/ui/Tag.astro';
+import Alert from '../components/ui/Alert.astro';
+import Accordion from '../components/ui/Accordion.astro';
+import Section from '../components/ui/Section.astro';
+import Container from '../components/ui/Container.astro';
+import Breadcrumbs from '../components/layout/Breadcrumbs.astro';
+import { contrastPairs, contrastRatio, forbiddenPairs, readTokens } from '../lib/contrast';
+import { formatCHF } from '../lib/format';
+
+const tokens = readTokens();
+const hex = (name: string) => tokens[name].toUpperCase();
+const scales = ['navy', 'piedra', 'salvia'] as const;
+const steps = [50, 100, 200, 300, 400, 500, 600, 700, 800, 900];
+const scaleTitle = {
+  navy: 'Azul Limmat · navy',
+  piedra: 'Gris Molasa · piedra',
+  salvia: 'Verde Salvia · salvia',
+};
+const onSwatch = (name: string) =>
+  contrastRatio(tokens[name], tokens.white) >= contrastRatio(tokens[name], tokens['navy-800'])
+    ? 'var(--white)'
+    : 'var(--navy-800)';
+const fmt = (n: number) => n.toFixed(2).replace('.', ',');
+
+const sections = [
+  ['logotipo', 'Logotipo'],
+  ['color', 'Color'],
+  ['tipografia', 'Tipografía'],
+  ['iconos', 'Iconografía'],
+  ['fotografia', 'Fotografía'],
+  ['elementos', 'Elementos gráficos'],
+  ['voz', 'Tono de voz'],
+  ['componentes', 'Componentes UI'],
+  ['movimiento', 'Movimiento'],
+];
+const serviceIcons: IconName[] = ['contabilidad', 'iva', 'nominas', 'constitucion', 'startups'];
+const stateIcons: IconName[] = ['estado-exito', 'estado-aviso', 'estado-error', 'estado-info'];
+const semantic = [
+  ['success', 'Éxito'],
+  ['warning', 'Aviso'],
+  ['error', 'Error'],
+  ['info', 'Información'],
+] as const;
+const scale = [
+  ['H1', 'Newsreader 400 · 56 / 1.05', 'h1', 'Tus números, bajo control.'],
+  ['H2', 'Newsreader 400 · 40 / 1.1', 'h2', 'La tranquilidad de una gran firma'],
+  ['H3', 'Newsreader 500 · 28 / 1.2', 'h3', 'Contabilidad y cierres anuales'],
+  ['H4', 'Instrument Sans 600 · 20 / 1.3', 'h4', 'Qué incluye'],
+] as const;
+const jargon = [
+  [
+    'Procederemos a la regularización de las discrepancias detectadas en la conciliación bancaria.',
+    'Hemos encontrado dos movimientos del banco que no cuadran. Los corregimos esta semana.',
+  ],
+  [
+    'Le recordamos la obligatoriedad de presentar la documentación en tiempo y forma.',
+    'Necesitamos tus facturas de octubre antes del 10 de noviembre para presentar el IVA a tiempo.',
+  ],
+  [
+    'Ofrecemos soluciones integrales de outsourcing contable orientadas a la optimización de recursos.',
+    'Llevamos tu contabilidad para que tú dediques ese tiempo a tu negocio.',
+  ],
+  [
+    'La sociedad deberá dotar la reserva legal conforme a lo dispuesto en el CO.',
+    'Por ley, una parte del beneficio debe quedarse en la empresa como reserva. Este año son 2 400 CHF.',
+  ],
+  [
+    'Su consulta ha sido derivada al departamento correspondiente.',
+    'Marc, tu asesor, te llama mañana antes de las 12:00.',
+  ],
+];
+const faq = [
+  {
+    q: '¿Qué necesito para empezar?',
+    a: 'Tus facturas, el acceso de lectura al banco y el último cierre, si lo tienes. Con eso ya podemos arrancar.',
+  },
+  {
+    q: '¿Cuándo tengo el cierre anual?',
+    a: 'Si cierras el 31 de diciembre y nos envías todo antes del 15 de enero, tienes los estados financieros a finales de febrero.',
+  },
+  {
+    q: 'Mi contabilidad va atrasada, ¿podéis ayudarme?',
+    a: 'Sí. Empezamos por ponerla al día y te damos un plan con fechas. Se presupuesta aparte, con precio cerrado.',
+  },
+];
+---
+
+<BaseLayout
+  title="Brand · guía viva"
+  description="Guía viva interna del brand book v1.0."
+  noindex
+  transparentHeader
+>
+  <!-- Portada -->
+  <header data-surface="dark" class="relative overflow-hidden bg-navy-800 text-piedra-50">
+    <Pattern tone="dark" mask="left" class="absolute inset-0" />
+    <Container class="relative flex min-h-[640px] flex-col justify-between gap-16 pt-28 pb-16">
+      <div class="t-eyebrow flex flex-wrap justify-between gap-4 !text-salvia-200">
+        <span>Guía viva · uso interno</span>
+        <span>Brand book v1.0 · Octubre 2026</span>
+      </div>
+      <div class="flex flex-col gap-10">
+        <Logo tone="negative" size={88} class="max-w-full [@media(max-width:800px)]:!text-[44px]" />
+        <p class="m-0 max-w-[560px] font-serif text-[1.75rem] font-light leading-snug text-navy-100">
+          Fiduciaria y contabilidad en Zúrich para pymes, autónomos y startups. Desde 2014.
+        </p>
+      </div>
+      <nav aria-label="Secciones de la guía">
+        <ul class="m-0 grid max-w-[880px] list-none grid-cols-[repeat(auto-fit,minmax(170px,1fr))] gap-x-6 gap-y-2 p-0 text-sm">
+          {sections.map(([id, label], i) => (
+            <li>
+              <a href={`#${id}`} class="flex gap-2.5 text-piedra-50 no-underline hover:underline">
+                <span class="text-salvia-300">{String(i + 1).padStart(2, '0')}</span>
+                {label}
+              </a>
+            </li>
+          ))}
+        </ul>
+      </nav>
+    </Container>
+  </header>
+
+  <!-- 01 Logotipo -->
+  <Section
+    id="logotipo"
+    label="01 · Logotipo"
+    title="Versiones del logotipo"
+    lead="El wordmark combina «Northbridge» en Newsreader Medium con «ADVISORY» en Instrument Sans SemiBold espaciada. Componente <Logo variant tone size /> con SVG inline y currentColor."
+    rule
+  >
+    <div class="grid gap-6 md:grid-cols-3">
+      {(
+        [
+          ['horizontal', 'Horizontal · principal'],
+          ['vertical', 'Vertical'],
+          ['symbol', 'Solo símbolo'],
+        ] as const
+      ).map(([v, label]) => (
+        <figure class="m-0">
+          <div class="flex h-60 items-center justify-center rounded-card border border-piedra-200 bg-white">
+            <Logo variant={v} size={v === 'symbol' ? 64 : 34} />
+          </div>
+          <figcaption class="t-small mt-3">{label}</figcaption>
+        </figure>
+      ))}
+    </div>
+
+    <div class="mt-8 grid gap-6 sm:grid-cols-2 lg:grid-cols-4">
+      <figure class="m-0">
+        <div class="flex h-40 items-center justify-center rounded-card border border-piedra-200 bg-piedra-100">
+          <Logo size={26} />
+        </div>
+        <figcaption class="t-small mt-3">Positivo · Azul marino 800 sobre claro</figcaption>
+      </figure>
+      <figure class="m-0">
+        <div class="flex h-40 items-center justify-center rounded-card bg-navy-800">
+          <Logo tone="negative" size={26} />
+        </div>
+        <figcaption class="t-small mt-3">Negativo · Blanco sobre azul marino</figcaption>
+      </figure>
+      <figure class="m-0">
+        <div class="flex h-40 items-center justify-center rounded-card border border-piedra-200 bg-white">
+          <Logo tone="mono" size={26} />
+        </div>
+        <figcaption class="t-small mt-3">Monocromo · Negro 100 % (fax, sellos, grabado)</figcaption>
+      </figure>
+      <figure class="m-0">
+        <div class="flex h-40 items-center justify-center rounded-card bg-salvia-400">
+          <Logo size={26} />
+        </div>
+        <figcaption class="t-small mt-3">Azul marino sobre salvia (uso puntual)</figcaption>
+      </figure>
+    </div>
+
+    <div class="mt-8 grid gap-6 lg:grid-cols-2">
+      <Card class="p-8">
+        <h3 class="mb-8 font-serif text-[1.75rem] font-normal">Zona de seguridad</h3>
+        <div class="flex justify-center">
+          <div class="relative bg-piedra-100 outline outline-1 outline-dashed outline-navy-300">
+            <Logo size={34} safeZone class="bg-white" />
+          </div>
+        </div>
+        <p class="t-small mt-6">
+          x = altura del símbolo. Ningún texto, imagen o borde de soporte debe entrar en este
+          margen. En el símbolo aislado, la zona es ½ x.
+        </p>
+      </Card>
+      <Card class="p-8">
+        <h3 class="mb-8 font-serif text-[1.75rem] font-normal">Tamaño mínimo</h3>
+        <div class="flex flex-wrap items-end gap-10">
+          <div>
+            <Logo size={18} />
+            <p class="t-small mt-2">
+              Horizontal
+              <br />
+              120 px
+            </p>
+          </div>
+          <div>
+            <Logo variant="vertical" size={14} />
+            <p class="t-small mt-2">
+              Vertical
+              <br />
+              64 px
+            </p>
+          </div>
+          <div>
+            <Logo variant="symbol" size={16} />
+            <p class="t-small mt-2">
+              Símbolo
+              <br />
+              16 px
+            </p>
+          </div>
+          <div>
+            <Logo variant="symbol" size={20} />
+            <p class="t-small mt-2">
+              Favicon
+              <br />
+              20 px · retícula 16
+            </p>
+          </div>
+        </div>
+        <p class="t-small mt-6">
+          Por debajo de 24 px de altura se usa la versión de favicon: trazo de 2 px ajustado a píxel
+          entero.
+        </p>
+      </Card>
+    </div>
+
+    <Card class="mt-6 p-8">
+      <h3 class="mb-6 font-serif text-[1.75rem] font-normal">Construcción del símbolo</h3>
+      <div class="flex flex-wrap items-center gap-10">
+        <svg
+          viewBox="0 0 48 48"
+          width="240"
+          height="240"
+          class="rounded-card bg-piedra-50 text-navy-800"
+          role="img"
+          aria-label="Retícula de 48 por 48 con el tablero y el arco tangente"
+        >
+          <g stroke="currentColor" stroke-width="0.15" opacity="0.35" fill="none">
+            {Array.from({ length: 13 }, (_, i) => (
+              <path d={`M${i * 4} 0V48M0 ${i * 4}H48`} />
+            ))}
+          </g>
+          <g fill="none" stroke="currentColor" stroke-width="4">
+            <path d="M4 13H44"></path>
+            <path d="M10 37V29A14 14 0 0 1 38 29V37"></path>
+          </g>
+        </svg>
+        <ul class="t-body m-0 list-disc pl-5">
+          <li>Retícula 48 × 48, trazo 4 (1/10 del ancho), igual en ambas líneas.</li>
+          <li>Arco: semicírculo de radio 14 con pilares rectos de 8 unidades.</li>
+          <li>Arco y tablero siempre tangentes. Terminales rectos.</li>
+        </ul>
+      </div>
+    </Card>
+
+    <h3 class="mt-14 mb-6 font-serif text-[1.75rem] font-normal">Usos incorrectos</h3>
+    <div class="grid gap-6 md:grid-cols-3">
+      {[
+        ['No deformar.', 'Escalar siempre de forma proporcional.', 'scale-x-[1.35] scale-y-[0.8]'],
+        ['No recolorear.', 'Solo azul marino, blanco o negro.', 'text-warning-icon'],
+        [
+          'No alterar la construcción.',
+          'Arco y tablero siempre tangentes; sin cursivas ni giros.',
+          '-skew-x-12 italic',
+        ],
+      ].map(([a, b, cls]) => (
+        <figure class="m-0">
+          <div class="relative flex h-44 items-center justify-center overflow-hidden rounded-card border border-piedra-200 bg-white">
+            <Logo size={26} class={cls} />
+            <svg
+              class="absolute inset-0 h-full w-full text-error-icon"
+              preserveAspectRatio="none"
+              viewBox="0 0 100 100"
+              aria-hidden="true"
+            >
+              <path
+                d="M5 95L95 5"
+                stroke="currentColor"
+                stroke-width="1"
+                vector-effect="non-scaling-stroke"
+                fill="none"
+              ></path>
+            </svg>
+          </div>
+          <figcaption class="t-small mt-3">
+            <strong class="text-error-text">{a}</strong> {b}
+          </figcaption>
+        </figure>
+      ))}
+    </div>
+  </Section>
+
+  <!-- 02 Color -->
+  <Section
+    id="color"
+    tone="piedra"
+    label="02 · Color"
+    title="Paleta"
+    lead="Fondo base Piedra 50, texto Navy 800. Blanco puro solo en tarjetas y superficies elevadas. Proporción 60 / 30 / 10."
+    rule
+  >
+    <div class="grid gap-6 md:grid-cols-3">
+      {[
+        ['Azul Limmat', 'Principal', 'navy-800'],
+        ['Gris Molasa', 'Neutro', 'piedra-100'],
+        ['Verde Salvia', 'Acento', 'salvia-400'],
+      ].map(([name, role, token]) => (
+        <div class="overflow-hidden rounded-card border border-piedra-200 bg-white">
+          <div
+            class="flex h-36 items-end p-4"
+            style={`background:var(--${token});color:${onSwatch(token)}`}
+          >
+            <span class="font-serif text-2xl">{name}</span>
+          </div>
+          <div class="p-4 text-sm">
+            <p class="m-0 font-semibold">{role}</p>
+            <p class="t-small t-tabular m-0">
+              {hex(token)} · --{token}
+            </p>
+          </div>
+        </div>
+      ))}
+    </div>
+
+    <h3 class="mt-14 mb-5 font-serif text-[1.75rem] font-normal">Escalas tonales</h3>
+    <div class="flex flex-col gap-6">
+      {scales.map((sc) => (
+        <div>
+          <p class="t-label mb-2 text-piedra-600">{scaleTitle[sc]}</p>
+          <ul class="m-0 grid list-none grid-cols-5 gap-1 p-0 md:grid-cols-10">
+            {steps.map((st) => (
+              <li class="text-[0.6875rem] leading-tight">
+                <span
+                  class="block h-20 rounded-tag border border-piedra-200"
+                  style={`background:var(--${sc}-${st})`}
+                ></span>
+                <b class="mt-1 block text-navy-800">{st}</b>
+                <span class="t-tabular block text-piedra-600">{hex(`${sc}-${st}`)}</span>
+              </li>
+            ))}
+          </ul>
+        </div>
+      ))}
+    </div>
+
+    <h3 class="mt-14 mb-2 font-serif text-[1.75rem] font-normal">Colores semánticos</h3>
+    <p class="t-small mb-5 max-w-[640px]">
+      Usa «Texto» para texto y «Icono / borde» para iconos y filetes. Los de icono no cumplen AA
+      como texto sobre su fondo.
+    </p>
+    <div class="grid gap-4 md:grid-cols-2 lg:grid-cols-4">
+      {semantic.map(([k, label]) => (
+        <div class="rounded-card border border-piedra-200 bg-white p-4">
+          <p class="m-0 mb-3 font-semibold">{label}</p>
+          <ul class="m-0 flex list-none flex-col gap-1 p-0 text-xs">
+            {(['bg', 'text', 'icon'] as const).map((r) => (
+              <li class="flex items-center gap-2">
+                <span
+                  class="inline-block h-5 w-5 rounded-tag border border-piedra-200"
+                  style={`background:var(--${k}-${r})`}
+                ></span>
+                <span class="t-tabular">
+                  {{ bg: 'Fondo', text: 'Texto', icon: 'Icono / borde' }[r]} · {hex(`${k}-${r}`)}
+                </span>
+              </li>
+            ))}
+          </ul>
+        </div>
+      ))}
+    </div>
+
+    <h3 class="mt-14 mb-5 font-serif text-[1.75rem] font-normal">Proporciones de uso</h3>
+    <div
+      class="flex h-14 overflow-hidden rounded-card border border-piedra-200"
+      role="img"
+      aria-label="Barra 60 por ciento gris cálido, 30 por ciento azul marino, 10 por ciento salvia"
+    >
+      <div class="flex basis-[60%] items-center bg-piedra-100 px-4 text-sm font-semibold">
+        60 % gris cálido
+      </div>
+      <div class="flex basis-[30%] items-center bg-navy-800 px-4 text-sm font-semibold text-white">
+        30 % azul marino
+      </div>
+      <div class="flex basis-[10%] items-center bg-salvia-400 px-3 text-sm font-semibold text-navy-800">
+        10 %
+      </div>
+    </div>
+
+    <h3 class="mt-14 mb-2 font-serif text-[1.75rem] font-normal">Contraste WCAG 2.1</h3>
+    <p class="t-small mb-5">Ratios calculados desde tokens.css, no copiados.</p>
+    <div class="overflow-x-auto rounded-card border border-piedra-200 bg-white">
+      <table class="t-tabular w-full min-w-[640px] border-collapse text-left text-sm">
+        <caption class="sr-only">Parejas de contraste aprobadas y prohibidas</caption>
+        <thead>
+          <tr class="border-b border-piedra-200 text-piedra-600">
+            <th scope="col" class="p-3 font-semibold">
+              Muestra
+            </th>
+            <th scope="col" class="p-3 font-semibold">
+              Uso
+            </th>
+            <th scope="col" class="p-3 font-semibold">
+              Ratio
+            </th>
+            <th scope="col" class="p-3 font-semibold">
+              Mínimo
+            </th>
+            <th scope="col" class="p-3 font-semibold">
+              Estado
+            </th>
+          </tr>
+        </thead>
+        <tbody>
+          {contrastPairs.map((p) => {
+            const r = contrastRatio(tokens[p.fg], tokens[p.bg]);
+            return (
+              <tr class="border-b border-piedra-200 last:border-0">
+                <td class="p-3">
+                  <span
+                    data-contrast-demo
+                    class="inline-block rounded-tag px-3 py-1 font-semibold"
+                    style={`background:var(--${p.bg});color:var(--${p.fg})`}
+                  >
+                    Aa
+                  </span>
+                </td>
+                <td class="p-3">{p.use}</td>
+                <td class="p-3">{fmt(r)} : 1</td>
+                <td class="p-3">{fmt(p.min)}</td>
+                <td class="p-3 font-semibold text-success-text">
+                  {r >= p.min ? 'Cumple' : 'No cumple'}
+                </td>
+              </tr>
+            );
+          })}
+          {forbiddenPairs.map((p) => {
+            const r = contrastRatio(tokens[p.fg], tokens[p.bg]);
+            return (
+              <tr class="bg-error-bg">
+                <td class="p-3">
+                  <span
+                    data-contrast-demo
+                    class="inline-block rounded-tag px-3 py-1 font-semibold"
+                    style={`background:var(--${p.bg});color:var(--${p.fg})`}
+                  >
+                    Aa
+                  </span>
+                </td>
+                <td class="p-3 text-error-text">{p.use}</td>
+                <td class="p-3 text-error-text">{fmt(r)} : 1</td>
+                <td class="p-3 text-error-text">4,50</td>
+                <td class="p-3 font-semibold text-error-text">Prohibido</td>
+              </tr>
+            );
+          })}
+        </tbody>
+      </table>
+    </div>
+  </Section>
+
+  <!-- 03 Tipografía -->
+  <Section
+    id="tipografia"
+    label="03 · Tipografía"
+    title="Newsreader e Instrument Sans"
+    lead="Autoalojadas con Fontsource. Newsreader con eje óptico (opsz 6–72): fina y precisa en titulares grandes."
+    rule
+  >
+    <div class="grid gap-6 md:grid-cols-2">
+      <Card class="p-8">
+        <p class="t-label mb-3 text-piedra-600">Títulos · Newsreader</p>
+        <p class="m-0 font-serif text-[7rem] leading-none font-light">Aa</p>
+        <p class="m-0 mt-4 font-serif text-2xl">
+          ABCDEFGHIJKLMNÑOPQRSTUVWXYZ
+          <br />
+          abcdefghijklmnñopqrstuvwxyz
+          <br />
+          0123456789 ¿¡€
+        </p>
+      </Card>
+      <Card class="p-8">
+        <p class="t-label mb-3 text-piedra-600">Texto · Instrument Sans</p>
+        <p class="m-0 font-sans text-[7rem] leading-none">Aa</p>
+        <p class="m-0 mt-4 font-sans text-xl">
+          ABCDEFGHIJKLMNÑOPQRSTUVWXYZ
+          <br />
+          abcdefghijklmnñopqrstuvwxyz
+          <br />
+          0123456789 ¿¡€
+        </p>
+      </Card>
+    </div>
+
+    <h3 class="mt-14 mb-6 font-serif text-[1.75rem] font-normal">Escala</h3>
+    <div class="flex flex-col divide-y divide-piedra-200 border-y border-piedra-200">
+      <div class="grid gap-2 py-6 md:grid-cols-[200px_1fr] md:gap-8">
+        <p class="t-small m-0">
+          Display · derivado
+          <br />
+          Newsreader 300 · 72–96 (hero)
+        </p>
+        <p class="t-display m-0">Tus números, bajo control.</p>
+      </div>
+      {scale.map(([role, spec, tag, sample]) => (
+        <div class="grid gap-2 py-6 md:grid-cols-[200px_1fr] md:gap-8">
+          <p class="t-small m-0">
+            {role}
+            <br />
+            {spec}
+          </p>
+          {tag === 'h1' && <h1 class="m-0">{sample}</h1>}
+          {tag === 'h2' && <h2 class="m-0">{sample}</h2>}
+          {tag === 'h3' && <h3 class="m-0">{sample}</h3>}
+          {tag === 'h4' && <h4 class="m-0">{sample}</h4>}
+        </div>
+      ))}
+      <div class="grid gap-2 py-6 md:grid-cols-[200px_1fr] md:gap-8">
+        <p class="t-small m-0">
+          Cuerpo
+          <br />
+          Instrument Sans 400 · 17 / 1.6 · Piedra 800
+        </p>
+        <p class="t-body m-0">
+          Llevamos tu contabilidad al día y cerramos el año sin sorpresas. Tú ves tus cifras claras,
+          cada trimestre. Si algo no cuadra, te lo contamos y lo corregimos esa semana.
+        </p>
+      </div>
+      <div class="grid gap-2 py-6 md:grid-cols-[200px_1fr] md:gap-8">
+        <p class="t-small m-0">
+          Pequeño
+          <br />
+          Instrument Sans 400 · 14 / 1.5 · Piedra 600
+        </p>
+        <p class="t-small m-0">
+          Precios sin IVA. Estimación orientativa; el precio cerrado te lo damos tras 20 minutos de
+          conversación.
+        </p>
+      </div>
+      <div class="grid gap-2 py-6 md:grid-cols-[200px_1fr] md:gap-8">
+        <p class="t-small m-0">
+          Etiqueta
+          <br />
+          Instrument Sans 600 · 12 · mayúsculas · 0,16 em
+        </p>
+        <div class="flex flex-wrap items-center gap-6">
+          <span class="t-label">Contabilidad</span>
+          <span class="t-eyebrow">02 · Servicios</span>
+        </div>
+      </div>
+    </div>
+
+    <h3 class="mt-14 mb-6 font-serif text-[1.75rem] font-normal">Cifras y precios</h3>
+    <div class="grid gap-6 md:grid-cols-3">
+      <Card class="p-8">
+        <p class="t-figure m-0 text-[5.5rem] text-navy-800">200+</p>
+        <p class="t-small m-0 mt-2">Clientes activos</p>
+      </Card>
+      <Card class="p-8">
+        <p class="t-small m-0">desde</p>
+        <p class="m-0 flex items-baseline gap-2">
+          <span class="t-price text-[3.5rem]">490</span>
+          <span class="font-sans text-sm text-piedra-600">CHF/mes</span>
+        </p>
+        <p class="t-small m-0 mt-2">Precios sin IVA</p>
+      </Card>
+      <Card class="p-8">
+        <p class="t-label m-0 mb-3 text-piedra-600">Tablas · tabular-nums</p>
+        <table class="t-tabular w-full text-sm">
+          <tbody>
+            <tr>
+              <td class="py-1">Reserva legal</td>
+              <td class="py-1 text-right">{formatCHF(2400)}</td>
+            </tr>
+            <tr>
+              <td class="py-1">Capital GmbH</td>
+              <td class="py-1 text-right">{formatCHF(20000)}</td>
+            </tr>
+            <tr>
+              <td class="py-1">Capital AG</td>
+              <td class="py-1 text-right">{formatCHF(100000)}</td>
+            </tr>
+          </tbody>
+        </table>
+      </Card>
+    </div>
+  </Section>
+
+  <!-- 04 Iconografía -->
+  <Section
+    id="iconos"
+    tone="piedra"
+    label="04 · Iconografía"
+    title="Iconos de línea"
+    lead="Retícula 24 px, trazo 1,5 px, terminales rectos, nunca rellenos. Navy 800 o blanco; Salvia 600 solo para icono activo."
+    rule
+  >
+    <div class="grid gap-6 md:grid-cols-2">
+      <Card class="p-8">
+        <p class="t-label mb-5 text-piedra-600">Servicios</p>
+        <ul class="m-0 flex list-none flex-wrap gap-6 p-0">
+          {serviceIcons.map((n) => (
+            <li class="flex w-24 flex-col items-center gap-2 text-center">
+              <Icon name={n} size={48} class="text-navy-800" />
+              <span class="t-small">{n}</span>
+            </li>
+          ))}
+        </ul>
+      </Card>
+      <Card class="p-8">
+        <p class="t-label mb-5 text-piedra-600">Estado · color «Icono / borde»</p>
+        <ul class="m-0 flex list-none flex-wrap gap-6 p-0">
+          {stateIcons.map((n) => (
+            <li class="flex w-24 flex-col items-center gap-2 text-center">
+              <Icon
+                name={n}
+                size={48}
+                class={
+                  {
+                    'estado-exito': 'text-success-icon',
+                    'estado-aviso': 'text-warning-icon',
+                    'estado-error': 'text-error-icon',
+                    'estado-info': 'text-info-icon',
+                  }[n as string]
+                }
+              />
+              <span class="t-small">{n}</span>
+            </li>
+          ))}
+        </ul>
+      </Card>
+      <Card class="p-8">
+        <p class="t-label mb-5 text-piedra-600">Escala proporcional · el trazo escala</p>
+        <div class="flex items-end gap-6 text-navy-800">
+          <Icon name="contabilidad" size={24} />
+          <Icon name="contabilidad" size={32} />
+          <Icon name="contabilidad" size={48} />
+          <Icon name="contabilidad" size={72} />
+        </div>
+      </Card>
+      <Card class="p-8">
+        <p class="t-label mb-5 text-piedra-600">Activo y sobre oscuro</p>
+        <div class="flex items-center gap-6">
+          <Icon name="iva" size={48} class="text-navy-800" />
+          <Icon name="iva" size={48} active />
+          <span class="inline-flex rounded-card bg-navy-800 p-3 text-white">
+            <Icon name="iva" size={48} />
+          </span>
+        </div>
+      </Card>
+    </div>
+  </Section>
+
+  <!-- 05 Fotografía -->
+  <Section
+    id="fotografia"
+    label="05 · Fotografía"
+    title="Personas reales, luz natural"
+    lead="Mientras no haya fotos: placeholders de Piedra 100 con el patrón viaducto claro y marco de arco. Nada de stock ni imágenes 3D."
+    rule
+  >
+    <div class="flex flex-wrap items-end gap-8">
+      <figure class="m-0 w-48">
+        <ArchFrame />
+        <figcaption class="t-small mt-3">Marco de arco · 3:4</figcaption>
+      </figure>
+      <figure class="m-0 w-64">
+        <ArchFrame ratio="4 / 5" />
+        <figcaption class="t-small mt-3">Marco de arco · 4:5</figcaption>
+      </figure>
+      <ul class="t-body m-0 max-w-sm list-disc pl-5">
+        <li>border-radius: 9999px 9999px 0 0 sobre un contenedor más alto que ancho.</li>
+        <li>Temperatura 5 200–5 600 K, saturación −10 a −15 %, sin viñeteado ni grano.</li>
+      </ul>
+    </div>
+  </Section>
+
+  <!-- 06 Elementos -->
+  <Section
+    id="elementos"
+    tone="piedra"
+    label="06 · Elementos"
+    title="Formas derivadas del puente"
+    lead="Se usan con moderación, como textura o estructura, nunca como decoración principal."
+    rule
+  >
+    <div class="grid gap-6 md:grid-cols-3">
+      <figure class="m-0">
+        <div class="h-60 overflow-hidden rounded-card">
+          <Pattern tone="dark" class="h-full" />
+        </div>
+        <figcaption class="t-small mt-3">
+          <b class="text-navy-800">Patrón viaducto · oscuro</b>
+          <br />
+          Navy 600 sobre Navy 800. Portadas, cabeceras, footer.
+        </figcaption>
+      </figure>
+      <figure class="m-0">
+        <div class="h-60 overflow-hidden rounded-card border border-piedra-200 bg-piedra-50">
+          <Pattern tone="light" class="h-full" />
+        </div>
+        <figcaption class="t-small mt-3">
+          <b class="text-navy-800">Patrón viaducto · claro</b>
+          <br />
+          Navy 200 sobre Piedra 50. Fondos de sección.
+        </figcaption>
+      </figure>
+      <figure class="m-0">
+        <div class="flex h-60 flex-col justify-center gap-6 rounded-card border border-piedra-200 bg-white px-6">
+          <BoardLine />
+          <span class="font-serif text-2xl">Línea de tablero</span>
+          <BoardLine tone="salvia" />
+        </div>
+        <figcaption class="t-small mt-3">
+          <b class="text-navy-800">Línea de tablero</b>
+          <br />
+          Separador con un arco en el arranque. 1,5 px.
+        </figcaption>
+      </figure>
+    </div>
+    <div class="mt-6 grid gap-6 lg:grid-cols-2">
+      <Card class="p-8">
+        <h3 class="mb-6 font-serif text-[1.5rem] font-normal">Radios de esquina</h3>
+        <div class="flex flex-wrap items-end gap-6 text-xs text-piedra-600">
+          <div class="flex flex-col gap-2">
+            <div class="h-16 w-16 rounded-tag border border-navy-800"></div>2 px · etiquetas
+          </div>
+          <div class="flex flex-col gap-2">
+            <div class="h-16 w-16 rounded-button border border-navy-800"></div>4 px · botones
+          </div>
+          <div class="flex flex-col gap-2">
+            <div class="h-16 w-16 rounded-card border border-navy-800"></div>8 px · tarjetas
+          </div>
+          <div class="flex flex-col gap-2">
+            <div class="h-24 w-16 rounded-arch border border-b-0 border-navy-800"></div>Arco ·
+            retratos
+          </div>
+        </div>
+        <p class="t-small mt-6">
+          El arco completo se reserva para fotografía y nunca se usa en botones.
+        </p>
+      </Card>
+      <Card class="p-8">
+        <h3 class="mb-6 font-serif text-[1.5rem] font-normal">Espaciado y líneas</h3>
+        <ul class="m-0 flex list-none flex-col gap-1 p-0 text-xs text-piedra-600">
+          {[1, 2, 3, 4, 5, 6, 7].map((n) => (
+            <li class="flex items-center gap-3">
+              <span class="w-8 t-tabular">--space-{n}</span>
+              <span class="block h-2 bg-navy-500" style={`width:var(--space-${n})`}></span>
+            </li>
+          ))}
+        </ul>
+        <p class="t-small mt-6">
+          Base de 4 px. Filetes de 1 px en Piedra 200; 1,5 px en azul marino para estructura.
+        </p>
+      </Card>
+    </div>
+  </Section>
+
+  <!-- 07 Voz -->
+  <Section
+    id="voz"
+    label="07 · Tono de voz"
+    title="Claros, precisos, cercanos y tranquilos"
+    lead="Tuteamos, frases cortas, siempre el siguiente paso concreto. Sin exclamaciones ni emojis."
+    rule
+  >
+    <div class="grid gap-6 md:grid-cols-2">
+      <Card class="p-8">
+        <p class="t-label mb-4 text-success-text">Decimos</p>
+        <ul class="t-body m-0 list-none space-y-2 p-0">
+          <li>«Nos encargamos»</li>
+          <li>«Te avisamos antes del plazo»</li>
+          <li>«Esto es lo que necesitamos de ti»</li>
+          <li>«Precio cerrado»</li>
+          <li>«Tu persona de contacto es…»</li>
+          <li>«Te lo explicamos»</li>
+        </ul>
+      </Card>
+      <Card class="p-8">
+        <p class="t-label mb-4 text-error-text">No decimos</p>
+        <ul class="t-body m-0 list-none space-y-2 p-0 line-through decoration-piedra-400">
+          <li>«Soluciones 360º»</li>
+          <li>«Sinergias»</li>
+          <li>«En tiempo y forma»</li>
+          <li>«A la mayor brevedad»</li>
+          <li>«¡Urgente!»</li>
+          <li>«Optimización fiscal agresiva»</li>
+        </ul>
+      </Card>
+    </div>
+    <h3 class="mt-14 mb-6 font-serif text-[1.75rem] font-normal">De la jerga al lenguaje claro</h3>
+    <div class="flex flex-col divide-y divide-piedra-200 border-y border-piedra-200">
+      {jargon.map(([a, b]) => (
+        <div class="grid gap-3 py-5 md:grid-cols-2 md:gap-10">
+          <p class="t-body m-0 text-piedra-600">
+            <span class="t-label mr-2 text-error-text">Antes</span>
+            {a}
+          </p>
+          <p class="t-body m-0 text-navy-800">
+            <span class="t-label mr-2 text-success-text">Después</span>
+            {b}
+          </p>
+        </div>
+      ))}
+    </div>
+  </Section>
+
+  <!-- 08 Componentes -->
+  <Section
+    id="componentes"
+    tone="piedra"
+    label="08 · Componentes"
+    title="Componentes de interfaz"
+    lead="Derivados del manual, solo con tokens. Foco visible: contorno de 2 px, offset 3 px (Tab para verlo)."
+    rule
+  >
+    <h3 class="mb-5 font-serif text-[1.5rem] font-normal">Botones</h3>
+    <div class="flex flex-wrap items-center gap-4">
+      <Button href="#componentes" arrow>
+        Reserva tu consulta gratuita
+      </Button>
+      <Button variant="secondary" href="#componentes">
+        Calcula tu precio
+      </Button>
+      <Button variant="ghost" href="#componentes">
+        Escríbenos
+      </Button>
+      <Button size="sm" href="#componentes">
+        Pequeño
+      </Button>
+      <Button disabled>Desactivado</Button>
+    </div>
+    <div
+      data-surface="dark"
+      class="mt-5 flex flex-wrap items-center gap-4 rounded-card bg-navy-800 p-6"
+    >
+      <Button on="dark" href="#componentes" arrow>
+        Reserva tu consulta gratuita
+      </Button>
+      <Button variant="secondary" href="#componentes">
+        Calcula tu precio
+      </Button>
+      <Button variant="ghost" on="dark" href="#componentes">
+        Escríbenos
+      </Button>
+    </div>
+
+    <h3 class="mt-12 mb-5 font-serif text-[1.5rem] font-normal">Etiquetas</h3>
+    <div class="flex flex-wrap gap-3">
+      <Tag>Contabilidad</Tag>
+      <Tag tone="navy">Growth</Tag>
+      <Tag tone="salvia">Recomendado</Tag>
+    </div>
+
+    <h3 class="mt-12 mb-5 font-serif text-[1.5rem] font-normal">Alertas</h3>
+    <div class="grid gap-4 md:grid-cols-2">
+      <Alert variant="success" title="Recibido.">
+        Te respondemos antes de las 12:00 del próximo día laborable.
+      </Alert>
+      <Alert variant="warning" title="Plazo cercano.">
+        El IVA del 3.er trimestre vence el 30 de noviembre.
+      </Alert>
+      <Alert variant="error" title="El IBAN no es válido.">
+        Revisa que empiece por CH y tenga 21 caracteres.
+      </Alert>
+      <Alert variant="info" title="Ten en cuenta.">
+        Las fechas fiscales deben comprobarse cada año.
+      </Alert>
+    </div>
+
+    <h3 class="mt-12 mb-5 font-serif text-[1.5rem] font-normal">Tarjetas</h3>
+    <div class="grid gap-6 md:grid-cols-3">
+      <Card>
+        <Icon name="contabilidad" size={32} class="mb-4" />
+        <h4 class="m-0 mb-2">Contabilidad y cierres</h4>
+        <p class="t-small m-0">Tarjeta estática. Borde 1 px Piedra 200, radio 8 px.</p>
+      </Card>
+      <Card href="#componentes">
+        <Icon name="iva" size={32} class="mb-4" />
+        <h4 class="m-0 mb-2">IVA y declaraciones</h4>
+        <p class="t-small m-0">Tarjeta enlace: el borde pasa a Navy 800 al pasar el ratón.</p>
+      </Card>
+      <Card>
+        <p class="t-small m-0">desde</p>
+        <p class="m-0 flex items-baseline gap-2">
+          <span class="t-price text-[2.5rem]">190</span>
+          <span class="text-sm text-piedra-600">CHF/mes</span>
+        </p>
+        <p class="t-small m-0 mt-1">Precios sin IVA</p>
+      </Card>
+    </div>
+
+    <h3 class="mt-12 mb-5 font-serif text-[1.5rem] font-normal">Acordeón</h3>
+    <Accordion items={faq} openFirst class="max-w-[760px] bg-transparent" />
+
+    <h3 class="mt-12 mb-5 font-serif text-[1.5rem] font-normal">Migas de pan</h3>
+    <Breadcrumbs
+      items={[{ label: 'Servicios', href: '/servicios' }, { label: 'IVA y fiscalidad' }]}
+    />
+  </Section>
+
+  <!-- 09 Movimiento -->
+  <Section
+    id="movimiento"
+    label="09 · Movimiento"
+    title="Tokens de movimiento"
+    lead="Lento y suave, sin rebotes. Solo transform y opacity. Con reduced-motion o sin JS, estado final inmediato."
+    rule
+  >
+    <div class="grid items-center gap-10 md:grid-cols-2">
+      <ul class="t-tabular m-0 list-none space-y-2 p-0 text-sm">
+        <li>
+          <b>--dur-fast</b> 200 ms · hover, foco
+        </li>
+        <li>
+          <b>--dur-base</b> 500 ms · cambios de estado
+        </li>
+        <li>
+          <b>--dur-slow</b> 900 ms · reveals
+        </li>
+        <li>
+          <b>--dur-scene</b> 1 600 ms · escenas
+        </li>
+        <li>
+          <b>--ease-out</b> cubic-bezier(0.22, 1, 0.36, 1)
+        </li>
+        <li>
+          <b>--ease-in-out</b> cubic-bezier(0.65, 0, 0.35, 1)
+        </li>
+      </ul>
+      <div
+        class="flex items-center justify-center rounded-card bg-navy-800 p-10 text-white"
+        data-surface="dark"
+      >
+        <BridgeMark animate class="h-36 w-auto" />
+      </div>
+    </div>
+  </Section>
+</BaseLayout>

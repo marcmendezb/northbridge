@@ -1,0 +1,51 @@
+---
+/** Símbolo con trazo animable (pathLength=1). Estático si hay reduced-motion o no hay JS. */
+interface Props {
+  animate?: boolean;
+  /** Retraso en segundos. */
+  delay?: number;
+  strokeWidth?: number;
+  class?: string;
+  label?: string;
+}
+
+const { animate = false, delay = 0, strokeWidth = 4, class: className = '', label } = Astro.props;
+---
+
+<svg
+  viewBox="4 11 40 26"
+  fill="none"
+  stroke="currentColor"
+  stroke-width={strokeWidth}
+  class:list={['nb-bridge', className]}
+  data-animate={animate ? '' : undefined}
+  style={`--bridge-delay:${delay}s`}
+  role={label ? 'img' : undefined}
+  aria-label={label}
+  aria-hidden={label ? undefined : 'true'}
+>
+  <path class="nb-deck" d="M4 13H44" pathLength="1"></path>
+  <path class="nb-arch" d="M10 37V29A14 14 0 0 1 38 29V37" pathLength="1"></path>
+</svg>
+
+<style is:global>
+  @media (prefers-reduced-motion: no-preference) {
+    .js .nb-bridge[data-animate] path {
+      stroke-dasharray: 1;
+      stroke-dashoffset: 1;
+      animation: nb-draw var(--dur-slow) var(--ease-in-out) forwards;
+    }
+    .js .nb-bridge[data-animate] .nb-deck {
+      animation-delay: var(--bridge-delay);
+    }
+    .js .nb-bridge[data-animate] .nb-arch {
+      animation-duration: 1200ms;
+      animation-delay: calc(var(--bridge-delay) + 0.5s);
+    }
+    @keyframes nb-draw {
+      to {
+        stroke-dashoffset: 0;
+      }
+    }
+  }
+</style>

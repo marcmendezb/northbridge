@@ -1,0 +1,147 @@
+---
+import { site } from '../../lib/site';
+
+interface Props {
+  variant?: 'horizontal' | 'vertical' | 'symbol';
+  tone?: 'positive' | 'negative' | 'mono';
+  /** Horizontal/vertical: tamaño de fuente de «Northbridge» en px. Símbolo: altura en px. */
+  size?: number;
+  /** Aplica la zona de seguridad (x = altura del símbolo). */
+  safeZone?: boolean;
+  class?: string;
+}
+
+const {
+  variant = 'horizontal',
+  tone = 'positive',
+  size,
+  safeZone = false,
+  class: className = '',
+} = Astro.props;
+
+const minSize = { horizontal: 18, vertical: 14, symbol: 16 }[variant]; // 120 px / 64 px / 16 px
+const defaults = { horizontal: 28, vertical: 28, symbol: 32 }[variant];
+const px = Math.max(size ?? defaults, minSize);
+const toneClass = { positive: 'text-navy-800', negative: 'text-white', mono: 'text-black' }[tone];
+// Por debajo de 24 px de altura se usa la versión optimizada (retícula 16, trazo 2).
+const symbolHeight = variant === 'symbol' ? px : px * 1.09;
+const useFavicon = symbolHeight < 24;
+---
+
+<span
+  role="img"
+  aria-label={site.name}
+  class:list={['nb-logo', `nb-logo--${variant}`, toneClass, className]}
+  style={`font-size:${px}px;${safeZone ? `padding:${variant === 'symbol' ? symbolHeight / 2 : symbolHeight}px;` : ''}`}
+>
+  {variant === 'symbol' ? (
+    useFavicon ? (
+      <svg
+        class="nb-logo__mark"
+        viewBox="0 0 16 16"
+        fill="none"
+        stroke="currentColor"
+        stroke-width="2"
+        aria-hidden="true"
+        style={`width:${px}px;height:${px}px`}
+      >
+        <path d="M1 4H15" />
+        <path d="M3 13V10A5 5 0 0 1 13 10V13" />
+      </svg>
+    ) : (
+      <svg
+        class="nb-logo__mark"
+        viewBox="4 11 40 26"
+        fill="none"
+        stroke="currentColor"
+        stroke-width="4"
+        aria-hidden="true"
+        style={`height:${px}px;width:${(px * 40) / 26}px`}
+      >
+        <path d="M4 13H44" />
+        <path d="M10 37V29A14 14 0 0 1 38 29V37" />
+      </svg>
+    )
+  ) : (
+    <>
+      <svg
+        class="nb-logo__mark"
+        viewBox={useFavicon ? '0 0 16 16' : '4 11 40 26'}
+        fill="none"
+        stroke="currentColor"
+        stroke-width={useFavicon ? 2 : 4}
+        aria-hidden="true"
+      >
+        {useFavicon ? (
+          <>
+            <path d="M1 4H15" />
+            <path d="M3 13V10A5 5 0 0 1 13 10V13" />
+          </>
+        ) : (
+          <>
+            <path d="M4 13H44" />
+            <path d="M10 37V29A14 14 0 0 1 38 29V37" />
+          </>
+        )}
+      </svg>
+      <span class="nb-logo__text" aria-hidden="true">
+        <span class="nb-logo__name">Northbridge</span>
+        <span class="nb-logo__sub">ADVISORY</span>
+      </span>
+    </>
+  )}
+</span>
+
+<style>
+  .nb-logo {
+    display: inline-flex;
+    box-sizing: content-box;
+    line-height: 1;
+    white-space: nowrap;
+  }
+  .nb-logo--horizontal {
+    align-items: center;
+    gap: 0.3em;
+  }
+  .nb-logo--vertical {
+    flex-direction: column;
+    align-items: center;
+    gap: 0.28em;
+    text-align: center;
+  }
+  .nb-logo--horizontal .nb-logo__mark,
+  .nb-logo--vertical .nb-logo__mark {
+    height: 1.09em;
+    width: calc(1.09em * 40 / 26);
+    flex: none;
+  }
+  .nb-logo--symbol .nb-logo__mark {
+    flex: none;
+    display: block;
+  }
+  .nb-logo__text {
+    display: flex;
+    flex-direction: column;
+    gap: 0.16em;
+  }
+  .nb-logo--vertical .nb-logo__text {
+    align-items: center;
+  }
+  .nb-logo__name {
+    font-family: var(--font-display);
+    font-optical-sizing: auto;
+    font-weight: 500;
+    line-height: 0.9;
+    letter-spacing: -0.015em;
+  }
+  .nb-logo__sub {
+    font-family: var(--font-text);
+    font-size: 0.27em;
+    font-weight: 600;
+    line-height: 1;
+    letter-spacing: 0.36em;
+  }
+  .nb-logo--vertical .nb-logo__sub {
+    padding-left: 0.36em;
+  }
+</style>
