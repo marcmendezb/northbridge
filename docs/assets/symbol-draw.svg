@@ -1,0 +1,5 @@
+<!-- Version preparada para animar el trazo: pathLength="1" permite usar stroke-dasharray:1 y stroke-dashoffset:1 -> 0 -->
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="4 11 40 26" fill="none" stroke="currentColor" stroke-width="4">
+  <path class="nb-deck" d="M4 13H44" pathLength="1"/>
+  <path class="nb-arch" d="M10 37V29A14 14 0 0 1 38 29V37" pathLength="1"/>
+</svg>
