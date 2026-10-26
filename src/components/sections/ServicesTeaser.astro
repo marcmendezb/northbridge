@@ -267,24 +267,40 @@ const photos: Record<string, ImageMetadata> = {
   const fine = matchMedia('(hover: hover) and (pointer: fine)');
   const reduce = matchMedia('(prefers-reduced-motion: reduce)').matches;
 
-  /** Capa flotante que sigue al cursor por encima, con un leve retraso (transform y opacidad). */
+  /** Borde inferior del header flotante: por encima de él no se ve nada. */
+  const headerBottom = () => document.querySelector('.nb-bar')?.getBoundingClientRect().bottom ?? 0;
+
+  /**
+   * Capa flotante que sigue al cursor, con un leve retraso (transform y opacidad). Va encima del
+   * cursor; si ahí chocaría con el header, pasa debajo.
+   */
   function follower(float: HTMLElement, lift = 20) {
     const pos = { x: 0, y: 0 };
     const target = { x: 0, y: 0 };
     let shown = 0;
     let visible = false;
     let frame = 0;
+    /** Desplazamiento vertical respecto al cursor: negativo = encima. */
+    let offset = 0;
+    const wanted = () => {
+      const h = float.offsetHeight + lift;
+      return target.y - h >= headerBottom() + 12 ? -h : lift;
+    };
     const render = () => {
       const k = reduce ? 1 : 0.16;
       pos.x += (target.x - pos.x) * k;
       pos.y += (target.y - pos.y) * k;
+      const goal = wanted();
+      offset += (goal - offset) * (reduce ? 1 : 0.2);
       shown += ((visible ? 1 : 0) - shown) * (reduce ? 1 : 0.18);
       const scale = reduce ? 1 : 0.9 + shown * 0.1;
-      float.style.transform = `translate3d(${pos.x}px, ${pos.y}px, 0) translate(-50%, calc(-100% - ${lift}px)) scale(${scale})`;
+      float.style.transformOrigin = goal < 0 ? '50% 100%' : '50% 0%';
+      float.style.transform = `translate3d(${pos.x}px, ${pos.y + offset}px, 0) translate(-50%, 0) scale(${scale})`;
       float.style.opacity = String(shown);
       const settled =
         Math.abs(target.x - pos.x) < 0.1 &&
         Math.abs(target.y - pos.y) < 0.1 &&
+        Math.abs(goal - offset) < 0.1 &&
         Math.abs((visible ? 1 : 0) - shown) < 0.01;
       if (settled && !visible) float.removeAttribute('data-visible');
       frame = settled ? 0 : requestAnimationFrame(render);
@@ -301,6 +317,7 @@ const photos: Record<string, ImageMetadata> = {
           // Aparece justo donde está el cursor, sin viajar desde la posición anterior.
           pos.x = target.x = e.clientX;
           pos.y = target.y = e.clientY;
+          offset = wanted();
         }
         visible = true;
         float.setAttribute('data-visible', '');
