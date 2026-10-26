@@ -9,6 +9,7 @@ export function startSmoothScroll(): Lenis {
     lerp: 0.09,
     wheelMultiplier: 0.95,
     smoothWheel: true,
+    autoRaf: true,
     anchors: {
       offset: -(
         (parseFloat(getComputedStyle(document.documentElement).getPropertyValue('--header-h')) ||

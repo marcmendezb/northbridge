@@ -242,7 +242,7 @@ const isCurrent = (href: string) => path === href || (href !== '/' && path.start
     position: fixed;
     inset: 0 0 auto 0;
     z-index: 40;
-    padding: 12px clamp(16px, 4.5vw, 72px) 0;
+    padding-inline: clamp(16px, 4.5vw, 72px);
     pointer-events: none;
   }
   .nb-bar {
@@ -252,7 +252,8 @@ const isCurrent = (href: string) => path === href || (href !== '/' && path.start
     background: var(--white);
     color: var(--navy-800);
     border: 1px solid var(--rule);
-    border-radius: var(--radius-card, 8px);
+    border-top: 0;
+    border-radius: 0 0 var(--radius-card, 8px) var(--radius-card, 8px);
     box-shadow: 0 0 0 rgb(21 39 66 / 0);
     transition:
       box-shadow var(--dur-base) var(--ease-out),
@@ -267,7 +268,7 @@ const isCurrent = (href: string) => path === href || (href !== '/' && path.start
     align-items: center;
     justify-content: space-between;
     gap: 16px;
-    height: 76px;
+    height: var(--header-h);
     padding-inline: 20px;
   }
   @media (min-width: 1024px) {
@@ -307,25 +308,18 @@ const isCurrent = (href: string) => path === href || (href !== '/' && path.start
   .nb-nav__link {
     position: relative;
     display: inline-block;
-    padding: 0.625rem 1rem;
-    border-radius: var(--radius-button, 4px);
+    padding: 0.5rem 1rem;
     font-size: 1rem;
     font-weight: 500;
     color: var(--piedra-700);
     text-decoration: none;
-    transition:
-      color var(--dur-fast) var(--ease-out),
-      background-color var(--dur-fast) var(--ease-out);
+    transition: color var(--dur-fast) var(--ease-out);
   }
-  /* Hover: relleno suave en Piedra, sin subrayado. */
+  /* Hover: solo cambia el color del texto. */
   .nb-nav__link:hover,
-  .nb-nav__trigger[aria-expanded='true'] {
-    background: var(--piedra-100);
-    color: var(--navy-800);
-  }
+  .nb-nav__trigger[aria-expanded='true'],
   .nb-nav__link[aria-current='page'] {
     color: var(--navy-800);
-    background: var(--piedra-50);
   }
 
   /* CTA: botón primario con icono sobre Salvia 400 (Navy sobre Salvia, nunca blanco). */

@@ -222,3 +222,14 @@ test('desplegable de Servicios: sin JS el enlace lleva a /servicios', async ({ b
   await expect(link).toHaveAttribute('href', '/servicios');
   await ctx.close();
 });
+
+test('scroll con rueda de ratón: la página avanza con Lenis activo', async ({ page }) => {
+  await page.goto('/');
+  await expect(page.locator('html')).toHaveClass(/lenis/);
+  await page.mouse.move(700, 500);
+  for (let i = 0; i < 4; i++) {
+    await page.mouse.wheel(0, 300);
+    await page.waitForTimeout(250);
+  }
+  await expect.poll(() => page.evaluate(() => window.scrollY)).toBeGreaterThan(500);
+});
