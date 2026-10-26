@@ -60,7 +60,7 @@
   }
   .js:not(.anim-fail) [data-hero-line] {
     opacity: 0;
-    transform: translateY(110%);
+    transform: translateY(135%);
   }
   .js:not(.anim-fail) [data-hero-mark] path {
     stroke-dasharray: 1;
@@ -85,6 +85,29 @@
   to {
     stroke-dashoffset: 0;
   }
+}
+
+/* Máscaras de texto (SplitText y las de cada sección): con interlineados por debajo de 1, acentos,
+   mayúsculas y descendentes salen de la caja de línea. Se amplía la zona visible arriba y abajo
+   y se compensa con márgenes negativos para que la composición no se mueva. Los márgenes entre
+   líneas vecinas colapsan en bloque, así que todo el ajuste va abajo y la primera/última lo reparten. */
+.nb-split-line-mask,
+.hero__mask,
+.nb-crew__line,
+.nb-hist__digit {
+  --mask-top: 0.2em;
+  --mask-bottom: 0.24em;
+  padding-block: var(--mask-top) var(--mask-bottom);
+  margin-block: 0 calc((var(--mask-top) + var(--mask-bottom)) * -1);
+}
+:is(.nb-split-line-mask, .hero__mask, .nb-crew__line):first-child {
+  margin-top: calc(var(--mask-top) * -1);
+}
+:is(.nb-split-line-mask, .hero__mask, .nb-crew__line):last-child {
+  margin-bottom: calc(var(--mask-bottom) * -1);
+}
+.nb-hist__digit {
+  margin-block: calc(var(--mask-top) * -1) calc(var(--mask-bottom) * -1);
 }
 
 /* Lenis */
@@ -156,7 +179,7 @@ html.lenis body {
 @media (prefers-reduced-motion: no-preference) {
   .js.motion:not(.anim-fail) [data-year] .nb-hist__digit > span,
   .js.motion:not(.anim-fail) [data-crew-arch] .nb-crew__line > span {
-    transform: translateY(110%);
+    transform: translateY(135%);
   }
   .js.motion:not(.anim-fail) [data-crew-arch] {
     clip-path: inset(100% 0 0 0);

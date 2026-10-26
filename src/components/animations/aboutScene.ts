@@ -24,7 +24,7 @@ export function aboutScene({ gsap, ScrollTrigger }: AnimationKit) {
     gsap.fromTo(
       digits,
       // y: 0 anula el translateY del CSS inicial (GSAP lo leería como desplazamiento en px).
-      { yPercent: 105, y: 0 },
+      { yPercent: 135, y: 0 },
       {
         yPercent: 0,
         duration: 1.2,
@@ -65,7 +65,7 @@ export function aboutScene({ gsap, ScrollTrigger }: AnimationKit) {
     if (photo) tl.fromTo(photo, { scale: 1.15 }, { scale: 1, duration: 1.8, ease: 'expo.out' }, 0);
     tl.fromTo(
       lines,
-      { yPercent: 110, y: 0 },
+      { yPercent: 135, y: 0 },
       { yPercent: 0, duration: 1, stagger: 0.1, ease: 'expo.out' },
       0.75,
     );

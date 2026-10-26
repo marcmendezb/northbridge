@@ -22,7 +22,7 @@ export function heroScene({ gsap, ScrollTrigger }: AnimationKit) {
     intro.fromTo(
       lines,
       // y: 0 anula la traslación inicial del CSS (GSAP la leería como píxeles).
-      { yPercent: 110, y: 0, opacity: 0 },
+      { yPercent: 135, y: 0, opacity: 0 },
       { yPercent: 0, y: 0, opacity: 1, duration: 1.2, stagger: 0.09 },
       0.12,
     );

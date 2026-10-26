@@ -24,7 +24,7 @@ export async function splitReveal(
       onSplit: (self) => {
         gsap.set(el, { visibility: 'visible' });
         return gsap.from(self.lines, {
-          yPercent: 110,
+          yPercent: 135,
           opacity: 0,
           duration: 1.2,
           stagger: 0.09,
