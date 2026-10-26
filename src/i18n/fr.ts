@@ -205,6 +205,7 @@ export const fr: Messages = {
       line1: 'Vos chiffres,',
       line2: 'sous contrôle.',
       proof: '+10 ans à Zurich · 200+ clients',
+      scroll: 'Défiler',
     },
     proposal: {
       label: 'Notre promesse',

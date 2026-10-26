@@ -1,14 +1,14 @@
 ---
 import { Picture, getImage } from 'astro:assets';
 import heroPoster from '../../assets/img/hero-poster.jpg';
-import BridgeMark from '../brand/BridgeMark.astro';
 import Button from '../ui/Button.astro';
 import Container from '../ui/Container.astro';
 import { useI18n } from '../../i18n';
 import { getBookingCta } from '../../lib/site';
 const { t, lp, locale } = useI18n(Astro.currentLocale);
+const facts = t('home.hero.proof').split(' · ');
 const bookingCta = getBookingCta(locale);
-const posterFile = await getImage({ src: heroPoster, format: 'webp', width: 1280, quality: 74 });
+const posterFile = await getImage({ src: heroPoster, format: 'webp', width: 1920, quality: 76 });
 ---
 
 <section data-hero class="hero" aria-labelledby="hero-title">
@@ -19,7 +19,7 @@ const posterFile = await getImage({ src: heroPoster, format: 'webp', width: 1280
         <Picture
           src={heroPoster}
           formats={['avif', 'webp']}
-          widths={[640, 960, 1280]}
+          widths={[640, 960, 1280, 1920]}
           sizes="100vw"
           alt=""
           loading="eager"
@@ -28,7 +28,7 @@ const posterFile = await getImage({ src: heroPoster, format: 'webp', width: 1280
           quality={74}
           class="hero__img"
         />
-        <!-- Vídeo sin sonido (sin pista de audio). Sin JS o con reduced-motion se queda el fotograma inicial. -->
+        <!-- Vídeo sin sonido en ida y vuelta: el archivo ya contiene la secuencia hacia delante y hacia atrás, y loop la repite sin costura. Sin JS o con reduced-motion se queda el fotograma inicial. -->
         <video
           class="hero__video"
           data-hero-video
@@ -49,35 +49,56 @@ const posterFile = await getImage({ src: heroPoster, format: 'webp', width: 1280
     </div>
 
     <div class="hero__intro" data-surface="dark">
-      <Container class="hero__intro-inner">
-        <BridgeMark data-hero-mark strokeWidth={3} class="h-9 w-auto text-white" />
+      <div class="hero__intro-inner hero__align">
         <h1 id="hero-title" class="hero__title t-display m-0 text-white">
-          <span class="block overflow-hidden pb-[0.12em] -mb-[0.12em]">
+          <span class="hero__mask">
             <span data-hero-line class="block">
               {t('home.hero.line1')}
             </span>
           </span>
-          <span class="block overflow-hidden pb-[0.12em] -mb-[0.12em]">
+          <span class="hero__mask">
             <span data-hero-line class="block">
               {t('home.hero.line2')}
             </span>
           </span>
         </h1>
-        <p data-hero-fade="0.5" class="hero__sub m-0 font-serif font-light text-navy-100">
-          {t('brand.descriptor')}
-        </p>
-        <div data-hero-fade="0.62" class="flex flex-wrap items-center gap-4">
-          <Button href={bookingCta.href} on="dark" arrow>
-            {t('cta.book')}
-          </Button>
-          <Button href={lp('/calculadora')} variant="secondary">
-            {t('cta.calculate')}
-          </Button>
+        <div class="hero__aside">
+          <p data-hero-fade="0.5" class="hero__sub m-0 font-serif font-light text-navy-100">
+            {t('brand.descriptor')}
+          </p>
+          <div data-hero-fade="0.62" class="flex flex-wrap items-center gap-4">
+            <Button href={bookingCta.href} on="dark" arrow>
+              {t('cta.book')}
+            </Button>
+            <Button href={lp('/calculadora')} variant="secondary">
+              {t('cta.calculate')}
+            </Button>
+          </div>
         </div>
-        <p data-hero-fade="0.78" class="t-label m-0 !text-salvia-300">
-          {t('home.hero.proof')}
-        </p>
-      </Container>
+      </div>
+
+      <!-- Banda inferior: credenciales, hora en Zúrich con estado de la oficina e indicador de scroll. -->
+      <div class="hero__band" data-hero-fade="0.85">
+        <div class="hero__band-inner hero__align">
+          <ul class="hero__facts">
+            {facts.map((f) => (
+              <li>{f}</li>
+            ))}
+          </ul>
+          <span class="hero__scroll" aria-hidden="true">
+            {t('home.hero.scroll')}
+            <span class="hero__scroll-arrow">
+              <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5">
+                <path
+                  d="M12 4V19M6 13L12 19L18 13"
+                  stroke-linecap="butt"
+                  stroke-linejoin="miter"
+                ></path>
+              </svg>
+            </span>
+          </span>
+        </div>
+      </div>
     </div>
 
     <!-- La promesa: aparece cuando la foto ya es un arco. Sin JS o con reduced-motion, es el bloque que sigue al hero. -->
@@ -140,36 +161,130 @@ const posterFile = await getImage({ src: heroPoster, format: 'webp', width: 1280
     width: 100%;
     height: 100%;
     object-fit: cover;
-    object-position: 30% 50%;
+    object-position: 18% 50%;
   }
   .hero__img {
     width: 100%;
     height: 100%;
     object-fit: cover;
-    object-position: 30% 50%;
+    object-position: 18% 50%;
     display: block;
   }
   .hero__intro {
+    --band-h: 72px;
     position: relative;
     display: flex;
-    align-items: flex-end;
+    align-items: center;
     min-height: 100svh;
-    padding-top: calc(var(--header-h) + 32px);
-    padding-bottom: clamp(40px, 8svh, 88px);
+    padding-top: calc(var(--header-h) + 24px);
+    padding-bottom: calc(var(--band-h) + 24px);
+  }
+  /* Todo alineado a la izquierda, en el mismo margen que el logo del header. */
+  .hero__align {
+    width: 100%;
+    padding-inline: calc(
+      max(var(--header-gutter), (100% - var(--header-max)) / 2) + var(--header-pad)
+    );
   }
   .hero__intro-inner {
+    --hero-title: clamp(2.75rem, 0.5rem + 5.2vw, 5.25rem);
     display: flex;
     flex-direction: column;
     align-items: flex-start;
-    gap: 24px;
   }
   .hero__title {
-    font-size: clamp(2.75rem, 1rem + 6.4vw, 4.75rem);
+    font-size: var(--hero-title);
+    font-weight: 300;
+    line-height: 0.98;
+    letter-spacing: -0.025em;
   }
+  .hero__mask {
+    display: block;
+    overflow: hidden;
+    padding-bottom: 0.1em;
+    margin-bottom: -0.1em;
+  }
+  .hero__aside {
+    display: flex;
+    flex-direction: column;
+    align-items: flex-start;
+    gap: 28px;
+    margin-top: clamp(24px, 4svh, 40px);
+  }
+  @media (min-width: 768px) {
+    /* La columna de texto no invade la pared clara del vídeo. */
+    .hero__aside {
+      max-width: 36vw;
+    }
+  }
+  /* ── Banda inferior ── */
+  .hero__band {
+    position: absolute;
+    inset: auto 0 0;
+    height: var(--band-h);
+    background: var(--navy-800);
+    border-top: 1px solid var(--navy-700);
+    color: var(--navy-100);
+    font-size: 0.8125rem;
+    letter-spacing: 0.02em;
+  }
+  .hero__band-inner {
+    display: flex;
+    align-items: center;
+    gap: 32px;
+    height: 100%;
+  }
+  .hero__facts {
+    display: flex;
+    gap: 0;
+    margin: 0;
+    padding: 0;
+    list-style: none;
+  }
+  .hero__facts li + li {
+    margin-left: 20px;
+    padding-left: 20px;
+    border-left: 1px solid var(--navy-600);
+  }
+  .hero__scroll {
+    display: inline-flex;
+    align-items: center;
+    gap: 10px;
+    margin-left: auto;
+  }
+  .hero__scroll-arrow {
+    display: inline-flex;
+    width: 18px;
+    height: 18px;
+  }
+  .hero__scroll-arrow svg {
+    width: 100%;
+    height: 100%;
+    animation: hero-down 2.4s var(--ease-in-out) infinite;
+  }
+  /* Baja, se desvanece y vuelve a aparecer arriba: indica «hacia abajo» sin ruido. */
+  @keyframes hero-down {
+    0% {
+      transform: translateY(-5px);
+      opacity: 0;
+    }
+    30% {
+      opacity: 1;
+    }
+    70% {
+      transform: translateY(4px);
+      opacity: 1;
+    }
+    100% {
+      transform: translateY(8px);
+      opacity: 0;
+    }
+  }
+
   .hero__sub {
-    max-width: min(30rem, 100%);
+    max-width: 24rem;
     font-size: 1.25rem;
-    line-height: 1.35;
+    line-height: 1.4;
   }
   .hero__promise {
     position: relative;
@@ -201,9 +316,6 @@ const posterFile = await getImage({ src: heroPoster, format: 'webp', width: 1280
     color: var(--piedra-50);
   }
   @media (min-width: 768px) {
-    .hero__sub {
-      max-width: min(24rem, 30vw);
-    }
     .hero__promise-inner {
       grid-template-columns: 1.2fr 1fr;
       gap: 64px;
@@ -240,6 +352,20 @@ const posterFile = await getImage({ src: heroPoster, format: 'webp', width: 1280
     .hero__intro-inner {
       position: relative;
       z-index: 1;
+    }
+    .hero__intro {
+      flex-direction: column;
+      align-items: stretch;
+      padding-bottom: 0;
+    }
+    .hero__band {
+      position: relative;
+      height: auto;
+      margin-top: 40px;
+      padding-block: 18px;
+    }
+    .hero__scroll {
+      display: none;
     }
   }
 

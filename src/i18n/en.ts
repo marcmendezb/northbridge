@@ -206,6 +206,7 @@ export const en: Messages = {
       line1: 'Your numbers,',
       line2: 'under control.',
       proof: '10+ years in Zurich · 200+ clients',
+      scroll: 'Scroll',
     },
     proposal: {
       label: 'Our promise',

@@ -206,6 +206,7 @@ export const de: Messages = {
       line1: 'Deine Zahlen',
       line2: 'im Griff.',
       proof: 'Über 10 Jahre in Zürich · 200+ Kunden',
+      scroll: 'Scrollen',
     },
     proposal: {
       label: 'Unser Versprechen',

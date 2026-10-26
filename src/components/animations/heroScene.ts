@@ -56,11 +56,11 @@ export function heroScene({ gsap, ScrollTrigger }: AnimationKit) {
       const top = headerH + 28; // bajo el header flotante
       const bottom = Math.max(48, h * 0.07);
       const left = w - edge - archW;
-      // Dónde cae la ventana de luz de la foto (object-fit: cover, object-position 30 % 50 %).
+      // Dónde cae la ventana de luz de la foto (object-fit: cover, object-position 18 % 50 %).
       const s = Math.max(w / 1280, h / 720);
       const iw = 1280 * s;
       const ih = 720 * s;
-      const winX = (w - iw) * 0.3 + 0.655 * iw;
+      const winX = (w - iw) * 0.18 + 0.655 * iw;
       const winY = (h - ih) * 0.5 + 0.4 * ih;
       const archH = h - top - bottom;
       const scale = Math.max(1, Math.min(archW / (0.3 * iw), archH / (0.62 * ih)));

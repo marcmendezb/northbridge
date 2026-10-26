@@ -204,6 +204,7 @@ export const es = {
       line1: 'Tus números,',
       line2: 'bajo control.',
       proof: '+10 años en Zúrich · 200+ clientes',
+      scroll: 'Desliza',
     },
     proposal: {
       label: 'Nuestra promesa',

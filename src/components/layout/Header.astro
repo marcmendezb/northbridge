@@ -352,6 +352,15 @@ const isCurrent = (href: string) => path === href || (href !== '/' && path.start
 <style is:global>
   :root {
     --header-h: 96px;
+    /* Geometría del header, compartida para alinear contenido con el logo (p. ej. el hero). */
+    --header-gutter: clamp(16px, 4.5vw, 72px);
+    --header-max: 1280px;
+    --header-pad: 24px;
+  }
+  @media (min-width: 1200px) {
+    :root {
+      --header-pad: clamp(32px, 3.6vw, 56px);
+    }
   }
 
   /* Barra flotante: superficie elevada blanca, pegada arriba, esquinas inferiores de tarjeta (8 px). */
@@ -359,12 +368,12 @@ const isCurrent = (href: string) => path === href || (href !== '/' && path.start
     position: fixed;
     inset: 0 0 auto 0;
     z-index: 40;
-    padding-inline: clamp(16px, 4.5vw, 72px);
+    padding-inline: var(--header-gutter);
     pointer-events: none;
   }
   .nb-bar {
     pointer-events: auto;
-    max-width: 1280px;
+    max-width: var(--header-max);
     margin-inline: auto;
     background: var(--white);
     color: var(--navy-800);
@@ -386,13 +395,12 @@ const isCurrent = (href: string) => path === href || (href !== '/' && path.start
     justify-content: space-between;
     gap: 16px;
     height: var(--header-h);
-    padding-inline: 24px;
+    padding-inline: var(--header-pad);
   }
   @media (min-width: 1200px) {
     .nb-bar__row {
       display: grid;
       grid-template-columns: minmax(max-content, 1fr) auto minmax(max-content, 1fr);
-      padding-inline: clamp(32px, 3.6vw, 56px);
     }
   }
   .nb-bar__logo {
@@ -495,7 +503,7 @@ const isCurrent = (href: string) => path === href || (href !== '/' && path.start
     display: grid;
     grid-template-columns: 1fr 1fr minmax(300px, 400px);
     gap: 24px 56px;
-    margin-inline: clamp(32px, 3.6vw, 56px);
+    margin-inline: var(--header-pad);
     padding: 32px 0 28px;
     border-top: 1px solid var(--rule);
   }
