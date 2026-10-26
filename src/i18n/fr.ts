@@ -34,6 +34,9 @@ export const fr: Messages = {
   lang: {
     label: 'Langue',
     switch: 'Changer de langue',
+    country: 'Pays',
+    region: 'Pays et langue',
+    countryHint: 'Monnaie et formes juridiques de votre pays.',
   },
   cta: {
     book: 'Réservez votre consultation gratuite',
@@ -69,15 +72,15 @@ export const fr: Messages = {
   },
   price: {
     from: 'dès',
-    perMonth: 'CHF/mois',
+    perMonth: '{currency}/mois',
     vatNote: 'Prix hors TVA',
     vatFirst: 'TVA (MWST)',
     vatNoteFirst: 'Prix hors TVA (MWST)',
     includedFrom: 'Inclus dès la formule {name}',
-    packageStarts: 'La formule {name} commence à {amount} CHF/mois.',
+    packageStarts: 'La formule {name} commence à {amount}/mois.',
     package: 'Formule {name}.',
     fixed: 'Prix fixe.',
-    unitOnce: 'CHF',
+    unitOnce: '{currency}',
   },
   alert: {
     success: 'Confirmé',
@@ -138,7 +141,7 @@ export const fr: Messages = {
     packages: {
       essential: { forWhom: 'Indépendants et très petites entreprises sans personnel' },
       growth: { forWhom: 'PME avec une équipe et start-up en développement' },
-      full: { forWhom: 'PME jusqu’à 50 collaborateurs et sociétés structurées (AG)' },
+      full: { forWhom: 'PME jusqu’à 50 collaborateurs et sociétés structurées ({ag})' },
     },
     rows: {
       accounting: 'Comptabilité mensuelle et bouclement annuel',
@@ -178,7 +181,7 @@ export const fr: Messages = {
     separateLead:
       'Sur devis séparé, à prix fixe. Nous vous le remettons par écrit avant de commencer.',
     separateConstitution:
-      'GmbH dès {gmbh} ; AG dès {ag}. Les frais de notaire et du registre du commerce ne sont pas inclus.',
+      '{gmbhName} dès {gmbh} ; {agName} dès {ag}. Les frais de notaire et du registre du commerce ne sont pas inclus.',
     faqLabel: 'Questions',
     faqTitle: 'Questions sur les tarifs',
     ctaTitle: 'Vous ne savez pas quelle formule choisir ?',
@@ -256,7 +259,7 @@ export const fr: Messages = {
         invoices: 'Factures par mois',
         employees: 'Collaborateurs',
         result: 'Votre estimation',
-        types: { autonomo: 'Indépendant', startup: 'Start-up', gmbh: 'GmbH', ag: 'AG' },
+        types: { autonomo: 'Indépendant', startup: 'Start-up' },
       },
     },
     testimonials: {

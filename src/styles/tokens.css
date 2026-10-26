@@ -60,6 +60,14 @@
   --info-text: #1e3454;
   --info-icon: #2a4469;
 
+  /* Banderas del selector de país (no son colores de marca: solo dentro de <Flag />). */
+  --flag-red: #da291c;
+  --flag-yellow: #f1bf00;
+  --flag-gold: #ffcc00;
+  --flag-black: #000000;
+  --flag-blue: #002654;
+  --flag-green: #009246;
+
   /* Roles */
   --bg: var(--white);
   --fg: var(--navy-800);

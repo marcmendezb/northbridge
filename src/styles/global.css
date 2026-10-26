@@ -106,3 +106,14 @@ html.lenis body {
   width: 100%;
   padding-inline: max(var(--header-gutter), (100% - var(--header-max)) / 2);
 }
+
+/* ── País (src/lib/country.ts): el HTML trae una variante por país y solo se ve la del activo.
+   Sin elección guardada (o sin JS) se muestra Suiza, el país por defecto. ── */
+:root:not([data-country]) [data-cc]:not([data-cc~='CH']),
+:root[data-country='CH'] [data-cc]:not([data-cc~='CH']),
+:root[data-country='ES'] [data-cc]:not([data-cc~='ES']),
+:root[data-country='DE'] [data-cc]:not([data-cc~='DE']),
+:root[data-country='FR'] [data-cc]:not([data-cc~='FR']),
+:root[data-country='IT'] [data-cc]:not([data-cc~='IT']) {
+  display: none !important;
+}

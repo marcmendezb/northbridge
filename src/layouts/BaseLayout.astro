@@ -1,5 +1,6 @@
 ---
 import '@fontsource-variable/newsreader/opsz.css';
+import '@fontsource-variable/newsreader/opsz-italic.css';
 import '@fontsource-variable/instrument-sans/wght.css';
 import '../styles/global.css';
 import newsreaderLatin from '@fontsource-variable/newsreader/files/newsreader-latin-opsz-normal.woff2?url';
@@ -49,6 +50,14 @@ const alternateLinks = alternates(parsePath(Astro.url.pathname).canonical).map((
       document.documentElement.classList.add('js');
       if (!matchMedia('(prefers-reduced-motion: reduce)').matches)
         document.documentElement.classList.add('motion');
+      // País elegido en el header (moneda y formas jurídicas), antes de pintar: sin saltos.
+      try {
+        const nbCountry = localStorage.getItem('nb-country');
+        if (/^(CH|ES|DE|FR|IT)$/.test(nbCountry || ''))
+          document.documentElement.dataset.country = nbCountry;
+      } catch {
+        // Sin almacenamiento: se queda el país por defecto.
+      }
     </script>
     <title>{fullTitle}</title>
     <meta name="description" content={description} />

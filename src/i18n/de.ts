@@ -34,6 +34,9 @@ export const de: Messages = {
   lang: {
     label: 'Sprache',
     switch: 'Sprache wechseln',
+    country: 'Land',
+    region: 'Land und Sprache',
+    countryHint: 'Währung und Rechtsformen deines Landes.',
   },
   cta: {
     book: 'Kostenloses Erstgespräch buchen',
@@ -69,15 +72,15 @@ export const de: Messages = {
   },
   price: {
     from: 'ab',
-    perMonth: 'CHF/Monat',
+    perMonth: '{currency}/Monat',
     vatNote: 'Preise exkl. MWST',
     vatFirst: 'Mehrwertsteuer (MWST)',
     vatNoteFirst: 'Preise exkl. Mehrwertsteuer (MWST)',
     includedFrom: 'Inbegriffen ab {name}',
-    packageStarts: 'Das Paket {name} gibt es ab {amount} CHF/Monat.',
+    packageStarts: 'Das Paket {name} gibt es ab {amount}/Monat.',
     package: 'Paket {name}.',
     fixed: 'Fixpreis.',
-    unitOnce: 'CHF',
+    unitOnce: '{currency}',
   },
   alert: {
     success: 'Erfolgreich',
@@ -138,7 +141,7 @@ export const de: Messages = {
     packages: {
       essential: { forWhom: 'Selbstständige und Kleinstfirmen ohne Personal' },
       growth: { forWhom: 'KMU mit Team und Startups im Aufbau' },
-      full: { forWhom: 'KMU bis 50 Mitarbeitende und Firmen mit Struktur (AG)' },
+      full: { forWhom: 'KMU bis 50 Mitarbeitende und Firmen mit Struktur ({ag})' },
     },
     rows: {
       accounting: 'Monatliche Buchhaltung und Jahresabschluss',
@@ -178,7 +181,7 @@ export const de: Messages = {
     separateLead:
       'Dafür erhältst du eine separate Offerte zum Fixpreis. Schriftlich, bevor wir beginnen.',
     separateConstitution:
-      'GmbH ab {gmbh}, AG ab {ag}. Notariats- und Handelsregistergebühren sind nicht inbegriffen.',
+      '{gmbhName} ab {gmbh}, {agName} ab {ag}. Notariats- und Handelsregistergebühren sind nicht inbegriffen.',
     faqLabel: 'Fragen',
     faqTitle: 'Fragen zu den Preisen',
     ctaTitle: 'Nicht sicher, welches Paket passt?',
@@ -257,7 +260,7 @@ export const de: Messages = {
         invoices: 'Rechnungen pro Monat',
         employees: 'Mitarbeitende',
         result: 'Deine Schätzung',
-        types: { autonomo: 'Selbstständig', startup: 'Startup', gmbh: 'GmbH', ag: 'AG' },
+        types: { autonomo: 'Selbstständig', startup: 'Startup' },
       },
     },
     testimonials: {

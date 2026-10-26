@@ -11,7 +11,8 @@ import Accordion from '../components/ui/Accordion.astro';
 import ComparisonCell from '../components/ui/ComparisonCell.astro';
 import { useI18n, type MessageKey } from '../i18n';
 import { getBookingCta } from '../lib/site';
-import { formatCHF } from '../lib/format';
+import { byCountry, currencyOf, legalForm } from '../lib/country';
+import { formatMoney } from '../lib/pricing/currency';
 import {
   COMPARISON,
   FIXED_PRICES,
@@ -36,14 +37,22 @@ const highlights = (id: PackageId) =>
     const note = cellText(r[id]);
     return note ? `${rowLabel(r.id)}: ${lowerFirst(note)}` : rowLabel(r.id);
   });
-const constitution = t('pricing.separateConstitution', {
-  gmbh: formatCHF(FIXED_PRICES.gmbh.from, locale),
-  ag: formatCHF(FIXED_PRICES.ag.from, locale),
-});
+/** Formas jurídicas e importes según el país elegido (HTML con una variante por país). */
 const separate = SEPARATE_QUOTE.map((key) => {
   const label = t(`pricing.separate.${key}` as MessageKey);
-  return key === 'constitution' ? `${label}. ${constitution}` : label;
+  if (key !== 'constitution') return byCountry(() => label);
+  return byCountry((c) => {
+    const currency = currencyOf(c);
+    return `${label}. ${t('pricing.separateConstitution', {
+      gmbhName: legalForm(c, 'gmbh'),
+      agName: legalForm(c, 'ag'),
+      gmbh: formatMoney(FIXED_PRICES.gmbh.from, currency, locale),
+      ag: formatMoney(FIXED_PRICES.ag.from, currency, locale),
+    })}`;
+  });
 });
+const forWhom = (id: PackageId) =>
+  byCountry((c) => t(`pricing.packages.${id}.forWhom` as MessageKey, { ag: legalForm(c, 'ag') }));
 const faq = tRaw<{ q: string; a: string }[]>('pricing.faq');
 ---
 
@@ -76,7 +85,7 @@ const faq = tRaw<{ q: string; a: string }[]>('pricing.faq');
                   <span class="t-label mr-2 !text-[0.6875rem] text-piedra-600">
                     {t('pricing.forWhom')}
                   </span>
-                  {t(`pricing.packages.${id}.forWhom` as MessageKey)}
+                  <Fragment set:html={forWhom(id)} />
                 </p>
               </div>
               <PriceTag amount={p.from} firstVat={i === 0} />
@@ -151,7 +160,7 @@ const faq = tRaw<{ q: string; a: string }[]>('pricing.faq');
     rule
   >
     <Card class="max-w-[760px] p-8">
-      <CheckList items={separate} />
+      <CheckList items={separate} html />
     </Card>
   </Section>
 

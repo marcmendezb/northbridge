@@ -3,9 +3,18 @@ import { Image, Picture } from 'astro:assets';
 import promoPhoto from '../../assets/img/home/hero-poster.jpg';
 import Icon from '../brand/Icon.astro';
 import Arrow from '../brand/Arrow.astro';
+import Flag from '../brand/Flag.astro';
 import logoMark from '../../assets/brand/logo-header.png';
 import { alternates, localeMeta, parsePath, useI18n } from '../../i18n';
 import { getBookingCta, getMainNav, getServiceLinks, site } from '../../lib/site';
+import {
+  COUNTRIES,
+  DEFAULT_COUNTRY,
+  byCountry,
+  countryName,
+  currencyOf,
+  legalForm,
+} from '../../lib/country';
 const { t, lp, locale } = useI18n(Astro.currentLocale);
 const bookingCta = getBookingCta(locale);
 const mainNav = getMainNav(locale);
@@ -15,6 +24,13 @@ const langOptions = alternates(parsePath(Astro.url.pathname).canonical).map((a) 
   ...a,
   ...localeMeta[a.locale],
   current: a.locale === locale,
+}));
+/** País: moneda y formas jurídicas (independiente del idioma). Lo marca el script del header. */
+const countryOptions = COUNTRIES.map((code) => ({
+  code,
+  name: countryName(code, locale),
+  meta: `${currencyOf(code)} · ${legalForm(code, 'gmbh')}, ${legalForm(code, 'ag')}`,
+  current: code === DEFAULT_COUNTRY,
 }));
 
 interface Props {
@@ -112,10 +128,17 @@ const isCurrent = (href: string) => path === href || (href !== '/' && path.start
               class="nb-nav__link nb-lang__trigger"
               aria-expanded="false"
               aria-controls="mega-idiomas"
-              aria-label={`${t('lang.switch')}: ${localeMeta[locale].name}`}
               data-mega-trigger
             >
-              <span aria-hidden="true">{localeMeta[locale].short}</span>
+              <span class="sr-only">
+                {t('lang.region')}: <Fragment set:html={byCountry((c) => countryName(c, locale))} />
+                , {localeMeta[locale].name}
+              </span>
+              <span aria-hidden="true" class="nb-lang__codes">
+                <Fragment set:html={byCountry((c) => c)} />
+                <span class="nb-lang__sep">·</span>
+                {localeMeta[locale].short}
+              </span>
               <svg
                 class="nb-nav__chev"
                 viewBox="0 0 16 16"
@@ -245,6 +268,32 @@ const isCurrent = (href: string) => path === href || (href !== '/' && path.start
         <div class="nb-mega__clip">
           <div class="nb-mega__inner">
             <div class="nb-mega__col">
+              <p class="nb-mega__head" id="mega-country-head">
+                {t('lang.country')}
+              </p>
+              <ul class="nb-mega__list" aria-labelledby="mega-country-head">
+                {countryOptions.map((o) => (
+                  <li>
+                    <button
+                      type="button"
+                      class="nb-mega__link nb-country"
+                      data-country-option={o.code}
+                      aria-pressed={o.current ? 'true' : 'false'}
+                    >
+                      <span class="nb-country__flag">
+                        <Flag country={o.code} />
+                      </span>
+                      <span class="nb-country__body">
+                        <span>{o.name}</span>
+                        <span class="nb-country__meta">{o.meta}</span>
+                      </span>
+                    </button>
+                  </li>
+                ))}
+              </ul>
+              <p class="nb-mega__info">{t('lang.countryHint')}</p>
+            </div>
+            <div class="nb-mega__col">
               <p class="nb-mega__head">{t('lang.label')}</p>
               <ul class="nb-mega__list">
                 {langOptions.map((o) => (
@@ -264,26 +313,6 @@ const isCurrent = (href: string) => path === href || (href !== '/' && path.start
                   </li>
                 ))}
               </ul>
-            </div>
-            <div class="nb-mega__col">
-              <p class="nb-mega__head">{t('footer.contact')}</p>
-              <ul class="nb-mega__list">
-                <li>
-                  <a href={`tel:${site.phone.replace(/\s/g, '')}`} class="nb-mega__link">
-                    <span>{site.phone}</span>
-                  </a>
-                </li>
-                <li>
-                  <a href={`mailto:${site.email}`} class="nb-mega__link">
-                    <span>{site.email}</span>
-                  </a>
-                </li>
-              </ul>
-              <p class="nb-mega__info">
-                {site.address.street}, {site.address.postalCode} {site.address.city}
-                <br />
-                {t('footer.hours')}
-              </p>
             </div>
             <a href={bookingCta.href} class="nb-mega__promo" data-surface="dark">
               <Picture
@@ -329,6 +358,20 @@ const isCurrent = (href: string) => path === href || (href !== '/' && path.start
             <span>{bookingCta.label}</span>
             <Arrow />
           </a>
+          <ul class="nb-mobile__langs nb-mobile__countries" aria-label={t('lang.country')}>
+            {countryOptions.map((o) => (
+              <li>
+                <button
+                  type="button"
+                  data-country-option={o.code}
+                  aria-pressed={o.current ? 'true' : 'false'}
+                  aria-label={`${o.name} (${o.meta})`}
+                >
+                  <Flag country={o.code} />
+                </button>
+              </li>
+            ))}
+          </ul>
           <ul class="nb-mobile__langs" aria-label={t('lang.label')}>
             {langOptions.map((o) => (
               <li>
@@ -634,6 +677,41 @@ const isCurrent = (href: string) => path === href || (href !== '/' && path.start
     border-color: var(--salvia-600);
     color: var(--salvia-600);
   }
+  /* País: botón con el mismo aspecto que los enlaces del desplegable; debajo, moneda y formas. */
+  .nb-country {
+    padding: 4px 0;
+    border: 0;
+    background: none;
+    cursor: pointer;
+    text-align: left;
+  }
+  .nb-country__body {
+    display: flex;
+    flex-direction: column;
+    gap: 2px;
+  }
+  .nb-country__meta {
+    font-family: var(--font-sans);
+    font-size: 0.8125rem;
+    letter-spacing: 0.02em;
+    color: var(--piedra-600);
+  }
+  /* La bandera ocupa el sitio del código; la elegida lleva un anillo Navy. */
+  .nb-country {
+    align-items: flex-start;
+  }
+  /* Bandera pequeña, alineada con la primera línea del nombre. */
+  .nb-country__flag {
+    display: inline-flex;
+    justify-content: center;
+    width: 34px;
+    padding-top: 0.55rem;
+  }
+  .nb-country[aria-pressed='true'] .nb-flag,
+  .nb-mobile__countries button[aria-pressed='true'] .nb-flag {
+    outline: 1px solid var(--navy-800);
+    outline-offset: 2px;
+  }
   .nb-mega__link[aria-current] .nb-mega__code {
     border-color: var(--navy-800);
     background: var(--navy-800);
@@ -658,6 +736,14 @@ const isCurrent = (href: string) => path === href || (href !== '/' && path.start
     font-weight: 600;
     letter-spacing: 0.06em;
   }
+  .nb-lang__codes {
+    display: inline-flex;
+    align-items: center;
+    gap: 6px;
+  }
+  .nb-lang__sep {
+    color: var(--piedra-400);
+  }
   .nb-lang__trigger[aria-expanded='true'] .nb-nav__chev {
     transform: rotate(180deg);
   }
@@ -670,7 +756,8 @@ const isCurrent = (href: string) => path === href || (href !== '/' && path.start
     list-style: none;
   }
   .nb-lang__nojs a,
-  .nb-mobile__langs a {
+  .nb-mobile__langs a,
+  .nb-mobile__langs button {
     display: inline-flex;
     align-items: center;
     justify-content: center;
@@ -683,13 +770,29 @@ const isCurrent = (href: string) => path === href || (href !== '/' && path.start
     text-decoration: none;
   }
   .nb-lang__nojs a[aria-current],
-  .nb-mobile__langs a[aria-current] {
+  .nb-mobile__langs a[aria-current],
+  .nb-mobile__langs button[aria-pressed='true'] {
     color: var(--salvia-600);
   }
   .nb-mobile__langs {
     margin-top: 20px;
     padding-top: 12px;
     border-top: 1px solid var(--piedra-200);
+  }
+  .nb-mobile__langs button {
+    padding: 0;
+    border: 0;
+    background: none;
+    cursor: pointer;
+  }
+  /* Elegir país necesita JS; sin JS se queda el de por defecto. */
+  html:not(.js) .nb-mobile__countries {
+    display: none;
+  }
+  .js .nb-mobile__countries + .nb-mobile__langs {
+    margin-top: 0;
+    padding-top: 0;
+    border-top: 0;
   }
   .nb-lang__nojs {
     display: none;
@@ -862,7 +965,7 @@ const isCurrent = (href: string) => path === href || (href !== '/' && path.start
           setMega(open ? m : null);
           // Con teclado (Enter o Espacio), el foco pasa al primer enlace del panel.
           if (open && (e as MouseEvent).detail === 0)
-            m.panel.querySelector<HTMLElement>('a[href]')?.focus();
+            m.panel.querySelector<HTMLElement>('a[href], button')?.focus();
         });
         m.item.addEventListener('mouseenter', () => hoverable() && later(m, current ? 0 : 80));
         m.item.addEventListener('mouseleave', () => hoverable() && later(null, 220));
@@ -886,6 +989,31 @@ const isCurrent = (href: string) => path === href || (href !== '/' && path.start
       });
       desktop.addEventListener('change', () => setMega(null));
     }
+
+    // ── País: cambia moneda y formas jurídicas en toda la página (CSS de [data-cc]) y se recuerda ──
+    const root = document.documentElement;
+    const countryButtons = [
+      ...document.querySelectorAll<HTMLButtonElement>('[data-country-option]'),
+    ];
+    const syncCountry = () => {
+      const active = root.dataset.country ?? 'CH';
+      for (const b of countryButtons)
+        b.setAttribute('aria-pressed', String(b.dataset.countryOption === active));
+    };
+    for (const b of countryButtons) {
+      b.addEventListener('click', () => {
+        const code = b.dataset.countryOption;
+        if (!code) return;
+        root.dataset.country = code;
+        try {
+          localStorage.setItem('nb-country', code);
+        } catch {
+          // Sin almacenamiento: el país vale para esta página.
+        }
+        syncCountry();
+      });
+    }
+    syncCountry();
 
     if (btn && panel) {
       const focusables = () =>

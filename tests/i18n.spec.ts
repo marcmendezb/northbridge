@@ -39,7 +39,7 @@ test('i18n: con teclado, Enter abre idiomas, el foco entra y Esc lo cierra', asy
   await page.locator('.nb-lang__trigger').focus();
   await page.keyboard.press('Enter');
   await expect(page.locator('#mega-idiomas')).toHaveAttribute('data-open', 'true');
-  await expect(page.locator('#mega-idiomas a').first()).toBeFocused();
+  await expect(page.locator('#mega-idiomas [data-country-option]').first()).toBeFocused();
   await page.keyboard.press('Escape');
   await expect(page.locator('#mega-idiomas')).toHaveAttribute('data-open', 'false');
   await expect(page.locator('.nb-lang__trigger')).toBeFocused();
@@ -62,4 +62,34 @@ test.describe('sin JS', () => {
     await expect(page.locator('.nb-lang__nojs a')).toHaveCount(5);
     await expect(page.locator('.nb-lang__nojs a[lang="it-CH"]')).toHaveAttribute('href', '/it');
   });
+});
+
+test('país: cambia moneda y formas jurídicas, independiente del idioma, y se recuerda', async ({
+  page,
+}) => {
+  await page.setViewportSize({ width: 1440, height: 900 });
+  await page.goto('/precios', { waitUntil: 'networkidle' });
+  const growth = page.locator('ul li .t-price').nth(1);
+  const constitution = page.locator('main li').filter({ hasText: 'Constitución de empresa.' });
+  // Por defecto, Suiza: francos convertidos desde el euro, GmbH y AG.
+  await expect(
+    page.locator('ul li .font-sans').filter({ hasText: 'CHF/mes' }).first(),
+  ).toBeVisible();
+  await expect(constitution).toContainText('GmbH', { useInnerText: true });
+  const chf = Number((await growth.innerText()).replace(/\D/g, ''));
+  expect(chf).toBeLessThan(490);
+
+  await page.locator('.nb-lang__trigger').click();
+  const spain = page.locator('#mega-idiomas [data-country-option="ES"]');
+  await spain.click();
+  await expect(spain).toHaveAttribute('aria-pressed', 'true');
+  await expect(growth).toHaveText('490', { useInnerText: true });
+  await expect(constitution).toContainText('SL', { useInnerText: true });
+  await expect(constitution).not.toContainText('GmbH', { useInnerText: true });
+  await expect(page.locator('html')).toHaveAttribute('lang', 'es');
+
+  // Al cambiar de idioma se mantiene el país.
+  await page.goto('/en/pricing');
+  await expect(page.locator('html')).toHaveAttribute('data-country', 'ES');
+  await expect(page.locator('ul li .t-price').nth(1)).toHaveText('490', { useInnerText: true });
 });

@@ -32,6 +32,9 @@ export const es = {
   lang: {
     label: 'Idioma',
     switch: 'Cambiar idioma',
+    country: 'País',
+    region: 'País e idioma',
+    countryHint: 'Moneda y formas jurídicas de tu país.',
   },
   cta: {
     book: 'Reserva tu consulta gratuita',
@@ -67,15 +70,15 @@ export const es = {
   },
   price: {
     from: 'desde',
-    perMonth: 'CHF/mes',
+    perMonth: '{currency}/mes',
     vatNote: 'Precios sin IVA',
     vatFirst: 'IVA (MWST)',
     vatNoteFirst: 'Precios sin IVA (MWST)',
     includedFrom: 'Incluido desde {name}',
-    packageStarts: 'El paquete {name} empieza en {amount} CHF/mes.',
+    packageStarts: 'El paquete {name} empieza en {amount}/mes.',
     package: 'Paquete {name}.',
     fixed: 'Precio cerrado.',
-    unitOnce: 'CHF',
+    unitOnce: '{currency}',
   },
   alert: {
     success: 'Correcto',
@@ -136,7 +139,7 @@ export const es = {
     packages: {
       essential: { forWhom: 'Autónomos y empresas muy pequeñas sin personal' },
       growth: { forWhom: 'Pymes con equipo y startups en marcha' },
-      full: { forWhom: 'Pymes de hasta 50 empleados y empresas con estructura (AG)' },
+      full: { forWhom: 'Pymes de hasta 50 empleados y empresas con estructura ({ag})' },
     },
     rows: {
       accounting: 'Contabilidad mensual y cierre anual',
@@ -176,7 +179,7 @@ export const es = {
     separateLead:
       'Se presupuesta aparte, con precio cerrado. Te lo damos por escrito antes de empezar.',
     separateConstitution:
-      'GmbH desde {gmbh}; AG desde {ag}. Las tasas de notaría y del registro mercantil no están incluidas.',
+      '{gmbhName} desde {gmbh}; {agName} desde {ag}. Las tasas de notaría y del registro mercantil no están incluidas.',
     faqLabel: 'Preguntas',
     faqTitle: 'Preguntas sobre precios',
     ctaTitle: '¿No sabes qué paquete te encaja?',
@@ -252,7 +255,7 @@ export const es = {
         invoices: 'Facturas al mes',
         employees: 'Empleados',
         result: 'Tu estimación',
-        types: { autonomo: 'Autónomo', startup: 'Startup', gmbh: 'GmbH', ag: 'AG' },
+        types: { autonomo: 'Autónomo', startup: 'Startup' },
       },
     },
     testimonials: {

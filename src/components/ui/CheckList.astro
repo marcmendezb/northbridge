@@ -2,9 +2,11 @@
 /** Lista con checks de línea (trazo 1,5, terminales rectos). */
 interface Props {
   items: string[];
+  /** Los elementos ya vienen como HTML seguro (variantes por país de `byCountry`). */
+  html?: boolean;
   class?: string;
 }
-const { items, class: className = '' } = Astro.props;
+const { items, html = false, class: className = '' } = Astro.props;
 ---
 
 <ul class:list={['m-0 flex list-none flex-col gap-3 p-0', className]}>
@@ -20,7 +22,7 @@ const { items, class: className = '' } = Astro.props;
       >
         <path d="M2.5 8.5l3.5 3.5 7.5-8" />
       </svg>
-      <span class="t-body">{item}</span>
+      {html ? <span class="t-body" set:html={item} /> : <span class="t-body">{item}</span>}
     </li>
   ))}
 </ul>

@@ -12,8 +12,8 @@ function walk(dir: string): string[] {
 }
 
 describe('brand rule: prices live only in lib/pricing/config.ts', () => {
-  it('no amount in CHF outside config.ts, content or tests', () => {
-    const amount = /\d[\d\s\u202F.,]*\s?CHF/;
+  it('no amount in CHF or EUR outside config.ts, content or tests', () => {
+    const amount = /\d[\d\s\u202F.,]*\s?(CHF|EUR|€)/;
     const offenders = walk(root)
       .filter((f) => /\.(astro|ts|tsx)$/.test(f) && !f.endsWith('.test.ts'))
       .filter((f) => relative(root, f) !== 'lib/pricing/config.ts' && !f.includes('/dev/'))

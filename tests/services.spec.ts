@@ -57,14 +57,16 @@ test('las 5 subpáginas salen de una plantilla y llevan FAQPage JSON-LD con 4 pr
 test('precios: importes desde config, Growth único destacado, tabla accesible', async ({
   page,
 }) => {
+  // En un país con euro se ven los importes de config.ts tal cual (Suiza los convierte a CHF).
+  await page.addInitScript(() => localStorage.setItem('nb-country', 'ES'));
   await page.goto('/precios');
   await expect(page.getByText('Precios sin IVA (MWST)')).toHaveCount(1);
   await expect(page.getByText('Recomendado')).toHaveCount(2); // tarjeta + cabecera de tabla
   const table = page.getByRole('table', { name: /Comparativa de los paquetes/ });
   await expect(table.getByRole('columnheader')).toHaveCount(4);
-  await expect(page.getByText('1 490 CHF', { exact: false }).first()).toBeVisible();
+  await expect(page.getByText('SL desde 1 490 €', { exact: false }).first()).toBeVisible();
   for (const n of ['190', '490', '990'])
-    await expect(page.locator('.t-price', { hasText: n })).toHaveCount(1);
+    await expect(page.locator('.t-price:visible', { hasText: n })).toHaveCount(1);
 });
 
 test('acordeón de FAQ: abre con teclado y actualiza aria-expanded', async ({ page }) => {

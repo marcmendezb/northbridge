@@ -15,6 +15,7 @@ import { useI18n } from '../i18n';
 import { entryKey } from '../lib/content';
 import { getBookingCta } from '../lib/site';
 import { describePricing } from '../lib/pricing/display';
+import { byCountry, currencyOf } from '../lib/country';
 
 interface Props {
   entry: CollectionEntry<'servicios'>;
@@ -24,7 +25,14 @@ const { entry, related } = Astro.props;
 const { t, lp, locale } = useI18n(Astro.currentLocale);
 const bookingCta = getBookingCta(locale);
 const d = entry.data;
-const prices = d.pricing.map((p) => ({ ...p, ...describePricing(p, locale) }));
+/** El detalle puede citar un importe: una variante por país (moneda). */
+const prices = d.pricing.map((p) => {
+  const base = describePricing(p, locale);
+  const detail = base.detail
+    ? byCountry((c) => describePricing(p, locale, currencyOf(c)).detail ?? '')
+    : undefined;
+  return { ...p, ...base, detail };
+});
 const mentionsVat = JSON.stringify(d).includes('MWST');
 
 const faqJsonLd = {
@@ -102,11 +110,11 @@ const faqJsonLd = {
             <Card class="flex flex-col gap-2 p-6">
               <p class="t-label m-0 text-piedra-600">{p.label}</p>
               {p.amount ? (
-                <PriceTag amount={p.amount} unit={p.unit} firstVat={!mentionsVat && i === 0} />
+                <PriceTag amount={p.amount} once={p.once} firstVat={!mentionsVat && i === 0} />
               ) : (
                 <p class="t-price m-0 text-[1.75rem] text-navy-800">{p.headline}</p>
               )}
-              {p.detail && <p class="t-small m-0">{p.detail}</p>}
+              {p.detail && <p class="t-small m-0" set:html={p.detail} />}
             </Card>
           </li>
         ))}

@@ -34,6 +34,9 @@ export const it: Messages = {
   lang: {
     label: 'Lingua',
     switch: 'Cambia lingua',
+    country: 'Paese',
+    region: 'Paese e lingua',
+    countryHint: 'Valuta e forme giuridiche del tuo paese.',
   },
   cta: {
     book: 'Prenota la consulenza gratuita',
@@ -69,15 +72,15 @@ export const it: Messages = {
   },
   price: {
     from: 'da',
-    perMonth: 'CHF/mese',
+    perMonth: '{currency}/mese',
     vatNote: 'Prezzi IVA esclusa',
     vatFirst: 'IVA (MWST)',
     vatNoteFirst: 'Prezzi IVA (MWST) esclusa',
     includedFrom: 'Incluso a partire da {name}',
-    packageStarts: 'Il pacchetto {name} parte da {amount} CHF/mese.',
+    packageStarts: 'Il pacchetto {name} parte da {amount}/mese.',
     package: 'Pacchetto {name}.',
     fixed: 'Prezzo fisso.',
-    unitOnce: 'CHF',
+    unitOnce: '{currency}',
   },
   alert: {
     success: 'Fatto',
@@ -138,7 +141,7 @@ export const it: Messages = {
     packages: {
       essential: { forWhom: 'Indipendenti e microimprese senza personale' },
       growth: { forWhom: 'PMI con personale e startup già avviate' },
-      full: { forWhom: 'PMI fino a 50 dipendenti e società strutturate (AG)' },
+      full: { forWhom: 'PMI fino a 50 dipendenti e società strutturate ({ag})' },
     },
     rows: {
       accounting: 'Contabilità mensile e chiusura annuale',
@@ -178,7 +181,7 @@ export const it: Messages = {
     separateLead:
       'Lo preventiviamo a parte, a prezzo fisso. Te lo diamo per iscritto prima di iniziare.',
     separateConstitution:
-      'GmbH da {gmbh}; AG da {ag}. Le spese notarili e gli emolumenti del registro di commercio non sono inclusi.',
+      '{gmbhName} da {gmbh}; {agName} da {ag}. Le spese notarili e gli emolumenti del registro di commercio non sono inclusi.',
     faqLabel: 'Domande',
     faqTitle: 'Domande sui prezzi',
     ctaTitle: 'Non sai quale pacchetto fa per te?',
@@ -254,7 +257,7 @@ export const it: Messages = {
         invoices: 'Fatture al mese',
         employees: 'Dipendenti',
         result: 'La tua stima',
-        types: { autonomo: 'Indipendente', startup: 'Startup', gmbh: 'GmbH', ag: 'AG' },
+        types: { autonomo: 'Indipendente', startup: 'Startup' },
       },
     },
     testimonials: {

@@ -10,6 +10,9 @@ import { useI18n, type MessageKey } from '../../i18n';
 import { calculate, type CompanyType } from '../../lib/pricing/calculate';
 import { PACKAGES } from '../../lib/pricing/config';
 import { formatNumber } from '../../lib/format';
+import { COUNTRIES, byCountry, currencyOf, legalForm } from '../../lib/country';
+import { convert } from '../../lib/pricing/currency';
+import { priceUnit } from '../../lib/pricing/display';
 const { t, lp, locale } = useI18n(Astro.currentLocale);
 
 // Ejemplo de docs/07: Pyme (GmbH), 60 facturas, 5 empleados.
@@ -19,6 +22,19 @@ const types: CompanyType[] = ['autonomo', 'startup', 'gmbh', 'ag'];
 const active = types.indexOf(example.type);
 const [min, max] = result.custom ? [0, 0] : result.range;
 const pkgName = result.custom ? '' : PACKAGES[result.package].name;
+/** Autónomo y startup se traducen; la GmbH y la AG son las formas jurídicas del país elegido. */
+const typeLabel = (ty: CompanyType) =>
+  ty === 'gmbh' || ty === 'ag'
+    ? byCountry((c) => legalForm(c, ty))
+    : byCountry(() => t(`home.calculator.preview.types.${ty}` as MessageKey));
+/** El rango, convertido desde el euro: una variante por moneda (las cifras cuentan al entrar). */
+const currencies = [...new Set(COUNTRIES.map(currencyOf))].map((currency) => ({
+  currency,
+  countries: COUNTRIES.filter((c) => currencyOf(c) === currency).join(' '),
+  min: convert(min, currency),
+  max: convert(max, currency),
+}));
+const unit = byCountry((c) => priceUnit(currencyOf(c), locale));
 ---
 
 <section class="nb-calc nb-container" aria-labelledby="calc-title">
@@ -54,7 +70,7 @@ const pkgName = result.custom ? '' : PACKAGES[result.package].name;
           <span class="nb-calc__chip-bg" data-calc-chip-bg aria-hidden="true"></span>
           {types.map((ty, i) => (
             <span class="nb-calc__chip" data-active={i === active ? '' : undefined}>
-              {t(`home.calculator.preview.types.${ty}` as MessageKey)}
+              <Fragment set:html={typeLabel(ty)} />
             </span>
           ))}
         </span>
@@ -93,10 +109,14 @@ const pkgName = result.custom ? '' : PACKAGES[result.package].name;
         </span>
         <span class="nb-calc__price">
           <span class="nb-calc__amount">
-            <span data-calc-count={min}>{formatNumber(min, locale)}</span>–
-            <span data-calc-count={max}>{formatNumber(max, locale)}</span>
+            {currencies.map((v) => (
+              <span data-cc={v.countries}>
+                <span data-calc-count={v.min}>{formatNumber(v.min, locale)}</span>–
+                <span data-calc-count={v.max}>{formatNumber(v.max, locale)}</span>
+              </span>
+            ))}
           </span>
-          <span class="nb-calc__unit">{t('price.perMonth')}</span>
+          <span class="nb-calc__unit" set:html={unit} />
         </span>
         <span class="nb-calc__vat">{t('price.vatNote')}</span>
       </div>

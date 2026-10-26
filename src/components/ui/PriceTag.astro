@@ -1,12 +1,19 @@
 ---
 import { formatNumber } from '../../lib/format';
+import { byCountry, currencyOf } from '../../lib/country';
+import { convert } from '../../lib/pricing/currency';
+import { priceUnit } from '../../lib/pricing/display';
 import { useI18n } from '../../i18n';
 const { t, locale } = useI18n(Astro.currentLocale);
 
-/** «desde» y la unidad en Instrument Sans; el importe en Newsreader. Siempre con «Precios sin IVA». */
+/**
+ * «desde» y la unidad en Instrument Sans; el importe en Newsreader. Siempre con «Precios sin IVA».
+ * `amount` va en EUR (config.ts): se muestra convertido a la moneda del país elegido.
+ */
 interface Props {
   amount: number;
-  unit?: string;
+  /** Precio cerrado (pago único): la unidad es solo la moneda. */
+  once?: boolean;
   size?: 'md' | 'lg';
   /** Primera mención de IVA en la página: «IVA (MWST)». */
   firstVat?: boolean;
@@ -15,21 +22,24 @@ interface Props {
 }
 const {
   amount,
-  unit = t('price.perMonth'),
+  once = false,
   size = 'md',
   firstVat = false,
   hideVatNote = false,
   class: className = '',
 } = Astro.props;
+const value = byCountry((c) => formatNumber(convert(amount, currencyOf(c)), locale));
+const unit = byCountry((c) => priceUnit(currencyOf(c), locale, once));
 ---
 
 <div class:list={['flex flex-col gap-1', className]}>
   <p class="m-0 flex flex-wrap items-baseline gap-x-2">
     <span class="font-sans text-sm text-piedra-600">{t('price.from')}</span>
-    <span class:list={['t-price text-navy-800', size === 'lg' ? 'text-[3.5rem]' : 'text-[2.5rem]']}>
-      {formatNumber(amount, locale)}
-    </span>
-    <span class="font-sans text-sm text-piedra-600">{unit}</span>
+    <span
+      class:list={['t-price text-navy-800', size === 'lg' ? 'text-[3.5rem]' : 'text-[2.5rem]']}
+      set:html={value}
+    />
+    <span class="font-sans text-sm text-piedra-600" set:html={unit} />
   </p>
   {!hideVatNote && (
     <p class="t-small m-0">{firstVat ? t('price.vatNoteFirst') : t('price.vatNote')}</p>

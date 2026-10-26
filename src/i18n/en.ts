@@ -34,6 +34,9 @@ export const en: Messages = {
   lang: {
     label: 'Language',
     switch: 'Change language',
+    country: 'Country',
+    region: 'Country and language',
+    countryHint: 'Currency and legal forms for your country.',
   },
   cta: {
     book: 'Book your free consultation',
@@ -69,15 +72,15 @@ export const en: Messages = {
   },
   price: {
     from: 'from',
-    perMonth: 'CHF/month',
+    perMonth: '{currency}/month',
     vatNote: 'Prices excl. VAT',
     vatFirst: 'VAT (MWST)',
     vatNoteFirst: 'Prices excl. VAT (MWST)',
     includedFrom: 'Included from {name}',
-    packageStarts: 'The {name} package starts at {amount} CHF/month.',
+    packageStarts: 'The {name} package starts at {amount}/month.',
     package: '{name} package.',
     fixed: 'Fixed price.',
-    unitOnce: 'CHF',
+    unitOnce: '{currency}',
   },
   alert: {
     success: 'Success',
@@ -138,7 +141,7 @@ export const en: Messages = {
     packages: {
       essential: { forWhom: 'Freelancers and very small businesses with no staff' },
       growth: { forWhom: 'SMEs with a team, and startups up and running' },
-      full: { forWhom: 'SMEs with up to 50 employees and established companies (AG)' },
+      full: { forWhom: 'SMEs with up to 50 employees and established companies ({ag})' },
     },
     rows: {
       accounting: 'Monthly bookkeeping and year-end closing',
@@ -178,7 +181,7 @@ export const en: Messages = {
     separateLead:
       'Quoted separately, at a fixed price. We give it to you in writing before we start.',
     separateConstitution:
-      'GmbH from {gmbh}; AG from {ag}. Notary and commercial register fees are not included.',
+      '{gmbhName} from {gmbh}; {agName} from {ag}. Notary and commercial register fees are not included.',
     faqLabel: 'Questions',
     faqTitle: 'Questions about pricing',
     ctaTitle: 'Not sure which package fits?',
@@ -257,7 +260,7 @@ export const en: Messages = {
         invoices: 'Invoices per month',
         employees: 'Employees',
         result: 'Your estimate',
-        types: { autonomo: 'Self-employed', startup: 'Startup', gmbh: 'GmbH', ag: 'AG' },
+        types: { autonomo: 'Self-employed', startup: 'Startup' },
       },
     },
     testimonials: {

@@ -44,7 +44,7 @@ export function recommendedPackage({ type, invoices, employees }: CalculatorInpu
   return 'essential';
 }
 
-/** Precio mensual estimado (CHF, sin IVA): función pura, todos los importes salen de config.ts. */
+/** Precio mensual estimado (EUR, sin IVA; convert() para otras monedas): función pura, todos los importes salen de config.ts. */
 export function calculate(input: CalculatorInput): CalculatorResult {
   if (input.invoices > INVOICE_TIERS[INVOICE_TIERS.length - 1].upTo) return { custom: true };
   const raw = BASE[input.type] + invoiceFee(input.invoices) + payrollFee(input.employees);

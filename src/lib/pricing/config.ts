@@ -1,7 +1,18 @@
 /**
- * Única fuente de importes y reglas de precio (CHF, sin IVA).
+ * Única fuente de importes y reglas de precio (en EUR, sin IVA). En los países con otra moneda
+ * (Suiza: CHF) el importe se convierte desde el euro con `convert()` (currency.ts).
  * Todos los valores son ficticios y provisionales: docs/07-calculadora-y-precios.md.
  */
+
+export type Currency = 'EUR' | 'CHF';
+/** Moneda en la que están escritos todos los importes de este archivo. */
+export const BASE_CURRENCY = 'EUR' satisfies Currency;
+/**
+ * Unidades de cada moneda por 1 EUR. CHF: tipo de referencia del BCE del 23-10-2026
+ * (ecb.europa.eu, euro foreign exchange reference rates). Revisar antes de publicar: DECISIONES.md.
+ */
+export const EXCHANGE_RATES: Record<Currency, number> = { EUR: 1, CHF: 0.9227 };
+export const EXCHANGE_RATE_DATE = '2026-10-23';
 
 export type PackageId = 'essential' | 'growth' | 'full';
 export type FixedId = 'gmbh' | 'ag';
