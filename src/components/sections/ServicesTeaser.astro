@@ -63,8 +63,8 @@ const photos: Record<string, ImageMetadata> = {
     ))}
   </div>
   <div class="nb-rows__float nb-fan" data-fan-float aria-hidden="true">
-    {Object.entries(photos).map(([key, src]) => (
-      <span class="nb-fan__strip" data-fan-strip>
+    {Object.entries(photos).map(([key, src], i) => (
+      <span class="nb-fan__card" data-fan-card style={`--i:${i - 2}`}>
         <Picture
           src={src}
           formats={['avif', 'webp']}
@@ -74,7 +74,7 @@ const photos: Record<string, ImageMetadata> = {
           loading="lazy"
           quality={70}
           class="nb-fan__img"
-          data-fan={key}
+          data-fan-photo={key}
         />
       </span>
     ))}
@@ -217,34 +217,43 @@ const photos: Record<string, ImageMetadata> = {
     opacity: 1;
     transform: scale(1);
   }
-  /* «Ver los 5 servicios»: mini acordeón con las cinco fotos; se abre una franja cada vez. */
+  /* «Ver los 5 servicios»: las cinco fotos como cartas apiladas que se abren en abanico. */
   .nb-fan {
-    width: clamp(260px, 24vw, 360px);
-    aspect-ratio: 16 / 10;
-    background: var(--navy-800);
+    width: clamp(130px, 10vw, 160px);
+    aspect-ratio: 3 / 4;
+    overflow: visible;
+    border-radius: 0;
+    background: none;
+    box-shadow: none;
   }
-  .nb-fan__strip {
+  .nb-fan__card {
     position: absolute;
     inset: 0;
     overflow: hidden;
-    clip-path: inset(0 100% 0 0);
-    transition:
-      clip-path 700ms var(--ease-out),
-      transform 700ms var(--ease-out);
+    border-radius: var(--radius-card, 8px);
+    background: var(--piedra-100);
+    box-shadow:
+      0 0 0 1px rgb(255 255 255 / 0.7),
+      0 12px 28px rgb(21 39 66 / 0.18);
+    /* Apiladas: casi superpuestas, con un leve desfase. */
+    transform: translate(calc(var(--i) * 3px), calc(var(--i) * -2px))
+      rotate(calc(var(--i) * 1.5deg));
+    transition: transform 650ms var(--ease-out);
+    transition-delay: calc((var(--i) + 2) * 35ms);
   }
-  .nb-fan__strip picture {
+  /* Abiertas en abanico, desde el centro. */
+  .nb-fan[data-open] .nb-fan__card {
+    transform: translate(calc(var(--i) * 32%), calc(var(--i) * var(--i) * 3px))
+      rotate(calc(var(--i) * 4deg));
+  }
+  .nb-fan__card picture {
     display: contents;
   }
   .nb-fan__img {
-    position: absolute;
-    top: 0;
-    left: 0;
+    width: 100%;
     height: 100%;
-    width: var(--fan-max, 52%);
-    max-width: none;
     object-fit: cover;
-    object-position: 75% 50%;
-    transition: transform 700ms var(--ease-out);
+    object-position: 76% 50%;
   }
   @media (hover: none), (pointer: coarse) {
     .nb-rows__float {
@@ -259,7 +268,7 @@ const photos: Record<string, ImageMetadata> = {
   const reduce = matchMedia('(prefers-reduced-motion: reduce)').matches;
 
   /** Capa flotante que sigue al cursor por encima, con un leve retraso (transform y opacidad). */
-  function follower(float: HTMLElement) {
+  function follower(float: HTMLElement, lift = 20) {
     const pos = { x: 0, y: 0 };
     const target = { x: 0, y: 0 };
     let shown = 0;
@@ -271,7 +280,7 @@ const photos: Record<string, ImageMetadata> = {
       pos.y += (target.y - pos.y) * k;
       shown += ((visible ? 1 : 0) - shown) * (reduce ? 1 : 0.18);
       const scale = reduce ? 1 : 0.9 + shown * 0.1;
-      float.style.transform = `translate3d(${pos.x}px, ${pos.y}px, 0) translate(-50%, calc(-100% - 20px)) scale(${scale})`;
+      float.style.transform = `translate3d(${pos.x}px, ${pos.y}px, 0) translate(-50%, calc(-100% - ${lift}px)) scale(${scale})`;
       float.style.opacity = String(shown);
       const settled =
         Math.abs(target.x - pos.x) < 0.1 &&
@@ -337,46 +346,20 @@ const photos: Record<string, ImageMetadata> = {
     hideOnScroll(rows, f);
   }
 
-  // «Ver los 5 servicios»: mini acordeón de cinco franjas; la abierta rota cada 0,9 s.
+  // «Ver los 5 servicios»: las cinco cartas siguen al cursor y se abren en abanico.
   const trigger = document.querySelector<HTMLElement>('[data-fan-trigger]');
   const fan = document.querySelector<HTMLElement>('[data-fan-float]');
   if (trigger && fan && fine.matches) {
-    const f = follower(fan);
-    const strips = [...fan.querySelectorAll<HTMLElement>('[data-fan-strip]')];
-    const OPEN = 0.52;
-    const closed = (1 - OPEN) / (strips.length - 1);
-    fan.style.setProperty('--fan-max', `${OPEN * 100}%`);
-    let active = 0;
-    let timer = 0;
-    /** Coloca las franjas: recorte (clip-path) y desplazamiento, sin animar el layout. */
-    const layout = (open: number | null) => {
-      let left = 0;
-      strips.forEach((strip, i) => {
-        const w = open === null ? 1 / strips.length : i === open ? OPEN : closed;
-        const img = strip.querySelector<HTMLElement>('img');
-        strip.style.transform = `translateX(${left * 100}%)`;
-        // 2 px de separación entre franjas (el fondo navy hace de filete).
-        strip.style.clipPath = `inset(0 calc(${(1 - w) * 100}% + 2px) 0 0)`;
-        // La foto queda centrada en su franja.
-        if (img) img.style.transform = `translateX(${((w - OPEN) / 2 / OPEN) * 100}%)`;
-        left += w;
-      });
-    };
-    layout(null);
-    const cycle = () => {
-      layout(active);
-      active = (active + 1) % strips.length;
-    };
+    const f = follower(fan, 40);
     trigger.addEventListener('pointerenter', (e) => {
       f.show(e);
-      active = 0;
-      cycle();
-      if (!reduce) timer = window.setInterval(cycle, 900);
+      // Un fotograma después, para que el abanico parta de la pila.
+      requestAnimationFrame(() => fan.setAttribute('data-open', ''));
     });
     trigger.addEventListener('pointermove', (e) => f.move(e));
     trigger.addEventListener('pointerleave', () => {
       f.hide();
-      window.clearInterval(timer);
+      fan.removeAttribute('data-open');
     });
     hideOnScroll(trigger, f);
   }
