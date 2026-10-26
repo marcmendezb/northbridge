@@ -3,19 +3,38 @@ import Section from '../ui/Section.astro';
 import Button from '../ui/Button.astro';
 import Icon from '../brand/Icon.astro';
 import Arrow from '../brand/Arrow.astro';
+import { Picture } from 'astro:assets';
+import type { ImageMetadata } from 'astro';
+import contabilidad from '../../assets/img/services/contabilidad.jpeg';
+import iva from '../../assets/img/services/iva.jpeg';
+import nominas from '../../assets/img/services/nominas.jpeg';
+import constitucion from '../../assets/img/services/constitucion.jpeg';
+import startups from '../../assets/img/services/startup.jpeg';
 import { useI18n } from '../../i18n';
 import { entryKey, getServices } from '../../lib/content';
 const { t, lp, locale } = useI18n(Astro.currentLocale);
 
 const featured = ['contabilidad', 'iva', 'nominas'];
 const services = (await getServices(locale)).filter((s) => featured.includes(s.data.icon));
+/** Foto de cada servicio: aparece sobre el cursor al pasar por su fila (solo con ratón). */
+const photos: Record<string, ImageMetadata> = {
+  contabilidad,
+  iva,
+  nominas,
+  constitucion,
+  startups,
+};
 ---
 
 <Section tone="base" title={t('home.services.title')} lead={t('home.services.lead')}>
-  <ol class="nb-rows m-0 list-none p-0">
+  <ol class="nb-rows m-0 list-none p-0" data-rows>
     {services.map((s) => (
       <li data-reveal class="nb-row">
-        <a href={lp(`/servicios/${entryKey(s)}`)} class="nb-row__link nb-trace">
+        <a
+          href={lp(`/servicios/${entryKey(s)}`)}
+          class="nb-row__link nb-trace"
+          data-row-photo={s.data.icon}
+        >
           <span class="nb-row__main">
             <span class="nb-row__title">{s.data.title}</span>
             <span class="nb-row__sum">{s.data.summary}</span>
@@ -28,6 +47,21 @@ const services = (await getServices(locale)).filter((s) => featured.includes(s.d
       </li>
     ))}
   </ol>
+  <div class="nb-rows__float" data-rows-float aria-hidden="true">
+    {services.map((s) => (
+      <Picture
+        src={photos[s.data.icon]}
+        formats={['avif', 'webp']}
+        widths={[400, 720]}
+        sizes="360px"
+        alt=""
+        loading="lazy"
+        quality={72}
+        class="nb-rows__photo"
+        data-photo={s.data.icon}
+      />
+    ))}
+  </div>
   <div data-reveal class="mt-12">
     <Button variant="ghost" href={lp('/servicios')} arrow>
       {t('home.services.more')}
@@ -127,4 +161,118 @@ const services = (await getServices(locale)).filter((s) => featured.includes(s.d
       color: var(--white);
     }
   }
+
+  /* Foto flotante: sigue al cursor por encima, con un leve retraso (solo transform y opacity). */
+  .nb-rows__float {
+    position: fixed;
+    top: 0;
+    left: 0;
+    z-index: 30;
+    width: clamp(240px, 22vw, 340px);
+    aspect-ratio: 3 / 2;
+    overflow: hidden;
+    border-radius: var(--radius-card, 8px);
+    background: var(--piedra-100);
+    box-shadow: 0 18px 40px rgb(21 39 66 / 0.18);
+    pointer-events: none;
+    opacity: 0;
+    visibility: hidden;
+    will-change: transform, opacity;
+  }
+  .nb-rows__float[data-visible] {
+    visibility: visible;
+  }
+  .nb-rows__photo {
+    position: absolute;
+    inset: 0;
+    width: 100%;
+    height: 100%;
+    object-fit: cover;
+    /* Las fotos dejan la mitad izquierda en navy: se encuadra el motivo. */
+    object-position: 78% 50%;
+    opacity: 0;
+    transform: scale(1.08);
+    transition:
+      opacity 420ms var(--ease-out),
+      transform 900ms var(--ease-out);
+  }
+  .nb-rows__photo[data-active] {
+    opacity: 1;
+    transform: scale(1);
+  }
+  @media (hover: none), (pointer: coarse) {
+    .nb-rows__float {
+      display: none;
+    }
+  }
 </style>
+
+<script>
+  // Foto que sigue al cursor sobre «Cómo te ayudamos». Solo con ratón; sin JS no aparece.
+  const rows = document.querySelector<HTMLElement>('[data-rows]');
+  const float = document.querySelector<HTMLElement>('[data-rows-float]');
+  const fine = matchMedia('(hover: hover) and (pointer: fine)');
+  if (rows && float && fine.matches) {
+    const reduce = matchMedia('(prefers-reduced-motion: reduce)').matches;
+    const photos = [...float.querySelectorAll<HTMLElement>('[data-photo]')];
+    const pos = { x: 0, y: 0 };
+    const target = { x: 0, y: 0 };
+    let shown = 0;
+    let visible = false;
+    let frame = 0;
+
+    const render = () => {
+      // Interpolación suave hacia el cursor; sin ella con movimiento reducido.
+      const k = reduce ? 1 : 0.16;
+      pos.x += (target.x - pos.x) * k;
+      pos.y += (target.y - pos.y) * k;
+      shown += ((visible ? 1 : 0) - shown) * (reduce ? 1 : 0.18);
+      const scale = reduce ? 1 : 0.9 + shown * 0.1;
+      float.style.transform = `translate3d(${pos.x}px, ${pos.y}px, 0) translate(-50%, calc(-100% - 20px)) scale(${scale})`;
+      float.style.opacity = String(shown);
+      const settled =
+        Math.abs(target.x - pos.x) < 0.1 &&
+        Math.abs(target.y - pos.y) < 0.1 &&
+        Math.abs((visible ? 1 : 0) - shown) < 0.01;
+      if (settled && !visible) float.removeAttribute('data-visible');
+      frame = settled ? 0 : requestAnimationFrame(render);
+    };
+    const tick = () => {
+      if (!frame) frame = requestAnimationFrame(render);
+    };
+
+    rows.querySelectorAll<HTMLElement>('[data-row-photo]').forEach((link) => {
+      link.addEventListener('pointerenter', (e) => {
+        if (!visible) {
+          // Aparece justo donde está el cursor, sin viajar desde la posición anterior.
+          pos.x = target.x = e.clientX;
+          pos.y = target.y = e.clientY;
+        }
+        visible = true;
+        float.setAttribute('data-visible', '');
+        photos.forEach((p) =>
+          p.toggleAttribute('data-active', p.dataset.photo === link.dataset.rowPhoto),
+        );
+        tick();
+      });
+    });
+    rows.addEventListener('pointermove', (e) => {
+      target.x = e.clientX;
+      target.y = e.clientY;
+      tick();
+    });
+    const hide = () => {
+      visible = false;
+      tick();
+    };
+    rows.addEventListener('pointerleave', hide);
+    // Si la página se desplaza bajo el cursor quieto, se esconde al salir de la lista.
+    window.addEventListener(
+      'scroll',
+      () => {
+        if (visible && !rows.matches(':hover')) hide();
+      },
+      { passive: true },
+    );
+  }
+</script>
