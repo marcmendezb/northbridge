@@ -247,6 +247,13 @@ export const es = {
       title: 'Calcula tu precio en 1 minuto',
       text: 'Elige tu tipo de empresa, cuántas facturas tienes al mes y cuántos empleados. Te damos una estimación al momento.',
       note: 'Es una estimación orientativa. El precio cerrado te lo damos tras 20 minutos de conversación, sin compromiso.',
+      preview: {
+        type: 'Tipo de empresa',
+        invoices: 'Facturas al mes',
+        employees: 'Empleados',
+        result: 'Tu estimación',
+        types: { autonomo: 'Autónomo', startup: 'Startup', gmbh: 'GmbH', ag: 'AG' },
+      },
     },
     testimonials: {
       label: 'Clientes',

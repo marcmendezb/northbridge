@@ -252,6 +252,13 @@ export const de: Messages = {
       title: 'Berechne deinen Preis in 1 Minute',
       text: 'Wähle deine Unternehmensform und gib an, wie viele Rechnungen pro Monat und wie viele Mitarbeitende du hast. Du erhältst sofort eine Schätzung.',
       note: 'Das ist eine erste Schätzung. Den Fixpreis erhältst du nach einem Gespräch von 20 Minuten, unverbindlich.',
+      preview: {
+        type: 'Unternehmensform',
+        invoices: 'Rechnungen pro Monat',
+        employees: 'Mitarbeitende',
+        result: 'Deine Schätzung',
+        types: { autonomo: 'Selbstständig', startup: 'Startup', gmbh: 'GmbH', ag: 'AG' },
+      },
     },
     testimonials: {
       label: 'Kunden',

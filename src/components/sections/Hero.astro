@@ -49,7 +49,7 @@ const posterFile = await getImage({ src: heroPoster, format: 'webp', width: 1920
 
       <!-- Pie de la imagen: credenciales e indicador de scroll. Se encoge con la foto y queda como base del arco. -->
       <div class="hero__band" data-hero-band data-hero-fade="0.85">
-        <div class="hero__band-inner nb-container">
+        <div class="hero__band-inner">
           <ul class="hero__facts">
             {facts.map((f) => (
               <li>{f}</li>
@@ -137,7 +137,8 @@ const posterFile = await getImage({ src: heroPoster, format: 'webp', width: 1920
 <style is:global>
   /* ── Base (sin JS, reduced-motion y móvil): foto con el texto sobre la mitad navy y la promesa debajo ── */
   .hero {
-    --band-h: 72px;
+    --band-h: 64px;
+    --band-gap: 24px;
     position: relative;
     background: var(--navy-800);
   }
@@ -177,7 +178,7 @@ const posterFile = await getImage({ src: heroPoster, format: 'webp', width: 1920
     align-items: center;
     min-height: 100svh;
     padding-top: calc(var(--header-h) + 24px);
-    padding-bottom: calc(var(--band-h) + 24px);
+    padding-bottom: calc(var(--band-h) + var(--band-gap) + 32px);
   }
   /* Todo alineado a la izquierda, en el mismo margen que el logo del header (.nb-container). */
   .hero__intro-inner {
@@ -212,19 +213,23 @@ const posterFile = await getImage({ src: heroPoster, format: 'webp', width: 1920
     }
   }
   /* ── Banda inferior ── */
+  /* Barra flotante al pie, espejo del header: mismo ancho, aire inferior y esquinas de tarjeta. */
   .hero__band {
+    --band-x: max(var(--header-gutter), (100% - var(--header-max)) / 2);
     position: absolute;
-    inset: auto 0 0;
+    inset: auto var(--band-x) var(--band-gap) var(--band-x);
     height: var(--band-h);
+    border-radius: var(--radius-card, 8px);
     --band-fg: var(--navy-100);
     --band-divider: var(--navy-600);
     background: var(--navy-800);
-    border-top: 1px solid var(--navy-700);
+    border: 1px solid var(--navy-700);
     color: var(--band-fg);
     font-size: 0.8125rem;
     letter-spacing: 0.02em;
   }
   .hero__band-inner {
+    padding-inline: var(--header-pad);
     display: flex;
     align-items: center;
     gap: 32px;
@@ -348,6 +353,7 @@ const posterFile = await getImage({ src: heroPoster, format: 'webp', width: 1920
       padding-bottom: 0;
     }
     .hero__band {
+      --band-gap: 12px;
       height: auto;
       padding-block: 14px;
     }

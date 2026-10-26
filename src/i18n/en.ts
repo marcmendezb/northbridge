@@ -252,6 +252,13 @@ export const en: Messages = {
       title: 'Calculate your price in 1 minute',
       text: 'Choose your type of company, how many invoices you have a month and how many employees. We give you an instant estimate.',
       note: 'This is a guide estimate. We give you a fixed price after a 20-minute conversation, with no commitment.',
+      preview: {
+        type: 'Company type',
+        invoices: 'Invoices per month',
+        employees: 'Employees',
+        result: 'Your estimate',
+        types: { autonomo: 'Self-employed', startup: 'Startup', gmbh: 'GmbH', ag: 'AG' },
+      },
     },
     testimonials: {
       label: 'Clients',

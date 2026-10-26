@@ -249,6 +249,13 @@ export const it: Messages = {
       title: 'Calcola il tuo prezzo in 1 minuto',
       text: 'Scegli il tipo di azienda, quante fatture emetti al mese e quanti dipendenti hai. Ti diamo subito una stima.',
       note: 'È una stima indicativa. Il prezzo fisso te lo diamo dopo 20 minuti di conversazione, senza impegno.',
+      preview: {
+        type: 'Tipo di impresa',
+        invoices: 'Fatture al mese',
+        employees: 'Dipendenti',
+        result: 'La tua stima',
+        types: { autonomo: 'Indipendente', startup: 'Startup', gmbh: 'GmbH', ag: 'AG' },
+      },
     },
     testimonials: {
       label: 'Clienti',

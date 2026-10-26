@@ -132,7 +132,18 @@ export function heroScene({ gsap, ScrollTrigger }: AnimationKit) {
         getComputedStyle(document.documentElement).getPropertyValue(name).trim();
       const restLeft = () =>
         facts ? facts.getBoundingClientRect().left - Number(gsap.getProperty(facts, 'x')) : 0;
-      tl.to(band, { y: () => -geometry().bottom, ease: 'power2.inOut', duration: 0.62 }, 0.04)
+      // La barra flota a --band-gap del borde: sube lo justo para apoyarse en la base del arco.
+      const gap = () => parseFloat(getComputedStyle(band).bottom) || 0;
+      tl.to(
+        band,
+        {
+          y: () => gap() - geometry().bottom,
+          borderRadius: 0,
+          ease: 'power2.inOut',
+          duration: 0.62,
+        },
+        0.04,
+      )
         .to(
           facts,
           { x: () => geometry().left + 28 - restLeft(), ease: 'power2.inOut', duration: 0.62 },
@@ -143,7 +154,7 @@ export function heroScene({ gsap, ScrollTrigger }: AnimationKit) {
           band,
           {
             backgroundColor: token('--white'),
-            borderTopColor: token('--white'),
+            borderColor: token('--white'),
             '--band-fg': token('--navy-800'),
             '--band-divider': token('--piedra-200'),
             duration: 0.1,

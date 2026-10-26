@@ -251,6 +251,13 @@ export const fr: Messages = {
       title: 'Calculez votre prix en 1 minute',
       text: 'Indiquez votre type d’entreprise, votre nombre de factures par mois et de collaborateurs. Vous obtenez une estimation immédiate.',
       note: 'Il s’agit d’une estimation indicative. Le prix fixe vous est communiqué après 20 minutes d’échange, sans engagement.',
+      preview: {
+        type: 'Type d’entreprise',
+        invoices: 'Factures par mois',
+        employees: 'Collaborateurs',
+        result: 'Votre estimation',
+        types: { autonomo: 'Indépendant', startup: 'Start-up', gmbh: 'GmbH', ag: 'AG' },
+      },
     },
     testimonials: {
       label: 'Clients',
