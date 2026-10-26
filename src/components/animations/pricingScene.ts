@@ -104,5 +104,65 @@ export function pricingScene({ gsap, ScrollTrigger }: AnimationKit) {
       tl.fromTo(rule, { scaleX: 0 }, { scaleX: 1, duration: 1.1, ease: 'power2.inOut' }, 0.1);
   });
 
+  // Cierre: la propuesta se posa, se escribe línea a línea, el precio cuenta y se firma.
+  const doc = document.querySelector<HTMLElement>('[data-doc]');
+  if (doc) {
+    const rows = doc.querySelectorAll('[data-doc-row]');
+    const rules = doc.querySelectorAll('[data-doc-rule]');
+    const signature = doc.querySelector('[data-doc-signature]');
+    const stamp = doc.querySelectorAll('[data-doc-stamp] > *');
+    const amounts = Array.from(doc.querySelectorAll<HTMLElement>('[data-doc-amount] [data-cc]'));
+    const amountNodes = amounts.length
+      ? amounts
+      : Array.from(doc.querySelectorAll<HTMLElement>('[data-doc-amount]'));
+    gsap.set(stamp, { strokeDasharray: 1, strokeDashoffset: 1 });
+    const tl = gsap.timeline({
+      defaults: { ease },
+      scrollTrigger: { trigger: doc, start: 'top 78%', once: true },
+    });
+    tl.fromTo(
+      doc,
+      { y: 80, rotation: -6, opacity: 0 },
+      { y: 0, rotation: -1.5, opacity: 1, duration: 1.3, ease: 'expo.out' },
+      0,
+    )
+      .fromTo(rows, { opacity: 0, x: -14 }, { opacity: 1, x: 0, duration: 0.7, stagger: 0.14 }, 0.5)
+      .fromTo(
+        rules,
+        { scaleX: 0 },
+        { scaleX: 1, duration: 0.8, stagger: 0.14, ease: 'power2.inOut' },
+        0.55,
+      );
+    amountNodes.forEach((node) => {
+      const final = node.textContent ?? '';
+      const value = Number(final.replace(/\D/g, ''));
+      if (!value) return;
+      const state = { v: 0 };
+      tl.to(
+        state,
+        {
+          v: value,
+          duration: 1.2,
+          ease: 'power2.out',
+          onUpdate: () => {
+            node.textContent = String(Math.round(state.v / 10) * 10);
+          },
+          onComplete: () => {
+            node.textContent = final;
+          },
+        },
+        1.2,
+      );
+    });
+    if (signature)
+      tl.fromTo(
+        signature,
+        { clipPath: 'inset(0 100% 0 0)' },
+        { clipPath: 'inset(0 0% 0 0)', duration: 1.3, ease: 'power2.inOut' },
+        1.9,
+      );
+    tl.to(stamp, { strokeDashoffset: 0, duration: 0.6, stagger: 0.12, ease: 'power2.inOut' }, 2.6);
+  }
+
   ScrollTrigger.refresh();
 }

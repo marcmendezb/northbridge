@@ -1,0 +1,326 @@
+---
+/**
+ * Cierre de Precios: lo que recibes después de los 20 minutos. A la izquierda, la invitación;
+ * a la derecha, una propuesta de precio cerrado de ejemplo (importe calculado con calculate.ts,
+ * en la moneda del país elegido) que se escribe línea a línea y se firma (pricingScene.ts).
+ */
+import Button from '../ui/Button.astro';
+import { useI18n } from '../../i18n';
+import { getBookingCta, site } from '../../lib/site';
+import { calculate } from '../../lib/pricing/calculate';
+import { PACKAGES } from '../../lib/pricing/config';
+import { convert } from '../../lib/pricing/currency';
+import { priceUnit } from '../../lib/pricing/display';
+import { byCountry, currencyOf } from '../../lib/country';
+import { formatNumber } from '../../lib/format';
+
+const { t, lp, locale } = useI18n(Astro.currentLocale);
+const bookingCta = getBookingCta(locale);
+// El mismo ejemplo de docs/07 que el teaser de la calculadora: pyme, 60 facturas, 5 empleados.
+const example = calculate({ type: 'gmbh', invoices: 60, employees: 5 });
+const price = example.custom ? 0 : example.price;
+const pkg = example.custom ? '' : PACKAGES[example.package].name;
+const amount = byCountry((c) => formatNumber(convert(price, currencyOf(c)), locale));
+const unit = byCountry((c) => priceUnit(currencyOf(c), locale));
+const rows = [
+  { label: t('pricing.docFor'), value: t('pricing.docForValue') },
+  { label: t('pricing.docPackage'), value: pkg },
+  { label: t('pricing.docIncludes'), value: t('pricing.docIncludesValue') },
+  { label: t('pricing.docContact'), value: 'Lea Brunner' },
+  { label: t('pricing.docCommitment'), value: t('pricing.docCommitmentValue') },
+];
+---
+
+<section class="nb-prop" data-surface="dark" aria-labelledby="prop-title" data-proposal>
+  <div class="nb-container nb-prop__grid">
+    <div class="nb-prop__text">
+      <p class="nb-prop__label">{t('pricing.closeLabel')}</p>
+      <h2 class="nb-prop__title" id="prop-title" data-split>
+        {t('home.cta.title')}
+      </h2>
+      <p class="nb-prop__lead" data-reveal>
+        {t('pricing.closeText')}
+      </p>
+      <div class="nb-prop__actions" data-reveal>
+        <Button href={bookingCta.href} on="dark" arrow>
+          {bookingCta.label}
+        </Button>
+        <Button href={lp('/calculadora')} variant="ghost" on="dark">
+          {t('cta.calculate')}
+        </Button>
+      </div>
+    </div>
+
+    <div class="nb-prop__stage">
+      <article class="nb-doc" aria-label={t('pricing.docTitle')} data-doc>
+        <header class="nb-doc__head">
+          <span class="nb-doc__brand" aria-hidden="true">
+            <svg viewBox="4 11 40 26">
+              <path d="M4 13H44"></path>
+              <path d="M10 37V29A14 14 0 0 1 38 29V37"></path>
+            </svg>
+            {site.name}
+          </span>
+          <span class="nb-doc__tag">{t('pricing.docExample')}</span>
+        </header>
+        <h3 class="nb-doc__title">{t('pricing.docTitle')}</h3>
+        <dl class="nb-doc__rows">
+          {rows.map((r) => (
+            <div class="nb-doc__row" data-doc-row>
+              <dt>{r.label}</dt>
+              <dd>{r.value}</dd>
+              <span class="nb-doc__rule" aria-hidden="true" data-doc-rule></span>
+            </div>
+          ))}
+        </dl>
+        <div class="nb-doc__total" data-doc-row>
+          <span class="nb-doc__total-label">{t('pricing.docPrice')}</span>
+          <span class="nb-doc__price">
+            <span class="nb-doc__amount" set:html={amount} data-doc-amount />
+            <span class="nb-doc__unit" set:html={unit} />
+          </span>
+          <span class="nb-doc__vat">{t('pricing.docVat')}</span>
+        </div>
+        <footer class="nb-doc__foot">
+          <div class="nb-doc__sign">
+            <span class="nb-doc__sign-label">{t('pricing.docSigned')}</span>
+            <span class="nb-doc__signature" data-doc-signature>
+              Lea Brunner
+            </span>
+            <span class="nb-doc__sign-line" aria-hidden="true"></span>
+          </div>
+          <svg class="nb-doc__stamp" viewBox="0 0 64 64" aria-hidden="true" data-doc-stamp>
+            <rect x="2" y="2" width="60" height="60" rx="4" pathLength="1"></rect>
+            <path d="M14 24H50" pathLength="1"></path>
+            <path d="M20 46V38A12 12 0 0 1 44 38V46" pathLength="1"></path>
+          </svg>
+        </footer>
+      </article>
+    </div>
+  </div>
+</section>
+
+<style is:global>
+  .nb-prop {
+    position: relative;
+    padding-block: var(--section-y);
+    overflow: clip;
+    background: var(--navy-800);
+    color: var(--navy-100);
+  }
+  .nb-prop__grid {
+    display: grid;
+    gap: 64px;
+  }
+  @media (min-width: 1024px) {
+    .nb-prop__grid {
+      grid-template-columns: minmax(0, 1fr) minmax(0, 1fr);
+      align-items: center;
+      gap: 96px;
+    }
+  }
+  .nb-prop__text {
+    display: grid;
+    gap: 24px;
+  }
+  .nb-prop__label {
+    margin: 0;
+    font-size: 0.75rem;
+    font-weight: 600;
+    letter-spacing: 0.16em;
+    text-transform: uppercase;
+    color: var(--salvia-300);
+  }
+  .nb-prop__title {
+    margin: 0;
+    max-width: 11ch;
+    font-size: clamp(3rem, 1rem + 5.4vw, 6.5rem);
+    font-weight: 300;
+    line-height: 0.96;
+    letter-spacing: -0.03em;
+    color: var(--white);
+  }
+  .nb-prop__lead {
+    margin: 0;
+    max-width: 30rem;
+    font-family: var(--font-display);
+    font-size: clamp(1.25rem, 1rem + 0.8vw, 1.625rem);
+    line-height: 1.35;
+  }
+  .nb-prop__actions {
+    display: flex;
+    flex-wrap: wrap;
+    align-items: center;
+    gap: 12px 24px;
+    margin-top: 8px;
+  }
+
+  /* La propuesta: una hoja sobre la mesa, ligeramente girada (2D, sin perspectiva). */
+  .nb-prop__stage {
+    display: grid;
+    justify-items: center;
+    padding-block: 16px;
+  }
+  .nb-doc {
+    width: min(100%, 520px);
+    display: grid;
+    gap: 20px;
+    padding: clamp(24px, 3.5vw, 44px);
+    border-radius: var(--radius-card, 8px);
+    background: var(--white);
+    color: var(--navy-800);
+    box-shadow: 0 30px 60px rgb(13 26 46 / 0.35);
+    transform: rotate(-1.5deg);
+  }
+  .nb-doc__head {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: 12px;
+    padding-bottom: 16px;
+    border-bottom: 1.5px solid var(--navy-800);
+  }
+  .nb-doc__brand {
+    display: inline-flex;
+    align-items: center;
+    gap: 10px;
+    font-family: var(--font-display);
+    font-size: 1.0625rem;
+    font-weight: 500;
+  }
+  .nb-doc__brand svg {
+    width: 26px;
+    height: 17px;
+    fill: none;
+    stroke: currentColor;
+    stroke-width: 4;
+  }
+  .nb-doc__tag {
+    padding: 3px 8px;
+    border: 1px solid var(--piedra-300);
+    border-radius: var(--radius-tag, 2px);
+    font-size: 0.6875rem;
+    font-weight: 600;
+    letter-spacing: 0.12em;
+    text-transform: uppercase;
+    color: var(--piedra-600);
+  }
+  .nb-doc__title {
+    margin: 4px 0 0;
+    font-size: clamp(1.5rem, 1rem + 1vw, 2rem);
+    font-weight: 400;
+  }
+  .nb-doc__rows {
+    margin: 0;
+  }
+  .nb-doc__row {
+    position: relative;
+    display: grid;
+    grid-template-columns: minmax(0, 0.8fr) minmax(0, 1.2fr);
+    gap: 4px 16px;
+    padding-block: 12px;
+  }
+  .nb-doc__row dt {
+    font-size: 0.75rem;
+    font-weight: 600;
+    letter-spacing: 0.1em;
+    text-transform: uppercase;
+    color: var(--piedra-600);
+    padding-top: 3px;
+  }
+  .nb-doc__row dd {
+    margin: 0;
+    font-size: 0.9375rem;
+    line-height: 1.45;
+    color: var(--navy-800);
+  }
+  .nb-doc__rule {
+    position: absolute;
+    inset: auto 0 0;
+    height: 1px;
+    background: var(--piedra-200);
+    transform-origin: left;
+  }
+  .nb-doc__total {
+    display: grid;
+    grid-template-columns: 1fr auto;
+    align-items: baseline;
+    gap: 2px 16px;
+    margin-top: 4px;
+    padding: 18px 20px;
+    border-radius: var(--radius-button, 4px);
+    background: var(--piedra-100);
+  }
+  .nb-doc__total-label {
+    font-size: 0.75rem;
+    font-weight: 600;
+    letter-spacing: 0.1em;
+    text-transform: uppercase;
+    color: var(--piedra-700);
+  }
+  .nb-doc__price {
+    display: inline-flex;
+    align-items: baseline;
+    gap: 6px;
+    grid-row: span 2;
+  }
+  .nb-doc__amount {
+    font-family: var(--font-display);
+    font-size: clamp(2.5rem, 1.5rem + 2.4vw, 3.5rem);
+    font-weight: 300;
+    line-height: 1;
+    letter-spacing: -0.02em;
+    font-variant-numeric: tabular-nums;
+  }
+  .nb-doc__unit {
+    font-size: 0.875rem;
+    color: var(--piedra-600);
+  }
+  .nb-doc__vat {
+    font-size: 0.8125rem;
+    color: var(--piedra-600);
+  }
+  .nb-doc__foot {
+    display: flex;
+    align-items: flex-end;
+    justify-content: space-between;
+    gap: 16px;
+    margin-top: 8px;
+  }
+  .nb-doc__sign {
+    display: grid;
+    gap: 2px;
+    min-width: 0;
+  }
+  .nb-doc__sign-label {
+    font-size: 0.6875rem;
+    font-weight: 600;
+    letter-spacing: 0.12em;
+    text-transform: uppercase;
+    color: var(--piedra-600);
+  }
+  .nb-doc__signature {
+    font-family: var(--font-display);
+    font-style: italic;
+    font-size: clamp(1.75rem, 1.2rem + 1.4vw, 2.25rem);
+    font-weight: 300;
+    line-height: 1.1;
+    color: var(--navy-700);
+  }
+  .nb-doc__sign-line {
+    display: block;
+    width: 200px;
+    max-width: 100%;
+    height: 1px;
+    background: var(--piedra-400);
+  }
+  .nb-doc__stamp {
+    flex: none;
+    width: 64px;
+    height: 64px;
+    fill: none;
+    stroke: var(--salvia-600);
+    stroke-width: 2.5;
+    transform: rotate(-6deg);
+  }
+</style>

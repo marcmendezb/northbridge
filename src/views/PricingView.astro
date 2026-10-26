@@ -8,7 +8,7 @@ import PriceTag from '../components/ui/PriceTag.astro';
 import Accordion from '../components/ui/Accordion.astro';
 import ComparisonCell from '../components/ui/ComparisonCell.astro';
 import CalculatorTeaser from '../components/sections/CalculatorTeaser.astro';
-import FinalCta from '../components/sections/FinalCta.astro';
+import ProposalCta from '../components/sections/ProposalCta.astro';
 import Arrow from '../components/brand/Arrow.astro';
 import { useI18n, type MessageKey } from '../i18n';
 import { getBookingCta } from '../lib/site';
@@ -274,7 +274,7 @@ const faq = tRaw<{ q: string; a: string }[]>('pricing.faq');
     </div>
   </Section>
 
-  <FinalCta />
+  <ProposalCta />
 </BaseLayout>
 
 <style is:global>
