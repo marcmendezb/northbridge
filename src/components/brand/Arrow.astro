@@ -1,0 +1,79 @@
+---
+/**
+ * Flecha de la marca: apunta arriba a la derecha (sale de la página hacia el destino).
+ * Trazo uniforme y terminales rectos, como el símbolo. Al pasar el ratón por el enlace o botón
+ * que la contiene, sale por la esquina y entra otra igual desde abajo (solo transform).
+ */
+interface Props {
+  /** Tamaño en px; por defecto, el del texto (1em). */
+  size?: number;
+  strokeWidth?: number;
+  class?: string;
+}
+const { size, strokeWidth = 1.5, class: className = '' } = Astro.props;
+const style = size ? `--nb-arrow-size:${size}px` : undefined;
+const d = 'M6 18L17.25 6.75M8.25 6.75H17.25V15.75';
+---
+
+<span class:list={['nb-arrow', className]} style={style} aria-hidden="true">
+  <svg
+    viewBox="0 0 24 24"
+    fill="none"
+    stroke="currentColor"
+    stroke-width={strokeWidth}
+    stroke-linecap="butt"
+    stroke-linejoin="miter"
+  >
+    <path d={d}></path>
+  </svg>
+  <svg
+    viewBox="0 0 24 24"
+    fill="none"
+    stroke="currentColor"
+    stroke-width={strokeWidth}
+    stroke-linecap="butt"
+    stroke-linejoin="miter"
+  >
+    <path d={d}></path>
+  </svg>
+</span>
+
+<style is:global>
+  .nb-arrow {
+    position: relative;
+    display: inline-block;
+    flex: none;
+    width: var(--nb-arrow-size, 1.15em);
+    height: var(--nb-arrow-size, 1.15em);
+    overflow: hidden;
+    vertical-align: -0.2em;
+  }
+  .nb-arrow svg {
+    position: absolute;
+    inset: 0;
+    width: 100%;
+    height: 100%;
+    transition: transform 420ms var(--ease-out);
+  }
+  .nb-arrow svg:last-child {
+    transform: translate(-110%, 110%);
+  }
+  :is(a, button):is(:hover, :focus-visible) .nb-arrow svg:first-child {
+    transform: translate(110%, -110%);
+  }
+  :is(a, button):is(:hover, :focus-visible) .nb-arrow svg:last-child {
+    transform: none;
+    transition-delay: 60ms;
+  }
+  @media (prefers-reduced-motion: reduce) {
+    .nb-arrow svg {
+      transition: none;
+    }
+    :is(a, button):is(:hover, :focus-visible) .nb-arrow svg:first-child {
+      transform: none;
+    }
+    .nb-arrow svg:last-child {
+      display: none;
+    }
+  }
+</style>

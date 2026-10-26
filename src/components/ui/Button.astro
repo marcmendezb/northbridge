@@ -1,4 +1,5 @@
 ---
+import Arrow from '../brand/Arrow.astro';
 /** Botón primario, secundario o ghost. Radio 4 px, nunca en arco. Salvia nunca lleva texto blanco. */
 interface Props {
   variant?: 'primary' | 'secondary' | 'ghost';
@@ -36,8 +37,7 @@ const variants = {
   ghost:
     (on === 'dark'
       ? 'text-piedra-50 hover:text-salvia-300'
-      : 'text-navy-600 hover:text-salvia-600') +
-    ' min-h-11 rounded-button px-1 underline decoration-1 underline-offset-[3px]',
+      : 'text-navy-600 hover:text-salvia-600') + ' min-h-11 rounded-button px-1',
 };
 const classes = [base, variant === 'ghost' ? '' : sizes[size], variants[variant], className];
 ---
@@ -45,25 +45,11 @@ const classes = [base, variant === 'ghost' ? '' : sizes[size], variants[variant]
 {href ? (
   <a href={href} class:list={classes} aria-disabled={disabled ? 'true' : undefined} {...rest}>
     <slot />
-    {arrow && (
-      <span
-        class="inline-block transition-transform duration-200 group-hover:translate-x-[3px]"
-        aria-hidden="true"
-      >
-        →
-      </span>
-    )}
+    {arrow && <Arrow />}
   </a>
 ) : (
   <button type={type} disabled={disabled} class:list={classes} {...rest}>
     <slot />
-    {arrow && (
-      <span
-        class="inline-block transition-transform duration-200 group-hover:translate-x-[3px]"
-        aria-hidden="true"
-      >
-        →
-      </span>
-    )}
+    {arrow && <Arrow />}
   </button>
 )}

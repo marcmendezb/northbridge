@@ -42,7 +42,7 @@ const horizontal = steps.length === 4 ? 'lg' : 'md';
     <path d="M1 14V10A11 11 0 0 1 23 10V14" pathLength="1"></path>
   </svg>
   <ol class:list={['m-0 grid list-none gap-12 p-0 md:gap-10', cols]}>
-    {steps.map((step, i) => (
+    {steps.map((step) => (
       <li
         data-reveal
         class:list={['relative pl-10 md:pl-0', horizontal === 'lg' ? 'lg:pt-10' : 'md:pt-10']}
@@ -54,7 +54,6 @@ const horizontal = steps.length === 4 ? 'lg' : 'md';
           ]}
           aria-hidden="true"
         ></span>
-        <p class="t-eyebrow m-0 mb-3">{String(i + 1).padStart(2, '0')}</p>
         <h3 class="m-0 mb-3">{step.title}</h3>
         <p class="t-body m-0">{step.text}</p>
       </li>

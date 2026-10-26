@@ -2,6 +2,7 @@
 import Section from '../ui/Section.astro';
 import Button from '../ui/Button.astro';
 import Icon from '../brand/Icon.astro';
+import Arrow from '../brand/Arrow.astro';
 import { useI18n } from '../../i18n';
 import { entryKey, getServices } from '../../lib/content';
 const { t, lp, locale } = useI18n(Astro.currentLocale);
@@ -12,28 +13,16 @@ const services = (await getServices(locale)).filter((s) => featured.includes(s.d
 
 <Section tone="base" title={t('home.services.title')} lead={t('home.services.lead')}>
   <ol class="nb-rows m-0 list-none p-0">
-    {services.map((s, i) => (
+    {services.map((s) => (
       <li data-reveal class="nb-row">
         <a href={lp(`/servicios/${entryKey(s)}`)} class="nb-row__link nb-trace">
-          <span class="nb-row__n t-figure" aria-hidden="true">
-            {String(i + 1).padStart(2, '0')}
-          </span>
           <span class="nb-row__main">
             <span class="nb-row__title">{s.data.title}</span>
             <span class="nb-row__sum">{s.data.summary}</span>
           </span>
           <Icon name={s.data.icon} size={44} class="nb-row__icon" />
-          <span class="nb-row__arrow" aria-hidden="true">
-            <svg
-              viewBox="0 0 24 24"
-              width="28"
-              height="28"
-              fill="none"
-              stroke="currentColor"
-              stroke-width="1.5"
-            >
-              <path d="M4 12h15M13 6l6 6-6 6" />
-            </svg>
+          <span class="nb-row__arrow">
+            <Arrow size={30} />
           </span>
         </a>
       </li>
@@ -56,7 +45,7 @@ const services = (await getServices(locale)).filter((s) => featured.includes(s.d
   .nb-row__link {
     position: relative;
     display: grid;
-    grid-template-columns: auto 1fr auto;
+    grid-template-columns: 1fr auto;
     align-items: center;
     gap: 8px 24px;
     padding-block: clamp(24px, 3.5vw, 44px);
@@ -79,12 +68,6 @@ const services = (await getServices(locale)).filter((s) => featured.includes(s.d
     transition:
       color var(--dur-base) var(--ease-out),
       transform var(--dur-base) var(--ease-out);
-  }
-  .nb-row__n {
-    font-size: clamp(1.25rem, 1rem + 1vw, 1.75rem);
-    color: var(--salvia-600);
-    align-self: start;
-    padding-top: 0.6em;
   }
   .nb-row__main {
     display: grid;
@@ -113,7 +96,7 @@ const services = (await getServices(locale)).filter((s) => featured.includes(s.d
   }
   @media (min-width: 768px) {
     .nb-row__link {
-      grid-template-columns: 4.5rem 1fr auto auto;
+      grid-template-columns: 1fr auto auto;
     }
     .nb-row__icon {
       display: inline-block;
@@ -137,18 +120,11 @@ const services = (await getServices(locale)).filter((s) => featured.includes(s.d
       color: var(--navy-100);
       transform: translateX(12px);
     }
-    .nb-row__link:hover .nb-row__n,
-    .nb-row__link:focus-visible .nb-row__n {
-      color: var(--salvia-300);
-    }
     .nb-row__link:hover .nb-row__icon,
     .nb-row__link:focus-visible .nb-row__icon,
     .nb-row__link:hover .nb-row__arrow,
     .nb-row__link:focus-visible .nb-row__arrow {
       color: var(--white);
-    }
-    .nb-row__link:hover .nb-row__arrow {
-      transform: translateX(6px);
     }
   }
 </style>

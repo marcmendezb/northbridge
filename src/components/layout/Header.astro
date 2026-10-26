@@ -2,6 +2,7 @@
 import { Image, Picture } from 'astro:assets';
 import promoPhoto from '../../assets/img/hero-poster.jpg';
 import Icon from '../brand/Icon.astro';
+import Arrow from '../brand/Arrow.astro';
 import logoMark from '../../assets/brand/logo-header.png';
 import { alternates, localeMeta, parsePath, useI18n } from '../../i18n';
 import { getBookingCta, getMainNav, getServiceLinks, site } from '../../lib/site';
@@ -204,7 +205,7 @@ const isCurrent = (href: string) => path === href || (href !== '/' && path.start
                 ))}
               </ul>
               <a href={lp('/servicios')} class="nb-mega__all">
-                {t('nav.mega.seeAll')} <span aria-hidden="true">→</span>
+                {t('nav.mega.seeAll')} <Arrow />
               </a>
             </div>
             <div class="nb-mega__col">
@@ -242,7 +243,7 @@ const isCurrent = (href: string) => path === href || (href !== '/' && path.start
                 <span class="nb-mega__promo-title">{t('nav.mega.promoTitle')}</span>
                 <span class="nb-mega__promo-text">{t('nav.mega.promoText')}</span>
                 <span class="nb-mega__promo-cta">
-                  {t('cta.calculate')} <span aria-hidden="true">→</span>
+                  {t('cta.calculate')} <Arrow />
                 </span>
               </span>
             </a>
@@ -311,7 +312,7 @@ const isCurrent = (href: string) => path === href || (href !== '/' && path.start
                 <span class="nb-mega__promo-title">{t('home.cta.title')}</span>
                 <span class="nb-mega__promo-text">{t('home.cta.text')}</span>
                 <span class="nb-mega__promo-cta">
-                  {bookingCta.label} <span aria-hidden="true">→</span>
+                  {bookingCta.label} <Arrow />
                 </span>
               </span>
             </a>
@@ -455,11 +456,14 @@ const isCurrent = (href: string) => path === href || (href !== '/' && path.start
     text-decoration: none;
     transition: color var(--dur-fast) var(--ease-out);
   }
-  /* Hover: solo cambia el color del texto. */
-  .nb-nav__link:hover,
-  .nb-nav__trigger[aria-expanded='true'],
+  /* Hover: el mismo color que los enlaces de los desplegables (Salvia 600), sin desplazamiento. */
   .nb-nav__link[aria-current='page'] {
     color: var(--navy-800);
+  }
+  .nb-nav__link:hover,
+  .nb-nav__link:focus-visible,
+  .nb-nav__trigger[aria-expanded='true'] {
+    color: var(--salvia-600);
   }
 
   /* CTA: botón primario con icono sobre Salvia 400 (Navy sobre Salvia, nunca blanco). */
@@ -486,9 +490,6 @@ const isCurrent = (href: string) => path === href || (href !== '/' && path.start
   }
   .nb-nav__trigger[aria-expanded='true'] .nb-nav__chev {
     transform: rotate(180deg);
-  }
-  .nb-nav__trigger[aria-expanded='true'] {
-    color: var(--navy-800);
   }
   .nb-mega {
     display: none;
@@ -573,9 +574,6 @@ const isCurrent = (href: string) => path === href || (href !== '/' && path.start
     font-size: 0.9375rem;
     font-weight: 600;
     color: var(--navy-600);
-    text-decoration: underline;
-    text-decoration-thickness: 1px;
-    text-underline-offset: 3px;
   }
   .nb-mega__all:hover {
     color: var(--salvia-600);
@@ -636,9 +634,6 @@ const isCurrent = (href: string) => path === href || (href !== '/' && path.start
     margin-top: 12px;
     font-size: 0.9375rem;
     font-weight: 600;
-    text-decoration: underline;
-    text-decoration-thickness: 1px;
-    text-underline-offset: 3px;
   }
   /* Idiomas: mismo desplegable que Servicios; el código del idioma ocupa el sitio del icono. */
   .nb-mega__code {
@@ -713,9 +708,7 @@ const isCurrent = (href: string) => path === href || (href !== '/' && path.start
   }
   .nb-lang__nojs a[aria-current],
   .nb-mobile__langs a[aria-current] {
-    color: var(--navy-800);
-    text-decoration: underline;
-    text-underline-offset: 4px;
+    color: var(--salvia-600);
   }
   .nb-mobile__langs {
     margin-top: 20px;
@@ -845,9 +838,7 @@ const isCurrent = (href: string) => path === href || (href !== '/' && path.start
     text-decoration: none;
   }
   .nb-mobile__link[aria-current='page'] {
-    text-decoration: underline;
-    text-underline-offset: 6px;
-    text-decoration-thickness: 1.5px;
+    color: var(--salvia-600);
   }
   @keyframes nb-menu-in {
     from {
