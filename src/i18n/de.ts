@@ -431,6 +431,17 @@ export const de: Messages = {
     specialty: 'Fachgebiet',
     ctaTitle: 'Lerne uns in 20 Minuten kennen.',
     ctaText: 'Ein unverbindliches Gespräch. Danach ein Fixpreis.',
+    facts: [
+      { value: '2014', label: 'In Zürich gegründet' },
+      { value: '200+', label: 'Aktive Kunden' },
+      { value: '4', label: 'Fachleute im Team' },
+      { value: '1', label: 'Ansprechperson pro Kunde' },
+    ],
+    officeLabel: 'Büro',
+    officeTitle: 'Im Seefeld, nahe am See.',
+    officeText:
+      'Sechs Gehminuten vom Bahnhof Stadelhofen. Wenn du lieber persönlich sprichst, empfangen wir dich hier.',
+    officeCta: 'Anfahrt',
   },
   resources: {
     seoTitle: 'Ratgeber',

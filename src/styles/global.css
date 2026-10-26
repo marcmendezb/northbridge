@@ -139,3 +139,18 @@ html.lenis body {
     transform: scaleY(0);
   }
 }
+
+/* Nosotros (aboutScene.ts): estados iniciales solo con JS y movimiento permitido. */
+@media (prefers-reduced-motion: no-preference) {
+  .js.motion:not(.anim-fail) [data-year] .nb-hist__digit > span,
+  .js.motion:not(.anim-fail) [data-crew-arch] .nb-crew__line > span {
+    transform: translateY(110%);
+  }
+  .js.motion:not(.anim-fail) [data-crew-arch] {
+    clip-path: inset(100% 0 0 0);
+  }
+  .js.motion:not(.anim-fail) [data-method-mark] path {
+    stroke-dasharray: 1;
+    stroke-dashoffset: 1;
+  }
+}

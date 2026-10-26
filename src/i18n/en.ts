@@ -431,6 +431,17 @@ export const en: Messages = {
     specialty: 'Specialty',
     ctaTitle: 'Get to know us in 20 minutes.',
     ctaText: 'A conversation with no commitment. A fixed price afterwards.',
+    facts: [
+      { value: '2014', label: 'Founded in Zurich' },
+      { value: '200+', label: 'Active clients' },
+      { value: '4', label: 'Specialists on the team' },
+      { value: '1', label: 'Contact person per client' },
+    ],
+    officeLabel: 'Office',
+    officeTitle: 'In Seefeld, by the lake.',
+    officeText:
+      'Six minutes on foot from Stadelhofen station. If you prefer to talk in person, we welcome you here.',
+    officeCta: 'How to get here',
   },
   resources: {
     seoTitle: 'Resources',

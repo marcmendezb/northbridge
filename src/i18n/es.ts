@@ -430,6 +430,17 @@ export const es = {
     specialty: 'Especialidad',
     ctaTitle: 'Conócenos en 20 minutos.',
     ctaText: 'Una conversación sin compromiso. Después, precio cerrado.',
+    facts: [
+      { value: '2014', label: 'Fundada en Zúrich' },
+      { value: '200+', label: 'Clientes activos' },
+      { value: '4', label: 'Especialistas en el equipo' },
+      { value: '1', label: 'Persona de contacto por cliente' },
+    ],
+    officeLabel: 'Oficina',
+    officeTitle: 'En Seefeld, junto al lago.',
+    officeText:
+      'Estamos a seis minutos a pie de la estación de Stadelhofen. Si prefieres hablar en persona, te recibimos aquí.',
+    officeCta: 'Cómo llegar',
   },
   resources: {
     seoTitle: 'Recursos',

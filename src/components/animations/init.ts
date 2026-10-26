@@ -1,3 +1,4 @@
+import { aboutScene } from './aboutScene';
 import { calcPreview } from './calcPreview';
 import { countUp } from './countUp';
 import { finalScene } from './finalScene';
@@ -37,6 +38,7 @@ export async function initPage() {
     mediaReveal(kit);
     priceDeck(kit);
     pricingScene(kit);
+    aboutScene(kit);
     void splitReveal(kit);
   });
 

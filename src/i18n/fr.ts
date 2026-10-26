@@ -430,6 +430,17 @@ export const fr: Messages = {
     specialty: 'Spécialité',
     ctaTitle: 'Faisons connaissance en 20 minutes.',
     ctaText: 'Un échange sans engagement. Ensuite, un prix fixe.',
+    facts: [
+      { value: '2014', label: 'Fondée à Zurich' },
+      { value: '200+', label: 'Clients actifs' },
+      { value: '4', label: 'Spécialistes dans l’équipe' },
+      { value: '1', label: 'Interlocuteur par client' },
+    ],
+    officeLabel: 'Bureau',
+    officeTitle: 'À Seefeld, près du lac.',
+    officeText:
+      'À six minutes à pied de la gare de Stadelhofen. Si vous préférez parler en personne, nous vous recevons ici.',
+    officeCta: 'Accès',
   },
   resources: {
     seoTitle: 'Ressources',
