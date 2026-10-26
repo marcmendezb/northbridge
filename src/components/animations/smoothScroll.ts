@@ -6,8 +6,10 @@ let instance: Lenis | undefined;
 export function startSmoothScroll(): Lenis {
   if (instance) return instance;
   instance = new Lenis({
-    lerp: 0.09,
-    wheelMultiplier: 0.95,
+    // Frenada exponencial (ease-out expo): arranque ágil y final suave, sin sensación de goma.
+    duration: 1.25,
+    easing: (t) => (t === 1 ? 1 : 1 - Math.pow(2, -10 * t)),
+    wheelMultiplier: 0.9,
     smoothWheel: true,
     autoRaf: true,
     anchors: {
