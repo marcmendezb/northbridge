@@ -20,6 +20,14 @@ export const es = {
     home: 'Inicio',
     skipToContent: 'Saltar al contenido',
     backToTop: 'Volver arriba',
+    mega: {
+      services: 'Servicios',
+      start: 'Para empezar',
+      seeAll: 'Ver todos los servicios',
+      promoTitle: 'Calcula tu precio en 1 minuto',
+      promoText: 'Estimación orientativa, sin compromiso.',
+      toggle: 'Servicios, mostrar el menú',
+    },
   },
   cta: {
     book: 'Reserva tu consulta gratuita',

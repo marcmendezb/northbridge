@@ -16,7 +16,8 @@ interface Props {
   title?: string;
   description?: string;
   noindex?: boolean;
-  transparentHeader?: boolean;
+  /** El contenido empieza bajo el header flotante (hero a sangre). */
+  overlayHeader?: boolean;
   minimalHeader?: boolean;
   /** Pantallas sin pie (p. ej. herramientas internas). */
   hideFooter?: boolean;
@@ -25,7 +26,7 @@ const {
   title,
   description = t('brand.descriptor'),
   noindex = false,
-  transparentHeader = false,
+  overlayHeader = false,
   minimalHeader = false,
   hideFooter = false,
 } = Astro.props;
@@ -41,6 +42,8 @@ const canonical = new URL(Astro.url.pathname, Astro.site ?? site.url);
     <meta name="viewport" content="width=device-width, initial-scale=1" />
     <script is:inline>
       document.documentElement.classList.add('js');
+      if (!matchMedia('(prefers-reduced-motion: reduce)').matches)
+        document.documentElement.classList.add('motion');
     </script>
     <title>{fullTitle}</title>
     <meta name="description" content={description} />
@@ -66,20 +69,26 @@ const canonical = new URL(Astro.url.pathname, Astro.site ?? site.url);
     >
       {t('nav.skipToContent')}
     </a>
-    <Header transparent={transparentHeader} minimal={minimalHeader} />
-    <main id="contenido" tabindex="-1" class="flex-1 outline-none">
+    <Header minimal={minimalHeader} />
+    <main
+      id="contenido"
+      tabindex="-1"
+      class:list={['flex-1 outline-none', !overlayHeader && 'pt-[var(--header-h)]']}
+    >
       <slot />
     </main>
     {!hideFooter && <Footer />}
     <script>
-      // GSAP solo se carga en páginas con escenas, y solo si el usuario admite movimiento.
-      const wantsMotion = !matchMedia('(prefers-reduced-motion: reduce)').matches;
-      if (
-        wantsMotion &&
-        document.querySelector('[data-hero],[data-reveal],[data-count],[data-connector]')
-      ) {
-        import('../components/animations/init')
-          .then((m) => m.initPage())
+      // Smooth scroll en todas las páginas; GSAP solo donde hay escenas. Nada de esto con reduced-motion.
+      if (!matchMedia('(prefers-reduced-motion: reduce)').matches) {
+        import('../components/animations/smoothScroll')
+          .then(async (m) => {
+            m.startSmoothScroll();
+            if (document.querySelector('[data-hero],[data-reveal],[data-count],[data-connector]')) {
+              const { initPage } = await import('../components/animations/init');
+              await initPage();
+            }
+          })
           .catch(() => document.documentElement.classList.add('anim-fail'));
       }
     </script>

@@ -2,6 +2,7 @@ import { countUp } from './countUp';
 import { drawConnector } from './drawConnector';
 import { heroScene } from './heroScene';
 import { revealOnScroll } from './revealOnScroll';
+import { getSmoothScroll } from './smoothScroll';
 
 /**
  * Registra las escenas de la página según los atributos `data-*` presentes.
@@ -14,6 +15,8 @@ export async function initPage() {
   ]);
   gsap.registerPlugin(ScrollTrigger);
   const kit = { gsap, ScrollTrigger };
+  // ScrollTrigger sigue la posición que calcula Lenis.
+  getSmoothScroll()?.on('scroll', ScrollTrigger.update);
 
   const mm = gsap.matchMedia();
   mm.add('(prefers-reduced-motion: no-preference)', () => {

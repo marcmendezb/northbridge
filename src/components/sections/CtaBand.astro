@@ -1,22 +1,45 @@
 ---
+import { Picture } from 'astro:assets';
+import heroPhoto from '../../assets/img/hero-poster.jpg';
 import Section from '../ui/Section.astro';
 import Button from '../ui/Button.astro';
+import ArchFrame from '../brand/ArchFrame.astro';
 import { bookingCta } from '../../lib/site';
 import { t } from '../../i18n';
 
 interface Props {
   title?: string;
   text?: string;
+  /** Muestra el marco de arco con la fotografía (solo en la Home). */
+  photo?: boolean;
 }
-const { title = t('home.cta.title'), text = t('home.cta.text') } = Astro.props;
+const { title = t('home.cta.title'), text = t('home.cta.text'), photo = false } = Astro.props;
 ---
 
 <Section tone="navy" pattern>
-  <div data-reveal class="flex flex-col items-start gap-6 md:max-w-[40rem]">
-    <h2 class="m-0 text-white">{title}</h2>
-    <p class="m-0 text-lg text-navy-100">{text}</p>
-    <Button href={bookingCta.href} on="dark" arrow>
-      {bookingCta.label}
-    </Button>
+  <div class:list={['grid items-center gap-12', photo && 'md:grid-cols-[1.3fr_1fr] md:gap-20']}>
+    <div data-reveal class="flex flex-col items-start gap-6">
+      <h2 class="t-h2-lg m-0 max-w-[16ch] text-white">{title}</h2>
+      <p class="m-0 max-w-[30rem] text-lg text-navy-100">{text}</p>
+      <Button href={bookingCta.href} on="dark" arrow>
+        {bookingCta.label}
+      </Button>
+    </div>
+    {photo && (
+      <div data-reveal class="hidden md:block md:justify-self-end md:w-full md:max-w-[22rem]">
+        <ArchFrame ratio="3 / 4">
+          <Picture
+            src={heroPhoto}
+            formats={['avif', 'webp']}
+            widths={[480, 720, 960]}
+            sizes="352px"
+            alt=""
+            loading="lazy"
+            quality={70}
+            class="h-full w-full object-cover object-[66%_50%]"
+          />
+        </ArchFrame>
+      </div>
+    )}
   </div>
 </Section>

@@ -26,11 +26,27 @@ export const mainNav = [
 export const bookingCta = { href: localizedPath(site.bookingPath), label: t('cta.book') };
 
 export const serviceLinks = [
-  { href: '/servicios/contabilidad-y-cierres', label: t('servicesList.contabilidad') },
-  { href: '/servicios/iva-y-fiscalidad', label: t('servicesList.iva') },
-  { href: '/servicios/nominas-y-seguros-sociales', label: t('servicesList.nominas') },
-  { href: '/servicios/constitucion-de-empresas', label: t('servicesList.constitucion') },
-  { href: '/servicios/asesoria-para-startups', label: t('servicesList.startups') },
+  {
+    href: '/servicios/contabilidad-y-cierres',
+    icon: 'contabilidad' as const,
+    label: t('servicesList.contabilidad'),
+  },
+  { href: '/servicios/iva-y-fiscalidad', icon: 'iva' as const, label: t('servicesList.iva') },
+  {
+    href: '/servicios/nominas-y-seguros-sociales',
+    icon: 'nominas' as const,
+    label: t('servicesList.nominas'),
+  },
+  {
+    href: '/servicios/constitucion-de-empresas',
+    icon: 'constitucion' as const,
+    label: t('servicesList.constitucion'),
+  },
+  {
+    href: '/servicios/asesoria-para-startups',
+    icon: 'startups' as const,
+    label: t('servicesList.startups'),
+  },
 ].map((l) => ({ ...l, href: localizedPath(l.href) }));
 
 export const resourceLinks = [

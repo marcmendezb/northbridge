@@ -9,24 +9,51 @@ const stats = [
 ];
 ---
 
-<Section label={t('home.stats.label')} title={t('home.stats.title')} rule>
-  <dl class="m-0 grid gap-10 md:grid-cols-3 md:gap-8">
+<Section tone="navy" class="nb-statement">
+  <h2 class="sr-only">{t('home.stats.title')}</h2>
+  <dl class="m-0 flex flex-col">
     {stats.map((s) => (
-      <div data-reveal class="border-t border-piedra-200 pt-6">
+      <div data-reveal class="nb-stat">
         <dt class="sr-only">{`${s.value}${s.suffix} ${s.label}`}</dt>
-        <dd class="m-0">
-          <p
-            aria-hidden="true"
-            class="t-figure m-0 text-[clamp(4rem,2.5rem+6vw,6rem)] text-navy-800"
-          >
+        <dd class="m-0" aria-hidden="true">
+          <span class="nb-stat__num t-figure">
             <span data-count={s.count ? s.value : undefined}>{s.value}</span>
             {s.suffix}
-          </p>
-          <p class="t-small m-0 mt-3" aria-hidden="true">
-            {s.label}
-          </p>
+          </span>
+          <span class="nb-stat__label">{s.label}</span>
         </dd>
       </div>
     ))}
   </dl>
 </Section>
+
+<style is:global>
+  .nb-stat {
+    border-top: 1px solid var(--navy-600);
+    padding-block: clamp(20px, 3vw, 36px);
+  }
+  .nb-stat:last-child {
+    border-bottom: 1px solid var(--navy-600);
+  }
+  .nb-stat dd {
+    display: flex;
+    flex-wrap: wrap;
+    align-items: baseline;
+    gap: 0 clamp(16px, 3vw, 48px);
+  }
+  .nb-stat__num {
+    font-size: clamp(4.5rem, 2rem + 11vw, 11rem);
+    line-height: 0.9;
+    color: var(--salvia-300);
+    min-width: 2.4ch;
+  }
+  .nb-stat__label {
+    font-family: var(--font-display);
+    font-optical-sizing: auto;
+    font-weight: 300;
+    font-size: clamp(1.5rem, 1rem + 2.2vw, 3rem);
+    line-height: 1.1;
+    color: var(--piedra-50);
+    letter-spacing: -0.01em;
+  }
+</style>

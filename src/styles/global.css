@@ -38,8 +38,7 @@
     opacity: 0;
     transform: translateY(20px);
   }
-  .js:not(.anim-fail) [data-hero-fade],
-  .js:not(.anim-fail) [data-hero-pattern] {
+  .js:not(.anim-fail) [data-hero-fade] {
     opacity: 0;
   }
   .js:not(.anim-fail) [data-hero-line] {
@@ -78,4 +77,19 @@
   to {
     stroke-dashoffset: 0;
   }
+}
+
+/* Lenis */
+html.lenis,
+html.lenis body {
+  height: auto;
+}
+.lenis.lenis-smooth {
+  scroll-behavior: auto !important;
+}
+.lenis.lenis-smooth [data-lenis-prevent] {
+  overscroll-behavior: contain;
+}
+.lenis.lenis-stopped {
+  overflow: clip;
 }

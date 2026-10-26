@@ -1,4 +1,6 @@
 ---
+import { Image } from 'astro:assets';
+import type { ImageMetadata } from 'astro';
 import { site } from '../../lib/site';
 
 interface Props {
@@ -8,6 +10,8 @@ interface Props {
   size?: number;
   /** Aplica la zona de seguridad (x = altura del símbolo). */
   safeZone?: boolean;
+  /** Símbolo en imagen (PNG del brand) en lugar del SVG inline. Solo variante horizontal. */
+  markImage?: ImageMetadata;
   class?: string;
 }
 
@@ -16,6 +20,7 @@ const {
   tone = 'positive',
   size,
   safeZone = false,
+  markImage,
   class: className = '',
 } = Astro.props;
 
@@ -64,26 +69,39 @@ const useFavicon = symbolHeight < 24;
     )
   ) : (
     <>
-      <svg
-        class="nb-logo__mark"
-        viewBox={useFavicon ? '0 0 16 16' : '4 11 40 26'}
-        fill="none"
-        stroke="currentColor"
-        stroke-width={useFavicon ? 2 : 4}
-        aria-hidden="true"
-      >
-        {useFavicon ? (
-          <>
-            <path d="M1 4H15" />
-            <path d="M3 13V10A5 5 0 0 1 13 10V13" />
-          </>
-        ) : (
-          <>
-            <path d="M4 13H44" />
-            <path d="M10 37V29A14 14 0 0 1 38 29V37" />
-          </>
-        )}
-      </svg>
+      {markImage && variant === 'horizontal' ? (
+        <Image
+          src={markImage}
+          alt=""
+          width={168}
+          densities={[1, 2]}
+          class="nb-logo__mark nb-logo__mark--img"
+          aria-hidden="true"
+          loading="eager"
+          decoding="async"
+        />
+      ) : (
+        <svg
+          class="nb-logo__mark"
+          viewBox={useFavicon ? '0 0 16 16' : '4 11 40 26'}
+          fill="none"
+          stroke="currentColor"
+          stroke-width={useFavicon ? 2 : 4}
+          aria-hidden="true"
+        >
+          {useFavicon ? (
+            <>
+              <path d="M1 4H15" />
+              <path d="M3 13V10A5 5 0 0 1 13 10V13" />
+            </>
+          ) : (
+            <>
+              <path d="M4 13H44" />
+              <path d="M10 37V29A14 14 0 0 1 38 29V37" />
+            </>
+          )}
+        </svg>
+      )}
       <span class="nb-logo__text" aria-hidden="true">
         <span class="nb-logo__name">Northbridge</span>
         <span class="nb-logo__sub">ADVISORY</span>
@@ -92,7 +110,7 @@ const useFavicon = symbolHeight < 24;
   )}
 </span>
 
-<style>
+<style is:global>
   .nb-logo {
     display: inline-flex;
     box-sizing: content-box;
@@ -114,6 +132,10 @@ const useFavicon = symbolHeight < 24;
     height: 1.09em;
     width: calc(1.09em * 40 / 26);
     flex: none;
+  }
+  .nb-logo__mark--img {
+    width: auto;
+    object-fit: contain;
   }
   .nb-logo--symbol .nb-logo__mark {
     flex: none;

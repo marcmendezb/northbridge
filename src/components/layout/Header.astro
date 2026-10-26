@@ -1,90 +1,205 @@
 ---
-import Logo from '../brand/Logo.astro';
-import Button from '../ui/Button.astro';
-import Container from '../ui/Container.astro';
-import { t } from '../../i18n';
-import { bookingCta, mainNav } from '../../lib/site';
+import { Image, Picture } from 'astro:assets';
+import promoPhoto from '../../assets/img/hero-poster.jpg';
+import Icon from '../brand/Icon.astro';
+import logoMark from '../../assets/brand/logo-header.png';
+import { localizedPath, t } from '../../i18n';
+import { bookingCta, mainNav, serviceLinks, site } from '../../lib/site';
 
 interface Props {
-  /** Transparente sobre el hero (se solidifica tras 24 px de scroll). */
-  transparent?: boolean;
   /** Cabecera reducida (landing de consulta): solo logo y CTA. */
   minimal?: boolean;
 }
-const { transparent = false, minimal = false } = Astro.props;
+const { minimal = false } = Astro.props;
 const path = Astro.url.pathname.replace(/\/$/, '') || '/';
 const isCurrent = (href: string) => path === href || (href !== '/' && path.startsWith(`${href}/`));
 ---
 
-<header
-  class="nb-header"
-  data-transparent={transparent ? '' : undefined}
-  data-minimal={minimal ? '' : undefined}
->
-  <Container class="flex h-[var(--header-h)] items-center justify-between gap-6">
-    <a href="/" class="nb-header__logo -m-2 block p-2 no-underline">
-      <Logo size={24} />
-    </a>
-
-    {!minimal && (
-      <nav aria-label={t('nav.main')} class="nb-nav hidden items-center gap-8 lg:flex">
-        <ul class="m-0 flex list-none items-center gap-7 p-0">
-          {mainNav.map((l) => (
-            <li>
-              <a
-                href={l.href}
-                class="nb-nav__link"
-                aria-current={isCurrent(l.href) ? 'page' : undefined}
-              >
-                {l.label}
-              </a>
-            </li>
-          ))}
-        </ul>
-        <Button href={bookingCta.href} size="sm" class="nb-cta">
-          {t('nav.freeConsultation')}
-        </Button>
-      </nav>
-    )}
-    {minimal && (
-      <Button href={bookingCta.href} size="sm" class="nb-cta hidden sm:inline-flex">
-        {t('nav.freeConsultation')}
-      </Button>
-    )}
-
-    {!minimal && (
-      <button
-        type="button"
-        class="nb-menu-btn -mr-2 h-11 w-11 items-center justify-center"
-        aria-expanded="false"
-        aria-controls="mobile-menu"
-        aria-label={t('nav.openMenu')}
-        data-label-open={t('nav.openMenu')}
-        data-label-close={t('nav.closeMenu')}
-      >
-        <svg
-          viewBox="0 0 24 24"
-          width="24"
-          height="24"
-          fill="none"
-          stroke="currentColor"
-          stroke-width="1.5"
+<header class="nb-header" data-minimal={minimal ? '' : undefined}>
+  <div class="nb-bar">
+    <div class="nb-bar__row">
+      <a href="/" class="nb-bar__logo" aria-label={`${site.name}, ${t('nav.home').toLowerCase()}`}>
+        <Image
+          src={logoMark}
+          alt=""
+          width={168}
+          densities={[1, 2]}
+          class="nb-bar__logo-img"
+          loading="eager"
+          decoding="async"
           aria-hidden="true"
-        >
-          <path class="nb-menu-btn__open" d="M3 7h18M3 12h18M3 17h18" />
-          <path class="nb-menu-btn__close" d="M5 5l14 14M19 5L5 19" />
-        </svg>
-      </button>
-    )}
-  </Container>
+        />
+      </a>
 
-  {!minimal && (
-    <div id="mobile-menu" class="nb-mobile lg:hidden" data-open="false">
-      <Container>
-        <nav aria-label={t('nav.main')} class="py-4">
+      {!minimal && (
+        <nav aria-label={t('nav.main')} class="nb-nav">
+          <ul class="m-0 flex list-none items-center gap-8 p-0">
+            {mainNav.map((l) => {
+              const hasMega = l.href === localizedPath('/servicios');
+              return (
+                <li class:list={[hasMega && 'nb-has-menu']}>
+                  {hasMega ? (
+                    <>
+                      <a
+                        href={l.href}
+                        class="nb-nav__link nb-nav__nojs"
+                        aria-current={isCurrent(l.href) ? 'page' : undefined}
+                      >
+                        {l.label}
+                      </a>
+                      <button
+                        type="button"
+                        class="nb-nav__link nb-nav__trigger"
+                        aria-expanded="false"
+                        aria-controls="mega-servicios"
+                        aria-current={isCurrent(l.href) ? 'page' : undefined}
+                        data-mega-trigger
+                      >
+                        {l.label}
+                        <svg
+                          class="nb-nav__chev"
+                          viewBox="0 0 16 16"
+                          width="14"
+                          height="14"
+                          fill="none"
+                          stroke="currentColor"
+                          stroke-width="1.5"
+                          aria-hidden="true"
+                        >
+                          <path d="M3 6l5 5 5-5" />
+                        </svg>
+                      </button>
+                    </>
+                  ) : (
+                    <a
+                      href={l.href}
+                      class="nb-nav__link"
+                      aria-current={isCurrent(l.href) ? 'page' : undefined}
+                    >
+                      {l.label}
+                    </a>
+                  )}
+                </li>
+              );
+            })}
+          </ul>
+        </nav>
+      )}
+
+      <div class="nb-bar__end">
+        <a href={bookingCta.href} class:list={['nb-cta', minimal && 'nb-cta--always']}>
+          <span class="nb-cta__icon" aria-hidden="true">
+            <svg
+              viewBox="0 0 24 24"
+              width="18"
+              height="18"
+              fill="none"
+              stroke="currentColor"
+              stroke-width="1.5"
+            >
+              <rect x="4" y="5" width="16" height="15" />
+              <path d="M4 10h16M9 3v4M15 3v4" />
+            </svg>
+          </span>
+          <span>{t('nav.freeConsultation')}</span>
+        </a>
+        {!minimal && (
+          <button
+            type="button"
+            class="nb-menu-btn"
+            aria-expanded="false"
+            aria-controls="mobile-menu"
+            aria-label={t('nav.openMenu')}
+            data-label-open={t('nav.openMenu')}
+            data-label-close={t('nav.closeMenu')}
+          >
+            <svg
+              viewBox="0 0 24 24"
+              width="24"
+              height="24"
+              fill="none"
+              stroke="currentColor"
+              stroke-width="1.5"
+              aria-hidden="true"
+            >
+              <path class="nb-menu-btn__open" d="M3 7h18M3 12h18M3 17h18" />
+              <path class="nb-menu-btn__close" d="M5 5l14 14M19 5L5 19" />
+            </svg>
+          </button>
+        )}
+      </div>
+    </div>
+
+    {!minimal && (
+      <div id="mega-servicios" class="nb-mega" data-mega data-open="false">
+        <div class="nb-mega__clip">
+          <div class="nb-mega__inner">
+            <div class="nb-mega__col">
+              <p class="nb-mega__head">{t('nav.mega.services')}</p>
+              <ul class="nb-mega__list">
+                {serviceLinks.map((l) => (
+                  <li>
+                    <a href={l.href} class="nb-mega__link">
+                      <Icon name={l.icon} size={22} />
+                      <span>{l.label}</span>
+                    </a>
+                  </li>
+                ))}
+              </ul>
+              <a href={localizedPath('/servicios')} class="nb-mega__all">
+                {t('nav.mega.seeAll')} <span aria-hidden="true">→</span>
+              </a>
+            </div>
+            <div class="nb-mega__col">
+              <p class="nb-mega__head">{t('nav.mega.start')}</p>
+              <ul class="nb-mega__list">
+                <li>
+                  <a href={localizedPath('/precios')} class="nb-mega__link">
+                    <span>{t('nav.prices')}</span>
+                  </a>
+                </li>
+                <li>
+                  <a href={localizedPath('/calculadora')} class="nb-mega__link">
+                    <span>{t('footer.calculator')}</span>
+                  </a>
+                </li>
+                <li>
+                  <a href={bookingCta.href} class="nb-mega__link">
+                    <span>{t('nav.freeConsultation')}</span>
+                  </a>
+                </li>
+              </ul>
+            </div>
+            <a href={localizedPath('/calculadora')} class="nb-mega__promo" data-surface="dark">
+              <Picture
+                src={promoPhoto}
+                formats={['avif', 'webp']}
+                widths={[480, 720]}
+                sizes="360px"
+                alt=""
+                loading="lazy"
+                quality={70}
+                class="nb-mega__promo-img"
+              />
+              <span class="nb-mega__promo-body">
+                <span class="nb-mega__promo-title">{t('nav.mega.promoTitle')}</span>
+                <span class="nb-mega__promo-text">{t('nav.mega.promoText')}</span>
+                <span class="nb-mega__promo-cta">
+                  {t('cta.calculate')} <span aria-hidden="true">→</span>
+                </span>
+              </span>
+            </a>
+          </div>
+        </div>
+      </div>
+    )}
+
+    {!minimal && (
+      <div id="mobile-menu" class="nb-mobile" data-open="false" data-lenis-prevent>
+        <nav aria-label={t('nav.main')} class="px-5 pt-2 pb-6">
           <ul class="m-0 flex list-none flex-col p-0">
             {mainNav.map((l) => (
-              <li class="border-b border-piedra-200">
+              <li class="border-t border-piedra-200">
                 <a
                   href={l.href}
                   class="nb-mobile__link"
@@ -95,74 +210,384 @@ const isCurrent = (href: string) => path === href || (href !== '/' && path.start
               </li>
             ))}
           </ul>
-          <Button href={bookingCta.href} class="mt-5 w-full">
-            {bookingCta.label}
-          </Button>
+          <a href={bookingCta.href} class="nb-cta nb-cta--block mt-5">
+            <span class="nb-cta__icon" aria-hidden="true">
+              <svg
+                viewBox="0 0 24 24"
+                width="18"
+                height="18"
+                fill="none"
+                stroke="currentColor"
+                stroke-width="1.5"
+              >
+                <rect x="4" y="5" width="16" height="15" />
+                <path d="M4 10h16M9 3v4M15 3v4" />
+              </svg>
+            </span>
+            <span>{bookingCta.label}</span>
+          </a>
         </nav>
-      </Container>
-    </div>
-  )}
+      </div>
+    )}
+  </div>
 </header>
 
 <style is:global>
   :root {
-    --header-h: 72px;
+    --header-h: 96px;
   }
 
+  /* Barra flotante: superficie elevada blanca, pegada arriba, esquinas inferiores de tarjeta (8 px). */
   .nb-header {
-    position: sticky;
-    top: 0;
+    position: fixed;
+    inset: 0 0 auto 0;
     z-index: 40;
-    background: var(--piedra-50);
-    color: var(--navy-800);
-    border-bottom: 1px solid var(--rule);
-    transition:
-      background-color var(--dur-fast) var(--ease-out),
-      border-color var(--dur-fast) var(--ease-out);
+    padding-inline: 12px;
+    pointer-events: none;
   }
-  .nb-header[data-transparent] {
-    margin-bottom: calc(var(--header-h) * -1);
+  @media (min-width: 1024px) {
+    .nb-header {
+      padding-inline: 24px;
+    }
   }
-  .nb-header[data-transparent]:not([data-scrolled]):not([data-menu-open]) {
-    background: transparent;
-    border-bottom-color: transparent;
-    color: var(--piedra-50);
-  }
-  .nb-header[data-transparent]:not([data-scrolled]):not([data-menu-open]) .nb-logo {
-    color: var(--white);
-  }
-  .nb-header[data-transparent]:not([data-scrolled]):not([data-menu-open]) .nb-nav__link:hover {
-    color: var(--salvia-300);
-  }
-  .nb-header[data-transparent]:not([data-scrolled]):not([data-menu-open]) :focus-visible {
-    outline-color: var(--salvia-300);
-  }
-  .nb-header[data-transparent]:not([data-scrolled]):not([data-menu-open]) .nb-cta {
+  .nb-bar {
+    pointer-events: auto;
+    max-width: 1240px;
+    margin-inline: auto;
     background: var(--white);
     color: var(--navy-800);
+    border: 1px solid var(--rule);
+    border-top: 0;
+    border-radius: 0 0 var(--radius-card, 8px) var(--radius-card, 8px);
+    box-shadow: 0 0 0 rgb(21 39 66 / 0);
+    transition:
+      box-shadow var(--dur-base) var(--ease-out),
+      border-color var(--dur-base) var(--ease-out);
+  }
+  .nb-header[data-scrolled] .nb-bar {
+    border-color: var(--piedra-100);
+    box-shadow: 0 10px 32px rgb(21 39 66 / 0.1);
+  }
+  .nb-bar__row {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: 16px;
+    height: var(--header-h);
+    padding-inline: 20px;
+  }
+  @media (min-width: 1024px) {
+    .nb-bar__row {
+      display: grid;
+      grid-template-columns: 1fr auto 1fr;
+      padding-inline: 16px 16px;
+    }
+  }
+  .nb-bar__logo {
+    display: inline-flex;
+    align-items: center;
+    min-height: 44px;
+    padding: 4px 8px;
+    margin-left: -8px;
+  }
+  .nb-bar__logo-img {
+    display: block;
+    height: 40px;
+    width: auto;
+  }
+  .nb-bar__end {
+    display: flex;
+    align-items: center;
+    justify-content: flex-end;
+    gap: 4px;
   }
 
+  .nb-nav {
+    display: none;
+  }
+  @media (min-width: 1024px) {
+    .nb-nav {
+      display: block;
+    }
+  }
   .nb-nav__link {
-    font-size: 0.9375rem;
-    font-weight: 500;
-    color: inherit;
-    text-decoration: none;
+    position: relative;
+    display: inline-block;
     padding: 0.5rem 0;
-    border-bottom: 1.5px solid transparent;
-    transition:
-      color var(--dur-fast) var(--ease-out),
-      border-color var(--dur-fast) var(--ease-out);
+    font-size: 1rem;
+    font-weight: 500;
+    color: var(--piedra-700);
+    text-decoration: none;
+    transition: color var(--dur-fast) var(--ease-out);
+  }
+  .nb-nav__link::after {
+    content: '';
+    position: absolute;
+    inset: auto 0 0 0;
+    height: 1.5px;
+    background: var(--navy-800);
+    transform: scaleX(0);
+    transform-origin: left;
+    transition: transform var(--dur-base) var(--ease-out);
   }
   .nb-nav__link:hover {
-    color: var(--salvia-600);
+    color: var(--navy-800);
+  }
+  .nb-nav__link:hover::after,
+  .nb-nav__link[aria-current='page']::after {
+    transform: scaleX(1);
   }
   .nb-nav__link[aria-current='page'] {
-    border-bottom-color: currentColor;
+    color: var(--navy-800);
   }
 
-  /* Menú móvil: sin JS, los enlaces quedan visibles bajo la cabecera; con JS se abre y se cierra. */
+  /* CTA: botón primario con icono sobre Salvia 400 (Navy sobre Salvia, nunca blanco). */
+  /* ── Desplegable de Servicios (solo escritorio): la barra crece hacia abajo ── */
+  .nb-nav__trigger {
+    display: none;
+    align-items: center;
+    gap: 6px;
+    cursor: pointer;
+    background: none;
+    border: 0;
+    font: inherit;
+    font-size: 1rem;
+    font-weight: 500;
+  }
+  .js .nb-nav__trigger {
+    display: inline-flex;
+  }
+  .js .nb-nav__nojs {
+    display: none;
+  }
+  .nb-nav__chev {
+    transition: transform var(--dur-base) var(--ease-out);
+  }
+  .nb-nav__trigger[aria-expanded='true'] .nb-nav__chev {
+    transform: rotate(180deg);
+  }
+  .nb-nav__trigger[aria-expanded='true'] {
+    color: var(--navy-800);
+  }
+  .nb-mega {
+    display: none;
+  }
+  @media (min-width: 1024px) {
+    .js .nb-mega {
+      display: grid;
+      grid-template-rows: 0fr;
+      visibility: hidden;
+      transition:
+        grid-template-rows var(--dur-base) var(--ease-out),
+        visibility 0s linear var(--dur-base);
+    }
+    .js .nb-mega[data-open='true'] {
+      grid-template-rows: 1fr;
+      visibility: visible;
+      transition:
+        grid-template-rows var(--dur-base) var(--ease-out),
+        visibility 0s;
+    }
+  }
+  .nb-mega__clip {
+    min-height: 0;
+    overflow: hidden;
+  }
+  .nb-mega__inner {
+    display: grid;
+    grid-template-columns: 1fr 1fr minmax(300px, 400px);
+    gap: 24px 56px;
+    margin: 0 24px;
+    padding: 36px 24px 32px;
+    border-top: 1px solid var(--rule);
+  }
+  .nb-mega__head {
+    margin: 0 0 20px;
+    font-size: 0.75rem;
+    font-weight: 600;
+    letter-spacing: 0.16em;
+    text-transform: uppercase;
+    color: var(--piedra-600);
+  }
+  .nb-mega__list {
+    display: flex;
+    flex-direction: column;
+    gap: 2px;
+    margin: 0;
+    padding: 0;
+    list-style: none;
+  }
+  .nb-mega__link {
+    display: inline-flex;
+    align-items: center;
+    gap: 14px;
+    min-height: 44px;
+    font-family: var(--font-display);
+    font-optical-sizing: auto;
+    font-size: 1.375rem;
+    font-weight: 400;
+    line-height: 1.2;
+    color: var(--navy-800);
+    text-decoration: none;
+    transition:
+      color var(--dur-fast) var(--ease-out),
+      transform var(--dur-base) var(--ease-out);
+  }
+  .nb-mega__link .nb-icon {
+    color: var(--piedra-600);
+    transition: color var(--dur-fast) var(--ease-out);
+  }
+  .nb-mega__link:hover,
+  .nb-mega__link:focus-visible {
+    color: var(--salvia-600);
+    transform: translateX(4px);
+  }
+  .nb-mega__link:hover .nb-icon,
+  .nb-mega__link:focus-visible .nb-icon {
+    color: var(--salvia-600);
+  }
+  .nb-mega__all {
+    display: inline-block;
+    margin-top: 18px;
+    font-size: 0.9375rem;
+    font-weight: 600;
+    color: var(--navy-600);
+    text-decoration: underline;
+    text-decoration-thickness: 1px;
+    text-underline-offset: 3px;
+  }
+  .nb-mega__all:hover {
+    color: var(--salvia-600);
+  }
+  /* Tarjeta de la derecha: foto provisional; aquí irá la calculadora. */
+  .nb-mega__promo {
+    position: relative;
+    display: flex;
+    min-height: 280px;
+    overflow: hidden;
+    border-radius: var(--radius-card, 8px);
+    background: var(--navy-800);
+    color: var(--white);
+    text-decoration: none;
+    isolation: isolate;
+  }
+  .nb-mega__promo-img {
+    position: absolute;
+    inset: 0;
+    z-index: -2;
+    width: 100%;
+    height: 100%;
+    object-fit: cover;
+    object-position: 66% 50%;
+    transition: transform 1200ms var(--ease-out);
+  }
+  .nb-mega__promo::after {
+    content: '';
+    position: absolute;
+    inset: 0;
+    z-index: -1;
+    background: rgb(21 39 66 / 0.62);
+  }
+  .nb-mega__promo:hover .nb-mega__promo-img {
+    transform: scale(1.04);
+  }
+  .nb-mega__promo-body {
+    display: flex;
+    flex-direction: column;
+    justify-content: flex-end;
+    gap: 8px;
+    padding: 24px;
+    width: 100%;
+  }
+  .nb-mega__promo-title {
+    font-family: var(--font-display);
+    font-optical-sizing: auto;
+    font-size: 1.75rem;
+    font-weight: 400;
+    line-height: 1.1;
+    letter-spacing: -0.01em;
+  }
+  .nb-mega__promo-text {
+    font-size: 0.9375rem;
+    color: var(--navy-100);
+  }
+  .nb-mega__promo-cta {
+    margin-top: 12px;
+    font-size: 0.9375rem;
+    font-weight: 600;
+    text-decoration: underline;
+    text-decoration-thickness: 1px;
+    text-underline-offset: 3px;
+  }
+  .nb-header[data-mega-open] .nb-bar {
+    border-color: var(--piedra-100);
+    box-shadow: 0 10px 32px rgb(21 39 66 / 0.1);
+  }
+
+  .nb-cta {
+    display: inline-flex;
+    align-items: center;
+    gap: 10px;
+    min-height: 52px;
+    padding: 8px 22px 8px 8px;
+    border-radius: var(--radius-button, 4px);
+    background: var(--navy-800);
+    color: var(--white);
+    font-size: 0.9375rem;
+    font-weight: 600;
+    line-height: 1;
+    white-space: nowrap;
+    text-decoration: none;
+    transition: background-color var(--dur-fast) var(--ease-out);
+  }
+  .nb-cta:hover {
+    background: var(--navy-700);
+  }
+  .nb-cta__icon {
+    display: inline-flex;
+    width: 36px;
+    height: 36px;
+    align-items: center;
+    justify-content: center;
+    border-radius: var(--radius-tag, 2px);
+    background: var(--salvia-400);
+    color: var(--navy-800);
+    transition: transform var(--dur-base) var(--ease-out);
+  }
+  .nb-cta:hover .nb-cta__icon {
+    transform: translateX(-2px);
+  }
+  .nb-bar__end > .nb-cta {
+    display: none;
+  }
+  @media (min-width: 640px) {
+    .nb-bar__end > .nb-cta {
+      display: inline-flex;
+    }
+    .nb-bar__end {
+      gap: 12px;
+    }
+  }
+  .nb-bar__end > .nb-cta--always {
+    display: inline-flex;
+  }
+  .nb-cta--block {
+    display: flex;
+    width: 100%;
+    justify-content: center;
+  }
+  .nb-cta--block .nb-cta__icon {
+    margin-right: 0;
+  }
+
+  /* Menú móvil: sin JS, los enlaces quedan visibles dentro de la barra; con JS se abre y se cierra. */
   .nb-menu-btn {
     display: none;
+    width: 44px;
+    height: 44px;
+    align-items: center;
+    justify-content: center;
+    margin-right: -6px;
   }
   .nb-menu-btn__close {
     display: none;
@@ -172,6 +597,9 @@ const isCurrent = (href: string) => path === href || (href !== '/' && path.start
   }
   @media (min-width: 1024px) {
     .js .nb-menu-btn {
+      display: none;
+    }
+    .nb-mobile {
       display: none;
     }
   }
@@ -189,8 +617,8 @@ const isCurrent = (href: string) => path === href || (href !== '/' && path.start
     animation: nb-menu-in var(--dur-base) var(--ease-out);
   }
   .nb-mobile {
-    background: var(--piedra-50);
-    color: var(--navy-800);
+    max-height: calc(100svh - var(--header-h) - 12px);
+    overflow-y: auto;
   }
   .nb-mobile__link {
     display: block;
@@ -224,10 +652,58 @@ const isCurrent = (href: string) => path === href || (href !== '/' && path.start
     const btn = header.querySelector<HTMLButtonElement>('.nb-menu-btn');
     const panel = header.querySelector<HTMLElement>('#mobile-menu');
 
-    // Solidificar tras 24 px de scroll.
+    // La sombra aparece tras 24 px de scroll.
     const onScroll = () => header.toggleAttribute('data-scrolled', window.scrollY > 24);
     onScroll();
     window.addEventListener('scroll', onScroll, { passive: true });
+
+    // ── Desplegable de Servicios ──
+    const megaTrigger = header.querySelector<HTMLButtonElement>('[data-mega-trigger]');
+    const mega = header.querySelector<HTMLElement>('[data-mega]');
+    const desktop = window.matchMedia('(min-width: 1024px)');
+    if (megaTrigger && mega) {
+      const item = megaTrigger.closest('li')!;
+      let timer: number | undefined;
+      const setMega = (open: boolean, returnFocus = false) => {
+        window.clearTimeout(timer);
+        megaTrigger.setAttribute('aria-expanded', String(open));
+        mega.dataset.open = String(open);
+        header.toggleAttribute('data-mega-open', open);
+        if (!open && returnFocus) megaTrigger.focus();
+      };
+      const later = (open: boolean, ms: number) => {
+        window.clearTimeout(timer);
+        timer = window.setTimeout(() => setMega(open), ms);
+      };
+      const hoverable = () => desktop.matches && window.matchMedia('(hover: hover)').matches;
+
+      megaTrigger.addEventListener('click', (e) => {
+        const open = megaTrigger.getAttribute('aria-expanded') !== 'true';
+        setMega(open);
+        // Con teclado (Enter o Espacio), el foco pasa al primer enlace del panel.
+        if (open && (e as MouseEvent).detail === 0)
+          mega.querySelector<HTMLElement>('a[href]')?.focus();
+      });
+      item.addEventListener('mouseenter', () => hoverable() && later(true, 80));
+      item.addEventListener('mouseleave', () => hoverable() && later(false, 220));
+      mega.addEventListener('mouseenter', () => hoverable() && window.clearTimeout(timer));
+      mega.addEventListener('mouseleave', () => hoverable() && later(false, 220));
+      document.addEventListener('keydown', (e) => {
+        if (e.key === 'Escape' && megaTrigger.getAttribute('aria-expanded') === 'true') {
+          e.preventDefault();
+          // Si el foco estaba dentro, vuelve al botón; si solo había ratón, no se roba el foco.
+          setMega(false, header.contains(document.activeElement));
+        }
+      });
+      header.addEventListener('focusout', (e) => {
+        const next = e.relatedTarget as Node | null;
+        if (next && !item.contains(next) && !mega.contains(next)) setMega(false);
+      });
+      document.addEventListener('click', (e) => {
+        if (!header.contains(e.target as Node)) setMega(false);
+      });
+      desktop.addEventListener('change', () => setMega(false));
+    }
 
     if (btn && panel) {
       const focusables = () =>
@@ -244,6 +720,7 @@ const isCurrent = (href: string) => path === href || (href !== '/' && path.start
         panel.dataset.open = String(open);
         header.toggleAttribute('data-menu-open', open);
         document.documentElement.style.overflow = open ? 'hidden' : '';
+        window.dispatchEvent(new CustomEvent('nb:scroll-lock', { detail: open }));
         if (open) panel.querySelector<HTMLElement>('a')?.focus();
         else if (returnFocus) btn.focus();
       };

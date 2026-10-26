@@ -1,56 +1,343 @@
 ---
+import { Picture, getImage } from 'astro:assets';
+import heroPoster from '../../assets/img/hero-poster.jpg';
 import BridgeMark from '../brand/BridgeMark.astro';
-import Pattern from '../brand/Pattern.astro';
 import Button from '../ui/Button.astro';
 import Container from '../ui/Container.astro';
-import { t } from '../../i18n';
+import { localizedPath, t } from '../../i18n';
 import { bookingCta } from '../../lib/site';
-import { localizedPath } from '../../i18n';
+const posterFile = await getImage({ src: heroPoster, format: 'webp', width: 1280, quality: 74 });
 ---
 
-<section
-  data-hero
-  data-surface="dark"
-  class="relative isolate overflow-hidden bg-navy-800 text-piedra-50"
->
-  <div data-hero-pattern class="absolute inset-x-0 top-0 -bottom-16 -z-10">
-    <Pattern tone="dark" mask="left" class="h-full" />
-  </div>
-
-  <!-- El puente como estructura gráfica del hero: arco ampliado, trazo fino -->
-  <div class="pointer-events-none absolute right-[-12%] bottom-[-6%] -z-10 w-[88%] text-navy-300 opacity-40 md:right-[-3%] md:bottom-[8%] md:w-[52%] md:opacity-70">
-    <BridgeMark data-hero-mark strokeWidth={0.7} class="h-auto w-full" />
-  </div>
-
-  <Container class="flex min-h-[640px] flex-col justify-center gap-8 pt-[calc(var(--header-h)+48px)] pb-20 md:min-h-[min(760px,92svh)]">
-    <h1 class="t-display m-0 max-w-[12ch] text-white">
-      <span class="block overflow-hidden pb-[0.12em] -mb-[0.12em]">
-        <span data-hero-line class="block">
-          {t('home.hero.line1')}
-        </span>
-      </span>
-      <span class="block overflow-hidden pb-[0.12em] -mb-[0.12em]">
-        <span data-hero-line class="block">
-          {t('home.hero.line2')}
-        </span>
-      </span>
-    </h1>
-    <p
-      data-hero-fade="1.5"
-      class="m-0 max-w-[34rem] font-serif text-[1.375rem] leading-snug font-light text-navy-100 md:text-[1.75rem]"
-    >
-      {t('brand.descriptor')}
-    </p>
-    <div data-hero-fade="1.5" class="flex flex-wrap items-center gap-4">
-      <Button href={bookingCta.href} on="dark" arrow>
-        {t('cta.book')}
-      </Button>
-      <Button href={localizedPath('/calculadora')} variant="secondary">
-        {t('cta.calculate')}
-      </Button>
+<section data-hero class="hero" aria-labelledby="hero-title">
+  <div class="hero__stage">
+    <!-- Foto a sangre. Al hacer scroll se encoge hasta quedar enmarcada en el arco de la marca. -->
+    <div class="hero__photo" data-hero-photo>
+      <div class="hero__media" data-hero-media>
+        <Picture
+          src={heroPoster}
+          formats={['avif', 'webp']}
+          widths={[640, 960, 1280]}
+          sizes="100vw"
+          alt=""
+          loading="eager"
+          fetchpriority="high"
+          decoding="async"
+          quality={74}
+          class="hero__img"
+        />
+        <!-- Vídeo sin sonido (sin pista de audio). Sin JS o con reduced-motion se queda el fotograma inicial. -->
+        <video
+          class="hero__video"
+          data-hero-video
+          poster={posterFile.src}
+          muted
+          loop
+          playsinline
+          preload="none"
+          tabindex="-1"
+          aria-hidden="true"
+          disablepictureinpicture
+          disableRemotePlayback
+        >
+          <source src="/video/hero-home.webm" type="video/webm" />
+          <source src="/video/hero-home.mp4" type="video/mp4" />
+        </video>
+      </div>
     </div>
-    <p data-hero-fade="1.8" class="t-label m-0 !text-salvia-300">
-      {t('home.hero.proof')}
-    </p>
-  </Container>
+
+    <div class="hero__intro" data-surface="dark">
+      <Container class="hero__intro-inner">
+        <BridgeMark data-hero-mark strokeWidth={3} class="h-9 w-auto text-white" />
+        <h1 id="hero-title" class="hero__title t-display m-0 text-white">
+          <span class="block overflow-hidden pb-[0.12em] -mb-[0.12em]">
+            <span data-hero-line class="block">
+              {t('home.hero.line1')}
+            </span>
+          </span>
+          <span class="block overflow-hidden pb-[0.12em] -mb-[0.12em]">
+            <span data-hero-line class="block">
+              {t('home.hero.line2')}
+            </span>
+          </span>
+        </h1>
+        <p data-hero-fade="1.5" class="hero__sub m-0 font-serif font-light text-navy-100">
+          {t('brand.descriptor')}
+        </p>
+        <div data-hero-fade="1.5" class="flex flex-wrap items-center gap-4">
+          <Button href={bookingCta.href} on="dark" arrow>
+            {t('cta.book')}
+          </Button>
+          <Button href={localizedPath('/calculadora')} variant="secondary">
+            {t('cta.calculate')}
+          </Button>
+        </div>
+        <p data-hero-fade="1.8" class="t-label m-0 !text-salvia-300">
+          {t('home.hero.proof')}
+        </p>
+      </Container>
+    </div>
+
+    <!-- La promesa: aparece cuando la foto ya es un arco. Sin JS o con reduced-motion, es el bloque que sigue al hero. -->
+    <div class="hero__promise" data-hero-promise>
+      <Container class="hero__promise-inner">
+        <svg
+          class="hero__rule"
+          data-hero-rule
+          viewBox="0 0 400 20"
+          preserveAspectRatio="xMinYMid meet"
+          fill="none"
+          stroke="currentColor"
+          stroke-width="1.5"
+          aria-hidden="true"
+        >
+          <path d="M0 2H400" pathLength="1"></path>
+          <path d="M4 20V14A12 12 0 0 1 28 14V20" pathLength="1"></path>
+        </svg>
+        <p
+          data-hero-promise-line
+          class="hero__promise-title m-0 font-serif font-light text-navy-800"
+        >
+          {t('brand.promise')}
+        </p>
+        <div data-hero-promise-line class="hero__promise-body flex flex-col gap-4">
+          <p class="t-body m-0">{t('home.proposal.body1')}</p>
+          <p class="t-body m-0">{t('home.proposal.body2')}</p>
+        </div>
+      </Container>
+    </div>
+  </div>
 </section>
+
+<style is:global>
+  /* ── Base (sin JS, reduced-motion y móvil): foto con el texto sobre la mitad navy y la promesa debajo ── */
+  .hero {
+    position: relative;
+    background: var(--piedra-50);
+  }
+  .hero__stage {
+    position: relative;
+  }
+  .hero__photo {
+    position: absolute;
+    inset: 0 0 auto 0;
+    height: 100svh;
+    min-height: 560px;
+    overflow: hidden;
+    background: var(--navy-800);
+  }
+  .hero__media {
+    position: absolute;
+    inset: 0;
+  }
+  .hero__video {
+    position: absolute;
+    inset: 0;
+    width: 100%;
+    height: 100%;
+    object-fit: cover;
+    object-position: 30% 50%;
+  }
+  .hero__img {
+    width: 100%;
+    height: 100%;
+    object-fit: cover;
+    object-position: 30% 50%;
+    display: block;
+  }
+  .hero__intro {
+    position: relative;
+    display: flex;
+    align-items: flex-end;
+    min-height: 100svh;
+    padding-top: calc(var(--header-h) + 32px);
+    padding-bottom: clamp(40px, 8svh, 88px);
+  }
+  .hero__intro-inner {
+    display: flex;
+    flex-direction: column;
+    align-items: flex-start;
+    gap: 24px;
+  }
+  .hero__title {
+    font-size: clamp(2.75rem, 1rem + 6.4vw, 4.75rem);
+  }
+  .hero__sub {
+    max-width: min(30rem, 100%);
+    font-size: 1.25rem;
+    line-height: 1.35;
+  }
+  .hero__promise {
+    position: relative;
+    padding-block: var(--section-y);
+    background: var(--piedra-50);
+  }
+  .hero__promise-inner {
+    display: grid;
+    gap: 32px;
+  }
+  .hero__rule {
+    display: block;
+    width: 100%;
+    max-width: 400px;
+    height: 20px;
+    color: var(--navy-800);
+  }
+  .hero__promise-title {
+    font-size: clamp(1.875rem, 1.2rem + 2.4vw, 2.75rem);
+    line-height: 1.12;
+    letter-spacing: -0.01em;
+    text-wrap: balance;
+  }
+  @media (min-width: 768px) {
+    .hero__sub {
+      max-width: min(24rem, 30vw);
+    }
+    .hero__promise-inner {
+      grid-template-columns: 1.2fr 1fr;
+      gap: 64px;
+      align-items: end;
+    }
+    .hero__rule {
+      grid-column: 1 / -1;
+    }
+  }
+  /* En móvil la foto ocupa la parte superior y el texto va sobre navy liso, para que siempre se lea. */
+  @media (max-width: 767px) {
+    .hero__photo {
+      height: 54svh;
+      min-height: 0;
+    }
+    .hero__img,
+    .hero__video {
+      object-position: 80% 50%;
+    }
+    .hero__stage {
+      background: var(--navy-800);
+    }
+    .hero__intro {
+      min-height: 0;
+      padding-top: calc(54svh + 32px);
+    }
+    .hero__photo {
+      z-index: 0;
+    }
+    .hero__intro-inner {
+      position: relative;
+      z-index: 1;
+    }
+  }
+
+  /* ── Escena de scroll (solo escritorio con movimiento): el hero se ancla y la foto se transforma en arco ── */
+  @media (min-width: 768px) {
+    .js.motion:not(.anim-fail) .hero {
+      height: 250svh;
+    }
+    .js.motion:not(.anim-fail) .hero__stage {
+      position: sticky;
+      top: 0;
+      height: 100svh;
+      overflow: hidden;
+    }
+    .js.motion:not(.anim-fail) .hero__photo {
+      inset: 0;
+      height: 100%;
+      min-height: 0;
+      background: transparent;
+      z-index: 1;
+      will-change: clip-path;
+    }
+    .js.motion:not(.anim-fail) .hero__intro {
+      z-index: 2;
+      position: absolute;
+      inset: 0;
+      min-height: 0;
+    }
+    /* Orden de capas: promesa (abajo, sobre Piedra 50), foto, texto de entrada. */
+    .js.motion:not(.anim-fail) .hero__promise {
+      position: absolute;
+      inset: 0;
+      z-index: 0;
+      background: var(--piedra-50);
+      display: flex;
+      align-items: center;
+      padding: var(--header-h) 0 0;
+    }
+    .js.motion:not(.anim-fail) .hero__promise-inner {
+      width: 100%;
+      grid-template-columns: minmax(0, 1fr) minmax(0, 1fr);
+      gap: 0 clamp(32px, 6vw, 96px);
+      align-content: center;
+    }
+    .js.motion:not(.anim-fail) .hero__promise-inner > * {
+      max-width: min(34rem, 100%);
+    }
+    .js.motion:not(.anim-fail) .hero__promise-inner > .hero__rule {
+      grid-column: 1;
+      margin-bottom: 28px;
+    }
+    .js.motion:not(.anim-fail) .hero__promise-inner > .hero__promise-title {
+      grid-column: 1;
+    }
+    .js.motion:not(.anim-fail) .hero__promise-inner > .hero__promise-body {
+      grid-column: 1;
+      margin-top: 28px;
+    }
+    .js.motion:not(.anim-fail) .hero__promise-inner > * {
+      opacity: 0;
+    }
+  }
+</style>
+
+<script>
+  // Vídeo decorativo sin sonido: siempre en reproducción (en bucle) mientras el hero está en pantalla.
+  // Solo se detiene si el usuario pide movimiento reducido en su sistema, o fuera de pantalla para ahorrar CPU.
+  const video = document.querySelector<HTMLVideoElement>('[data-hero-video]');
+  if (video && !matchMedia('(prefers-reduced-motion: reduce)').matches) {
+    video.addEventListener(
+      'playing',
+      () => {
+        video.setAttribute('data-playing', '');
+      },
+      { once: true },
+    );
+
+    const play = () => void video.play().catch(() => undefined);
+    new IntersectionObserver(
+      ([entry]) => {
+        if (entry.isIntersecting) {
+          if (video.preload === 'auto') play();
+        } else video.pause();
+      },
+      { threshold: 0 },
+    ).observe(document.querySelector('[data-hero]')!);
+
+    // Algunos navegadores detienen el vídeo al volver a la pestaña o con ahorro de batería: se reanuda.
+    document.addEventListener('visibilitychange', () => {
+      if (!document.hidden) play();
+    });
+    video.addEventListener('pause', () => {
+      if (
+        !document.hidden &&
+        video.isConnected &&
+        video.dataset.stopped !== 'true' &&
+        !video.ended
+      ) {
+        const rect = document.querySelector('[data-hero]')!.getBoundingClientRect();
+        if (rect.bottom > 0 && rect.top < window.innerHeight) play();
+      }
+    });
+
+    // El vídeo no compite con el póster (LCP): empieza a cargarse cuando la página ya ha terminado de cargar.
+    const start = () => {
+      video.preload = 'auto';
+      play();
+    };
+    const whenIdle = () =>
+      'requestIdleCallback' in window
+        ? requestIdleCallback(start, { timeout: 1500 })
+        : setTimeout(start, 400);
+    if (document.readyState === 'complete') whenIdle();
+    else window.addEventListener('load', whenIdle, { once: true });
+  }
+</script>

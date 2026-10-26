@@ -1,7 +1,6 @@
 ---
 import BaseLayout from '../layouts/BaseLayout.astro';
 import Hero from '../components/sections/Hero.astro';
-import Proposal from '../components/sections/Proposal.astro';
 import ServicesTeaser from '../components/sections/ServicesTeaser.astro';
 import Stats from '../components/sections/Stats.astro';
 import Process from '../components/sections/Process.astro';
@@ -11,13 +10,12 @@ import CtaBand from '../components/sections/CtaBand.astro';
 import { t } from '../i18n';
 ---
 
-<BaseLayout description={t('home.seoDescription')} transparentHeader>
+<BaseLayout description={t('home.seoDescription')} overlayHeader>
   <Hero />
-  <Proposal />
   <ServicesTeaser />
   <Stats />
   <Process />
   <CalculatorTeaser />
   <Testimonials />
-  <CtaBand />
+  <CtaBand photo />
 </BaseLayout>

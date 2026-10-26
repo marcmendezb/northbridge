@@ -1,9 +1,8 @@
 ---
 import { getCollection } from 'astro:content';
-import Card from '../ui/Card.astro';
-import Icon from '../brand/Icon.astro';
 import Section from '../ui/Section.astro';
 import Button from '../ui/Button.astro';
+import Icon from '../brand/Icon.astro';
 import { localizedPath, t } from '../../i18n';
 
 const featured = ['contabilidad', 'iva', 'nominas'];
@@ -12,27 +11,145 @@ const services = (await getCollection('servicios'))
   .sort((a, b) => a.data.order - b.data.order);
 ---
 
-<Section
-  tone="piedra"
-  label={t('home.services.label')}
-  title={t('home.services.title')}
-  lead={t('home.services.lead')}
-  rule
->
-  <ul class="m-0 grid list-none gap-6 p-0 md:grid-cols-3">
-    {services.map((s) => (
-      <li data-reveal class="flex">
-        <Card href={localizedPath(`/servicios/${s.id}`)} class="flex w-full flex-col gap-4 p-8">
-          <Icon name={s.data.icon} size={40} />
-          <h3 class="m-0 text-[1.5rem]">{s.data.title}</h3>
-          <p class="t-small m-0 !text-piedra-700">{s.data.summary}</p>
-        </Card>
+<Section tone="piedra" title={t('home.services.title')} lead={t('home.services.lead')}>
+  <ol class="nb-rows m-0 list-none p-0">
+    {services.map((s, i) => (
+      <li data-reveal class="nb-row">
+        <a href={localizedPath(`/servicios/${s.id}`)} class="nb-row__link nb-trace">
+          <span class="nb-row__n t-figure" aria-hidden="true">
+            {String(i + 1).padStart(2, '0')}
+          </span>
+          <span class="nb-row__main">
+            <span class="nb-row__title">{s.data.title}</span>
+            <span class="nb-row__sum">{s.data.summary}</span>
+          </span>
+          <Icon name={s.data.icon} size={44} class="nb-row__icon" />
+          <span class="nb-row__arrow" aria-hidden="true">
+            <svg
+              viewBox="0 0 24 24"
+              width="28"
+              height="28"
+              fill="none"
+              stroke="currentColor"
+              stroke-width="1.5"
+            >
+              <path d="M4 12h15M13 6l6 6-6 6" />
+            </svg>
+          </span>
+        </a>
       </li>
     ))}
-  </ul>
-  <div data-reveal class="mt-10">
+  </ol>
+  <div data-reveal class="mt-12">
     <Button variant="ghost" href={localizedPath('/servicios')} arrow>
       {t('home.services.more')}
     </Button>
   </div>
 </Section>
+
+<style is:global>
+  .nb-rows {
+    border-top: 1.5px solid var(--navy-800);
+  }
+  .nb-row {
+    border-bottom: 1px solid var(--piedra-300);
+  }
+  .nb-row__link {
+    position: relative;
+    display: grid;
+    grid-template-columns: auto 1fr auto;
+    align-items: center;
+    gap: 8px 24px;
+    padding-block: clamp(24px, 3.5vw, 44px);
+    color: var(--navy-800);
+    text-decoration: none;
+    isolation: isolate;
+  }
+  /* Relleno navy que sube desde abajo (transform), con el texto invertido. */
+  .nb-row__link::before {
+    content: '';
+    position: absolute;
+    inset: 0 calc(var(--gutter) * -1);
+    z-index: -1;
+    background: var(--navy-800);
+    transform: scaleY(0);
+    transform-origin: bottom;
+    transition: transform var(--dur-base) var(--ease-out);
+  }
+  .nb-row__link > * {
+    transition:
+      color var(--dur-base) var(--ease-out),
+      transform var(--dur-base) var(--ease-out);
+  }
+  .nb-row__n {
+    font-size: clamp(1.25rem, 1rem + 1vw, 1.75rem);
+    color: var(--salvia-600);
+    align-self: start;
+    padding-top: 0.6em;
+  }
+  .nb-row__main {
+    display: grid;
+    gap: 8px;
+    min-width: 0;
+  }
+  .nb-row__title {
+    font-family: var(--font-display);
+    font-optical-sizing: auto;
+    font-size: clamp(1.75rem, 1rem + 3.2vw, 3.5rem);
+    font-weight: 300;
+    line-height: 1.04;
+    letter-spacing: -0.015em;
+  }
+  .nb-row__sum {
+    font-size: 1.0625rem;
+    line-height: 1.5;
+    color: var(--piedra-700);
+    max-width: 38rem;
+  }
+  .nb-row__icon {
+    display: none;
+  }
+  .nb-row__arrow {
+    display: none;
+  }
+  @media (min-width: 768px) {
+    .nb-row__link {
+      grid-template-columns: 4.5rem 1fr auto auto;
+    }
+    .nb-row__icon {
+      display: inline-block;
+    }
+    .nb-row__arrow {
+      display: inline-flex;
+    }
+  }
+  @media (hover: hover) {
+    .nb-row__link:hover::before,
+    .nb-row__link:focus-visible::before {
+      transform: scaleY(1);
+    }
+    .nb-row__link:hover .nb-row__title,
+    .nb-row__link:focus-visible .nb-row__title {
+      color: var(--white);
+      transform: translateX(12px);
+    }
+    .nb-row__link:hover .nb-row__sum,
+    .nb-row__link:focus-visible .nb-row__sum {
+      color: var(--navy-100);
+      transform: translateX(12px);
+    }
+    .nb-row__link:hover .nb-row__n,
+    .nb-row__link:focus-visible .nb-row__n {
+      color: var(--salvia-300);
+    }
+    .nb-row__link:hover .nb-row__icon,
+    .nb-row__link:focus-visible .nb-row__icon,
+    .nb-row__link:hover .nb-row__arrow,
+    .nb-row__link:focus-visible .nb-row__arrow {
+      color: var(--white);
+    }
+    .nb-row__link:hover .nb-row__arrow {
+      transform: translateX(6px);
+    }
+  }
+</style>
