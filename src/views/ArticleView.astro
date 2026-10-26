@@ -14,6 +14,7 @@ import nora from '../assets/img/about/team/nora-steiner.jpeg';
 import marc from '../assets/img/about/team/marc-bernasconi.jpeg';
 import { useI18n, type MessageKey } from '../i18n';
 import { entryKey, getTeam, readingMinutes } from '../lib/content';
+import { articleCovers } from '../lib/covers';
 import { formatDate } from '../lib/format';
 import { site } from '../lib/site';
 
@@ -35,6 +36,7 @@ const portraits: Record<string, ImageMetadata> = {
   'marc-bernasconi': marc,
 };
 const minutes = readingMinutes(entry.body);
+const cover = articleCovers[entryKey(entry)];
 const url = new URL(lp(`/recursos/${entryKey(entry)}`), Astro.site ?? site.url).toString();
 const jsonLd = {
   '@context': 'https://schema.org',
@@ -95,6 +97,23 @@ const jsonLd = {
       </div>
     </div>
   </header>
+
+  {cover && (
+    <div class="nb-container nb-art-cover">
+      <div class="nb-art-cover__frame" data-reveal-media>
+        <Picture
+          src={cover}
+          formats={['avif', 'webp']}
+          widths={[768, 1280, 1920]}
+          sizes="(min-width: 1440px) 1280px, 100vw"
+          alt=""
+          loading="eager"
+          quality={74}
+          class="nb-art-cover__img"
+        />
+      </div>
+    </div>
+  )}
 
   <div class="nb-container nb-art">
     {toc.length > 0 && (
@@ -178,7 +197,27 @@ const jsonLd = {
   .nb-art-head__inner {
     display: grid;
     gap: 20px;
-    padding-block: clamp(40px, 6vw, 80px);
+    padding-block: clamp(40px, 6vw, 80px) clamp(72px, 9vw, 136px);
+  }
+  /* Portada: a todo el ancho del contenedor, montada sobre el borde de la cabecera. */
+  .nb-art-cover {
+    margin-top: clamp(-56px, -4vw, -32px);
+  }
+  .nb-art-cover__frame {
+    aspect-ratio: 21 / 9;
+    overflow: hidden;
+    border-radius: var(--radius-card, 8px);
+    background: var(--piedra-200);
+  }
+  .nb-art-cover__img {
+    width: 100%;
+    height: 100%;
+    object-fit: cover;
+  }
+  @media (max-width: 767px) {
+    .nb-art-cover__frame {
+      aspect-ratio: 4 / 3;
+    }
   }
   .nb-art-head__cat {
     margin: 12px 0 0;

@@ -25,6 +25,8 @@ interface Props {
   perMonth: string;
   note: string;
   bookLabel: string;
+  /** Etiqueta corta del paquete recomendado («Recomendado»). */
+  recommendedTag: string;
   bookHref: string;
   pricingHref: string;
 }
@@ -96,6 +98,7 @@ export default function Calculator({
   perMonth,
   note,
   bookLabel,
+  recommendedTag,
   bookHref,
   pricingHref,
 }: Props) {
@@ -320,7 +323,7 @@ export default function Calculator({
                 >
                   {PACKAGES[p].name}
                   {result.package === p && (
-                    <span className="nb-calcx__pkg-tag">{s.recommended}</span>
+                    <span className="nb-calcx__pkg-tag">{recommendedTag}</span>
                   )}
                 </span>
               ))}

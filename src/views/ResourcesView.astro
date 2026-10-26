@@ -2,7 +2,9 @@
 import BaseLayout from '../layouts/BaseLayout.astro';
 import PageHeader from '../components/layout/PageHeader.astro';
 import CtaBand from '../components/sections/CtaBand.astro';
+import { Picture } from 'astro:assets';
 import Arrow from '../components/brand/Arrow.astro';
+import { articleCovers } from '../lib/covers';
 import { blogCategories } from '../content.config';
 import { useI18n, type MessageKey } from '../i18n';
 import { entryKey, getArticles, getTeam, readingMinutes } from '../lib/content';
@@ -44,19 +46,37 @@ const catLabel = (c: string) => t(`resources.categories.${c}` as MessageKey);
           data-reveal
         >
           <a href={lp(`/recursos/${entryKey(a)}`)} class="nb-res__card">
-            <span class="nb-res__meta">
-              <span class="nb-res__cat">{catLabel(a.data.category)}</span>
-              {a.data.featured && <span class="nb-res__featured">{t('resources.featured')}</span>}
-            </span>
-            <span class="nb-res__title">{a.data.title}</span>
-            <span class="nb-res__desc">{a.data.description}</span>
-            <span class="nb-res__foot">
-              <span>
-                {authorName(a.data.author)} / {formatDate(a.data.publishedAt, locale)} /{' '}
-                {t('resources.readingTime', { n: readingMinutes(a.body) })}
+            {articleCovers[entryKey(a)] && (
+              <span class="nb-res__cover">
+                <Picture
+                  src={articleCovers[entryKey(a)]}
+                  formats={['avif', 'webp']}
+                  widths={[480, 800, 1200]}
+                  sizes={
+                    i === 0 ? '(min-width: 768px) 50vw, 100vw' : '(min-width: 768px) 45vw, 100vw'
+                  }
+                  alt=""
+                  loading={i === 0 ? 'eager' : 'lazy'}
+                  quality={72}
+                  class="nb-res__img"
+                />
               </span>
-              <span class="nb-res__read">
-                {t('resources.read')} <Arrow />
+            )}
+            <span class="nb-res__body">
+              <span class="nb-res__meta">
+                <span class="nb-res__cat">{catLabel(a.data.category)}</span>
+                {a.data.featured && <span class="nb-res__featured">{t('resources.featured')}</span>}
+              </span>
+              <span class="nb-res__title">{a.data.title}</span>
+              <span class="nb-res__desc">{a.data.description}</span>
+              <span class="nb-res__foot">
+                <span>
+                  {authorName(a.data.author)} / {formatDate(a.data.publishedAt, locale)} /{' '}
+                  {t('resources.readingTime', { n: readingMinutes(a.body) })}
+                </span>
+                <span class="nb-res__read">
+                  {t('resources.read')} <Arrow />
+                </span>
               </span>
             </span>
           </a>
@@ -132,10 +152,9 @@ const catLabel = (c: string) => t(`resources.categories.${c}` as MessageKey);
   }
   .nb-res__card {
     display: grid;
-    align-content: start;
-    gap: 16px;
+    grid-template-rows: auto 1fr;
     height: 100%;
-    padding: clamp(24px, 3vw, 40px);
+    overflow: hidden;
     border: 1px solid var(--piedra-200);
     border-radius: var(--radius-card, 8px);
     background: var(--white);
@@ -148,9 +167,43 @@ const catLabel = (c: string) => t(`resources.categories.${c}` as MessageKey);
   .nb-res__card:hover {
     border-color: var(--navy-800);
   }
+  .nb-res__body {
+    display: grid;
+    align-content: start;
+    gap: 16px;
+    padding: clamp(24px, 3vw, 40px);
+  }
+  /* Portada: la foto entra con un zoom muy lento al pasar el ratón. */
+  .nb-res__cover {
+    display: block;
+    aspect-ratio: 16 / 9;
+    overflow: hidden;
+    background: var(--piedra-100);
+  }
+  .nb-res__cover picture {
+    display: contents;
+  }
+  .nb-res__img {
+    width: 100%;
+    height: 100%;
+    object-fit: cover;
+    transition: transform 1400ms var(--ease-out);
+  }
+  .nb-res__card:hover .nb-res__img {
+    transform: scale(1.04);
+  }
+  @media (min-width: 768px) {
+    .nb-res__item--featured .nb-res__card {
+      grid-template-columns: minmax(0, 1fr) minmax(0, 1fr);
+      grid-template-rows: none;
+    }
+    .nb-res__item--featured .nb-res__cover {
+      order: 2;
+      aspect-ratio: auto;
+      min-height: 420px;
+    }
+  }
   .nb-res__item--featured .nb-res__card {
-    grid-template-columns: minmax(0, 1fr);
-    min-height: 320px;
     border-color: var(--navy-800);
     background: var(--navy-800);
     color: var(--white);

@@ -1,6 +1,8 @@
 ---
 import BaseLayout from '../layouts/BaseLayout.astro';
-import PageHeader from '../components/layout/PageHeader.astro';
+import { Picture } from 'astro:assets';
+import Breadcrumbs from '../components/layout/Breadcrumbs.astro';
+import entrance from '../assets/img/about/office/nb-contacto-entrada-01.jpeg';
 import Button from '../components/ui/Button.astro';
 import ContactForm from '../components/islands/ContactForm.tsx';
 import { useI18n, type Messages } from '../i18n';
@@ -13,11 +15,35 @@ const tel = `tel:${site.phone.replace(/\s/g, '')}`;
 ---
 
 <BaseLayout title={t('contact.seoTitle')} description={t('contact.seoDescription')}>
-  <PageHeader
-    title={t('contact.title')}
-    lead={t('contact.lead')}
-    crumbs={[{ label: t('nav.contact') }]}
-  />
+  <header class="nb-ch">
+    <div class="nb-container nb-ch__inner">
+      <div class="nb-ch__text">
+        <Breadcrumbs items={[{ label: t('nav.contact') }]} />
+        <h1 class="nb-ch__title" data-split>
+          {t('contact.title')}
+        </h1>
+        <p class="nb-ch__lead" data-reveal>
+          {t('contact.lead')}
+        </p>
+        <p class="nb-ch__direct" data-reveal>
+          <a href={tel}>{site.phone}</a>
+          <a href={`mailto:${site.email}`}>{site.email}</a>
+        </p>
+      </div>
+      <div class="nb-ch__photo" data-reveal-media>
+        <Picture
+          src={entrance}
+          formats={['avif', 'webp']}
+          widths={[480, 800, 1200]}
+          sizes="(min-width: 1024px) 40vw, 100vw"
+          alt=""
+          loading="eager"
+          quality={74}
+          class="nb-ch__img"
+        />
+      </div>
+    </div>
+  </header>
 
   <section class="nb-contact nb-container">
     <div class="nb-contact__form">
@@ -111,6 +137,77 @@ const tel = `tel:${site.phone.replace(/\s/g, '')}`;
 </BaseLayout>
 
 <style is:global>
+  /* Cabecera: texto a la izquierda, la entrada de la oficina a la derecha. */
+  .nb-ch {
+    background: var(--white);
+  }
+  .nb-ch__inner {
+    display: grid;
+    gap: 32px;
+    padding-block: clamp(32px, 5vw, 72px) 0;
+  }
+  @media (min-width: 1024px) {
+    .nb-ch__inner {
+      grid-template-columns: minmax(0, 1.1fr) minmax(0, 0.9fr);
+      align-items: end;
+      gap: 72px;
+    }
+  }
+  .nb-ch__text {
+    display: grid;
+    gap: 24px;
+    padding-bottom: clamp(8px, 2vw, 32px);
+  }
+  .nb-ch__title {
+    margin: 0;
+    max-width: 12ch;
+    font-size: clamp(2.75rem, 1rem + 5vw, 6rem);
+    font-weight: 300;
+    line-height: 0.98;
+    letter-spacing: -0.03em;
+  }
+  .nb-ch__lead {
+    margin: 0;
+    max-width: 30rem;
+    font-size: 1.1875rem;
+    line-height: 1.55;
+    color: var(--piedra-800);
+  }
+  .nb-ch__direct {
+    display: grid;
+    gap: 4px;
+    margin: 8px 0 0;
+    padding-top: 20px;
+    border-top: 1.5px solid var(--navy-800);
+  }
+  .nb-ch__direct a {
+    font-family: var(--font-display);
+    font-size: clamp(1.5rem, 1rem + 1.4vw, 2.25rem);
+    line-height: 1.2;
+    color: var(--navy-800);
+    text-decoration: none;
+    transition: color var(--dur-fast) var(--ease-out);
+  }
+  .nb-ch__direct a:hover {
+    color: var(--salvia-600);
+  }
+  .nb-ch__photo {
+    aspect-ratio: 4 / 5;
+    overflow: hidden;
+    border-radius: var(--radius-card, 8px);
+    background: var(--piedra-100);
+  }
+  @media (max-width: 1023px) {
+    .nb-ch__photo {
+      aspect-ratio: 16 / 10;
+    }
+  }
+  .nb-ch__img {
+    width: 100%;
+    height: 100%;
+    object-fit: cover;
+    object-position: 50% 45%;
+  }
   .nb-contact {
     display: grid;
     gap: 16px;
@@ -318,6 +415,9 @@ const tel = `tel:${site.phone.replace(/\s/g, '')}`;
     background: var(--error-bg);
     color: var(--error-text);
     font-size: 0.9375rem;
+  }
+  .nb-form__field > .nb-form__check {
+    font-weight: 400;
   }
   .nb-form__check {
     display: flex;

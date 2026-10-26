@@ -172,7 +172,10 @@ const isCurrent = (href: string) => path === href || (href !== '/' && path.start
             </ul>
           </div>
         )}
-        <a href={bookingCta.href} class:list={['nb-cta', minimal && 'nb-cta--always']}>
+        <a
+          href={minimal ? '#reservar' : bookingCta.href}
+          class:list={['nb-cta', minimal && 'nb-cta--always']}
+        >
           <span>{t('nav.freeConsultation')}</span>
           <Arrow />
         </a>
@@ -895,6 +898,11 @@ const isCurrent = (href: string) => path === href || (href !== '/' && path.start
     .nb-bar__end {
       gap: 12px;
     }
+  }
+  /* Cabecera reducida (consulta gratuita): logo a la izquierda y el CTA, que baja al calendario. */
+  .nb-header[data-minimal] .nb-bar__row {
+    display: flex;
+    justify-content: space-between;
   }
   .nb-bar__end > .nb-cta--always {
     display: inline-flex;
