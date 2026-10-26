@@ -1,6 +1,6 @@
 ---
-title: "Legal notice"
-description: "Company details for Northbridge Advisory, the people responsible for its content and the terms of use of this website."
+title: 'Legal notice'
+description: 'Company details for Northbridge Advisory, the people responsible for its content and the terms of use of this website.'
 updatedAt: 2026-10-26
 ---
 

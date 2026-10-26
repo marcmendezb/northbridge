@@ -1,4 +1,4 @@
-import { useId, useState } from 'react';
+import { useEffect, useId, useState } from 'react';
 import { useForm, type Resolver } from 'react-hook-form';
 import type { Messages } from '../../i18n/es';
 import {
@@ -36,12 +36,19 @@ export default function ContactForm({ s, privacyHref, thanksHref, email }: Props
   const {
     register,
     handleSubmit,
+    setValue,
     formState: { errors, isSubmitting, submitCount },
   } = useForm<ContactData>({
     resolver,
     mode: 'onTouched',
     defaultValues: { name: '', email: '', phone: '', message: '', privacy: false as never },
   });
+
+  // Pregunta que llega desde Recursos (`?mensaje=…`): ya escrita en el mensaje.
+  useEffect(() => {
+    const message = new URLSearchParams(window.location.search).get('mensaje');
+    if (message) setValue('message', message.slice(0, 600));
+  }, [setValue]);
 
   const onSubmit = handleSubmit(
     async (data) => {

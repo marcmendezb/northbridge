@@ -481,6 +481,29 @@ export const en: Messages = {
     count: '{n} guides',
     ctaTitle: 'Is your situation not covered by any guide?',
     ctaText: 'Tell us about it in 20 minutes. We’ll tell you what to do and what it costs.',
+    heroTitle: 'Practical guides, no jargon.',
+    heroLead:
+      'Written by the people who do this work every day, with figures and deadlines checked against official sources.',
+    forCountry: 'Guides for',
+    countryHint: 'Change the country in the language menu at the top.',
+    upcomingLabel: 'Coming up',
+    upcomingTitle: 'The next deadlines',
+    upcomingNote:
+      'For an SME whose financial year is the calendar year. We remind you before each one.',
+    upcomingLink: 'See the full calendar',
+    askLabel: 'Ask us',
+    askText:
+      'Write your question the way you would ask it yourself. The person who handles that topic replies before 12:00 on the next working day.',
+    askField: 'Your question',
+    askExamples: [
+      'Do I need to register for VAT?',
+      'Is a GmbH or a sole proprietorship better for me?',
+      'What happens if I file my tax return late?',
+      'How do I pay myself a salary as a partner?',
+    ],
+    askSubmit: 'Send my question',
+    askOr: 'Or sort it out in 20 minutes',
+    askTeam: 'Answered by whoever handles the topic',
   },
   article: {
     by: 'By {name}',
@@ -495,6 +518,8 @@ export const en: Messages = {
     ctaText: 'In 20 minutes we’ll tell you what you need and what it costs. No commitment.',
     checked:
       'Figures checked against official sources on {date}. They change every year, so confirm them before you act.',
+    countryNotice: 'This guide is written for another country.',
+    countryOther: 'The version for your country',
   },
   form: {
     name: 'Name',

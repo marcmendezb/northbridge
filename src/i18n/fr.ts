@@ -480,6 +480,29 @@ export const fr: Messages = {
     count: '{n} guides',
     ctaTitle: 'Votre cas ne figure dans aucun guide ?',
     ctaText: 'Parlons-en 20 minutes. Nous vous disons quoi faire et combien cela coûte.',
+    heroTitle: 'Des guides pratiques, sans jargon.',
+    heroLead:
+      'Écrits par ceux qui font ce travail chaque jour, avec des chiffres et des délais vérifiés auprès de sources officielles.',
+    forCountry: 'Guides adaptés à',
+    countryHint: 'Changez de pays dans le menu des langues, en haut.',
+    upcomingLabel: 'À venir',
+    upcomingTitle: 'Les prochaines échéances',
+    upcomingNote:
+      'Pour une PME dont l’exercice correspond à l’année civile. Nous vous prévenons avant chacune.',
+    upcomingLink: 'Voir le calendrier complet',
+    askLabel: 'Posez-nous votre question',
+    askText:
+      'Écrivez votre question comme vous vous la poseriez. La personne qui suit ce sujet vous répond avant 12h00 le jour ouvrable suivant.',
+    askField: 'Votre question',
+    askExamples: [
+      'Dois-je m’inscrire à la TVA ?',
+      'Une GmbH ou une entreprise individuelle : que choisir ?',
+      'Que se passe-t-il si je dépose ma déclaration en retard ?',
+      'Comment me verser un salaire en tant qu’associé ?',
+    ],
+    askSubmit: 'Envoyer ma question',
+    askOr: 'Ou réglez-le en 20 minutes',
+    askTeam: 'Répond la personne qui suit le sujet',
   },
   article: {
     by: 'Par {name}',
@@ -495,6 +518,8 @@ export const fr: Messages = {
       'En 20 minutes, nous vous disons ce qu’il vous faut et combien cela coûte. Sans engagement.',
     checked:
       'Données vérifiées auprès des sources officielles le {date}. Elles changent chaque année : confirmez-les avant d’agir.',
+    countryNotice: 'Ce guide est rédigé pour un autre pays.',
+    countryOther: 'La version pour votre pays',
   },
   form: {
     name: 'Nom',

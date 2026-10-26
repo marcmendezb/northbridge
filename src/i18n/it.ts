@@ -482,6 +482,28 @@ export const it: Messages = {
     count: '{n} guide',
     ctaTitle: 'Il tuo caso non è in nessuna guida?',
     ctaText: 'Raccontacelo in 20 minuti. Ti diciamo cosa fare e quanto costa.',
+    heroTitle: 'Guide pratiche, senza gergo.',
+    heroLead:
+      'Scritte da chi fa questo lavoro ogni giorno, con cifre e scadenze verificate su fonti ufficiali.',
+    forCountry: 'Guide per',
+    countryHint: 'Cambia il paese nel menu della lingua, in alto.',
+    upcomingLabel: 'In arrivo',
+    upcomingTitle: 'Le prossime scadenze',
+    upcomingNote: 'Per una PMI con esercizio uguale all’anno solare. Ti avvisiamo prima di ognuna.',
+    upcomingLink: 'Vedi il calendario completo',
+    askLabel: 'Chiedici',
+    askText:
+      'Scrivi la tua domanda come la faresti a te stesso. Ti risponde la persona che segue quel tema, entro le 12:00 del giorno lavorativo successivo.',
+    askField: 'La tua domanda',
+    askExamples: [
+      'Devo iscrivermi all’IVA?',
+      'Mi conviene una GmbH o una ditta individuale?',
+      'Cosa succede se presento tardi la dichiarazione?',
+      'Come mi pago uno stipendio da socio?',
+    ],
+    askSubmit: 'Invia la mia domanda',
+    askOr: 'Oppure risolvilo in 20 minuti',
+    askTeam: 'Risponde chi segue il tema',
   },
   article: {
     by: 'Di {name}',
@@ -496,6 +518,8 @@ export const it: Messages = {
     ctaText: 'In 20 minuti ti diciamo di cosa hai bisogno e quanto costa. Senza impegno.',
     checked:
       'Dati verificati su fonti ufficiali il {date}. Cambiano ogni anno: confermali prima di agire.',
+    countryNotice: 'Questa guida è pensata per un altro paese.',
+    countryOther: 'La versione per il tuo paese',
   },
   form: {
     name: 'Nome',

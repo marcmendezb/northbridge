@@ -2,19 +2,20 @@
 import Logo from '../brand/Logo.astro';
 import Button from '../ui/Button.astro';
 import { useI18n } from '../../i18n';
-import {
-  getBookingCta,
-  getLegalLinks,
-  getMainNav,
-  getResourceLinks,
-  getServiceLinks,
-  site,
-} from '../../lib/site';
+import { getBookingCta, getLegalLinks, getMainNav, getServiceLinks, site } from '../../lib/site';
+import { entryKey, getArticles, guideCountries } from '../../lib/content';
 const { t, lp, locale } = useI18n(Astro.currentLocale);
 const bookingCta = getBookingCta(locale);
 const mainNav = getMainNav(locale);
 const serviceLinks = getServiceLinks(locale);
-const resourceLinks = getResourceLinks(locale);
+/** Las guías del país activo (o las suizas si aún no tiene): una variante por país con `data-cc`. */
+const guides = await getArticles(locale);
+const shownIn = guideCountries(guides);
+const resourceLinks = guides.map((g) => ({
+  href: lp(`/recursos/${entryKey(g)}`),
+  label: g.data.title,
+  cc: (shownIn.get(g.id) ?? []).join(' '),
+}));
 const legalLinks = getLegalLinks(locale);
 
 const year = new Date().getFullYear();
@@ -22,7 +23,8 @@ const companyLinks = [
   ...mainNav.filter((l) => l.href !== lp('/servicios') && l.href !== lp('/recursos')),
   { href: bookingCta.href, label: t('nav.freeConsultation') },
 ];
-const columns = [
+type FooterLink = { href: string; label: string; cc?: string };
+const columns: { id: string; title: string; links: FooterLink[] }[] = [
   { id: 'services', title: t('footer.services'), links: serviceLinks },
   {
     id: 'resources',
@@ -59,7 +61,7 @@ const columns = [
             </h2>
             <ul class="m-0 flex list-none flex-col gap-1 p-0">
               {c.links.map((l) => (
-                <li>
+                <li data-cc={l.cc}>
                   <a class="nb-footer__link" href={l.href}>
                     {l.label}
                   </a>

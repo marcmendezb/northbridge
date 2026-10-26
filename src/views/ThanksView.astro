@@ -3,10 +3,15 @@ import BaseLayout from '../layouts/BaseLayout.astro';
 import BridgeMark from '../components/brand/BridgeMark.astro';
 import Arrow from '../components/brand/Arrow.astro';
 import { localeMeta, useI18n } from '../i18n';
+import { entryKey, getArticles, guideCountries } from '../lib/content';
 
 const { t, tRaw, lp, locale } = useI18n(Astro.currentLocale);
 const next = tRaw<string[]>('thanks.next');
 const nextDay = t('thanks.nextDay');
+/** El calendario fiscal del país activo (o el suizo si aún no tiene). */
+const guides = await getArticles(locale);
+const shownIn = guideCountries(guides);
+const calendars = guides.filter((g) => g.data.topic === 'calendario');
 ---
 
 <BaseLayout title={t('thanks.seoTitle')} noindex overlayHeader>
@@ -46,9 +51,11 @@ const nextDay = t('thanks.nextDay');
 
       <div class="nb-thanks__more">
         <p class="nb-thanks__h">{t('thanks.meanwhile')}</p>
-        <a href={lp('/recursos/calendario-fiscal-para-pymes')}>
-          {t('thanks.readGuide')} <Arrow />
-        </a>
+        {calendars.map((g) => (
+          <a href={lp(`/recursos/${entryKey(g)}`)} data-cc={(shownIn.get(g.id) ?? []).join(' ')}>
+            {t('thanks.readGuide')} <Arrow />
+          </a>
+        ))}
         <a href={lp('/calculadora')}>
           {t('thanks.tryCalculator')} <Arrow />
         </a>

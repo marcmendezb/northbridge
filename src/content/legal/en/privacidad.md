@@ -1,6 +1,6 @@
 ---
-title: "Privacy policy"
-description: "What data we process on this website, why, for how long and how to exercise your rights under Swiss data protection law."
+title: 'Privacy policy'
+description: 'What data we process on this website, why, for how long and how to exercise your rights under Swiss data protection law.'
 updatedAt: 2026-10-26
 ---
 

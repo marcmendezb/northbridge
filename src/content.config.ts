@@ -65,6 +65,9 @@ const equipo = defineCollection({
 });
 
 export const blogCategories = ['constitucion', 'fiscal', 'startups', 'contabilidad'] as const;
+/** Tema común a las versiones de una guía en cada país (enlaza las equivalentes). */
+export const blogTopics = ['constitucion', 'calendario', 'errores'] as const;
+export const blogCountries = ['CH', 'ES', 'DE', 'FR', 'IT'] as const;
 
 /** Artículos de Recursos (docs/09). `author` es la clave del archivo de equipo (sin idioma). */
 const blog = defineCollection({
@@ -73,6 +76,9 @@ const blog = defineCollection({
     title: z.string(),
     description: z.string(),
     category: z.enum(blogCategories),
+    /** País al que se refiere la guía: cada guía existe en una versión por país. */
+    country: z.enum(blogCountries),
+    topic: z.enum(blogTopics),
     publishedAt: z.coerce.date(),
     updatedAt: z.coerce.date().optional(),
     /** Fecha en que se comprobaron los datos legales y fiscales (DECISIONES.md). */

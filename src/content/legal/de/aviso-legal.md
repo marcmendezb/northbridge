@@ -1,6 +1,6 @@
 ---
-title: "Impressum"
-description: "Angaben zu Northbridge Advisory, Verantwortliche für den Inhalt und Nutzungsbedingungen dieser Website."
+title: 'Impressum'
+description: 'Angaben zu Northbridge Advisory, Verantwortliche für den Inhalt und Nutzungsbedingungen dieser Website.'
 updatedAt: 2026-10-26
 ---
 

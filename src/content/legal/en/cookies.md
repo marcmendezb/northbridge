@@ -1,6 +1,6 @@
 ---
-title: "Cookie policy"
-description: "This website uses no tracking cookies and no third-party analytics. Here is what is stored in your browser and when the external calendar loads."
+title: 'Cookie policy'
+description: 'This website uses no tracking cookies and no third-party analytics. Here is what is stored in your browser and when the external calendar loads.'
 updatedAt: 2026-10-26
 ---
 

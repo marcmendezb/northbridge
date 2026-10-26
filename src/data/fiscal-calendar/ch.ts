@@ -1,21 +1,10 @@
-import type { Locale } from '../i18n/locales';
+import type { FiscalEvent } from './types';
 
 /**
- * Calendario fiscal de una pyme de Zúrich con ejercicio igual al año natural (docs/09).
- * Datos estructurados para reutilizarlos en el calendario interactivo de la fase 2.
- * Fuentes y fecha de comprobación: DECISIONES.md y el artículo «calendario-fiscal-para-pymes».
+ * Suiza (cantón de Zúrich). Datos comprobados el 26-10-2026 en fuentes oficiales: ver el artículo
+ * «calendario-fiscal-para-pymes» y DECISIONES.md.
  */
-type Text = Record<Locale, string>;
-export interface FiscalEvent {
-  id: string;
-  /** Mes (1–12) en que vence, para ordenar y agrupar. */
-  month: number;
-  when: Text;
-  what: Text;
-  need: Text;
-}
-
-export const FISCAL_CALENDAR: FiscalEvent[] = [
+export const events: FiscalEvent[] = [
   {
     id: 'ahv-salaries',
     month: 1,

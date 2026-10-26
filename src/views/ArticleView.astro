@@ -13,8 +13,10 @@ import tobias from '../assets/img/about/team/tobias-vogel.jpeg';
 import nora from '../assets/img/about/team/nora-steiner.jpeg';
 import marc from '../assets/img/about/team/marc-bernasconi.jpeg';
 import { useI18n, type MessageKey } from '../i18n';
-import { entryKey, getTeam, readingMinutes } from '../lib/content';
-import { articleCovers } from '../lib/covers';
+import Flag from '../components/brand/Flag.astro';
+import { entryKey, getArticles, getTeam, guideFor, readingMinutes } from '../lib/content';
+import { COUNTRIES, countryName } from '../lib/country';
+import { topicCovers } from '../lib/covers';
 import { formatDate } from '../lib/format';
 import { site } from '../lib/site';
 
@@ -36,7 +38,12 @@ const portraits: Record<string, ImageMetadata> = {
   'marc-bernasconi': marc,
 };
 const minutes = readingMinutes(entry.body);
-const cover = articleCovers[entryKey(entry)];
+const cover = topicCovers[d.topic];
+/** Si el país elegido no es el de esta guía y existe su versión, se avisa y se enlaza. */
+const allGuides = await getArticles(locale);
+const otherVersions = COUNTRIES.filter((c) => c !== d.country)
+  .map((c) => ({ c, guide: guideFor(allGuides, d.topic, c) }))
+  .filter((v) => v.guide);
 const url = new URL(lp(`/recursos/${entryKey(entry)}`), Astro.site ?? site.url).toString();
 const jsonLd = {
   '@context': 'https://schema.org',
@@ -97,6 +104,23 @@ const jsonLd = {
       </div>
     </div>
   </header>
+
+  {otherVersions.map((v) => (
+    <div class="nb-container nb-art-country" data-cc={v.c}>
+      <p class="nb-art-country__box">
+        <span class="nb-art-country__this">
+          <Flag country={d.country} />
+          {countryName(d.country, locale)}
+        </span>
+        <span>{t('article.countryNotice')}</span>
+        <a href={lp(`/recursos/${entryKey(v.guide!)}`)} class="nb-art-country__link">
+          <Flag country={v.c} />
+          {t('article.countryOther')}: {v.guide!.data.title}
+          <Arrow />
+        </a>
+      </p>
+    </div>
+  ))}
 
   {cover && (
     <div class="nb-container nb-art-cover">
@@ -198,6 +222,43 @@ const jsonLd = {
     display: grid;
     gap: 20px;
     padding-block: clamp(40px, 6vw, 80px) clamp(72px, 9vw, 136px);
+  }
+  /* Aviso de país: la guía es de otro país y existe la versión del tuyo. */
+  .nb-art-country {
+    margin-top: -24px;
+    margin-bottom: 40px;
+    position: relative;
+    z-index: 1;
+  }
+  .nb-art-country__box {
+    display: flex;
+    flex-wrap: wrap;
+    align-items: center;
+    gap: 8px 16px;
+    margin: 0;
+    padding: 14px 18px;
+    border: 1px solid var(--info-icon);
+    border-radius: var(--radius-button, 4px);
+    background: var(--info-bg);
+    font-size: 0.9375rem;
+    color: var(--info-text);
+  }
+  .nb-art-country__this,
+  .nb-art-country__link {
+    display: inline-flex;
+    align-items: center;
+    gap: 8px;
+  }
+  .nb-art-country__this {
+    font-weight: 600;
+  }
+  .nb-art-country__link {
+    font-weight: 600;
+    color: var(--navy-700);
+    text-decoration: none;
+  }
+  .nb-art-country__link:hover {
+    color: var(--salvia-600);
   }
   /* Portada: a todo el ancho del contenedor, montada sobre el borde de la cabecera. */
   .nb-art-cover {

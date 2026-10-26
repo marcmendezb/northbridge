@@ -1,6 +1,6 @@
 ---
-title: "Política de cookies"
-description: "Esta web no usa cookies de seguimiento ni analítica de terceros. Te explicamos qué se guarda en tu navegador y cuándo se carga el calendario externo."
+title: 'Política de cookies'
+description: 'Esta web no usa cookies de seguimiento ni analítica de terceros. Te explicamos qué se guarda en tu navegador y cuándo se carga el calendario externo.'
 updatedAt: 2026-10-26
 ---
 

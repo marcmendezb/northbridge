@@ -52,13 +52,6 @@ export const getServiceLinks = (locale: Locale = defaultLocale) =>
     label: t(serviceLabelKeys[key], locale),
   }));
 
-export const getResourceLinks = (locale: Locale = defaultLocale) =>
-  [
-    { key: 'como-constituir-una-gmbh-en-zurich', label: t('resourcesList.gmbh', locale) },
-    { key: 'calendario-fiscal-para-pymes', label: t('resourcesList.calendar', locale) },
-    { key: '5-errores-contables-de-las-startups', label: t('resourcesList.errors', locale) },
-  ].map((l) => ({ ...l, href: localizedPath(`/recursos/${l.key}`, locale) }));
-
 export const getLegalLinks = (locale: Locale = defaultLocale) =>
   [
     { href: localizedPath('/privacidad', locale), label: t('footer.privacy', locale) },

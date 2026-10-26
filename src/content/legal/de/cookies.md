@@ -1,6 +1,6 @@
 ---
-title: "Cookie-Richtlinie"
-description: "Diese Website verwendet keine Tracking-Cookies und keine Analyse-Tools von Dritten. Wir erklären dir, was in deinem Browser gespeichert wird und wann der externe Kalender geladen wird."
+title: 'Cookie-Richtlinie'
+description: 'Diese Website verwendet keine Tracking-Cookies und keine Analyse-Tools von Dritten. Wir erklären dir, was in deinem Browser gespeichert wird und wann der externe Kalender geladen wird.'
 updatedAt: 2026-10-26
 ---
 

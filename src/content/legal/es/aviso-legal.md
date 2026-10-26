@@ -1,6 +1,6 @@
 ---
-title: "Aviso legal"
-description: "Datos de identificación de Northbridge Advisory, responsables del contenido y condiciones de uso de esta web."
+title: 'Aviso legal'
+description: 'Datos de identificación de Northbridge Advisory, responsables del contenido y condiciones de uso de esta web.'
 updatedAt: 2026-10-26
 ---
 

@@ -1,13 +1,24 @@
 ---
 import BaseLayout from '../layouts/BaseLayout.astro';
-import PageHeader from '../components/layout/PageHeader.astro';
-import CtaBand from '../components/sections/CtaBand.astro';
+import Breadcrumbs from '../components/layout/Breadcrumbs.astro';
+import Flag from '../components/brand/Flag.astro';
+import ResourcesAsk from '../components/sections/ResourcesAsk.astro';
 import { Picture } from 'astro:assets';
 import Arrow from '../components/brand/Arrow.astro';
-import { articleCovers } from '../lib/covers';
+import { topicCovers } from '../lib/covers';
+import { FISCAL_CALENDARS } from '../data/fiscal-calendar';
+import { COUNTRIES, countryName } from '../lib/country';
+import { localeMeta } from '../i18n';
 import { blogCategories } from '../content.config';
 import { useI18n, type MessageKey } from '../i18n';
-import { entryKey, getArticles, getTeam, readingMinutes } from '../lib/content';
+import {
+  entryKey,
+  getArticles,
+  getTeam,
+  guideCountries,
+  guideFor,
+  readingMinutes,
+} from '../lib/content';
 import { formatDate } from '../lib/format';
 
 const { t, lp, locale } = useI18n(Astro.currentLocale);
@@ -17,14 +28,50 @@ const authorName = (key: string) => team.find((m) => entryKey(m) === key)?.data.
 /** Solo las categorías que tienen artículos (docs/09). */
 const categories = blogCategories.filter((c) => articles.some((a) => a.data.category === c));
 const catLabel = (c: string) => t(`resources.categories.${c}` as MessageKey);
+/** Países en los que se muestra cada guía (la propia o, si falta, la suiza). */
+const shownIn = guideCountries(articles);
+const lastChecked = new Date(Math.max(...articles.map((a) => a.data.checkedAt.getTime())));
+/** «Lo que viene»: calendario de cada país (si aún no tiene, el suizo) y su guía completa. */
+const monthName = new Intl.DateTimeFormat(localeMeta[locale].intl, { month: 'long' });
+const upcoming = COUNTRIES.map((c) => {
+  const country = FISCAL_CALENDARS[c] ? c : 'CH';
+  const guide = guideFor(articles, 'calendario', country);
+  return {
+    c,
+    events: [...(FISCAL_CALENDARS[country] ?? [])].sort((a, b) => a.month - b.month),
+    href: guide ? lp(`/recursos/${entryKey(guide)}`) : lp('/recursos'),
+  };
+});
 ---
 
 <BaseLayout title={t('resources.seoTitle')} description={t('resources.seoDescription')}>
-  <PageHeader
-    title={t('resources.title')}
-    lead={t('resources.lead')}
-    crumbs={[{ label: t('nav.resources') }]}
-  />
+  <header class="nb-rh">
+    <div class="nb-container nb-rh__inner">
+      <div class="nb-rh__main">
+        <Breadcrumbs items={[{ label: t('nav.resources') }]} />
+        <p class="nb-rh__label">{t('resources.title')}</p>
+        <h1 class="nb-rh__title" data-split>
+          {t('resources.heroTitle')}
+        </h1>
+        <p class="nb-rh__lead" data-reveal>
+          {t('resources.heroLead')}
+        </p>
+      </div>
+      <aside class="nb-rh__country" data-reveal>
+        <span class="nb-rh__for">{t('resources.forCountry')}</span>
+        {COUNTRIES.map((c) => (
+          <span class="nb-rh__name" data-cc={c}>
+            <Flag country={c} class="nb-rh__flag" />
+            {countryName(c, locale)}
+          </span>
+        ))}
+        <span class="nb-rh__hint">{t('resources.countryHint')}</span>
+        <span class="nb-rh__checked">
+          {t('article.checked', { date: formatDate(lastChecked, locale) }).split('.')[0]}.
+        </span>
+      </aside>
+    </div>
+  </header>
 
   <section class="nb-res nb-container" data-filter-scope>
     <div class="nb-res__filters" role="group" aria-label={t('resources.filterLabel')} data-filters>
@@ -39,24 +86,27 @@ const catLabel = (c: string) => t(`resources.categories.${c}` as MessageKey);
     </div>
 
     <ul class="nb-res__grid">
-      {articles.map((a, i) => (
+      {articles.map((a) => (
         <li
-          class:list={['nb-res__item', i === 0 && 'nb-res__item--featured']}
+          class:list={['nb-res__item', a.data.featured && 'nb-res__item--featured']}
           data-category={a.data.category}
+          data-cc={(shownIn.get(a.id) ?? []).join(' ')}
           data-reveal
         >
           <a href={lp(`/recursos/${entryKey(a)}`)} class="nb-res__card">
-            {articleCovers[entryKey(a)] && (
+            {topicCovers[a.data.topic] && (
               <span class="nb-res__cover">
                 <Picture
-                  src={articleCovers[entryKey(a)]}
+                  src={topicCovers[a.data.topic]}
                   formats={['avif', 'webp']}
                   widths={[480, 800, 1200]}
                   sizes={
-                    i === 0 ? '(min-width: 768px) 50vw, 100vw' : '(min-width: 768px) 45vw, 100vw'
+                    a.data.featured
+                      ? '(min-width: 768px) 50vw, 100vw'
+                      : '(min-width: 768px) 45vw, 100vw'
                   }
                   alt=""
-                  loading={i === 0 ? 'eager' : 'lazy'}
+                  loading={a.data.featured ? 'eager' : 'lazy'}
                   quality={72}
                   class="nb-res__img"
                 />
@@ -86,10 +136,213 @@ const catLabel = (c: string) => t(`resources.categories.${c}` as MessageKey);
     <p class="sr-only" aria-live="polite" data-filter-status></p>
   </section>
 
-  <CtaBand title={t('resources.ctaTitle')} text={t('resources.ctaText')} />
+  <section class="nb-next" aria-labelledby="next-title">
+    <div class="nb-container nb-next__inner">
+      <div class="nb-next__head">
+        <p class="nb-next__label">{t('resources.upcomingLabel')}</p>
+        <h2 class="nb-next__title" id="next-title" data-split>
+          {t('resources.upcomingTitle')}
+        </h2>
+        <p class="nb-next__note" data-reveal>
+          {t('resources.upcomingNote')}
+        </p>
+      </div>
+      {upcoming.map((u) => (
+        <div class="nb-next__country" data-cc={u.c} data-upcoming>
+          <ol class="nb-next__list">
+            {u.events.map((e, i) => (
+              <li class="nb-next__item" data-month={e.month} hidden={i > 3 ? true : undefined}>
+                <span class="nb-next__month">
+                  {monthName.format(new Date(2026, e.month - 1, 1))}
+                </span>
+                <span class="nb-next__what">{e.what[locale]}</span>
+                <span class="nb-next__when">{e.when[locale]}</span>
+              </li>
+            ))}
+          </ol>
+          <a href={u.href} class="nb-next__link">
+            {t('resources.upcomingLink')} <Arrow />
+          </a>
+        </div>
+      ))}
+    </div>
+  </section>
+
+  <ResourcesAsk />
 </BaseLayout>
 
 <style is:global>
+  /* ── Cabecera editorial ── */
+  .nb-rh {
+    background: var(--white);
+    border-bottom: 1px solid var(--piedra-200);
+  }
+  .nb-rh__inner {
+    display: grid;
+    gap: 40px;
+    padding-block: clamp(32px, 5vw, 72px) clamp(40px, 6vw, 88px);
+  }
+  @media (min-width: 1024px) {
+    .nb-rh__inner {
+      grid-template-columns: minmax(0, 1.6fr) minmax(0, 0.8fr);
+      align-items: end;
+      gap: 80px;
+    }
+  }
+  .nb-rh__main {
+    display: grid;
+    gap: 20px;
+  }
+  .nb-rh__label,
+  .nb-next__label {
+    margin: 12px 0 0;
+    font-size: 0.75rem;
+    font-weight: 600;
+    letter-spacing: 0.16em;
+    text-transform: uppercase;
+    color: var(--salvia-600);
+  }
+  .nb-rh__title {
+    margin: 0;
+    max-width: 12ch;
+    font-size: clamp(2.75rem, 1rem + 5.4vw, 6.5rem);
+    font-weight: 300;
+    line-height: 0.96;
+    letter-spacing: -0.03em;
+  }
+  .nb-rh__lead {
+    margin: 0;
+    max-width: 36rem;
+    font-size: 1.1875rem;
+    line-height: 1.55;
+    color: var(--piedra-800);
+  }
+  /* El país activo: bandera y nombre, como en el selector del header. */
+  .nb-rh__country {
+    display: grid;
+    gap: 8px;
+    padding-top: 20px;
+    border-top: 1.5px solid var(--navy-800);
+  }
+  .nb-rh__for {
+    font-size: 0.75rem;
+    font-weight: 600;
+    letter-spacing: 0.14em;
+    text-transform: uppercase;
+    color: var(--piedra-600);
+  }
+  .nb-rh__name {
+    display: inline-flex;
+    align-items: center;
+    gap: 14px;
+    font-family: var(--font-display);
+    font-size: clamp(2rem, 1rem + 2.4vw, 3rem);
+    font-weight: 300;
+    line-height: 1.1;
+    color: var(--navy-800);
+  }
+  .nb-rh__name .nb-flag {
+    width: 30px;
+    height: 20px;
+  }
+  .nb-rh__name .nb-flag--square {
+    width: 20px;
+    margin-inline: 5px;
+  }
+  .nb-rh__hint,
+  .nb-rh__checked {
+    font-size: 0.875rem;
+    color: var(--piedra-600);
+  }
+
+  /* ── Lo que viene ── */
+  .nb-next {
+    padding-block: var(--section-y);
+    background: var(--piedra-100);
+  }
+  .nb-next__inner {
+    display: grid;
+    gap: 40px;
+  }
+  @media (min-width: 1024px) {
+    .nb-next__inner {
+      grid-template-columns: minmax(0, 0.8fr) minmax(0, 1.6fr);
+      gap: 80px;
+      align-items: start;
+    }
+  }
+  .nb-next__head {
+    display: grid;
+    gap: 12px;
+  }
+  .nb-next__title {
+    margin: 0;
+    font-size: clamp(2.25rem, 1rem + 3vw, 3.75rem);
+    font-weight: 300;
+    line-height: 1.05;
+  }
+  .nb-next__note {
+    margin: 0;
+    color: var(--piedra-700);
+  }
+  .nb-next__country {
+    display: grid;
+    gap: 24px;
+  }
+  .nb-next__list {
+    margin: 0;
+    padding: 0;
+    list-style: none;
+    border-top: 1.5px solid var(--navy-800);
+  }
+  .nb-next__item {
+    display: grid;
+    grid-template-columns: 9rem minmax(0, 1fr);
+    gap: 4px 24px;
+    padding-block: 20px;
+    border-bottom: 1px solid var(--piedra-300);
+  }
+  .nb-next__item[hidden] {
+    display: none;
+  }
+  .nb-next__month {
+    grid-row: span 2;
+    font-family: var(--font-display);
+    font-size: clamp(1.5rem, 1rem + 1vw, 2rem);
+    font-weight: 300;
+    line-height: 1.1;
+    color: var(--navy-800);
+    text-transform: capitalize;
+  }
+  .nb-next__what {
+    font-weight: 600;
+    color: var(--navy-800);
+  }
+  .nb-next__when {
+    font-size: 0.9375rem;
+    color: var(--piedra-700);
+  }
+  @media (max-width: 559px) {
+    .nb-next__item {
+      grid-template-columns: minmax(0, 1fr);
+    }
+    .nb-next__month {
+      grid-row: auto;
+    }
+  }
+  .nb-next__link {
+    display: inline-flex;
+    align-items: center;
+    gap: 8px;
+    min-height: 44px;
+    font-weight: 600;
+    color: var(--navy-600);
+    text-decoration: none;
+  }
+  .nb-next__link:hover {
+    color: var(--salvia-600);
+  }
+
   .nb-res {
     display: grid;
     gap: 32px;
@@ -297,14 +550,28 @@ const catLabel = (c: string) => t(`resources.categories.${c}` as MessageKey);
       btn.addEventListener('click', () => {
         const value = btn.dataset.filter;
         for (const b of buttons) b.setAttribute('aria-pressed', String(b === btn));
-        let shown = 0;
-        for (const item of items) {
-          const visible = value === 'all' || item.dataset.category === value;
-          item.hidden = !visible;
-          if (visible) shown++;
-        }
+        for (const item of items)
+          item.hidden = !(value === 'all' || item.dataset.category === value);
+        // Solo cuentan las guías del país activo (las demás están ocultas por CSS).
+        const shown = items.filter((item) => item.offsetParent !== null).length;
         if (status) status.textContent = `${btn.textContent?.trim()}: ${shown}`;
       });
     }
+  });
+
+  // «Lo que viene»: los cuatro próximos vencimientos a partir del mes actual (con vuelta al año).
+  const month = new Date().getMonth() + 1;
+  document.querySelectorAll<HTMLElement>('[data-upcoming]').forEach((block) => {
+    const list = block.querySelector('ol');
+    const items = [...block.querySelectorAll<HTMLElement>('[data-month]')];
+    if (!list || !items.length) return;
+    const ordered = [
+      ...items.filter((i) => Number(i.dataset.month) >= month),
+      ...items.filter((i) => Number(i.dataset.month) < month),
+    ];
+    ordered.forEach((item, i) => {
+      item.hidden = i > 3;
+      list.append(item);
+    });
   });
 </script>

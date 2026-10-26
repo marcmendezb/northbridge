@@ -1,6 +1,6 @@
 ---
-title: "Datenschutzerklärung"
-description: "Welche Daten wir auf dieser Website bearbeiten, wofür, wie lange und wie du deine Rechte nach dem Schweizer Datenschutzgesetz ausübst."
+title: 'Datenschutzerklärung'
+description: 'Welche Daten wir auf dieser Website bearbeiten, wofür, wie lange und wie du deine Rechte nach dem Schweizer Datenschutzgesetz ausübst.'
 updatedAt: 2026-10-26
 ---
 

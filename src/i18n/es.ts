@@ -480,6 +480,29 @@ export const es = {
     count: '{n} guías',
     ctaTitle: '¿Tu caso no está en ninguna guía?',
     ctaText: 'Cuéntanoslo en 20 minutos. Te decimos qué hacer y cuánto cuesta.',
+    heroTitle: 'Guías prácticas, sin jerga.',
+    heroLead:
+      'Escritas por quien hace este trabajo cada día, con cifras y plazos comprobados en fuentes oficiales.',
+    forCountry: 'Guías para',
+    countryHint: 'Cambia el país en el menú de idioma, arriba.',
+    upcomingLabel: 'Lo que viene',
+    upcomingTitle: 'Los próximos vencimientos',
+    upcomingNote:
+      'Para una pyme con el ejercicio igual al año natural. Te avisamos antes de cada uno.',
+    upcomingLink: 'Ver el calendario completo',
+    askLabel: 'Pregúntanos',
+    askText:
+      'Escríbenos tu pregunta tal como te la harías a ti. Te responde la persona que lleva ese tema, antes de las 12:00 del siguiente día laborable.',
+    askField: 'Tu pregunta',
+    askExamples: [
+      '¿Tengo que darme de alta en el IVA?',
+      '¿Me conviene una GmbH o una empresa individual?',
+      '¿Qué pasa si presento tarde la declaración?',
+      '¿Cómo me pago un salario como socio?',
+    ],
+    askSubmit: 'Enviar mi pregunta',
+    askOr: 'O resuélvelo en 20 minutos',
+    askTeam: 'Responde quien lleva el tema',
   },
   article: {
     by: 'Por {name}',
@@ -494,6 +517,8 @@ export const es = {
     ctaText: 'En 20 minutos te decimos qué necesitas y cuánto cuesta. Sin compromiso.',
     checked:
       'Datos comprobados en fuentes oficiales el {date}. Cambian cada año: confírmalos antes de actuar.',
+    countryNotice: 'Esta guía está pensada para otro país.',
+    countryOther: 'La versión para tu país',
   },
   form: {
     name: 'Nombre',

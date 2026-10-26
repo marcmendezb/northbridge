@@ -57,7 +57,10 @@ export async function getStaticPaths() {
         props: {
           view: 'article' as const,
           entry,
-          related: articles.filter((a) => a.id !== entry.id).slice(0, 2),
+          // Sigue leyendo: otras guías del mismo país.
+          related: articles
+            .filter((a) => a.id !== entry.id && a.data.country === entry.data.country)
+            .slice(0, 2),
         },
       })),
       ...legal.map((entry) => ({

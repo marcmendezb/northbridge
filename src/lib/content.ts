@@ -1,5 +1,6 @@
 import { getCollection, type CollectionEntry } from 'astro:content';
 import type { Locale } from '../i18n';
+import { COUNTRIES, type Country } from './country';
 
 /** Clave estable de una entrada (nombre del archivo, igual en todos los idiomas). */
 export const entryKey = (entry: { id: string }) => entry.id.split('/').slice(1).join('/');
@@ -40,3 +41,22 @@ export async function getLegalPages(locale: Locale): Promise<CollectionEntry<'le
 /** Minutos de lectura (230 palabras por minuto, mínimo 1). */
 export const readingMinutes = (body = '') =>
   Math.max(1, Math.round(body.split(/\s+/).filter(Boolean).length / 230));
+
+/**
+ * Guías por país: cada país ve las suyas y, si aún no tiene versión propia de un tema, la de Suiza.
+ * Devuelve, para cada guía, los países en los que se muestra (para `data-cc`).
+ */
+export function guideCountries(articles: CollectionEntry<'blog'>[]): Map<string, Country[]> {
+  const shown = new Map<string, Country[]>();
+  for (const c of COUNTRIES) {
+    const own = articles.filter((a) => a.data.country === c);
+    const swiss = articles.filter((a) => a.data.country === 'CH');
+    const list = [...own, ...swiss.filter((s) => !own.some((o) => o.data.topic === s.data.topic))];
+    for (const a of list) shown.set(a.id, [...(shown.get(a.id) ?? []), c]);
+  }
+  return shown;
+}
+
+/** La versión de una guía (mismo tema) para otro país, si existe. */
+export const guideFor = (articles: CollectionEntry<'blog'>[], topic: string, country: Country) =>
+  articles.find((a) => a.data.topic === topic && a.data.country === country);

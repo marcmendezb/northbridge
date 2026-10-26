@@ -1,6 +1,6 @@
 ---
-title: "Politique en matière de cookies"
-description: "Ce site n’utilise ni cookies de suivi ni outils d’analyse tiers. Nous vous expliquons ce qui est enregistré dans votre navigateur et quand le calendrier externe est chargé."
+title: 'Politique en matière de cookies'
+description: 'Ce site n’utilise ni cookies de suivi ni outils d’analyse tiers. Nous vous expliquons ce qui est enregistré dans votre navigateur et quand le calendrier externe est chargé.'
 updatedAt: 2026-10-26
 ---
 

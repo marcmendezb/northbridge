@@ -1,6 +1,6 @@
 ---
-title: "Política de privacidad"
-description: "Qué datos tratamos en esta web, para qué, durante cuánto tiempo y cómo ejercer tus derechos según la ley suiza de protección de datos."
+title: 'Política de privacidad'
+description: 'Qué datos tratamos en esta web, para qué, durante cuánto tiempo y cómo ejercer tus derechos según la ley suiza de protección de datos.'
 updatedAt: 2026-10-26
 ---
 

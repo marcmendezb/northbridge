@@ -1,6 +1,6 @@
 ---
-title: "Mentions légales"
-description: "Coordonnées de Northbridge Advisory, responsables du contenu et conditions d’utilisation de ce site."
+title: 'Mentions légales'
+description: 'Coordonnées de Northbridge Advisory, responsables du contenu et conditions d’utilisation de ce site.'
 updatedAt: 2026-10-26
 ---
 

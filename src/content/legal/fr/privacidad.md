@@ -1,6 +1,6 @@
 ---
-title: "Politique de confidentialité"
-description: "Quelles données nous traitons sur ce site, dans quel but, pendant combien de temps et comment exercer vos droits selon la loi suisse sur la protection des données."
+title: 'Politique de confidentialité'
+description: 'Quelles données nous traitons sur ce site, dans quel but, pendant combien de temps et comment exercer vos droits selon la loi suisse sur la protection des données.'
 updatedAt: 2026-10-26
 ---
 

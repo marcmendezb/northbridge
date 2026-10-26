@@ -481,6 +481,29 @@ export const de: Messages = {
     count: '{n} Ratgeber',
     ctaTitle: 'Dein Fall steht in keinem Ratgeber?',
     ctaText: 'Erzähl uns in 20 Minuten davon. Wir sagen dir, was zu tun ist und was es kostet.',
+    heroTitle: 'Praktische Ratgeber, ohne Fachjargon.',
+    heroLead:
+      'Geschrieben von denen, die diese Arbeit jeden Tag machen, mit Zahlen und Fristen aus offiziellen Quellen.',
+    forCountry: 'Ratgeber für',
+    countryHint: 'Das Land wechselst du oben im Sprachmenü.',
+    upcomingLabel: 'Als Nächstes',
+    upcomingTitle: 'Die nächsten Fristen',
+    upcomingNote:
+      'Für ein KMU mit Geschäftsjahr gleich Kalenderjahr. Wir erinnern dich vor jeder Frist.',
+    upcomingLink: 'Ganzer Kalender',
+    askLabel: 'Frag uns',
+    askText:
+      'Schreib deine Frage so, wie du sie dir selbst stellen würdest. Es antwortet die Person, die das Thema betreut, bis 12:00 Uhr am nächsten Arbeitstag.',
+    askField: 'Deine Frage',
+    askExamples: [
+      'Muss ich mich für die MWST anmelden?',
+      'Lohnt sich für mich eine GmbH oder eine Einzelfirma?',
+      'Was passiert, wenn ich die Steuererklärung zu spät einreiche?',
+      'Wie zahle ich mir als Gesellschafter einen Lohn?',
+    ],
+    askSubmit: 'Frage senden',
+    askOr: 'Oder kläre es in 20 Minuten',
+    askTeam: 'Es antwortet, wer das Thema betreut',
   },
   article: {
     by: 'Von {name}',
@@ -495,6 +518,8 @@ export const de: Messages = {
     ctaText: 'In 20 Minuten sagen wir dir, was du brauchst und was es kostet. Unverbindlich.',
     checked:
       'Angaben am {date} in offiziellen Quellen geprüft. Sie ändern sich jedes Jahr: Prüfe sie, bevor du handelst.',
+    countryNotice: 'Dieser Ratgeber ist für ein anderes Land geschrieben.',
+    countryOther: 'Die Version für dein Land',
   },
   form: {
     name: 'Name',
