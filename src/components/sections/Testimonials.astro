@@ -1,0 +1,206 @@
+---
+import { getCollection } from 'astro:content';
+import Section from '../ui/Section.astro';
+import { t } from '../../i18n';
+
+const items = (await getCollection('testimonios')).sort((a, b) => a.data.order - b.data.order);
+---
+
+<Section
+  tone="piedra"
+  label={t('home.testimonials.label')}
+  title={t('home.testimonials.title')}
+  rule
+>
+  <div
+    data-carousel
+    role="region"
+    aria-roledescription="carrusel"
+    aria-label={t('home.testimonials.region')}
+    data-label-pause={t('home.testimonials.pause')}
+    data-label-play={t('home.testimonials.play')}
+  >
+    <ul class="nb-slides m-0 list-none p-0" aria-live="off">
+      {items.map((it, i) => (
+        <li class="nb-slide" data-active={i === 0 ? '' : undefined}>
+          <figure class="m-0 flex h-full flex-col gap-6 rounded-card border border-piedra-200 bg-white p-8">
+            <blockquote class="m-0 font-serif text-[1.375rem] leading-snug font-light text-navy-800">
+              <p class="m-0">«{it.data.quote}»</p>
+            </blockquote>
+            <figcaption class="mt-auto text-sm text-piedra-700">
+              <span class="block font-semibold text-navy-800">{it.data.author}</span>
+              {it.data.role}, {it.data.company}
+            </figcaption>
+          </figure>
+        </li>
+      ))}
+    </ul>
+
+    <div class="nb-controls mt-8 items-center gap-4">
+      <button
+        type="button"
+        class="nb-pause t-small inline-flex min-h-11 items-center gap-2 rounded-button px-2 font-semibold !text-navy-600 hover:!text-salvia-600"
+        aria-pressed="false"
+      >
+        <svg
+          viewBox="0 0 16 16"
+          width="16"
+          height="16"
+          fill="none"
+          stroke="currentColor"
+          stroke-width="1.5"
+          aria-hidden="true"
+        >
+          <path class="nb-pause__pause" d="M5 3v10M11 3v10" />
+          <path class="nb-pause__play" d="M5 3l8 5-8 5z" />
+        </svg>
+        <span class="nb-pause__label">{t('home.testimonials.pause')}</span>
+      </button>
+      <ul class="m-0 flex list-none gap-1 p-0">
+        {items.map((_, i) => (
+          <li>
+            <button
+              type="button"
+              class="nb-dot"
+              data-index={i}
+              aria-label={`${t('home.testimonials.goTo')} ${i + 1}`}
+              aria-current={i === 0 ? 'true' : undefined}
+            >
+              <span aria-hidden="true"></span>
+            </button>
+          </li>
+        ))}
+      </ul>
+    </div>
+  </div>
+</Section>
+
+<style is:global>
+  /* Sin JS: tres tarjetas visibles. Con JS: fundido cruzado (700 ms). */
+  .nb-slides {
+    display: grid;
+    gap: 1.5rem;
+  }
+  @media (min-width: 768px) {
+    .nb-slides {
+      grid-template-columns: repeat(3, 1fr);
+    }
+  }
+  .nb-controls {
+    display: none;
+  }
+  .js .nb-controls {
+    display: flex;
+  }
+  .js .nb-slides {
+    grid-template-columns: 1fr;
+    max-width: 52rem;
+  }
+  .js .nb-slide {
+    grid-area: 1 / 1;
+    opacity: 0;
+    visibility: hidden;
+    transition:
+      opacity 700ms var(--ease-in-out),
+      visibility 0s linear 700ms;
+  }
+  .js .nb-slide[data-active] {
+    opacity: 1;
+    visibility: visible;
+    transition:
+      opacity 700ms var(--ease-in-out),
+      visibility 0s;
+  }
+  .nb-pause__play {
+    display: none;
+  }
+  .nb-pause[aria-pressed='true'] .nb-pause__play {
+    display: inline;
+  }
+  .nb-pause[aria-pressed='true'] .nb-pause__pause {
+    display: none;
+  }
+  .nb-dot {
+    display: inline-flex;
+    width: 44px;
+    height: 44px;
+    align-items: center;
+    justify-content: center;
+  }
+  .nb-dot span {
+    display: block;
+    width: 24px;
+    height: 0;
+    border-top: 1.5px solid var(--piedra-400);
+    transition: border-color var(--dur-fast) var(--ease-out);
+  }
+  .nb-dot[aria-current='true'] span {
+    border-top-color: var(--navy-800);
+  }
+  .nb-dot:hover span {
+    border-top-color: var(--salvia-600);
+  }
+  @media (prefers-reduced-motion: reduce) {
+    .nb-pause {
+      display: none;
+    }
+  }
+</style>
+
+<script>
+  const root = document.querySelector<HTMLElement>('[data-carousel]');
+  if (root) {
+    const slides = Array.from(root.querySelectorAll<HTMLElement>('.nb-slide'));
+    const dots = Array.from(root.querySelectorAll<HTMLButtonElement>('.nb-dot'));
+    const pause = root.querySelector<HTMLButtonElement>('.nb-pause')!;
+    const label = pause.querySelector<HTMLElement>('.nb-pause__label')!;
+    const live = root.querySelector<HTMLElement>('.nb-slides')!;
+    const reduce = matchMedia('(prefers-reduced-motion: reduce)');
+    let index = 0;
+    let userPaused = false;
+    let hovering = false;
+    let timer: number | undefined;
+
+    const show = (i: number) => {
+      index = (i + slides.length) % slides.length;
+      slides.forEach((s, n) => s.toggleAttribute('data-active', n === index));
+      dots.forEach((d, n) =>
+        n === index ? d.setAttribute('aria-current', 'true') : d.removeAttribute('aria-current'),
+      );
+    };
+    const running = () => !reduce.matches && !userPaused && !hovering;
+    const sync = () => {
+      window.clearInterval(timer);
+      live.setAttribute('aria-live', running() ? 'off' : 'polite');
+      if (running()) timer = window.setInterval(() => show(index + 1), 8000);
+    };
+
+    pause.addEventListener('click', () => {
+      userPaused = !userPaused;
+      pause.setAttribute('aria-pressed', String(userPaused));
+      label.textContent = (userPaused ? root.dataset.labelPlay : root.dataset.labelPause) ?? '';
+      sync();
+    });
+    dots.forEach((d) =>
+      d.addEventListener('click', () => {
+        show(Number(d.dataset.index));
+        userPaused = true;
+        pause.setAttribute('aria-pressed', 'true');
+        label.textContent = root.dataset.labelPlay ?? '';
+        sync();
+      }),
+    );
+    for (const ev of ['mouseenter', 'focusin'] as const)
+      root.addEventListener(ev, () => {
+        hovering = true;
+        sync();
+      });
+    for (const ev of ['mouseleave', 'focusout'] as const)
+      root.addEventListener(ev, () => {
+        hovering = root.matches(':hover') || root.matches(':focus-within');
+        sync();
+      });
+    reduce.addEventListener('change', sync);
+    sync();
+  }
+</script>

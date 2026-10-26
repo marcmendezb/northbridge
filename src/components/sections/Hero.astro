@@ -1,0 +1,56 @@
+---
+import BridgeMark from '../brand/BridgeMark.astro';
+import Pattern from '../brand/Pattern.astro';
+import Button from '../ui/Button.astro';
+import Container from '../ui/Container.astro';
+import { t } from '../../i18n';
+import { bookingCta } from '../../lib/site';
+import { localizedPath } from '../../i18n';
+---
+
+<section
+  data-hero
+  data-surface="dark"
+  class="relative isolate overflow-hidden bg-navy-800 text-piedra-50"
+>
+  <div data-hero-pattern class="absolute inset-x-0 top-0 -bottom-16 -z-10">
+    <Pattern tone="dark" mask="left" class="h-full" />
+  </div>
+
+  <!-- El puente como estructura gráfica del hero: arco ampliado, trazo fino -->
+  <div class="pointer-events-none absolute right-[-12%] bottom-[-6%] -z-10 w-[88%] text-navy-300 opacity-40 md:right-[-3%] md:bottom-[8%] md:w-[52%] md:opacity-70">
+    <BridgeMark data-hero-mark strokeWidth={0.7} class="h-auto w-full" />
+  </div>
+
+  <Container class="flex min-h-[640px] flex-col justify-center gap-8 pt-[calc(var(--header-h)+48px)] pb-20 md:min-h-[min(760px,92svh)]">
+    <h1 class="t-display m-0 max-w-[12ch] text-white">
+      <span class="block overflow-hidden pb-[0.12em] -mb-[0.12em]">
+        <span data-hero-line class="block">
+          {t('home.hero.line1')}
+        </span>
+      </span>
+      <span class="block overflow-hidden pb-[0.12em] -mb-[0.12em]">
+        <span data-hero-line class="block">
+          {t('home.hero.line2')}
+        </span>
+      </span>
+    </h1>
+    <p
+      data-hero-fade="1.5"
+      class="m-0 max-w-[34rem] font-serif text-[1.375rem] leading-snug font-light text-navy-100 md:text-[1.75rem]"
+    >
+      {t('brand.descriptor')}
+    </p>
+    <div data-hero-fade="1.5" class="flex flex-wrap items-center gap-4">
+      <Button href={bookingCta.href} on="dark" arrow>
+        {t('cta.book')}
+      </Button>
+      <Button href={localizedPath('/calculadora')} variant="secondary">
+        {t('cta.calculate')}
+      </Button>
+    </div>
+    <p data-hero-fade="1.8" class="t-label m-0 !text-salvia-300">
+      {t('home.hero.proof')}
+    </p>
+  </Container>
+</section>

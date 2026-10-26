@@ -27,7 +27,7 @@ const isCurrent = (href: string) => path === href || (href !== '/' && path.start
     </a>
 
     {!minimal && (
-      <nav aria-label={t('nav.main')} class="nb-nav hidden items-center gap-8 md:flex">
+      <nav aria-label={t('nav.main')} class="nb-nav hidden items-center gap-8 lg:flex">
         <ul class="m-0 flex list-none items-center gap-7 p-0">
           {mainNav.map((l) => (
             <li>
@@ -79,7 +79,7 @@ const isCurrent = (href: string) => path === href || (href !== '/' && path.start
   </Container>
 
   {!minimal && (
-    <div id="mobile-menu" class="nb-mobile md:hidden" data-open="false">
+    <div id="mobile-menu" class="nb-mobile lg:hidden" data-open="false">
       <Container>
         <nav aria-label={t('nav.main')} class="py-4">
           <ul class="m-0 flex list-none flex-col p-0">
@@ -170,7 +170,7 @@ const isCurrent = (href: string) => path === href || (href !== '/' && path.start
   .js .nb-menu-btn {
     display: inline-flex;
   }
-  @media (min-width: 768px) {
+  @media (min-width: 1024px) {
     .js .nb-menu-btn {
       display: none;
     }
@@ -274,7 +274,7 @@ const isCurrent = (href: string) => path === href || (href !== '/' && path.start
       });
 
       // Al pasar a escritorio, cerrar el menú.
-      window.matchMedia('(min-width: 768px)').addEventListener('change', (m) => {
+      window.matchMedia('(min-width: 1024px)').addEventListener('change', (m) => {
         if (m.matches) setOpen(false, false);
       });
     }

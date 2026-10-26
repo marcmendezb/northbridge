@@ -31,3 +31,51 @@
   clip-path: inset(50%);
   white-space: nowrap;
 }
+
+/* Estados iniciales ocultos: solo con JS, sin fallo de animación y con movimiento permitido. */
+@media (prefers-reduced-motion: no-preference) {
+  .js:not(.anim-fail) [data-reveal] {
+    opacity: 0;
+    transform: translateY(20px);
+  }
+  .js:not(.anim-fail) [data-hero-fade],
+  .js:not(.anim-fail) [data-hero-pattern] {
+    opacity: 0;
+  }
+  .js:not(.anim-fail) [data-hero-line] {
+    transform: translateY(105%);
+  }
+  .js:not(.anim-fail) [data-hero-mark] path {
+    stroke-dasharray: 1;
+    stroke-dashoffset: 1;
+  }
+  .js:not(.anim-fail) [data-connector-line='h'] {
+    transform: scaleX(0);
+  }
+  .js:not(.anim-fail) [data-connector-line='v'] {
+    transform: scaleY(0);
+  }
+  .js:not(.anim-fail) [data-connector-arch] path {
+    stroke-dasharray: 1;
+    stroke-dashoffset: 1;
+  }
+}
+
+/* Icono que se traza al pasar el ratón por una tarjeta enlace (400 ms). Los trazos de los iconos miden < 80. */
+.nb-trace .nb-icon :is(path, rect, circle, line, polyline) {
+  stroke-dasharray: 80;
+  stroke-dashoffset: 0;
+}
+@media (prefers-reduced-motion: no-preference) {
+  .nb-trace:is(:hover, :focus-visible) .nb-icon :is(path, rect, circle, line, polyline) {
+    animation: nb-trace 400ms var(--ease-in-out);
+  }
+}
+@keyframes nb-trace {
+  from {
+    stroke-dashoffset: 80;
+  }
+  to {
+    stroke-dashoffset: 0;
+  }
+}

@@ -1,0 +1,22 @@
+---
+import Section from '../ui/Section.astro';
+import Button from '../ui/Button.astro';
+import { bookingCta } from '../../lib/site';
+import { t } from '../../i18n';
+
+interface Props {
+  title?: string;
+  text?: string;
+}
+const { title = t('home.cta.title'), text = t('home.cta.text') } = Astro.props;
+---
+
+<Section tone="navy" pattern>
+  <div data-reveal class="flex flex-col items-start gap-6 md:max-w-[40rem]">
+    <h2 class="m-0 text-white">{title}</h2>
+    <p class="m-0 text-lg text-navy-100">{text}</p>
+    <Button href={bookingCta.href} on="dark" arrow>
+      {bookingCta.label}
+    </Button>
+  </div>
+</Section>

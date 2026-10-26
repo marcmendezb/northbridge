@@ -1,12 +1,22 @@
 ---
 import BaseLayout from '../layouts/BaseLayout.astro';
-import Container from '../components/ui/Container.astro';
-import { t } from '../i18n';
+import Hero from '../components/sections/Hero.astro';
+import Proposal from '../components/sections/Proposal.astro';
+import ServicesTeaser from '../components/sections/ServicesTeaser.astro';
+import Stats from '../components/sections/Stats.astro';
+import Process from '../components/sections/Process.astro';
+import CalculatorTeaser from '../components/sections/CalculatorTeaser.astro';
+import Testimonials from '../components/sections/Testimonials.astro';
+import CtaBand from '../components/sections/CtaBand.astro';
 ---
 
-<BaseLayout>
-  <Container class="py-24">
-    <h1>{t('brand.claim')}</h1>
-    <p class="t-lead mt-4">{t('brand.descriptor')}</p>
-  </Container>
+<BaseLayout transparentHeader>
+  <Hero />
+  <Proposal />
+  <ServicesTeaser />
+  <Stats />
+  <Process />
+  <CalculatorTeaser />
+  <Testimonials />
+  <CtaBand />
 </BaseLayout>

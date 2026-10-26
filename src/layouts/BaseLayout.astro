@@ -71,5 +71,17 @@ const canonical = new URL(Astro.url.pathname, Astro.site ?? site.url);
       <slot />
     </main>
     {!hideFooter && <Footer />}
+    <script>
+      // GSAP solo se carga en páginas con escenas, y solo si el usuario admite movimiento.
+      const wantsMotion = !matchMedia('(prefers-reduced-motion: reduce)').matches;
+      if (
+        wantsMotion &&
+        document.querySelector('[data-hero],[data-reveal],[data-count],[data-connector]')
+      ) {
+        import('../components/animations/init')
+          .then((m) => m.initPage())
+          .catch(() => document.documentElement.classList.add('anim-fail'));
+      }
+    </script>
   </body>
 </html>

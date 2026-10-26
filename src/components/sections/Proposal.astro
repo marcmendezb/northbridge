@@ -1,0 +1,19 @@
+---
+import Section from '../ui/Section.astro';
+import { t } from '../../i18n';
+---
+
+<Section label={t('home.proposal.label')} rule>
+  <div class="grid gap-10 md:grid-cols-[1.2fr_1fr] md:gap-16">
+    <p
+      data-reveal
+      class="m-0 font-serif text-[clamp(1.75rem,1.2rem+2vw,2.75rem)] leading-[1.15] font-light tracking-[-0.01em] text-balance"
+    >
+      {t('brand.promise')}
+    </p>
+    <div data-reveal class="flex flex-col gap-4">
+      <p class="t-body m-0">{t('home.proposal.body1')}</p>
+      <p class="t-body m-0">{t('home.proposal.body2')}</p>
+    </div>
+  </div>
+</Section>

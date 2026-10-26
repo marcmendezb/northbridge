@@ -1,0 +1,32 @@
+---
+import Section from '../ui/Section.astro';
+import { t } from '../../i18n';
+
+const stats = [
+  { value: 200, suffix: '+', label: t('home.stats.clients'), count: true },
+  { value: 10, suffix: '+', label: t('home.stats.years'), count: true },
+  { value: 1, suffix: '', label: t('home.stats.contact'), count: false },
+];
+---
+
+<Section label={t('home.stats.label')} title={t('home.stats.title')} rule>
+  <dl class="m-0 grid gap-10 md:grid-cols-3 md:gap-8">
+    {stats.map((s) => (
+      <div data-reveal class="border-t border-piedra-200 pt-6">
+        <dt class="sr-only">{`${s.value}${s.suffix} ${s.label}`}</dt>
+        <dd class="m-0">
+          <p
+            aria-hidden="true"
+            class="t-figure m-0 text-[clamp(4rem,2.5rem+6vw,6rem)] text-navy-800"
+          >
+            <span data-count={s.count ? s.value : undefined}>{s.value}</span>
+            {s.suffix}
+          </p>
+          <p class="t-small m-0 mt-3" aria-hidden="true">
+            {s.label}
+          </p>
+        </dd>
+      </div>
+    ))}
+  </dl>
+</Section>
