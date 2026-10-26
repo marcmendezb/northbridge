@@ -71,5 +71,32 @@ export function aboutScene({ gsap, ScrollTrigger }: AnimationKit) {
     );
   });
 
+  // Cierre: la línea de base se traza y el equipo se levanta sobre ella, pilar a pilar.
+  const meet = document.querySelector<HTMLElement>('[data-meet]');
+  if (meet) {
+    const base = meet.querySelector('[data-meet-base]');
+    const arches = meet.querySelectorAll('[data-meet-arch]');
+    const names = meet.querySelectorAll('[data-meet-name]');
+    const tl = gsap.timeline({
+      scrollTrigger: {
+        trigger: meet.querySelector('.nb-meet__team'),
+        start: 'top 80%',
+        once: true,
+      },
+    });
+    if (base) tl.fromTo(base, { scaleX: 0 }, { scaleX: 1, duration: 1.1, ease: 'power2.inOut' }, 0);
+    tl.fromTo(
+      arches,
+      { yPercent: 101, y: 0 },
+      { yPercent: 0, duration: 1.3, stagger: 0.12, ease: 'expo.out' },
+      0.45,
+    ).fromTo(
+      names,
+      { opacity: 0, y: 8 },
+      { opacity: 1, y: 0, duration: 0.8, stagger: 0.12, ease: 'power3.out' },
+      0.95,
+    );
+  }
+
   ScrollTrigger.refresh();
 }

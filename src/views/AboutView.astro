@@ -5,7 +5,7 @@ import type { ImageMetadata } from 'astro';
 import BaseLayout from '../layouts/BaseLayout.astro';
 import Breadcrumbs from '../components/layout/Breadcrumbs.astro';
 import Arrow from '../components/brand/Arrow.astro';
-import CtaBand from '../components/sections/CtaBand.astro';
+import Button from '../components/ui/Button.astro';
 import office from '../assets/img/about/office/oficina.jpeg';
 import entrance from '../assets/img/about/office/nb-contacto-entrada-01.jpeg';
 import meeting from '../assets/img/about/office/nb-consulta-conversacion-01.jpeg';
@@ -15,7 +15,7 @@ import nora from '../assets/img/about/team/nora-steiner.jpeg';
 import marc from '../assets/img/about/team/marc-bernasconi.jpeg';
 import { useI18n } from '../i18n';
 import { entryKey, getTeam } from '../lib/content';
-import { site } from '../lib/site';
+import { getBookingCta, site } from '../lib/site';
 
 const { t, tRaw, lp, locale } = useI18n(Astro.currentLocale);
 const team = await getTeam(locale);
@@ -31,6 +31,9 @@ const story = tRaw<string[]>('about.story');
 const method = tRaw<{ title: string; text: string }[]>('about.method');
 const principles = tRaw<{ title: string; text: string }[]>('about.principles');
 const facts = tRaw<{ value: string; label: string }[]>('about.facts');
+const bookingCta = getBookingCta(locale);
+const guarantees = tRaw<string[]>('booking.guarantees');
+const tel = `tel:${site.phone.replace(/\s/g, '')}`;
 const yearDigits = String(site.founded).split('');
 /** «200+» → cifra animable y sufijo. */
 const splitFact = (v: string) => {
@@ -135,20 +138,16 @@ const splitFact = (v: string) => {
         <h2 class="nb-meth__title" id="method-title" data-split>
           {t('about.methodTitle')}
         </h2>
-        <span class="nb-meth__logo" aria-hidden="true" data-reveal>
-          <Image
-            src={logoMark}
-            alt=""
-            width={168}
-            densities={[1, 2]}
-            class="nb-meth__logo-mark"
-            loading="lazy"
-          />
-          <span class="nb-meth__logo-text">
-            <span class="nb-meth__logo-name">Northbridge</span>
-            <span class="nb-meth__logo-sub">Advisory</span>
-          </span>
-        </span>
+        <Image
+          src={logoMark}
+          alt=""
+          width={480}
+          densities={[1, 2]}
+          class="nb-meth__symbol"
+          loading="lazy"
+          aria-hidden="true"
+          data-reveal
+        />
       </div>
       <ol class="nb-meth__list" data-method-list>
         {method.map((m) => (
@@ -264,7 +263,70 @@ const splitFact = (v: string) => {
     </div>
   </section>
 
-  <CtaBand title={t('about.ctaTitle')} text={t('about.ctaText')} />
+  <!-- 7 · Cierre: el equipo, en pie como los pilares de un puente, y la consulta -->
+  <section class="nb-meet" data-surface="dark" aria-labelledby="meet-title" data-meet>
+    <div class="nb-container nb-meet__grid">
+      <div class="nb-meet__text">
+        <p class="nb-meet__label">{t('booking.label')}</p>
+        <h2 class="nb-meet__title" id="meet-title" data-split>
+          {t('about.ctaTitle')}
+        </h2>
+        <p class="nb-meet__lead" data-reveal>
+          {t('about.ctaText')}
+        </p>
+        <div class="nb-meet__actions" data-reveal>
+          <Button href={bookingCta.href} on="dark" arrow>
+            {bookingCta.label}
+          </Button>
+          <p class="nb-meet__call">
+            {t('about.ctaCall').split('{phone}')[0]}
+            <a href={tel}>{site.phone}</a>
+            {t('about.ctaCall').split('{phone}')[1]}
+          </p>
+        </div>
+        <ul class="nb-meet__guarantees" data-reveal>
+          {guarantees.map((g) => (
+            <li>
+              <svg viewBox="0 0 16 16" aria-hidden="true">
+                <path d="M2.5 8.5l3.5 3.5 7.5-8" />
+              </svg>
+              {g}
+            </li>
+          ))}
+        </ul>
+      </div>
+
+      <figure class="nb-meet__team">
+        <ul class="nb-meet__piers">
+          {team.map((m, i) => (
+            <li class="nb-meet__pier" style={`--h:${[100, 86, 94, 80][i % 4]}%`}>
+              <span class="nb-meet__mask">
+                <span class="nb-meet__arch" data-meet-arch>
+                  <Picture
+                    src={portraits[entryKey(m)]}
+                    formats={['avif', 'webp']}
+                    widths={[240, 400]}
+                    sizes="(min-width: 1024px) 12vw, 22vw"
+                    alt={m.data.name}
+                    loading="lazy"
+                    quality={72}
+                    class="nb-meet__img"
+                  />
+                </span>
+              </span>
+              <span class="nb-meet__name" data-meet-name>
+                {m.data.name.split(' ')[0]}
+              </span>
+            </li>
+          ))}
+        </ul>
+        <span class="nb-meet__base" aria-hidden="true" data-meet-base></span>
+        <figcaption class="nb-meet__caption" data-reveal>
+          {t('about.ctaPeople')}
+        </figcaption>
+      </figure>
+    </div>
+  </section>
 </BaseLayout>
 
 <style is:global>
@@ -556,44 +618,13 @@ const splitFact = (v: string) => {
     font-weight: 300;
     color: var(--white);
   }
-  /* Logo en negativo (blanco sobre Navy 800, docs/02): el mismo lockup horizontal del header. */
-  .nb-meth__logo {
-    --wm: clamp(34px, 3.4vw, 48px);
-    display: inline-flex;
-    align-items: center;
-    justify-self: start;
-    gap: calc(var(--wm) * 0.34);
-    margin-top: clamp(24px, 4vw, 56px);
-    color: var(--white);
-  }
-  .nb-meth__logo-mark {
+  /* Símbolo en negativo (blanco sobre Navy 800, docs/02), grande: el PNG navy pasa a blanco puro. */
+  .nb-meth__symbol {
     display: block;
-    width: auto;
-    height: calc(var(--wm) * 1.09);
-    /* El símbolo es navy en PNG: se pasa a blanco puro, sin cambiar su forma. */
+    width: clamp(180px, 22vw, 340px);
+    height: auto;
+    margin-top: clamp(32px, 5vw, 72px);
     filter: brightness(0) invert(1);
-  }
-  .nb-meth__logo-text {
-    display: flex;
-    flex-direction: column;
-    gap: calc(var(--wm) * 0.16);
-    white-space: nowrap;
-  }
-  .nb-meth__logo-name {
-    font-family: var(--font-display);
-    font-optical-sizing: auto;
-    font-size: var(--wm);
-    font-weight: 500;
-    line-height: 0.9;
-    letter-spacing: -0.015em;
-  }
-  .nb-meth__logo-sub {
-    font-family: var(--font-sans);
-    font-size: calc(var(--wm) * 0.27);
-    font-weight: 600;
-    line-height: 1;
-    letter-spacing: 0.36em;
-    text-transform: uppercase;
   }
   .nb-meth__list {
     margin: 0;
@@ -750,6 +781,168 @@ const splitFact = (v: string) => {
   }
   .nb-crew__quote p {
     margin: 0;
+  }
+
+  /* ── 7 · Cierre ── */
+  .nb-meet {
+    position: relative;
+    padding-block: var(--section-y);
+    overflow: clip;
+    background: var(--navy-800);
+    color: var(--navy-100);
+  }
+  .nb-meet__grid {
+    display: grid;
+    gap: 64px;
+  }
+  @media (min-width: 1024px) {
+    .nb-meet__grid {
+      grid-template-columns: minmax(0, 1fr) minmax(0, 1.05fr);
+      align-items: end;
+      gap: 80px;
+    }
+  }
+  .nb-meet__text {
+    display: grid;
+    gap: 24px;
+    align-content: end;
+  }
+  .nb-meet__label {
+    margin: 0;
+    font-size: 0.75rem;
+    font-weight: 600;
+    letter-spacing: 0.16em;
+    text-transform: uppercase;
+    color: var(--salvia-300);
+  }
+  .nb-meet__title {
+    margin: 0;
+    max-width: 10ch;
+    font-size: clamp(3rem, 1rem + 5.4vw, 6.5rem);
+    font-weight: 300;
+    line-height: 0.96;
+    letter-spacing: -0.03em;
+    color: var(--white);
+  }
+  .nb-meet__lead {
+    margin: 0;
+    font-family: var(--font-display);
+    font-size: clamp(1.25rem, 1rem + 0.8vw, 1.625rem);
+    line-height: 1.35;
+  }
+  .nb-meet__actions {
+    display: flex;
+    flex-wrap: wrap;
+    align-items: center;
+    gap: 16px 28px;
+    margin-top: 8px;
+  }
+  .nb-meet__call {
+    margin: 0;
+    font-size: 0.9375rem;
+  }
+  .nb-meet__call a {
+    font-weight: 600;
+    color: var(--white);
+    text-decoration: none;
+    white-space: nowrap;
+  }
+  .nb-meet__call a:hover {
+    color: var(--salvia-300);
+  }
+  .nb-meet__guarantees {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 10px 24px;
+    margin: 16px 0 0;
+    padding: 20px 0 0;
+    list-style: none;
+    border-top: 1px solid var(--navy-600);
+    font-size: 0.9375rem;
+    font-weight: 600;
+    color: var(--white);
+  }
+  .nb-meet__guarantees li {
+    display: inline-flex;
+    align-items: center;
+    gap: 8px;
+  }
+  .nb-meet__guarantees svg {
+    width: 16px;
+    height: 16px;
+    fill: none;
+    stroke: var(--salvia-300);
+    stroke-width: 1.5;
+  }
+
+  /* El equipo en pie sobre una línea de base: cuatro arcos de alturas distintas, como pilares. */
+  .nb-meet__team {
+    position: relative;
+    margin: 0;
+  }
+  .nb-meet__piers {
+    display: grid;
+    grid-template-columns: repeat(4, minmax(0, 1fr));
+    align-items: end;
+    gap: clamp(8px, 1.4vw, 20px);
+    height: clamp(260px, 30vw, 440px);
+    margin: 0;
+    padding: 0;
+    list-style: none;
+  }
+  .nb-meet__pier {
+    position: relative;
+    display: grid;
+    height: var(--h);
+  }
+  .nb-meet__mask {
+    display: block;
+    height: 100%;
+    overflow: hidden;
+    border-radius: 9999px 9999px 0 0;
+  }
+  .nb-meet__arch {
+    display: block;
+    height: 100%;
+    overflow: hidden;
+    border-radius: 9999px 9999px 0 0;
+    background: var(--navy-700);
+  }
+  .nb-meet__arch picture {
+    display: contents;
+  }
+  .nb-meet__img {
+    width: 100%;
+    height: 100%;
+    object-fit: cover;
+    object-position: 50% 30%;
+    transition: transform 1400ms var(--ease-out);
+  }
+  .nb-meet__pier:hover .nb-meet__img {
+    transform: scale(1.05);
+  }
+  .nb-meet__name {
+    position: absolute;
+    inset: auto 0 -36px;
+    font-size: 0.8125rem;
+    font-weight: 600;
+    letter-spacing: 0.12em;
+    text-align: center;
+    text-transform: uppercase;
+    color: var(--navy-100);
+  }
+  .nb-meet__base {
+    display: block;
+    height: 1.5px;
+    background: var(--white);
+    transform-origin: left;
+  }
+  .nb-meet__caption {
+    margin-top: 56px;
+    font-family: var(--font-display);
+    font-style: italic;
+    font-size: 1.25rem;
+    color: var(--navy-100);
   }
 
   /* ── 6 · Oficina ── */

@@ -432,6 +432,8 @@ export const it: Messages = {
     specialty: 'Specializzazione',
     ctaTitle: 'Conosciamoci in 20 minuti.',
     ctaText: 'Una conversazione senza impegno. Poi, un prezzo fisso.',
+    ctaPeople: 'Ti risponde una di queste quattro persone.',
+    ctaCall: 'Oppure chiamaci al {phone}.',
     facts: [
       { value: '2014', label: 'Fondata a Zurigo' },
       { value: '200+', label: 'Clienti attivi' },

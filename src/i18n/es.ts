@@ -430,6 +430,8 @@ export const es = {
     specialty: 'Especialidad',
     ctaTitle: 'Conócenos en 20 minutos.',
     ctaText: 'Una conversación sin compromiso. Después, precio cerrado.',
+    ctaPeople: 'Te atiende una de estas cuatro personas.',
+    ctaCall: 'O llámanos al {phone}.',
     facts: [
       { value: '2014', label: 'Fundada en Zúrich' },
       { value: '200+', label: 'Clientes activos' },

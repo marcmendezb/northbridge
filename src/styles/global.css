@@ -149,4 +149,13 @@ html.lenis body {
   .js.motion:not(.anim-fail) [data-crew-arch] {
     clip-path: inset(100% 0 0 0);
   }
+  .js.motion:not(.anim-fail) [data-meet-arch] {
+    transform: translateY(101%);
+  }
+  .js.motion:not(.anim-fail) [data-meet-base] {
+    transform: scaleX(0);
+  }
+  .js.motion:not(.anim-fail) [data-meet-name] {
+    opacity: 0;
+  }
 }

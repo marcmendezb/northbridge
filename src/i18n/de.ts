@@ -431,6 +431,8 @@ export const de: Messages = {
     specialty: 'Fachgebiet',
     ctaTitle: 'Lerne uns in 20 Minuten kennen.',
     ctaText: 'Ein unverbindliches Gespräch. Danach ein Fixpreis.',
+    ctaPeople: 'Dich empfängt eine dieser vier Personen.',
+    ctaCall: 'Oder ruf uns an: {phone}.',
     facts: [
       { value: '2014', label: 'In Zürich gegründet' },
       { value: '200+', label: 'Aktive Kunden' },
