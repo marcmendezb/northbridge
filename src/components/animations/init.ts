@@ -1,6 +1,7 @@
 import { countUp } from './countUp';
 import { drawViaduct } from './drawViaduct';
 import { heroScene } from './heroScene';
+import { journeyScene } from './journeyScene';
 import { mediaReveal } from './mediaReveal';
 import { revealOnScroll } from './revealOnScroll';
 import { splitReveal } from './splitReveal';
@@ -26,6 +27,7 @@ export async function initPage() {
     revealOnScroll(kit);
     countUp(kit);
     drawViaduct(kit);
+    journeyScene(kit);
     mediaReveal(kit);
     void splitReveal(kit);
   });

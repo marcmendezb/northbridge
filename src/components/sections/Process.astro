@@ -1,11 +1,262 @@
 ---
-import Section from '../ui/Section.astro';
-import ProcessSteps from './ProcessSteps.astro';
+/**
+ * «Tres pasos, sin burocracia»: recorrido horizontal anclado (escritorio con movimiento).
+ * Los pasos cruzan la pantalla sobre un tablero que se traza de punta a punta, y cada uno tiene su escena:
+ * reloj de 20 minutos, el símbolo que se cierra (precio cerrado) y un libro de cuentas que se completa.
+ * En móvil, sin JS o con movimiento reducido: pasos apilados con las escenas ya dibujadas.
+ */
 import { useI18n } from '../../i18n';
 const { t, tRaw } = useI18n(Astro.currentLocale);
 const steps = tRaw<{ title: string; text: string }[]>('home.process.steps');
+const visuals = ['timer', 'symbol', 'ledger'] as const;
+const ticks = Array.from({ length: 12 }, (_, i) => {
+  const a = (i / 12) * Math.PI * 2;
+  const p = (r: number) => [120 + r * Math.sin(a), 120 - r * Math.cos(a)].map((n) => n.toFixed(2));
+  const [x1, y1] = p(104);
+  const [x2, y2] = p(i % 3 === 0 ? 114 : 110);
+  return { x1, y1, x2, y2 };
+});
+const rows = [62, 104, 146, 188];
 ---
 
-<Section tone="base" title={t('home.process.title')}>
-  <ProcessSteps steps={steps} />
-</Section>
+<section class="nb-journey" data-journey aria-labelledby="journey-title">
+  <div class="nb-journey__pin" data-journey-pin>
+    <div class="nb-journey__head nb-container">
+      <h2 id="journey-title" class="t-h2-lg m-0" data-split>
+        {t('home.process.title')}
+      </h2>
+      <span class="nb-journey__progress" aria-hidden="true">
+        <span data-journey-progress></span>
+      </span>
+    </div>
+
+    <div class="nb-journey__viewport">
+      <ol class="nb-journey__track" data-journey-track>
+        <span class="nb-journey__deck" data-journey-deck aria-hidden="true"></span>
+        {steps.map((step, i) => (
+          <li class="nb-journey__panel" data-journey-panel data-visual={visuals[i]}>
+            <span class="nb-journey__pier" aria-hidden="true" />
+            <div class="nb-journey__visual" aria-hidden="true">
+              {visuals[i] === 'timer' && (
+                <svg viewBox="0 0 240 240" fill="none">
+                  <circle class="v-base" cx="120" cy="120" r="96" />
+                  {ticks.map((k) => (
+                    <line class="v-tick" x1={k.x1} y1={k.y1} x2={k.x2} y2={k.y2} />
+                  ))}
+                  <circle
+                    class="v-arc"
+                    cx="120"
+                    cy="120"
+                    r="96"
+                    pathLength="1"
+                    transform="rotate(-90 120 120)"
+                  />
+                  <line
+                    class="v-hand"
+                    x1="120"
+                    y1="120"
+                    x2="120"
+                    y2="40"
+                    transform="rotate(120 120 120)"
+                  />
+                  <circle class="v-dot" cx="120" cy="120" r="4" />
+                </svg>
+              )}
+              {visuals[i] === 'symbol' && (
+                <svg viewBox="0 0 240 240" fill="none">
+                  <path class="v-arch" d="M44 212V140A76 76 0 0 1 196 140V212" pathLength="1" />
+                  <path class="v-deck" d="M20 59H220" pathLength="1" />
+                </svg>
+              )}
+              {visuals[i] === 'ledger' && (
+                <svg viewBox="0 0 240 240" fill="none">
+                  <path class="v-frame" d="M16 28H224M16 222H224" />
+                  {rows.map((y) => (
+                    <>
+                      <path class="v-row" d={`M16 ${y}H176`} pathLength="1" />
+                      <path class="v-check" d={`M194 ${y - 2}l7 7l15-15`} pathLength="1" />
+                    </>
+                  ))}
+                </svg>
+              )}
+            </div>
+            <div class="nb-journey__text">
+              <h3 class="nb-journey__title">{step.title}</h3>
+              <p class="nb-journey__body">{step.text}</p>
+            </div>
+          </li>
+        ))}
+      </ol>
+    </div>
+  </div>
+</section>
+
+<style is:global>
+  .nb-journey {
+    position: relative;
+    background: var(--white);
+    color: var(--navy-800);
+  }
+  .nb-journey__pin {
+    padding-block: var(--section-y);
+  }
+  .nb-journey__head {
+    display: flex;
+    align-items: flex-end;
+    justify-content: space-between;
+    gap: 32px;
+  }
+  .nb-journey__progress {
+    display: none;
+    position: relative;
+    width: 160px;
+    height: 1.5px;
+    margin-bottom: 14px;
+    background: var(--piedra-200);
+  }
+  .nb-journey__progress > span {
+    position: absolute;
+    inset: 0;
+    background: var(--navy-800);
+    transform-origin: left;
+  }
+  .nb-journey__viewport {
+    margin-top: clamp(40px, 6vw, 72px);
+  }
+  .nb-journey__track {
+    position: relative;
+    display: grid;
+    gap: 72px;
+    margin: 0;
+    padding: 0 max(var(--header-gutter), (100% - var(--header-max)) / 2);
+    list-style: none;
+  }
+  .nb-journey__deck,
+  .nb-journey__pier {
+    display: none;
+  }
+  .nb-journey__panel {
+    display: grid;
+    gap: 28px;
+    align-content: start;
+  }
+  .nb-journey__visual {
+    width: clamp(168px, 22vw, 300px);
+    aspect-ratio: 1;
+  }
+  .nb-journey__visual svg {
+    width: 100%;
+    height: 100%;
+    overflow: visible;
+  }
+  .nb-journey__title {
+    margin: 0;
+    font-family: var(--font-display);
+    font-optical-sizing: auto;
+    font-size: clamp(2.25rem, 0.75rem + 4.6vw, 6rem);
+    font-weight: 300;
+    line-height: 1.02;
+    letter-spacing: -0.02em;
+    text-wrap: balance;
+    color: var(--navy-800);
+  }
+  .nb-journey__body {
+    max-width: 30ch;
+    margin: 20px 0 0;
+    font-size: clamp(1.0625rem, 0.9rem + 0.4vw, 1.3125rem);
+    line-height: 1.55;
+    color: var(--piedra-700);
+  }
+
+  /* Escenas: trazo uniforme y terminales rectos, como el símbolo. */
+  .nb-journey__visual :is(path, line, circle) {
+    stroke-linecap: butt;
+    stroke-linejoin: miter;
+  }
+  .v-base,
+  .v-frame {
+    stroke: var(--piedra-200);
+    stroke-width: 1.2;
+  }
+  .v-tick {
+    stroke: var(--piedra-300);
+    stroke-width: 1.2;
+  }
+  .v-arc {
+    stroke: var(--navy-800);
+    stroke-width: 5;
+    stroke-dasharray: 1;
+    stroke-dashoffset: 0.6667;
+  }
+  .v-hand {
+    stroke: var(--navy-800);
+    stroke-width: 1.6;
+  }
+  .v-dot {
+    fill: var(--navy-800);
+  }
+  .v-arch,
+  .v-deck {
+    stroke: var(--navy-800);
+    stroke-width: 18;
+  }
+  .v-row {
+    stroke: var(--navy-800);
+    stroke-width: 1.1;
+  }
+  .v-check {
+    stroke: var(--salvia-600);
+    stroke-width: 2;
+  }
+
+  /* ── Escritorio con movimiento: recorrido horizontal anclado ── */
+  @media (min-width: 1024px) {
+    .js.motion:not(.anim-fail) .nb-journey__pin {
+      display: flex;
+      flex-direction: column;
+      justify-content: center;
+      height: 100svh;
+      padding-block: calc(var(--header-h) + 24px) 48px;
+      overflow: hidden;
+    }
+    .js.motion:not(.anim-fail) .nb-journey__progress {
+      display: block;
+    }
+    .js.motion:not(.anim-fail) .nb-journey__track {
+      display: flex;
+      gap: 0;
+      width: max-content;
+      will-change: transform;
+    }
+    .js.motion:not(.anim-fail) .nb-journey__deck {
+      display: block;
+      position: absolute;
+      top: 0;
+      left: 0;
+      right: 0;
+      height: 1.5px;
+      background: var(--navy-800);
+      transform-origin: left;
+    }
+    .js.motion:not(.anim-fail) .nb-journey__panel {
+      position: relative;
+      flex: 0 0 min(80vw, 1240px);
+      grid-template-columns: auto minmax(0, 1fr);
+      align-items: center;
+      gap: clamp(32px, 4vw, 72px);
+      padding: clamp(48px, 8svh, 88px) clamp(48px, 6vw, 112px) 0 0;
+    }
+    .js.motion:not(.anim-fail) .nb-journey__visual {
+      width: min(44svh, 28vw);
+    }
+    .js.motion:not(.anim-fail) .nb-journey__pier {
+      display: block;
+      position: absolute;
+      top: 0;
+      left: 0;
+      width: 1.5px;
+      height: 28px;
+      background: var(--navy-800);
+    }
+  }
+</style>

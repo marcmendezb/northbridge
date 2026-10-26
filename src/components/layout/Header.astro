@@ -1,6 +1,6 @@
 ---
 import { Image, Picture } from 'astro:assets';
-import promoPhoto from '../../assets/img/hero-poster.jpg';
+import promoPhoto from '../../assets/img/home/hero-poster.jpg';
 import Icon from '../brand/Icon.astro';
 import Arrow from '../brand/Arrow.astro';
 import logoMark from '../../assets/brand/logo-header.png';
@@ -560,7 +560,7 @@ const isCurrent = (href: string) => path === href || (href !== '/' && path.start
     min-height: 280px;
     overflow: hidden;
     border-radius: var(--radius-card, 8px);
-    background: var(--navy-800);
+    background: var(--salvia-700);
     color: var(--white);
     text-decoration: none;
     isolation: isolate;
@@ -580,7 +580,8 @@ const isCurrent = (href: string) => path === href || (href !== '/' && path.start
     position: absolute;
     inset: 0;
     z-index: -1;
-    background: rgb(21 39 66 / 0.62);
+    /* Velo verde de acento (Salvia 700): el texto blanco cumple AA también sobre la zona clara de la foto. */
+    background: color-mix(in srgb, var(--salvia-700) 80%, transparent);
   }
   .nb-mega__promo:hover .nb-mega__promo-img {
     transform: scale(1.04);
@@ -603,7 +604,7 @@ const isCurrent = (href: string) => path === href || (href !== '/' && path.start
   }
   .nb-mega__promo-text {
     font-size: 0.9375rem;
-    color: var(--navy-100);
+    color: var(--white);
   }
   .nb-mega__promo-cta {
     margin-top: 12px;
