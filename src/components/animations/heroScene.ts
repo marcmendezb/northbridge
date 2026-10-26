@@ -101,7 +101,7 @@ export function heroScene({ gsap, ScrollTrigger }: AnimationKit) {
         },
         0,
       )
-      .to(introLayer, { opacity: 0, y: -48, ease: 'power1.in', duration: 0.26 }, 0.02)
+      .to(introLayer, { autoAlpha: 0, y: -48, ease: 'power1.in', duration: 0.26 }, 0.02)
       .fromTo(
         promiseParts,
         { opacity: 0, y: 28 },
@@ -111,7 +111,7 @@ export function heroScene({ gsap, ScrollTrigger }: AnimationKit) {
       .fromTo(
         '[data-hero-rule] path',
         { strokeDashoffset: 1 },
-        { strokeDashoffset: 0, duration: 0.3, stagger: 0.1, ease: 'power2.inOut' },
+        { strokeDashoffset: 0, duration: 0.3, ease: 'power2.inOut' },
         0.46,
       )
       .to({}, { duration: 0.001 }, 1);

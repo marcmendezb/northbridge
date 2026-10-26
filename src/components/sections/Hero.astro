@@ -81,28 +81,30 @@ const posterFile = await getImage({ src: heroPoster, format: 'webp', width: 1280
     <!-- La promesa: aparece cuando la foto ya es un arco. Sin JS o con reduced-motion, es el bloque que sigue al hero. -->
     <div class="hero__promise" data-hero-promise>
       <Container class="hero__promise-inner">
+        <p class="hero__eyebrow t-eyebrow m-0">{t('home.proposal.label')}</p>
         <svg
           class="hero__rule"
           data-hero-rule
-          viewBox="0 0 400 20"
-          preserveAspectRatio="xMinYMid meet"
+          viewBox="0 0 400 4"
+          preserveAspectRatio="none"
           fill="none"
           stroke="currentColor"
           stroke-width="1.5"
           aria-hidden="true"
         >
           <path d="M0 2H400" pathLength="1"></path>
-          <path d="M4 20V14A12 12 0 0 1 28 14V20" pathLength="1"></path>
         </svg>
-        <p
-          data-hero-promise-line
-          class="hero__promise-title m-0 font-serif font-light text-navy-800"
-        >
+        <p class="hero__promise-title m-0 font-serif font-light text-navy-800">
           {t('brand.promise')}
         </p>
-        <div data-hero-promise-line class="hero__promise-body flex flex-col gap-4">
-          <p class="t-body m-0">{t('home.proposal.body1')}</p>
+        <div class="hero__promise-body flex flex-col gap-4">
+          <p class="hero__lead m-0">{t('home.proposal.body1')}</p>
           <p class="t-body m-0">{t('home.proposal.body2')}</p>
+        </div>
+        <div class="hero__promise-cta">
+          <Button href={localizedPath('/nosotros')} arrow>
+            {t('home.proposal.cta')}
+          </Button>
         </div>
       </Container>
     </div>
@@ -179,15 +181,22 @@ const posterFile = await getImage({ src: heroPoster, format: 'webp', width: 1280
   .hero__rule {
     display: block;
     width: 100%;
-    max-width: 400px;
-    height: 20px;
+    height: 4px;
     color: var(--navy-800);
   }
   .hero__promise-title {
-    font-size: clamp(1.875rem, 1.2rem + 2.4vw, 2.75rem);
-    line-height: 1.12;
-    letter-spacing: -0.01em;
+    font-size: clamp(2.25rem, 1.1rem + 3.7vw, 4.25rem);
+    line-height: 1.04;
+    letter-spacing: -0.02em;
     text-wrap: balance;
+  }
+  .hero__lead {
+    font-family: var(--font-display);
+    font-optical-sizing: auto;
+    font-size: 1.375rem;
+    font-weight: 300;
+    line-height: 1.4;
+    color: var(--navy-800);
   }
   @media (min-width: 768px) {
     .hero__sub {
@@ -198,7 +207,11 @@ const posterFile = await getImage({ src: heroPoster, format: 'webp', width: 1280
       gap: 64px;
       align-items: end;
     }
-    .hero__rule {
+    .hero__rule,
+    .hero__eyebrow,
+    .hero__promise-title,
+    .hero__promise-body,
+    .hero__promise-cta {
       grid-column: 1 / -1;
     }
   }
@@ -270,18 +283,27 @@ const posterFile = await getImage({ src: heroPoster, format: 'webp', width: 1280
       align-content: center;
     }
     .js.motion:not(.anim-fail) .hero__promise-inner > * {
-      max-width: min(34rem, 100%);
-    }
-    .js.motion:not(.anim-fail) .hero__promise-inner > .hero__rule {
       grid-column: 1;
-      margin-bottom: 28px;
+      max-width: min(38rem, 100%);
     }
-    .js.motion:not(.anim-fail) .hero__promise-inner > .hero__promise-title {
-      grid-column: 1;
+    .js.motion:not(.anim-fail) .hero__eyebrow {
+      margin-bottom: 14px;
     }
-    .js.motion:not(.anim-fail) .hero__promise-inner > .hero__promise-body {
-      grid-column: 1;
-      margin-top: 28px;
+    .js.motion:not(.anim-fail) .hero__rule {
+      margin-bottom: 32px;
+    }
+    .js.motion:not(.anim-fail) .hero__promise-body {
+      margin-top: 32px;
+    }
+    .js.motion:not(.anim-fail) .hero__promise-cta {
+      margin-top: 36px;
+    }
+    /* La capa de entrada, ya invisible, no debe tapar el texto de la promesa (selección y clics). */
+    .js.motion:not(.anim-fail) .hero__intro {
+      pointer-events: none;
+    }
+    .js.motion:not(.anim-fail) .hero__intro a {
+      pointer-events: auto;
     }
     .js.motion:not(.anim-fail) .hero__promise-inner > * {
       opacity: 0;

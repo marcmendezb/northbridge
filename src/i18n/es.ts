@@ -160,6 +160,7 @@ export const es = {
     },
     proposal: {
       label: 'Nuestra promesa',
+      cta: 'Conoce Northbridge',
       body1:
         'Las pymes tenían dos opciones: una gran firma, con su burocracia y sus tarifas, o un servicio básico que se limitaba a presentar papeles.',
       body2:
