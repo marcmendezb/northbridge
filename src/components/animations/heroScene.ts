@@ -39,6 +39,8 @@ export function heroScene({ gsap, ScrollTrigger }: AnimationKit) {
   // ── Arco-portal ──
   const photo = hero.querySelector<HTMLElement>('[data-hero-photo]');
   const introLayer = hero.querySelector<HTMLElement>('.hero__intro');
+  const introText = hero.querySelector<HTMLElement>('.hero__intro-inner');
+  const band = hero.querySelector<HTMLElement>('[data-hero-band]');
   if (!photo || !introLayer) return;
 
   const mm = gsap.matchMedia();
@@ -49,7 +51,9 @@ export function heroScene({ gsap, ScrollTrigger }: AnimationKit) {
     const geometry = () => {
       const w = window.innerWidth;
       const h = window.innerHeight;
-      const edge = Math.max(0, (w - 1280) / 2) + 40; // borde del contenedor (1200 + 2 × 40)
+      // Borde derecho del arco = borde derecho de la barra del header (rejilla compartida).
+      const barEnd = document.querySelector('.nb-bar')?.getBoundingClientRect().right;
+      const edge = barEnd ? w - barEnd : Math.max(0, (w - 1280) / 2) + 40;
       const archW = Math.min(w * 0.4, 520);
       const headerH =
         parseFloat(getComputedStyle(document.documentElement).getPropertyValue('--header-h')) || 96;
@@ -65,6 +69,8 @@ export function heroScene({ gsap, ScrollTrigger }: AnimationKit) {
       const archH = h - top - bottom;
       const scale = Math.max(1, Math.min(archW / (0.3 * iw), archH / (0.62 * ih)));
       return {
+        left,
+        bottom,
         clip: `inset(${top}px ${edge}px ${bottom}px ${left}px round ${archW / 2}px ${archW / 2}px 0px 0px)`,
         origin: `${winX}px ${winY}px`,
         x: left + archW / 2 - winX,
@@ -97,7 +103,11 @@ export function heroScene({ gsap, ScrollTrigger }: AnimationKit) {
         },
         0,
       )
-      .to(introLayer, { autoAlpha: 0, y: -48, ease: 'power1.in', duration: 0.26 }, 0.02)
+      .to(
+        introText ?? introLayer,
+        { autoAlpha: 0, y: -48, ease: 'power1.in', duration: 0.26 },
+        0.02,
+      )
       .fromTo(
         promiseParts,
         { opacity: 0, y: 28 },
@@ -113,9 +123,51 @@ export function heroScene({ gsap, ScrollTrigger }: AnimationKit) {
       .to({}, { duration: 0.001 }, 1);
     // Antes de que la promesa aparezca, la regla está sin trazar.
     gsap.set('[data-hero-rule] path', { strokeDasharray: 1, strokeDashoffset: 1 });
+    // Pie de la imagen: sube con el recorte hasta la base del arco, las credenciales entran en él,
+    // «Desliza» desaparece y la banda pasa a blanco con texto navy.
+    if (band) {
+      const facts = band.querySelector<HTMLElement>('.hero__facts');
+      const cue = band.querySelector<HTMLElement>('.hero__scroll');
+      const token = (name: string) =>
+        getComputedStyle(document.documentElement).getPropertyValue(name).trim();
+      const restLeft = () =>
+        facts ? facts.getBoundingClientRect().left - Number(gsap.getProperty(facts, 'x')) : 0;
+      tl.to(band, { y: () => -geometry().bottom, ease: 'power2.inOut', duration: 0.62 }, 0.04)
+        .to(
+          facts,
+          { x: () => geometry().left + 28 - restLeft(), ease: 'power2.inOut', duration: 0.62 },
+          0.04,
+        )
+        .to(cue, { autoAlpha: 0, duration: 0.12 }, 0)
+        .to(
+          band,
+          {
+            backgroundColor: token('--white'),
+            borderTopColor: token('--white'),
+            '--band-fg': token('--navy-800'),
+            '--band-divider': token('--piedra-200'),
+            duration: 0.1,
+          },
+          0.54,
+        );
+    }
     ScrollTrigger.refresh();
     return () => {
-      gsap.set([photo, introLayer, img, ...promiseParts].filter(Boolean), { clearProps: 'all' });
+      gsap.set(
+        [
+          photo,
+          introLayer,
+          introText,
+          band,
+          band?.querySelector('.hero__facts'),
+          band?.querySelector('.hero__scroll'),
+          img,
+          ...promiseParts,
+        ].filter(Boolean),
+        {
+          clearProps: 'all',
+        },
+      );
     };
   });
 }

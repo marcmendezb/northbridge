@@ -6,11 +6,6 @@ interface Props {
 const { as: Tag = 'div', class: className = '' } = Astro.props;
 ---
 
-<Tag
-  class:list={[
-    'mx-auto w-full max-w-[calc(var(--content-max)+2*var(--gutter))] px-[var(--gutter)]',
-    className,
-  ]}
->
+<Tag class:list={['nb-container', className]}>
   <slot />
 </Tag>

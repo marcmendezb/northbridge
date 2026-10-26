@@ -46,10 +46,33 @@ const posterFile = await getImage({ src: heroPoster, format: 'webp', width: 1920
           <source src="/video/hero-home.mp4" type="video/mp4" />
         </video>
       </div>
+
+      <!-- Pie de la imagen: credenciales e indicador de scroll. Se encoge con la foto y queda como base del arco. -->
+      <div class="hero__band" data-hero-band data-hero-fade="0.85">
+        <div class="hero__band-inner nb-container">
+          <ul class="hero__facts">
+            {facts.map((f) => (
+              <li>{f}</li>
+            ))}
+          </ul>
+          <span class="hero__scroll" aria-hidden="true">
+            {t('home.hero.scroll')}
+            <span class="hero__scroll-arrow">
+              <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5">
+                <path
+                  d="M12 4V19M6 13L12 19L18 13"
+                  stroke-linecap="butt"
+                  stroke-linejoin="miter"
+                ></path>
+              </svg>
+            </span>
+          </span>
+        </div>
+      </div>
     </div>
 
     <div class="hero__intro" data-surface="dark">
-      <div class="hero__intro-inner hero__align">
+      <div class="hero__intro-inner nb-container">
         <h1 id="hero-title" class="hero__title t-display m-0 text-white">
           <span class="hero__mask">
             <span data-hero-line class="block">
@@ -74,29 +97,6 @@ const posterFile = await getImage({ src: heroPoster, format: 'webp', width: 1920
               {t('cta.calculate')}
             </Button>
           </div>
-        </div>
-      </div>
-
-      <!-- Banda inferior: credenciales, hora en Zúrich con estado de la oficina e indicador de scroll. -->
-      <div class="hero__band" data-hero-fade="0.85">
-        <div class="hero__band-inner hero__align">
-          <ul class="hero__facts">
-            {facts.map((f) => (
-              <li>{f}</li>
-            ))}
-          </ul>
-          <span class="hero__scroll" aria-hidden="true">
-            {t('home.hero.scroll')}
-            <span class="hero__scroll-arrow">
-              <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5">
-                <path
-                  d="M12 4V19M6 13L12 19L18 13"
-                  stroke-linecap="butt"
-                  stroke-linejoin="miter"
-                ></path>
-              </svg>
-            </span>
-          </span>
         </div>
       </div>
     </div>
@@ -137,6 +137,7 @@ const posterFile = await getImage({ src: heroPoster, format: 'webp', width: 1920
 <style is:global>
   /* ── Base (sin JS, reduced-motion y móvil): foto con el texto sobre la mitad navy y la promesa debajo ── */
   .hero {
+    --band-h: 72px;
     position: relative;
     background: var(--navy-800);
   }
@@ -171,7 +172,6 @@ const posterFile = await getImage({ src: heroPoster, format: 'webp', width: 1920
     display: block;
   }
   .hero__intro {
-    --band-h: 72px;
     position: relative;
     display: flex;
     align-items: center;
@@ -179,13 +179,7 @@ const posterFile = await getImage({ src: heroPoster, format: 'webp', width: 1920
     padding-top: calc(var(--header-h) + 24px);
     padding-bottom: calc(var(--band-h) + 24px);
   }
-  /* Todo alineado a la izquierda, en el mismo margen que el logo del header. */
-  .hero__align {
-    width: 100%;
-    padding-inline: calc(
-      max(var(--header-gutter), (100% - var(--header-max)) / 2) + var(--header-pad)
-    );
-  }
+  /* Todo alineado a la izquierda, en el mismo margen que el logo del header (.nb-container). */
   .hero__intro-inner {
     --hero-title: clamp(2.75rem, 0.5rem + 5.2vw, 5.25rem);
     display: flex;
@@ -222,9 +216,11 @@ const posterFile = await getImage({ src: heroPoster, format: 'webp', width: 1920
     position: absolute;
     inset: auto 0 0;
     height: var(--band-h);
+    --band-fg: var(--navy-100);
+    --band-divider: var(--navy-600);
     background: var(--navy-800);
     border-top: 1px solid var(--navy-700);
-    color: var(--navy-100);
+    color: var(--band-fg);
     font-size: 0.8125rem;
     letter-spacing: 0.02em;
   }
@@ -244,7 +240,7 @@ const posterFile = await getImage({ src: heroPoster, format: 'webp', width: 1920
   .hero__facts li + li {
     margin-left: 20px;
     padding-left: 20px;
-    border-left: 1px solid var(--navy-600);
+    border-left: 1px solid var(--band-divider);
   }
   .hero__scroll {
     display: inline-flex;
@@ -359,10 +355,8 @@ const posterFile = await getImage({ src: heroPoster, format: 'webp', width: 1920
       padding-bottom: 0;
     }
     .hero__band {
-      position: relative;
       height: auto;
-      margin-top: 40px;
-      padding-block: 18px;
+      padding-block: 14px;
     }
     .hero__scroll {
       display: none;

@@ -100,3 +100,9 @@ html.lenis body {
 .lenis.lenis-stopped {
   overflow: clip;
 }
+
+/* Contenedor: mismos bordes que la barra del header (y que las tarjetas del footer). */
+.nb-container {
+  width: 100%;
+  padding-inline: max(var(--header-gutter), (100% - var(--header-max)) / 2);
+}

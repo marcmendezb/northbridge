@@ -352,15 +352,6 @@ const isCurrent = (href: string) => path === href || (href !== '/' && path.start
 <style is:global>
   :root {
     --header-h: 96px;
-    /* Geometría del header, compartida para alinear contenido con el logo (p. ej. el hero). */
-    --header-gutter: clamp(16px, 4.5vw, 72px);
-    --header-max: 1280px;
-    --header-pad: 24px;
-  }
-  @media (min-width: 1200px) {
-    :root {
-      --header-pad: clamp(32px, 3.6vw, 56px);
-    }
   }
 
   /* Barra flotante: superficie elevada blanca, pegada arriba, esquinas inferiores de tarjeta (8 px). */
