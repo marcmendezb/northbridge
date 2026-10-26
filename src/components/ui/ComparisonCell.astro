@@ -1,0 +1,42 @@
+---
+import { t } from '../../i18n';
+import type { Cell } from '../../lib/pricing/config';
+
+interface Props {
+  cell: Cell;
+}
+const { cell } = Astro.props;
+const included = cell === true || (typeof cell === 'object' && cell !== null);
+const note = typeof cell === 'string' ? cell : typeof cell === 'object' ? cell.note : undefined;
+---
+
+{cell === false ? (
+  <>
+    <span aria-hidden="true" class="text-piedra-500">
+      —
+    </span>
+    <span class="sr-only">{t('pricing.notIncluded')}</span>
+  </>
+) : (
+  <span class="inline-flex items-start gap-2">
+    {included && (
+      <svg
+        class="mt-[0.3rem] h-4 w-4 flex-none text-salvia-600"
+        viewBox="0 0 16 16"
+        fill="none"
+        stroke="currentColor"
+        stroke-width="1.5"
+        aria-hidden="true"
+      >
+        <path d="M2.5 8.5l3.5 3.5 7.5-8" />
+      </svg>
+    )}
+    {included && (
+      <span class="sr-only">
+        {t('pricing.included')}
+        {note ? ': ' : ''}
+      </span>
+    )}
+    {note && <span>{note}</span>}
+  </span>
+)}

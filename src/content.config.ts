@@ -16,8 +16,17 @@ const servicios = defineCollection({
     forWhom: z.array(z.string()),
     process: z.array(z.object({ title: z.string(), text: z.string() })).length(4),
     faq: z.array(z.object({ q: z.string(), a: z.string() })).length(4),
-    /** Texto sin cifras; los importes viven solo en src/lib/pricing/config.ts. */
-    priceNote: z.string().optional(),
+    /** Referencias a src/lib/pricing/config.ts: los importes no se escriben aquí. */
+    pricing: z
+      .array(
+        z.object({
+          label: z.string(),
+          ref: z.enum(['essential', 'growth', 'full', 'gmbh', 'ag']),
+          /** from: «desde X CHF/mes» · included: «Incluido desde <paquete>» · fixed: «desde X CHF, precio cerrado». */
+          mode: z.enum(['from', 'included', 'fixed']),
+        }),
+      )
+      .min(1),
     seo: z.object({ title: z.string(), description: z.string() }),
   }),
 });

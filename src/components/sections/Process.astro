@@ -1,46 +1,10 @@
 ---
 import Section from '../ui/Section.astro';
+import ProcessSteps from './ProcessSteps.astro';
 import { es } from '../../i18n/es';
 import { t } from '../../i18n';
-
-const steps = es.home.process.steps;
 ---
 
 <Section tone="piedra" label={t('home.process.label')} title={t('home.process.title')} rule>
-  <div data-connector class="relative">
-    <!-- Línea conectora: horizontal en escritorio, vertical en móvil. Se dibuja con el scroll. -->
-    <div
-      data-connector-line="h"
-      class="absolute top-0 right-6 left-0 hidden h-[1.5px] origin-left bg-navy-800 md:block"
-    ></div>
-    <div
-      data-connector-line="v"
-      class="absolute top-2 bottom-0 left-[4px] block w-[1.5px] origin-top bg-navy-800 md:hidden"
-    ></div>
-    <svg
-      data-connector-arch
-      class="absolute top-0 right-0 hidden h-[14px] w-6 -translate-y-px text-navy-800 md:block"
-      viewBox="0 0 24 14"
-      fill="none"
-      stroke="currentColor"
-      stroke-width="1.5"
-      aria-hidden="true"
-    >
-      <path d="M1 14V10A11 11 0 0 1 23 10V14" pathLength="1"></path>
-    </svg>
-
-    <ol class="m-0 grid list-none gap-12 p-0 md:grid-cols-3 md:gap-10">
-      {steps.map((step, i) => (
-        <li data-reveal class="relative pl-10 md:pt-10 md:pl-0">
-          <span
-            class="absolute top-[0.35rem] left-0 block h-[9px] w-[9px] rounded-full border-[1.5px] border-navy-800 bg-piedra-100 md:top-0 md:-translate-y-1/2"
-            aria-hidden="true"
-          ></span>
-          <p class="t-eyebrow m-0 mb-3">{String(i + 1).padStart(2, '0')}</p>
-          <h3 class="m-0 mb-3">{step.title}</h3>
-          <p class="t-body m-0">{step.text}</p>
-        </li>
-      ))}
-    </ol>
-  </div>
+  <ProcessSteps steps={[...es.home.process.steps]} />
 </Section>

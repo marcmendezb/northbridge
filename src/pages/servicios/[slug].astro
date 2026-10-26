@@ -1,0 +1,150 @@
+---
+import { getCollection, type CollectionEntry } from 'astro:content';
+import BaseLayout from '../../layouts/BaseLayout.astro';
+import PageHeader from '../../components/layout/PageHeader.astro';
+import Section from '../../components/ui/Section.astro';
+import Card from '../../components/ui/Card.astro';
+import Button from '../../components/ui/Button.astro';
+import CheckList from '../../components/ui/CheckList.astro';
+import PriceTag from '../../components/ui/PriceTag.astro';
+import Accordion from '../../components/ui/Accordion.astro';
+import Icon from '../../components/brand/Icon.astro';
+import ProcessSteps from '../../components/sections/ProcessSteps.astro';
+import CtaBand from '../../components/sections/CtaBand.astro';
+import { localizedPath, t } from '../../i18n';
+import { bookingCta } from '../../lib/site';
+import { describePricing } from '../../lib/pricing/display';
+
+export async function getStaticPaths() {
+  const all = (await getCollection('servicios')).sort((a, b) => a.data.order - b.data.order);
+  return all.map((entry, i) => ({
+    params: { slug: entry.id },
+    props: { entry, related: [1, 2].map((n) => all[(i + n) % all.length]) },
+  }));
+}
+
+interface Props {
+  entry: CollectionEntry<'servicios'>;
+  related: CollectionEntry<'servicios'>[];
+}
+const { entry, related } = Astro.props;
+const d = entry.data;
+const prices = d.pricing.map((p) => ({ ...p, ...describePricing(p) }));
+const mentionsVat = JSON.stringify(d).includes('MWST');
+
+const faqJsonLd = {
+  '@context': 'https://schema.org',
+  '@type': 'FAQPage',
+  mainEntity: d.faq.map((f) => ({
+    '@type': 'Question',
+    name: f.q,
+    acceptedAnswer: { '@type': 'Answer', text: f.a },
+  })),
+};
+---
+
+<BaseLayout title={d.seo.title} description={d.seo.description}>
+  <PageHeader
+    title={d.title}
+    lead={d.summary}
+    crumbs={[{ label: t('nav.services'), href: localizedPath('/servicios') }, { label: d.title }]}
+  >
+    <div class="flex flex-wrap items-center gap-4 pt-2">
+      <Icon name={d.icon} size={48} class="mr-2" />
+      <Button href={bookingCta.href} arrow>
+        {bookingCta.label}
+      </Button>
+      <Button variant="ghost" href={localizedPath('/calculadora')}>
+        {t('services.detail.priceCalc')}
+      </Button>
+    </div>
+  </PageHeader>
+
+  <Section label={t('services.detail.labelScope')} rule>
+    <div class="grid gap-12 md:grid-cols-[1.4fr_1fr] md:gap-16">
+      <div data-reveal>
+        <h2 class="mb-6">{t('services.detail.includes')}</h2>
+        <CheckList items={d.includes} />
+      </div>
+      <div data-reveal>
+        <h2 class="mb-6">{t('services.detail.forWhom')}</h2>
+        <ul class="m-0 flex list-none flex-col gap-4 p-0">
+          {d.forWhom.map((w) => (
+            <li class="t-body border-l-[1.5px] border-navy-800 pl-4">{w}</li>
+          ))}
+        </ul>
+      </div>
+    </div>
+  </Section>
+
+  <Section
+    tone="piedra"
+    label={t('services.detail.process')}
+    title={t('services.detail.process')}
+    rule
+  >
+    <ProcessSteps steps={d.process} />
+  </Section>
+
+  <Section label={t('services.detail.labelPrice')} rule>
+    <div class="grid gap-8 md:grid-cols-[1fr_1fr] md:gap-16">
+      <div data-reveal class="flex flex-col gap-4">
+        <h2 class="m-0">{t('services.detail.price')}</h2>
+        <p class="t-body m-0">
+          {prices.some((p) => p.mode === 'fixed')
+            ? t('services.detail.priceFixedNote')
+            : t('home.calculator.note')}
+        </p>
+        <div class="pt-2">
+          <Button variant="ghost" href={localizedPath('/calculadora')} arrow>
+            {t('services.detail.priceCalc')}
+          </Button>
+        </div>
+      </div>
+      <ul class="m-0 grid list-none gap-4 p-0">
+        {prices.map((p, i) => (
+          <li data-reveal>
+            <Card class="flex flex-col gap-2 p-6">
+              <p class="t-label m-0 text-piedra-600">{p.label}</p>
+              {p.amount ? (
+                <PriceTag amount={p.amount} unit={p.unit} firstVat={!mentionsVat && i === 0} />
+              ) : (
+                <p class="t-price m-0 text-[1.75rem] text-navy-800">{p.headline}</p>
+              )}
+              {p.detail && <p class="t-small m-0">{p.detail}</p>}
+            </Card>
+          </li>
+        ))}
+      </ul>
+    </div>
+  </Section>
+
+  <Section tone="piedra" label={t('services.detail.labelFaq')} rule>
+    <div class="grid gap-10 md:grid-cols-[1fr_1.6fr] md:gap-16">
+      <h2 class="m-0">{t('services.detail.faq')}</h2>
+      <Accordion items={d.faq} level="h3" openFirst />
+    </div>
+    <script type="application/ld+json" set:html={JSON.stringify(faqJsonLd)} />
+  </Section>
+
+  <Section label={t('services.detail.labelRelated')} rule>
+    <ul class="m-0 grid list-none gap-6 p-0 md:grid-cols-2">
+      {related.map((r) => (
+        <li data-reveal class="flex">
+          <Card href={localizedPath(`/servicios/${r.id}`)} class="flex w-full flex-col gap-4 p-8">
+            <Icon name={r.data.icon} size={40} />
+            <h3 class="m-0 text-[1.5rem]">{r.data.title}</h3>
+            <p class="t-small m-0 !text-piedra-700">{r.data.summary}</p>
+          </Card>
+        </li>
+      ))}
+    </ul>
+    <div data-reveal class="mt-10">
+      <Button variant="ghost" href={localizedPath('/servicios')} arrow>
+        {t('services.detail.seeAll')}
+      </Button>
+    </div>
+  </Section>
+
+  <CtaBand />
+</BaseLayout>

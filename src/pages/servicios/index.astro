@@ -1,0 +1,97 @@
+---
+import { getCollection } from 'astro:content';
+import BaseLayout from '../../layouts/BaseLayout.astro';
+import PageHeader from '../../components/layout/PageHeader.astro';
+import Section from '../../components/ui/Section.astro';
+import Card from '../../components/ui/Card.astro';
+import Icon from '../../components/brand/Icon.astro';
+import CtaBand from '../../components/sections/CtaBand.astro';
+import { localizedPath, t } from '../../i18n';
+import { es } from '../../i18n/es';
+
+const services = (await getCollection('servicios')).sort((a, b) => a.data.order - b.data.order);
+const byIcon = Object.fromEntries(services.map((s) => [s.data.icon, s]));
+
+const profiles = [
+  { key: 'autonomo', icons: ['contabilidad', 'iva', 'nominas', 'constitucion'] },
+  { key: 'startup', icons: ['startups', 'constitucion', 'contabilidad', 'iva'] },
+  { key: 'pyme', icons: ['contabilidad', 'iva', 'nominas'] },
+] as const;
+---
+
+<BaseLayout title={t('services.index.seoTitle')} description={t('services.index.seoDescription')}>
+  <PageHeader
+    title={t('services.index.title')}
+    lead={t('services.index.lead')}
+    crumbs={[{ label: t('nav.services') }]}
+  />
+
+  <Section>
+    <ul class="m-0 grid list-none gap-6 p-0 md:grid-cols-2 lg:grid-cols-3">
+      {services.map((s) => (
+        <li data-reveal class="flex">
+          <Card href={localizedPath(`/servicios/${s.id}`)} class="flex w-full flex-col gap-4 p-8">
+            <Icon name={s.data.icon} size={40} />
+            <h2 class="m-0 text-[1.5rem] leading-tight font-medium">{s.data.title}</h2>
+            <p class="t-small m-0 !text-piedra-700">{s.data.summary}</p>
+            <p class="t-small m-0 mt-auto border-t border-piedra-200 pt-4">
+              <span class="t-label mr-2 !text-[0.6875rem] text-piedra-600">
+                {t('services.index.forWhomLabel')}
+              </span>
+              {s.data.forWhom[0]}
+            </p>
+          </Card>
+        </li>
+      ))}
+    </ul>
+  </Section>
+
+  <Section
+    tone="piedra"
+    label={t('services.index.guideLabel')}
+    title={t('services.index.guideTitle')}
+    lead={t('services.index.guideLead')}
+    rule
+  >
+    <div class="overflow-x-auto rounded-card border border-piedra-200 bg-white">
+      <table class="w-full min-w-[560px] border-collapse text-left">
+        <caption class="sr-only">{t('services.index.guideTitle')}</caption>
+        <thead>
+          <tr class="border-b border-piedra-200 text-piedra-600">
+            <th scope="col" class="t-label p-4 md:p-5">
+              {t('services.index.guideProfile')}
+            </th>
+            <th scope="col" class="t-label p-4 md:p-5">
+              {t('services.index.guideServices')}
+            </th>
+          </tr>
+        </thead>
+        <tbody>
+          {profiles.map((p) => (
+            <tr class="border-b border-piedra-200 align-top last:border-0">
+              <th
+                scope="row"
+                class="p-4 font-serif text-[1.25rem] font-medium text-navy-800 md:p-5"
+              >
+                {es.services.profiles[p.key]}
+              </th>
+              <td class="p-4 md:p-5">
+                <ul class="m-0 flex list-none flex-col gap-1 p-0">
+                  {p.icons.map((icon) => (
+                    <li>
+                      <a href={localizedPath(`/servicios/${byIcon[icon].id}`)}>
+                        {byIcon[icon].data.title}
+                      </a>
+                    </li>
+                  ))}
+                </ul>
+              </td>
+            </tr>
+          ))}
+        </tbody>
+      </table>
+    </div>
+  </Section>
+
+  <CtaBand />
+</BaseLayout>

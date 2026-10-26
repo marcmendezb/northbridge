@@ -7,7 +7,7 @@ export function formatNumber(value: number): string {
   return `${value < 0 ? '−' : ''}${grouped}${dec ? `,${dec}` : ''}`;
 }
 
-/** 4380 → «4 380 CHF» (espacio fino no separable entre cifra y moneda). */
+/** Importe + moneda, con espacio fino no separable entre ambos. */
 export function formatCHF(value: number): string {
   return `${formatNumber(value)}${NNBSP}CHF`;
 }

@@ -8,9 +8,10 @@ import Process from '../components/sections/Process.astro';
 import CalculatorTeaser from '../components/sections/CalculatorTeaser.astro';
 import Testimonials from '../components/sections/Testimonials.astro';
 import CtaBand from '../components/sections/CtaBand.astro';
+import { t } from '../i18n';
 ---
 
-<BaseLayout transparentHeader>
+<BaseLayout description={t('home.seoDescription')} transparentHeader>
   <Hero />
   <Proposal />
   <ServicesTeaser />

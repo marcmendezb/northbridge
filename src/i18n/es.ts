@@ -57,6 +57,7 @@ export const es = {
     perMonth: 'CHF/mes',
     vatNote: 'Precios sin IVA',
     vatFirst: 'IVA (MWST)',
+    vatNoteFirst: 'Precios sin IVA (MWST)',
   },
   alert: {
     success: 'Correcto',
@@ -64,7 +65,85 @@ export const es = {
     error: 'Error',
     info: 'Información',
   },
+  services: {
+    index: {
+      title: 'Servicios',
+      lead: 'Cinco servicios para que tu empresa tenga sus números al día, sus impuestos presentados y sus decisiones claras.',
+      forWhomLabel: 'Para quién',
+      guideLabel: 'Qué necesito',
+      guideTitle: 'Qué necesito si soy autónomo, startup o pyme',
+      guideLead: 'Elige tu caso y te decimos por dónde empezar.',
+      guideProfile: 'Tu caso',
+      guideServices: 'Servicios que te encajan',
+      seoTitle: 'Servicios',
+      seoDescription:
+        'Contabilidad, IVA, nóminas, constitución de empresas y asesoría para startups en Zúrich. Cinco servicios con precio cerrado y una persona de contacto fija.',
+    },
+    profiles: {
+      autonomo: 'Soy autónomo',
+      startup: 'Soy una startup',
+      pyme: 'Tengo una pyme',
+    },
+    detail: {
+      labelScope: 'Alcance',
+      labelProcess: 'Proceso',
+      labelPrice: 'Precio',
+      labelFaq: 'Preguntas',
+      labelRelated: 'Relacionados',
+      includes: 'Qué incluye',
+      forWhom: 'Para quién es',
+      process: 'Cómo lo hacemos',
+      price: 'Precio orientativo',
+      priceCalc: 'Calcula tu precio',
+      priceFixedNote: 'Precio cerrado tras la consulta gratuita.',
+      faq: 'Preguntas frecuentes',
+      related: 'Servicios relacionados',
+      seeAll: 'Ver todos los servicios',
+    },
+  },
+  pricing: {
+    seoTitle: 'Precios',
+    seoDescription:
+      'Tres paquetes de contabilidad y fiscalidad para pymes y autónomos en Zúrich: Essential, Growth y Full Service. Precios sin IVA y precio cerrado tras 20 minutos.',
+    title: 'Precios',
+    lead: 'Tres paquetes mensuales, con permanencia de tres meses. Y precio cerrado para lo que se hace una sola vez.',
+    forWhom: 'Pensado para',
+    recommended: 'Recomendado',
+    included: 'Incluido',
+    notIncluded: 'No incluido',
+    compareLabel: 'Comparativa',
+    compareTitle: 'Qué incluye cada paquete',
+    compareCaption: 'Comparativa de los paquetes Essential, Growth y Full Service',
+    feature: 'Servicio',
+    separateLabel: 'Aparte',
+    separateTitle: 'Qué no está incluido',
+    separateLead:
+      'Se presupuesta aparte, con precio cerrado. Te lo damos por escrito antes de empezar.',
+    separateConstitution:
+      'GmbH desde {gmbh}; AG desde {ag}. Las tasas de notaría y del registro mercantil no están incluidas.',
+    faqLabel: 'Preguntas',
+    faqTitle: 'Preguntas sobre precios',
+    ctaTitle: '¿No sabes qué paquete te encaja?',
+    ctaText:
+      'Calcula una estimación en un minuto o cuéntanoslo en 20 minutos de conversación, sin compromiso.',
+    faq: [
+      {
+        q: '¿Hay permanencia?',
+        a: 'Sí. Los paquetes mensuales tienen una permanencia de tres meses. Te lo explicamos en la consulta, antes de que decidas nada.',
+      },
+      {
+        q: '¿Puedo cambiar de paquete?',
+        a: 'Sí. Si tu empresa cambia, ajustamos el paquete y te decimos el nuevo precio antes de aplicarlo.',
+      },
+      {
+        q: '¿Qué pasa si mi empresa crece?',
+        a: 'Te avisamos cuando tus facturas o tu equipo pasen al siguiente tramo y te proponemos el paquete que mejor encaja. Con más de 200 facturas al mes te preparamos una propuesta a medida.',
+      },
+    ],
+  },
   home: {
+    seoDescription:
+      'Fiduciaria y contabilidad en Zúrich para pymes, autónomos y startups: contabilidad, IVA y nóminas con precio cerrado. Reserva tu consulta gratuita de 20 minutos.',
     hero: {
       line1: 'Tus números,',
       line2: 'bajo control.',

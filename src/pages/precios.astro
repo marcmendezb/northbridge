@@ -1,0 +1,170 @@
+---
+import BaseLayout from '../layouts/BaseLayout.astro';
+import PageHeader from '../components/layout/PageHeader.astro';
+import Section from '../components/ui/Section.astro';
+import Card from '../components/ui/Card.astro';
+import Tag from '../components/ui/Tag.astro';
+import Button from '../components/ui/Button.astro';
+import CheckList from '../components/ui/CheckList.astro';
+import PriceTag from '../components/ui/PriceTag.astro';
+import Accordion from '../components/ui/Accordion.astro';
+import ComparisonCell from '../components/ui/ComparisonCell.astro';
+import { es } from '../i18n/es';
+import { localizedPath, t } from '../i18n';
+import { bookingCta } from '../lib/site';
+import { formatCHF } from '../lib/format';
+import {
+  COMPARISON,
+  FIXED_PRICES,
+  PACKAGES,
+  SEPARATE_QUOTE,
+  type Cell,
+  type PackageId,
+} from '../lib/pricing/config';
+
+const ids = Object.keys(PACKAGES) as PackageId[];
+const cellText = (c: Cell) => (typeof c === 'string' ? c : typeof c === 'object' ? c.note : '');
+/** Cada paquete lista lo que incluye, tomado de la tabla comparativa. */
+const highlights = (id: PackageId) =>
+  COMPARISON.filter((r) => r[id] !== false).map((r) => {
+    const note = cellText(r[id]);
+    return note ? `${r.label}: ${note.charAt(0).toLowerCase()}${note.slice(1)}` : r.label;
+  });
+const constitution = es.pricing.separateConstitution
+  .replace('{gmbh}', formatCHF(FIXED_PRICES.gmbh.from))
+  .replace('{ag}', formatCHF(FIXED_PRICES.ag.from));
+const separate = SEPARATE_QUOTE.map((s) =>
+  s.key === 'constitution' ? `${s.label}. ${constitution}` : s.label,
+);
+---
+
+<BaseLayout title={t('pricing.seoTitle')} description={t('pricing.seoDescription')}>
+  <PageHeader
+    title={t('pricing.title')}
+    lead={t('pricing.lead')}
+    crumbs={[{ label: t('pricing.title') }]}
+  />
+
+  <Section>
+    <ul class="m-0 grid list-none items-stretch gap-6 p-0 lg:grid-cols-3">
+      {ids.map((id, i) => {
+        const p = PACKAGES[id];
+        return (
+          <li data-reveal class="flex">
+            <Card
+              as="div"
+              class:list={[
+                'flex w-full flex-col gap-6 p-8',
+                p.recommended && 'border-[1.5px] border-navy-800',
+              ]}
+            >
+              <div class="flex flex-col gap-3">
+                <div class="flex items-center justify-between gap-3">
+                  <h2 class="m-0 text-[1.75rem] font-medium">{p.name}</h2>
+                  {p.recommended && <Tag tone="salvia">{t('pricing.recommended')}</Tag>}
+                </div>
+                <p class="t-small m-0 min-h-[3em] !text-piedra-700">
+                  <span class="t-label mr-2 !text-[0.6875rem] text-piedra-600">
+                    {t('pricing.forWhom')}
+                  </span>
+                  {p.forWhom}
+                </p>
+              </div>
+              <PriceTag amount={p.from} firstVat={i === 0} />
+              <CheckList items={highlights(id)} class="flex-1 [&_.t-body]:!text-[0.9375rem]" />
+              <Button
+                href={bookingCta.href}
+                variant={p.recommended ? 'primary' : 'ghost'}
+                arrow
+                class="self-start"
+              >
+                {bookingCta.label}
+              </Button>
+            </Card>
+          </li>
+        );
+      })}
+    </ul>
+  </Section>
+
+  <Section tone="piedra" label={t('pricing.compareLabel')} title={t('pricing.compareTitle')} rule>
+    <div class="overflow-x-auto rounded-card border border-piedra-200 bg-white">
+      <table class="t-tabular w-full min-w-[760px] border-collapse text-left text-[0.9375rem]">
+        <caption class="sr-only">{t('pricing.compareCaption')}</caption>
+        <thead>
+          <tr class="border-b border-piedra-200">
+            <th scope="col" class="p-4 text-piedra-600">
+              <span class="t-label">{t('pricing.feature')}</span>
+            </th>
+            {ids.map((id) => (
+              <th
+                scope="col"
+                class:list={[
+                  'p-4 align-bottom',
+                  PACKAGES[id].recommended && 'border-t-[1.5px] border-t-navy-800 bg-piedra-50',
+                ]}
+              >
+                <span class="block font-serif text-[1.25rem] font-medium text-navy-800">
+                  {PACKAGES[id].name}
+                </span>
+                {PACKAGES[id].recommended && (
+                  <span class="t-label text-salvia-600">{t('pricing.recommended')}</span>
+                )}
+              </th>
+            ))}
+          </tr>
+        </thead>
+        <tbody>
+          {COMPARISON.map((row) => (
+            <tr class="border-b border-piedra-200 align-top last:border-0">
+              <th scope="row" class="p-4 font-medium text-navy-800">
+                {row.label}
+              </th>
+              {ids.map((id) => (
+                <td
+                  class:list={['p-4 text-piedra-800', PACKAGES[id].recommended && 'bg-piedra-50']}
+                >
+                  <ComparisonCell cell={row[id]} />
+                </td>
+              ))}
+            </tr>
+          ))}
+        </tbody>
+      </table>
+    </div>
+    <p class="t-small mt-4">{t('price.vatNote')}</p>
+  </Section>
+
+  <Section
+    label={t('pricing.separateLabel')}
+    title={t('pricing.separateTitle')}
+    lead={t('pricing.separateLead')}
+    rule
+  >
+    <Card class="max-w-[760px] p-8">
+      <CheckList items={separate} />
+    </Card>
+  </Section>
+
+  <Section tone="piedra" label={t('pricing.faqLabel')} rule>
+    <div class="grid gap-10 md:grid-cols-[1fr_1.6fr] md:gap-16">
+      <h2 class="m-0">{t('pricing.faqTitle')}</h2>
+      <Accordion items={[...es.pricing.faq]} level="h3" openFirst />
+    </div>
+  </Section>
+
+  <Section tone="navy" pattern>
+    <div data-reveal class="flex flex-col items-start gap-6 md:max-w-[40rem]">
+      <h2 class="m-0 text-white">{t('pricing.ctaTitle')}</h2>
+      <p class="m-0 text-lg text-navy-100">{t('pricing.ctaText')}</p>
+      <div class="flex flex-wrap items-center gap-4">
+        <Button href={bookingCta.href} on="dark" arrow>
+          {bookingCta.label}
+        </Button>
+        <Button href={localizedPath('/calculadora')} variant="ghost" on="dark">
+          {t('cta.calculate')}
+        </Button>
+      </div>
+    </div>
+  </Section>
+</BaseLayout>

@@ -1,0 +1,36 @@
+---
+import { formatNumber } from '../../lib/format';
+import { t } from '../../i18n';
+
+/** «desde» y la unidad en Instrument Sans; el importe en Newsreader. Siempre con «Precios sin IVA». */
+interface Props {
+  amount: number;
+  unit?: string;
+  size?: 'md' | 'lg';
+  /** Primera mención de IVA en la página: «IVA (MWST)». */
+  firstVat?: boolean;
+  hideVatNote?: boolean;
+  class?: string;
+}
+const {
+  amount,
+  unit = 'CHF/mes',
+  size = 'md',
+  firstVat = false,
+  hideVatNote = false,
+  class: className = '',
+} = Astro.props;
+---
+
+<div class:list={['flex flex-col gap-1', className]}>
+  <p class="m-0 flex flex-wrap items-baseline gap-x-2">
+    <span class="font-sans text-sm text-piedra-600">{t('price.from')}</span>
+    <span class:list={['t-price text-navy-800', size === 'lg' ? 'text-[3.5rem]' : 'text-[2.5rem]']}>
+      {formatNumber(amount)}
+    </span>
+    <span class="font-sans text-sm text-piedra-600">{unit}</span>
+  </p>
+  {!hideVatNote && (
+    <p class="t-small m-0">{firstVat ? t('price.vatNoteFirst') : t('price.vatNote')}</p>
+  )}
+</div>

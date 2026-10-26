@@ -1,0 +1,26 @@
+---
+/** Lista con checks de línea (trazo 1,5, terminales rectos). */
+interface Props {
+  items: string[];
+  class?: string;
+}
+const { items, class: className = '' } = Astro.props;
+---
+
+<ul class:list={['m-0 flex list-none flex-col gap-3 p-0', className]}>
+  {items.map((item) => (
+    <li class="flex gap-3">
+      <svg
+        class="mt-[0.35rem] h-4 w-4 flex-none text-salvia-600"
+        viewBox="0 0 16 16"
+        fill="none"
+        stroke="currentColor"
+        stroke-width="1.5"
+        aria-hidden="true"
+      >
+        <path d="M2.5 8.5l3.5 3.5 7.5-8" />
+      </svg>
+      <span class="t-body">{item}</span>
+    </li>
+  ))}
+</ul>
