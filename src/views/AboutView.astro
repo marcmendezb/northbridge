@@ -1,5 +1,6 @@
 ---
-import { Picture } from 'astro:assets';
+import { Image, Picture } from 'astro:assets';
+import logoMark from '../assets/brand/logo-header.png';
 import type { ImageMetadata } from 'astro';
 import BaseLayout from '../layouts/BaseLayout.astro';
 import Breadcrumbs from '../components/layout/Breadcrumbs.astro';
@@ -134,10 +135,20 @@ const splitFact = (v: string) => {
         <h2 class="nb-meth__title" id="method-title" data-split>
           {t('about.methodTitle')}
         </h2>
-        <svg class="nb-meth__mark" viewBox="4 11 40 26" aria-hidden="true" data-method-mark>
-          <path d="M4 13H44" pathLength="1"></path>
-          <path d="M10 37V29A14 14 0 0 1 38 29V37" pathLength="1"></path>
-        </svg>
+        <span class="nb-meth__logo" aria-hidden="true" data-reveal>
+          <Image
+            src={logoMark}
+            alt=""
+            width={168}
+            densities={[1, 2]}
+            class="nb-meth__logo-mark"
+            loading="lazy"
+          />
+          <span class="nb-meth__logo-text">
+            <span class="nb-meth__logo-name">Northbridge</span>
+            <span class="nb-meth__logo-sub">Advisory</span>
+          </span>
+        </span>
       </div>
       <ol class="nb-meth__list" data-method-list>
         {method.map((m) => (
@@ -545,13 +556,44 @@ const splitFact = (v: string) => {
     font-weight: 300;
     color: var(--white);
   }
-  .nb-meth__mark {
-    width: clamp(160px, 18vw, 260px);
+  /* Logo en negativo (blanco sobre Navy 800, docs/02): el mismo lockup horizontal del header. */
+  .nb-meth__logo {
+    --wm: clamp(34px, 3.4vw, 48px);
+    display: inline-flex;
+    align-items: center;
+    justify-self: start;
+    gap: calc(var(--wm) * 0.34);
     margin-top: clamp(24px, 4vw, 56px);
-    overflow: visible;
-    fill: none;
-    stroke: var(--white);
-    stroke-width: 2;
+    color: var(--white);
+  }
+  .nb-meth__logo-mark {
+    display: block;
+    width: auto;
+    height: calc(var(--wm) * 1.09);
+    /* El símbolo es navy en PNG: se pasa a blanco puro, sin cambiar su forma. */
+    filter: brightness(0) invert(1);
+  }
+  .nb-meth__logo-text {
+    display: flex;
+    flex-direction: column;
+    gap: calc(var(--wm) * 0.16);
+    white-space: nowrap;
+  }
+  .nb-meth__logo-name {
+    font-family: var(--font-display);
+    font-optical-sizing: auto;
+    font-size: var(--wm);
+    font-weight: 500;
+    line-height: 0.9;
+    letter-spacing: -0.015em;
+  }
+  .nb-meth__logo-sub {
+    font-family: var(--font-sans);
+    font-size: calc(var(--wm) * 0.27);
+    font-weight: 600;
+    line-height: 1;
+    letter-spacing: 0.36em;
+    text-transform: uppercase;
   }
   .nb-meth__list {
     margin: 0;

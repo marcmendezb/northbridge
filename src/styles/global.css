@@ -149,8 +149,4 @@ html.lenis body {
   .js.motion:not(.anim-fail) [data-crew-arch] {
     clip-path: inset(100% 0 0 0);
   }
-  .js.motion:not(.anim-fail) [data-method-mark] path {
-    stroke-dasharray: 1;
-    stroke-dashoffset: 1;
-  }
 }

@@ -5,7 +5,6 @@ import type { AnimationKit } from './types';
  * - Cabecera: la foto se acerca despacio y el texto se aleja al salir (scrub).
  * - Historia: las cifras del año suben una a una desde su máscara.
  * - Principios: la fila que pasa por el centro de la pantalla se ilumina (clase `is-lit`).
- * - Método: el símbolo se traza (tablero y después arco) mientras se recorren los cuatro puntos.
  * - Equipo: cada retrato se descubre en arco y su nombre sube, línea a línea.
  * Solo transform, opacity, clip-path y trazos. Con movimiento reducido no se registra.
  */
@@ -44,20 +43,6 @@ export function aboutScene({ gsap, ScrollTrigger }: AnimationKit) {
       toggleClass: { targets: row, className: 'is-lit' },
     });
   });
-
-  // Método: el símbolo se construye con el scroll de la lista.
-  const mark = document.querySelector('[data-method-mark]');
-  const list = document.querySelector('[data-method-list]');
-  if (mark && list) {
-    const [deck, arch] = Array.from(mark.querySelectorAll('path'));
-    gsap.set([deck, arch], { strokeDasharray: 1, strokeDashoffset: 1 });
-    gsap
-      .timeline({
-        scrollTrigger: { trigger: list, start: 'top 70%', end: 'bottom 70%', scrub: 0.8 },
-      })
-      .to(deck, { strokeDashoffset: 0, ease: 'none', duration: 0.35 })
-      .to(arch, { strokeDashoffset: 0, ease: 'none', duration: 0.65 });
-  }
 
   // Equipo: arco que se descubre de abajo arriba; después, el nombre.
   document.querySelectorAll<HTMLElement>('[data-crew-arch]').forEach((arch, i) => {
