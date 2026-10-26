@@ -1,14 +1,25 @@
 ---
 import Logo from '../brand/Logo.astro';
 import Button from '../ui/Button.astro';
-import { t, localizedPath } from '../../i18n';
-import { bookingCta, legalLinks, mainNav, resourceLinks, serviceLinks, site } from '../../lib/site';
+import { useI18n } from '../../i18n';
+import {
+  getBookingCta,
+  getLegalLinks,
+  getMainNav,
+  getResourceLinks,
+  getServiceLinks,
+  site,
+} from '../../lib/site';
+const { t, lp, locale } = useI18n(Astro.currentLocale);
+const bookingCta = getBookingCta(locale);
+const mainNav = getMainNav(locale);
+const serviceLinks = getServiceLinks(locale);
+const resourceLinks = getResourceLinks(locale);
+const legalLinks = getLegalLinks(locale);
 
 const year = new Date().getFullYear();
 const companyLinks = [
-  ...mainNav.filter(
-    (l) => l.href !== localizedPath('/servicios') && l.href !== localizedPath('/recursos'),
-  ),
+  ...mainNav.filter((l) => l.href !== lp('/servicios') && l.href !== lp('/recursos')),
   { href: bookingCta.href, label: t('nav.freeConsultation') },
 ];
 const columns = [
@@ -16,10 +27,7 @@ const columns = [
   {
     id: 'resources',
     title: t('footer.resources'),
-    links: [
-      ...resourceLinks,
-      { href: localizedPath('/calculadora'), label: t('footer.calculator') },
-    ],
+    links: [...resourceLinks, { href: lp('/calculadora'), label: t('footer.calculator') }],
   },
   { id: 'company', title: t('footer.company'), links: companyLinks },
 ];
@@ -28,7 +36,7 @@ const columns = [
 <footer class="nb-footer">
   <div class="nb-footer__grid">
     <div class="nb-footer__brand" data-surface="dark">
-      <a href="/" class="relative block w-fit no-underline">
+      <a href={lp('/')} class="relative block w-fit no-underline">
         <Logo tone="negative" size={26} />
       </a>
       <div class="relative flex flex-col items-start gap-6">

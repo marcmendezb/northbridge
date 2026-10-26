@@ -187,7 +187,7 @@ test('desplegable de Servicios: abre al pasar el ratón, enlaza y se cierra con 
 }) => {
   await page.setViewportSize({ width: 1440, height: 900 });
   await page.goto('/', { waitUntil: 'networkidle' });
-  const trigger = page.locator('[data-mega-trigger]');
+  const trigger = page.locator('.nb-nav__trigger');
   await expect(trigger).toHaveAttribute('aria-expanded', 'false');
   await trigger.hover();
   await expect(trigger).toHaveAttribute('aria-expanded', 'true');

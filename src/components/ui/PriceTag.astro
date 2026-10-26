@@ -1,6 +1,7 @@
 ---
 import { formatNumber } from '../../lib/format';
-import { t } from '../../i18n';
+import { useI18n } from '../../i18n';
+const { t, locale } = useI18n(Astro.currentLocale);
 
 /** «desde» y la unidad en Instrument Sans; el importe en Newsreader. Siempre con «Precios sin IVA». */
 interface Props {
@@ -14,7 +15,7 @@ interface Props {
 }
 const {
   amount,
-  unit = 'CHF/mes',
+  unit = t('price.perMonth'),
   size = 'md',
   firstVat = false,
   hideVatNote = false,
@@ -26,7 +27,7 @@ const {
   <p class="m-0 flex flex-wrap items-baseline gap-x-2">
     <span class="font-sans text-sm text-piedra-600">{t('price.from')}</span>
     <span class:list={['t-price text-navy-800', size === 'lg' ? 'text-[3.5rem]' : 'text-[2.5rem]']}>
-      {formatNumber(amount)}
+      {formatNumber(amount, locale)}
     </span>
     <span class="font-sans text-sm text-piedra-600">{unit}</span>
   </p>

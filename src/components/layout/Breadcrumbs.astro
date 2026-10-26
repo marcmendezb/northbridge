@@ -1,6 +1,7 @@
 ---
-import { t } from '../../i18n';
+import { useI18n } from '../../i18n';
 import { site } from '../../lib/site';
+const { t, lp } = useI18n(Astro.currentLocale);
 
 interface Crumb {
   label: string;
@@ -11,7 +12,7 @@ interface Props {
   class?: string;
 }
 const { items, class: className = '' } = Astro.props;
-const all: Crumb[] = [{ label: t('nav.home'), href: '/' }, ...items];
+const all: Crumb[] = [{ label: t('nav.home'), href: lp('/') }, ...items];
 const jsonLd = {
   '@context': 'https://schema.org',
   '@type': 'BreadcrumbList',

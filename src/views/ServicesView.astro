@@ -1,15 +1,15 @@
 ---
-import { getCollection } from 'astro:content';
-import BaseLayout from '../../layouts/BaseLayout.astro';
-import PageHeader from '../../components/layout/PageHeader.astro';
-import Section from '../../components/ui/Section.astro';
-import Card from '../../components/ui/Card.astro';
-import Icon from '../../components/brand/Icon.astro';
-import CtaBand from '../../components/sections/CtaBand.astro';
-import { localizedPath, t } from '../../i18n';
-import { es } from '../../i18n/es';
+import BaseLayout from '../layouts/BaseLayout.astro';
+import PageHeader from '../components/layout/PageHeader.astro';
+import Section from '../components/ui/Section.astro';
+import Card from '../components/ui/Card.astro';
+import Icon from '../components/brand/Icon.astro';
+import CtaBand from '../components/sections/CtaBand.astro';
+import { useI18n, type MessageKey } from '../i18n';
+import { entryKey, getServices } from '../lib/content';
 
-const services = (await getCollection('servicios')).sort((a, b) => a.data.order - b.data.order);
+const { t, lp, locale } = useI18n(Astro.currentLocale);
+const services = await getServices(locale);
 const byIcon = Object.fromEntries(services.map((s) => [s.data.icon, s]));
 
 const profiles = [
@@ -30,7 +30,7 @@ const profiles = [
     <ul class="m-0 grid list-none gap-6 p-0 md:grid-cols-2 lg:grid-cols-3">
       {services.map((s) => (
         <li data-reveal class="flex">
-          <Card href={localizedPath(`/servicios/${s.id}`)} class="flex w-full flex-col gap-4 p-8">
+          <Card href={lp(`/servicios/${entryKey(s)}`)} class="flex w-full flex-col gap-4 p-8">
             <Icon name={s.data.icon} size={40} />
             <h2 class="m-0 text-[1.5rem] leading-tight font-medium">{s.data.title}</h2>
             <p class="t-small m-0 !text-piedra-700">{s.data.summary}</p>
@@ -73,13 +73,13 @@ const profiles = [
                 scope="row"
                 class="p-4 font-serif text-[1.25rem] font-medium text-navy-800 md:p-5"
               >
-                {es.services.profiles[p.key]}
+                {t(`services.profiles.${p.key}` as MessageKey)}
               </th>
               <td class="p-4 md:p-5">
                 <ul class="m-0 flex list-none flex-col gap-1 p-0">
                   {p.icons.map((icon) => (
                     <li>
-                      <a href={localizedPath(`/servicios/${byIcon[icon].id}`)}>
+                      <a href={lp(`/servicios/${entryKey(byIcon[icon])}`)}>
                         {byIcon[icon].data.title}
                       </a>
                     </li>

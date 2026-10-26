@@ -24,11 +24,17 @@ export default defineConfig({
     react(),
     mdx(),
     brandGuide,
-    sitemap({ filter: (page) => !page.includes('/_brand') }),
+    sitemap({
+      filter: (page) => !page.includes('/_brand'),
+      i18n: {
+        defaultLocale: 'es',
+        locales: { es: 'es', en: 'en', de: 'de-CH', fr: 'fr-CH', it: 'it-CH' },
+      },
+    }),
   ],
   i18n: {
     defaultLocale: 'es',
-    locales: ['es'],
+    locales: ['es', 'en', 'de', 'fr', 'it'],
     routing: { prefixDefaultLocale: false },
   },
   vite: { plugins: [tailwindcss()] },

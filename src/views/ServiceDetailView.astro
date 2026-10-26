@@ -1,35 +1,30 @@
 ---
-import { getCollection, type CollectionEntry } from 'astro:content';
-import BaseLayout from '../../layouts/BaseLayout.astro';
-import PageHeader from '../../components/layout/PageHeader.astro';
-import Section from '../../components/ui/Section.astro';
-import Card from '../../components/ui/Card.astro';
-import Button from '../../components/ui/Button.astro';
-import CheckList from '../../components/ui/CheckList.astro';
-import PriceTag from '../../components/ui/PriceTag.astro';
-import Accordion from '../../components/ui/Accordion.astro';
-import Icon from '../../components/brand/Icon.astro';
-import ProcessSteps from '../../components/sections/ProcessSteps.astro';
-import CtaBand from '../../components/sections/CtaBand.astro';
-import { localizedPath, t } from '../../i18n';
-import { bookingCta } from '../../lib/site';
-import { describePricing } from '../../lib/pricing/display';
-
-export async function getStaticPaths() {
-  const all = (await getCollection('servicios')).sort((a, b) => a.data.order - b.data.order);
-  return all.map((entry, i) => ({
-    params: { slug: entry.id },
-    props: { entry, related: [1, 2].map((n) => all[(i + n) % all.length]) },
-  }));
-}
+import type { CollectionEntry } from 'astro:content';
+import BaseLayout from '../layouts/BaseLayout.astro';
+import PageHeader from '../components/layout/PageHeader.astro';
+import Section from '../components/ui/Section.astro';
+import Card from '../components/ui/Card.astro';
+import Button from '../components/ui/Button.astro';
+import CheckList from '../components/ui/CheckList.astro';
+import PriceTag from '../components/ui/PriceTag.astro';
+import Accordion from '../components/ui/Accordion.astro';
+import Icon from '../components/brand/Icon.astro';
+import ProcessSteps from '../components/sections/ProcessSteps.astro';
+import CtaBand from '../components/sections/CtaBand.astro';
+import { useI18n } from '../i18n';
+import { entryKey } from '../lib/content';
+import { getBookingCta } from '../lib/site';
+import { describePricing } from '../lib/pricing/display';
 
 interface Props {
   entry: CollectionEntry<'servicios'>;
   related: CollectionEntry<'servicios'>[];
 }
 const { entry, related } = Astro.props;
+const { t, lp, locale } = useI18n(Astro.currentLocale);
+const bookingCta = getBookingCta(locale);
 const d = entry.data;
-const prices = d.pricing.map((p) => ({ ...p, ...describePricing(p) }));
+const prices = d.pricing.map((p) => ({ ...p, ...describePricing(p, locale) }));
 const mentionsVat = JSON.stringify(d).includes('MWST');
 
 const faqJsonLd = {
@@ -47,14 +42,14 @@ const faqJsonLd = {
   <PageHeader
     title={d.title}
     lead={d.summary}
-    crumbs={[{ label: t('nav.services'), href: localizedPath('/servicios') }, { label: d.title }]}
+    crumbs={[{ label: t('nav.services'), href: lp('/servicios') }, { label: d.title }]}
   >
     <div class="flex flex-wrap items-center gap-4 pt-2">
       <Icon name={d.icon} size={48} class="mr-2" />
       <Button href={bookingCta.href} arrow>
         {bookingCta.label}
       </Button>
-      <Button variant="ghost" href={localizedPath('/calculadora')}>
+      <Button variant="ghost" href={lp('/calculadora')}>
         {t('services.detail.priceCalc')}
       </Button>
     </div>
@@ -96,7 +91,7 @@ const faqJsonLd = {
             : t('home.calculator.note')}
         </p>
         <div class="pt-2">
-          <Button variant="ghost" href={localizedPath('/calculadora')} arrow>
+          <Button variant="ghost" href={lp('/calculadora')} arrow>
             {t('services.detail.priceCalc')}
           </Button>
         </div>
@@ -131,7 +126,7 @@ const faqJsonLd = {
     <ul class="m-0 grid list-none gap-6 p-0 md:grid-cols-2">
       {related.map((r) => (
         <li data-reveal class="flex">
-          <Card href={localizedPath(`/servicios/${r.id}`)} class="flex w-full flex-col gap-4 p-8">
+          <Card href={lp(`/servicios/${entryKey(r)}`)} class="flex w-full flex-col gap-4 p-8">
             <Icon name={r.data.icon} size={40} />
             <h3 class="m-0 text-[1.5rem]">{r.data.title}</h3>
             <p class="t-small m-0 !text-piedra-700">{r.data.summary}</p>
@@ -140,7 +135,7 @@ const faqJsonLd = {
       ))}
     </ul>
     <div data-reveal class="mt-10">
-      <Button variant="ghost" href={localizedPath('/servicios')} arrow>
+      <Button variant="ghost" href={lp('/servicios')} arrow>
         {t('services.detail.seeAll')}
       </Button>
     </div>

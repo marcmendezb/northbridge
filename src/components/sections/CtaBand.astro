@@ -4,8 +4,10 @@ import heroPhoto from '../../assets/img/hero-poster.jpg';
 import Section from '../ui/Section.astro';
 import Button from '../ui/Button.astro';
 import ArchFrame from '../brand/ArchFrame.astro';
-import { bookingCta } from '../../lib/site';
-import { t } from '../../i18n';
+import { getBookingCta } from '../../lib/site';
+import { useI18n } from '../../i18n';
+const { t, locale } = useI18n(Astro.currentLocale);
+const bookingCta = getBookingCta(locale);
 
 interface Props {
   title?: string;

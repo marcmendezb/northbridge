@@ -9,9 +9,8 @@ import CheckList from '../components/ui/CheckList.astro';
 import PriceTag from '../components/ui/PriceTag.astro';
 import Accordion from '../components/ui/Accordion.astro';
 import ComparisonCell from '../components/ui/ComparisonCell.astro';
-import { es } from '../i18n/es';
-import { localizedPath, t } from '../i18n';
-import { bookingCta } from '../lib/site';
+import { useI18n, type MessageKey } from '../i18n';
+import { getBookingCta } from '../lib/site';
 import { formatCHF } from '../lib/format';
 import {
   COMPARISON,
@@ -22,20 +21,30 @@ import {
   type PackageId,
 } from '../lib/pricing/config';
 
+const { t, tRaw, lp, locale } = useI18n(Astro.currentLocale);
+const bookingCta = getBookingCta(locale);
 const ids = Object.keys(PACKAGES) as PackageId[];
-const cellText = (c: Cell) => (typeof c === 'string' ? c : typeof c === 'object' ? c.note : '');
+const rowLabel = (id: string) => t(`pricing.rows.${id}` as MessageKey);
+const cellText = (c: Cell) =>
+  typeof c === 'object' ? t(`pricing.cells.${'note' in c ? c.note : c.text}` as MessageKey) : '';
+/** En alemán los sustantivos van en mayúscula: no se fuerza la minúscula tras los dos puntos. */
+const lowerFirst = (s: string) =>
+  locale === 'de' ? s : `${s.charAt(0).toLowerCase()}${s.slice(1)}`;
 /** Cada paquete lista lo que incluye, tomado de la tabla comparativa. */
 const highlights = (id: PackageId) =>
   COMPARISON.filter((r) => r[id] !== false).map((r) => {
     const note = cellText(r[id]);
-    return note ? `${r.label}: ${note.charAt(0).toLowerCase()}${note.slice(1)}` : r.label;
+    return note ? `${rowLabel(r.id)}: ${lowerFirst(note)}` : rowLabel(r.id);
   });
-const constitution = es.pricing.separateConstitution
-  .replace('{gmbh}', formatCHF(FIXED_PRICES.gmbh.from))
-  .replace('{ag}', formatCHF(FIXED_PRICES.ag.from));
-const separate = SEPARATE_QUOTE.map((s) =>
-  s.key === 'constitution' ? `${s.label}. ${constitution}` : s.label,
-);
+const constitution = t('pricing.separateConstitution', {
+  gmbh: formatCHF(FIXED_PRICES.gmbh.from, locale),
+  ag: formatCHF(FIXED_PRICES.ag.from, locale),
+});
+const separate = SEPARATE_QUOTE.map((key) => {
+  const label = t(`pricing.separate.${key}` as MessageKey);
+  return key === 'constitution' ? `${label}. ${constitution}` : label;
+});
+const faq = tRaw<{ q: string; a: string }[]>('pricing.faq');
 ---
 
 <BaseLayout title={t('pricing.seoTitle')} description={t('pricing.seoDescription')}>
@@ -67,7 +76,7 @@ const separate = SEPARATE_QUOTE.map((s) =>
                   <span class="t-label mr-2 !text-[0.6875rem] text-piedra-600">
                     {t('pricing.forWhom')}
                   </span>
-                  {p.forWhom}
+                  {t(`pricing.packages.${id}.forWhom` as MessageKey)}
                 </p>
               </div>
               <PriceTag amount={p.from} firstVat={i === 0} />
@@ -118,7 +127,7 @@ const separate = SEPARATE_QUOTE.map((s) =>
           {COMPARISON.map((row) => (
             <tr class="border-b border-piedra-200 align-top last:border-0">
               <th scope="row" class="p-4 font-medium text-navy-800">
-                {row.label}
+                {rowLabel(row.id)}
               </th>
               {ids.map((id) => (
                 <td
@@ -149,7 +158,7 @@ const separate = SEPARATE_QUOTE.map((s) =>
   <Section tone="piedra" label={t('pricing.faqLabel')} rule>
     <div class="grid gap-10 md:grid-cols-[1fr_1.6fr] md:gap-16">
       <h2 class="m-0">{t('pricing.faqTitle')}</h2>
-      <Accordion items={[...es.pricing.faq]} level="h3" openFirst />
+      <Accordion items={faq} level="h3" openFirst />
     </div>
   </Section>
 
@@ -161,7 +170,7 @@ const separate = SEPARATE_QUOTE.map((s) =>
         <Button href={bookingCta.href} on="dark" arrow>
           {bookingCta.label}
         </Button>
-        <Button href={localizedPath('/calculadora')} variant="ghost" on="dark">
+        <Button href={lp('/calculadora')} variant="ghost" on="dark">
           {t('cta.calculate')}
         </Button>
       </div>

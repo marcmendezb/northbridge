@@ -1,6 +1,7 @@
 ---
 import Icon from '../brand/Icon.astro';
-import { t } from '../../i18n';
+import { useI18n } from '../../i18n';
+const { t } = useI18n(Astro.currentLocale);
 
 /** Alerta semántica: texto en la columna «Texto» (AA); icono y filete en la columna «Icono / borde». */
 interface Props {

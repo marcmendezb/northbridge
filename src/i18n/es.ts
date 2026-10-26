@@ -1,4 +1,4 @@
-/** Textos de interfaz en español (tuteo, frases cortas, sin exclamaciones). */
+/** Textos de interfaz en español (tuteo, frases cortas, sin exclamaciones). Es la plantilla de forma de todos los idiomas. */
 export const es = {
   brand: {
     name: 'Northbridge Advisory',
@@ -28,6 +28,10 @@ export const es = {
       promoText: 'Estimación orientativa, sin compromiso.',
       toggle: 'Servicios, mostrar el menú',
     },
+  },
+  lang: {
+    label: 'Idioma',
+    switch: 'Cambiar idioma',
   },
   cta: {
     book: 'Reserva tu consulta gratuita',
@@ -67,6 +71,11 @@ export const es = {
     vatNote: 'Precios sin IVA',
     vatFirst: 'IVA (MWST)',
     vatNoteFirst: 'Precios sin IVA (MWST)',
+    includedFrom: 'Incluido desde {name}',
+    packageStarts: 'El paquete {name} empieza en {amount} CHF/mes.',
+    package: 'Paquete {name}.',
+    fixed: 'Precio cerrado.',
+    unitOnce: 'CHF',
   },
   alert: {
     success: 'Correcto',
@@ -124,6 +133,44 @@ export const es = {
     compareTitle: 'Qué incluye cada paquete',
     compareCaption: 'Comparativa de los paquetes Essential, Growth y Full Service',
     feature: 'Servicio',
+    packages: {
+      essential: { forWhom: 'Autónomos y empresas muy pequeñas sin personal' },
+      growth: { forWhom: 'Pymes con equipo y startups en marcha' },
+      full: { forWhom: 'Pymes de hasta 50 empleados y empresas con estructura (AG)' },
+    },
+    rows: {
+      accounting: 'Contabilidad mensual y cierre anual',
+      vat: 'IVA (MWST)',
+      payroll: 'Nóminas y seguros sociales',
+      report: 'Informe en lenguaje claro',
+      meeting: 'Reunión con tu asesor',
+      contact: 'Persona de contacto',
+      taxPlanning: 'Planificación fiscal anual',
+      capTable: 'Startups: cap table básico',
+      valuation: 'Startups: valoración y preparación de ronda',
+      taxRequests: 'Gestión de requerimientos de la autoridad fiscal',
+    },
+    cells: {
+      upTo20Invoices: 'hasta 20 facturas/mes',
+      byVolume: 'según volumen',
+      quarterlyNote: 'trimestral',
+      upTo10Employees: 'hasta 10 empleados',
+      upTo50Employees: 'hasta 50 empleados',
+      annual: 'Anual',
+      quarterly: 'Trimestral',
+      monthly: 'Mensual',
+      contactEssential: 'Email, respuesta en 2 días laborables',
+      contactGrowth: 'Interlocutor fijo y teléfono directo',
+      contactFull: 'Interlocutor fijo, respuesta el mismo día laborable',
+      consult: 'Consulta',
+      priority: 'Prioritaria',
+    },
+    separate: {
+      constitution: 'Constitución de empresa',
+      backlog: 'Regularización de contabilidades atrasadas',
+      valuation: 'Valoraciones puntuales fuera del paquete',
+      extraordinary: 'Procesos extraordinarios (inspecciones, reestructuraciones)',
+    },
     separateLabel: 'Aparte',
     separateTitle: 'Qué no está incluido',
     separateLead:
@@ -224,3 +271,11 @@ type Leaves<T, P extends string = ''> = {
 }[keyof T & string];
 
 export type MessageKey = Leaves<typeof es>;
+
+/** Forma del diccionario: misma estructura que `es`, con textos libres. Todos los idiomas la cumplen. */
+type Widen<T> = T extends string
+  ? string
+  : T extends readonly (infer U)[]
+    ? readonly Widen<U>[]
+    : { -readonly [K in keyof T]: Widen<T[K]> };
+export type Messages = Widen<typeof es>;

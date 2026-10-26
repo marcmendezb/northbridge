@@ -71,7 +71,7 @@ test.describe('reduced motion', () => {
 test('axe con el desplegable de Servicios abierto', async ({ page }) => {
   await page.setViewportSize({ width: 1440, height: 900 });
   await page.goto('/servicios', { waitUntil: 'networkidle' });
-  await page.locator('[data-mega-trigger]').hover();
+  await page.locator('.nb-nav__trigger').hover();
   await page.waitForTimeout(900);
   const results = await new AxeBuilder({ page })
     .withTags(['wcag2a', 'wcag2aa', 'wcag21aa', 'wcag22aa'])

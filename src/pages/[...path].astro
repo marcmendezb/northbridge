@@ -1,0 +1,51 @@
+---
+import type { CollectionEntry } from 'astro:content';
+import HomeView from '../views/HomeView.astro';
+import ServicesView from '../views/ServicesView.astro';
+import ServiceDetailView from '../views/ServiceDetailView.astro';
+import PricingView from '../views/PricingView.astro';
+import { locales, localizedPath, type Locale } from '../i18n';
+import { entryKey, getServices } from '../lib/content';
+
+/**
+ * Todas las páginas en todos los idiomas. La ruta pública sale de la ruta canónica (española)
+ * traducida con `localizedPath` (src/i18n/routes.ts): `/servicios` → `/en/services`.
+ */
+export async function getStaticPaths() {
+  const toParam = (canonical: string, locale: Locale) =>
+    localizedPath(canonical, locale).replace(/^\//, '') || undefined;
+
+  const paths = [];
+  for (const locale of locales) {
+    const services = await getServices(locale);
+    paths.push(
+      { params: { path: toParam('/', locale) }, props: { view: 'home' as const } },
+      { params: { path: toParam('/servicios', locale) }, props: { view: 'services' as const } },
+      { params: { path: toParam('/precios', locale) }, props: { view: 'pricing' as const } },
+      ...services.map((entry, i) => ({
+        params: { path: toParam(`/servicios/${entryKey(entry)}`, locale) },
+        props: {
+          view: 'service' as const,
+          entry,
+          related: [1, 2].map((n) => services[(i + n) % services.length]),
+        },
+      })),
+    );
+  }
+  return paths;
+}
+
+type Props =
+  | { view: 'home' | 'services' | 'pricing' }
+  | {
+      view: 'service';
+      entry: CollectionEntry<'servicios'>;
+      related: CollectionEntry<'servicios'>[];
+    };
+const props = Astro.props;
+---
+
+{props.view === 'home' && <HomeView />}
+{props.view === 'services' && <ServicesView />}
+{props.view === 'pricing' && <PricingView />}
+{props.view === 'service' && <ServiceDetailView entry={props.entry} related={props.related} />}

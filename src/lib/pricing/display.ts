@@ -1,3 +1,4 @@
+import { t, type Locale } from '../../i18n';
 import { formatNumber } from '../format';
 import { FIXED_PRICES, PACKAGES, type FixedId, type PackageId } from './config';
 
@@ -11,22 +12,34 @@ export interface PricingRef {
 const isPackage = (ref: string): ref is PackageId => ref in PACKAGES;
 
 /** Texto de precio orientativo de un servicio, siempre derivado de config.ts. */
-export function describePricing({ ref, mode }: PricingRef): {
+export function describePricing(
+  { ref, mode }: PricingRef,
+  locale: Locale = 'es',
+): {
   headline: string;
   detail?: string;
   amount?: number;
   unit?: string;
 } {
   if (isPackage(ref)) {
-    const pkg = PACKAGES[ref];
+    const { name, from } = PACKAGES[ref];
     if (mode === 'included') {
       return {
-        headline: `Incluido desde ${pkg.name}`,
-        detail: `El paquete ${pkg.name} empieza en ${formatNumber(pkg.from)}\u202FCHF/mes.`,
+        headline: t('price.includedFrom', locale, { name }),
+        detail: t('price.packageStarts', locale, { name, amount: formatNumber(from, locale) }),
       };
     }
-    return { headline: 'desde', amount: pkg.from, unit: 'CHF/mes', detail: `Paquete ${pkg.name}.` };
+    return {
+      headline: t('price.from', locale),
+      amount: from,
+      unit: t('price.perMonth', locale),
+      detail: t('price.package', locale, { name }),
+    };
   }
-  const fixed = FIXED_PRICES[ref];
-  return { headline: 'desde', amount: fixed.from, unit: 'CHF', detail: 'Precio cerrado.' };
+  return {
+    headline: t('price.from', locale),
+    amount: FIXED_PRICES[ref].from,
+    unit: t('price.unitOnce', locale),
+    detail: t('price.fixed', locale),
+  };
 }

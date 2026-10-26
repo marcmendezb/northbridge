@@ -2,14 +2,20 @@ import { defineCollection } from 'astro:content';
 import { glob } from 'astro/loaders';
 import { z } from 'astro/zod';
 
-export const serviceIcons = ['contabilidad', 'iva', 'nominas', 'constitucion', 'startups'] as const;
+export const serviceIconNames = [
+  'contabilidad',
+  'iva',
+  'nominas',
+  'constitucion',
+  'startups',
+] as const;
 
 const servicios = defineCollection({
-  loader: glob({ pattern: '*.{md,mdx}', base: './src/content/servicios' }),
+  loader: glob({ pattern: '*/*.{md,mdx}', base: './src/content/servicios' }),
   schema: z.object({
     title: z.string(),
     order: z.number(),
-    icon: z.enum(serviceIcons),
+    icon: z.enum(serviceIconNames),
     /** 1–2 frases, lenguaje claro. */
     summary: z.string(),
     includes: z.array(z.string()),
@@ -32,7 +38,7 @@ const servicios = defineCollection({
 });
 
 const testimonios = defineCollection({
-  loader: glob({ pattern: '*.json', base: './src/content/testimonios' }),
+  loader: glob({ pattern: '*/*.json', base: './src/content/testimonios' }),
   schema: z.object({
     author: z.string(),
     role: z.string(),

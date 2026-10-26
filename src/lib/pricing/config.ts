@@ -11,24 +11,18 @@ export const PACKAGES = {
     name: 'Essential',
     from: 190,
     recommended: false,
-    forWhom: 'Autónomos y empresas muy pequeñas sin personal',
   },
   growth: {
     name: 'Growth',
     from: 490,
     recommended: true,
-    forWhom: 'Pymes con equipo y startups en marcha',
   },
   full: {
     name: 'Full Service',
     from: 990,
     recommended: false,
-    forWhom: 'Pymes de hasta 50 empleados y empresas con estructura (AG)',
   },
-} as const satisfies Record<
-  PackageId,
-  { name: string; from: number; recommended: boolean; forWhom: string }
->;
+} as const satisfies Record<PackageId, { name: string; from: number; recommended: boolean }>;
 
 /** Servicios de precio cerrado, fuera de los paquetes mensuales. */
 export const FIXED_PRICES = {
@@ -39,11 +33,41 @@ export const FIXED_PRICES = {
 /** Permanencia de los paquetes mensuales, en meses. */
 export const COMMITMENT_MONTHS = 3;
 
-/** Celda de la tabla comparativa: true = incluido; false = no incluido; texto; o incluido con nota. */
-export type Cell = boolean | string | { note: string };
+/** Identificadores de los textos de celda (`pricing.cells.*` en el diccionario). */
+export type CellId =
+  | 'upTo20Invoices'
+  | 'byVolume'
+  | 'quarterlyNote'
+  | 'upTo10Employees'
+  | 'upTo50Employees'
+  | 'annual'
+  | 'quarterly'
+  | 'monthly'
+  | 'contactEssential'
+  | 'contactGrowth'
+  | 'contactFull'
+  | 'consult'
+  | 'priority';
 
+/**
+ * Celda de la tabla comparativa: true = incluido; false = no incluido;
+ * `{ text }` = solo texto; `{ note }` = incluido con nota. Los textos viven en el diccionario.
+ */
+export type Cell = boolean | { text: CellId } | { note: CellId };
+
+/** `id` es la clave de `pricing.rows.*` en el diccionario. */
 export interface ComparisonRow {
-  label: string;
+  id:
+    | 'accounting'
+    | 'vat'
+    | 'payroll'
+    | 'report'
+    | 'meeting'
+    | 'contact'
+    | 'taxPlanning'
+    | 'capTable'
+    | 'valuation'
+    | 'taxRequests';
   essential: Cell;
   growth: Cell;
   full: Cell;
@@ -51,49 +75,49 @@ export interface ComparisonRow {
 
 export const COMPARISON: readonly ComparisonRow[] = [
   {
-    label: 'Contabilidad mensual y cierre anual',
-    essential: { note: 'hasta 20 facturas/mes' },
-    growth: { note: 'según volumen' },
-    full: { note: 'según volumen' },
+    id: 'accounting',
+    essential: { note: 'upTo20Invoices' },
+    growth: { note: 'byVolume' },
+    full: { note: 'byVolume' },
   },
-  { label: 'IVA (MWST)', essential: { note: 'trimestral' }, growth: true, full: true },
+  { id: 'vat', essential: { note: 'quarterlyNote' }, growth: true, full: true },
   {
-    label: 'Nóminas y seguros sociales',
+    id: 'payroll',
     essential: false,
-    growth: { note: 'hasta 10 empleados' },
-    full: { note: 'hasta 50 empleados' },
+    growth: { note: 'upTo10Employees' },
+    full: { note: 'upTo50Employees' },
   },
-  { label: 'Informe en lenguaje claro', essential: 'Anual', growth: 'Trimestral', full: 'Mensual' },
-  { label: 'Reunión con tu asesor', essential: false, growth: 'Trimestral', full: 'Mensual' },
   {
-    label: 'Persona de contacto',
-    essential: 'Email, respuesta en 2 días laborables',
-    growth: 'Interlocutor fijo y teléfono directo',
-    full: 'Interlocutor fijo, respuesta el mismo día laborable',
+    id: 'report',
+    essential: { text: 'annual' },
+    growth: { text: 'quarterly' },
+    full: { text: 'monthly' },
   },
-  { label: 'Planificación fiscal anual', essential: false, growth: false, full: true },
-  { label: 'Startups: cap table básico', essential: false, growth: true, full: true },
   {
-    label: 'Startups: valoración y preparación de ronda',
+    id: 'meeting',
     essential: false,
-    growth: false,
-    full: true,
+    growth: { text: 'quarterly' },
+    full: { text: 'monthly' },
   },
   {
-    label: 'Gestión de requerimientos de la autoridad fiscal',
-    essential: 'Consulta',
+    id: 'contact',
+    essential: { text: 'contactEssential' },
+    growth: { text: 'contactGrowth' },
+    full: { text: 'contactFull' },
+  },
+  { id: 'taxPlanning', essential: false, growth: false, full: true },
+  { id: 'capTable', essential: false, growth: true, full: true },
+  { id: 'valuation', essential: false, growth: false, full: true },
+  {
+    id: 'taxRequests',
+    essential: { text: 'consult' },
     growth: true,
-    full: 'Prioritaria',
+    full: { text: 'priority' },
   },
 ];
 
-/** Se presupuesta aparte, con precio cerrado. */
-export const SEPARATE_QUOTE = [
-  { key: 'constitution', label: 'Constitución de empresa' },
-  { key: 'backlog', label: 'Regularización de contabilidades atrasadas' },
-  { key: 'valuation', label: 'Valoraciones puntuales fuera del paquete' },
-  { key: 'extraordinary', label: 'Procesos extraordinarios (inspecciones, reestructuraciones)' },
-] as const;
+/** Se presupuesta aparte, con precio cerrado (`pricing.separate.*` en el diccionario). */
+export const SEPARATE_QUOTE = ['constitution', 'backlog', 'valuation', 'extraordinary'] as const;
 
 // ── Calculadora (fase 4) ──────────────────────────────────────────────────────
 export const BASE = { autonomo: 190, startup: 290, gmbh: 340, ag: 520 };

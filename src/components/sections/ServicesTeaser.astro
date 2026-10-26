@@ -1,21 +1,20 @@
 ---
-import { getCollection } from 'astro:content';
 import Section from '../ui/Section.astro';
 import Button from '../ui/Button.astro';
 import Icon from '../brand/Icon.astro';
-import { localizedPath, t } from '../../i18n';
+import { useI18n } from '../../i18n';
+import { entryKey, getServices } from '../../lib/content';
+const { t, lp, locale } = useI18n(Astro.currentLocale);
 
 const featured = ['contabilidad', 'iva', 'nominas'];
-const services = (await getCollection('servicios'))
-  .filter((s) => featured.includes(s.data.icon))
-  .sort((a, b) => a.data.order - b.data.order);
+const services = (await getServices(locale)).filter((s) => featured.includes(s.data.icon));
 ---
 
 <Section tone="base" title={t('home.services.title')} lead={t('home.services.lead')}>
   <ol class="nb-rows m-0 list-none p-0">
     {services.map((s, i) => (
       <li data-reveal class="nb-row">
-        <a href={localizedPath(`/servicios/${s.id}`)} class="nb-row__link nb-trace">
+        <a href={lp(`/servicios/${entryKey(s)}`)} class="nb-row__link nb-trace">
           <span class="nb-row__n t-figure" aria-hidden="true">
             {String(i + 1).padStart(2, '0')}
           </span>
@@ -41,7 +40,7 @@ const services = (await getCollection('servicios'))
     ))}
   </ol>
   <div data-reveal class="mt-12">
-    <Button variant="ghost" href={localizedPath('/servicios')} arrow>
+    <Button variant="ghost" href={lp('/servicios')} arrow>
       {t('home.services.more')}
     </Button>
   </div>

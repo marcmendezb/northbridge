@@ -1,13 +1,16 @@
 ---
-import { t } from '../../i18n';
+import { useI18n, type MessageKey } from '../../i18n';
 import type { Cell } from '../../lib/pricing/config';
+const { t } = useI18n(Astro.currentLocale);
+const cellText = (id: string) => t(`pricing.cells.${id}` as MessageKey);
 
 interface Props {
   cell: Cell;
 }
 const { cell } = Astro.props;
-const included = cell === true || (typeof cell === 'object' && cell !== null);
-const note = typeof cell === 'string' ? cell : typeof cell === 'object' ? cell.note : undefined;
+const included = cell === true || (typeof cell === 'object' && 'note' in cell);
+const note =
+  typeof cell === 'object' ? cellText('note' in cell ? cell.note : cell.text) : undefined;
 ---
 
 {cell === false ? (

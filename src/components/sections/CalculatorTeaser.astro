@@ -1,7 +1,8 @@
 ---
 import Section from '../ui/Section.astro';
 import Button from '../ui/Button.astro';
-import { localizedPath, t } from '../../i18n';
+import { useI18n } from '../../i18n';
+const { t, lp } = useI18n(Astro.currentLocale);
 ---
 
 <Section tone="navy">
@@ -12,7 +13,7 @@ import { localizedPath, t } from '../../i18n';
       <p class="t-small m-0 !text-navy-200">{t('home.calculator.note')}</p>
     </div>
     <div data-reveal class="md:justify-self-end">
-      <Button on="dark" href={localizedPath('/calculadora')} arrow>
+      <Button on="dark" href={lp('/calculadora')} arrow>
         {t('cta.calculate')}
       </Button>
     </div>

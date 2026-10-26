@@ -1,9 +1,11 @@
 ---
-import { getCollection } from 'astro:content';
 import Section from '../ui/Section.astro';
-import { t } from '../../i18n';
+import { localeMeta, useI18n } from '../../i18n';
+import { getTestimonials } from '../../lib/content';
+const { t, locale } = useI18n(Astro.currentLocale);
 
-const items = (await getCollection('testimonios')).sort((a, b) => a.data.order - b.data.order);
+const items = await getTestimonials(locale);
+const [open, close] = localeMeta[locale].quotes;
 ---
 
 <Section tone="base" title={t('home.testimonials.title')}>
@@ -20,7 +22,11 @@ const items = (await getCollection('testimonios')).sort((a, b) => a.data.order -
         <li class="nb-slide" data-active={i === 0 ? '' : undefined}>
           <figure class="nb-quote m-0">
             <blockquote class="nb-quote__text m-0">
-              <p class="m-0">«{it.data.quote}»</p>
+              <p class="m-0">
+                {open}
+                {it.data.quote}
+                {close}
+              </p>
             </blockquote>
             <figcaption class="nb-quote__who">
               <span class="nb-quote__name">{it.data.author}</span>

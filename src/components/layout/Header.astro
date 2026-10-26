@@ -3,8 +3,18 @@ import { Image, Picture } from 'astro:assets';
 import promoPhoto from '../../assets/img/hero-poster.jpg';
 import Icon from '../brand/Icon.astro';
 import logoMark from '../../assets/brand/logo-header.png';
-import { localizedPath, t } from '../../i18n';
-import { bookingCta, mainNav, serviceLinks, site } from '../../lib/site';
+import { alternates, localeMeta, parsePath, useI18n } from '../../i18n';
+import { getBookingCta, getMainNav, getServiceLinks, site } from '../../lib/site';
+const { t, lp, locale } = useI18n(Astro.currentLocale);
+const bookingCta = getBookingCta(locale);
+const mainNav = getMainNav(locale);
+const serviceLinks = getServiceLinks(locale);
+/** La misma página en cada idioma. */
+const langOptions = alternates(parsePath(Astro.url.pathname).canonical).map((a) => ({
+  ...a,
+  ...localeMeta[a.locale],
+  current: a.locale === locale,
+}));
 
 interface Props {
   /** Cabecera reducida (landing de consulta): solo logo y CTA. */
@@ -18,7 +28,11 @@ const isCurrent = (href: string) => path === href || (href !== '/' && path.start
 <header class="nb-header" data-minimal={minimal ? '' : undefined}>
   <div class="nb-bar">
     <div class="nb-bar__row">
-      <a href="/" class="nb-bar__logo" aria-label={`${site.name}, ${t('nav.home').toLowerCase()}`}>
+      <a
+        href={lp('/')}
+        class="nb-bar__logo"
+        aria-label={`${site.name}, ${t('nav.home').toLowerCase()}`}
+      >
         <Image
           src={logoMark}
           alt=""
@@ -35,9 +49,12 @@ const isCurrent = (href: string) => path === href || (href !== '/' && path.start
         <nav aria-label={t('nav.main')} class="nb-nav">
           <ul class="m-0 flex list-none items-center gap-1 p-0">
             {mainNav.map((l) => {
-              const hasMega = l.href === localizedPath('/servicios');
+              const hasMega = l.href === lp('/servicios');
               return (
-                <li class:list={[hasMega && 'nb-has-menu']}>
+                <li
+                  class:list={[hasMega && 'nb-has-menu']}
+                  data-mega-item={hasMega ? '' : undefined}
+                >
                   {hasMega ? (
                     <>
                       <a
@@ -87,6 +104,46 @@ const isCurrent = (href: string) => path === href || (href !== '/' && path.start
       )}
 
       <div class="nb-bar__end">
+        {!minimal && (
+          <div class="nb-lang" data-mega-item>
+            <button
+              type="button"
+              class="nb-nav__link nb-lang__trigger"
+              aria-expanded="false"
+              aria-controls="mega-idiomas"
+              aria-label={`${t('lang.switch')}: ${localeMeta[locale].name}`}
+              data-mega-trigger
+            >
+              <span aria-hidden="true">{localeMeta[locale].short}</span>
+              <svg
+                class="nb-nav__chev"
+                viewBox="0 0 16 16"
+                width="14"
+                height="14"
+                fill="none"
+                stroke="currentColor"
+                stroke-width="1.5"
+                aria-hidden="true"
+              >
+                <path d="M3 6l5 5 5-5" />
+              </svg>
+            </button>
+            <ul class="nb-lang__nojs" aria-label={t('lang.label')}>
+              {langOptions.map((o) => (
+                <li>
+                  <a
+                    href={o.path}
+                    lang={o.htmlLang}
+                    hreflang={o.htmlLang}
+                    aria-current={o.current ? 'true' : undefined}
+                  >
+                    {o.short}
+                  </a>
+                </li>
+              ))}
+            </ul>
+          </div>
+        )}
         <a href={bookingCta.href} class:list={['nb-cta', minimal && 'nb-cta--always']}>
           <span class="nb-cta__icon" aria-hidden="true">
             <svg
@@ -146,7 +203,7 @@ const isCurrent = (href: string) => path === href || (href !== '/' && path.start
                   </li>
                 ))}
               </ul>
-              <a href={localizedPath('/servicios')} class="nb-mega__all">
+              <a href={lp('/servicios')} class="nb-mega__all">
                 {t('nav.mega.seeAll')} <span aria-hidden="true">→</span>
               </a>
             </div>
@@ -154,12 +211,12 @@ const isCurrent = (href: string) => path === href || (href !== '/' && path.start
               <p class="nb-mega__head">{t('nav.mega.start')}</p>
               <ul class="nb-mega__list">
                 <li>
-                  <a href={localizedPath('/precios')} class="nb-mega__link">
+                  <a href={lp('/precios')} class="nb-mega__link">
                     <span>{t('nav.prices')}</span>
                   </a>
                 </li>
                 <li>
-                  <a href={localizedPath('/calculadora')} class="nb-mega__link">
+                  <a href={lp('/calculadora')} class="nb-mega__link">
                     <span>{t('footer.calculator')}</span>
                   </a>
                 </li>
@@ -170,7 +227,7 @@ const isCurrent = (href: string) => path === href || (href !== '/' && path.start
                 </li>
               </ul>
             </div>
-            <a href={localizedPath('/calculadora')} class="nb-mega__promo" data-surface="dark">
+            <a href={lp('/calculadora')} class="nb-mega__promo" data-surface="dark">
               <Picture
                 src={promoPhoto}
                 formats={['avif', 'webp']}
@@ -186,6 +243,75 @@ const isCurrent = (href: string) => path === href || (href !== '/' && path.start
                 <span class="nb-mega__promo-text">{t('nav.mega.promoText')}</span>
                 <span class="nb-mega__promo-cta">
                   {t('cta.calculate')} <span aria-hidden="true">→</span>
+                </span>
+              </span>
+            </a>
+          </div>
+        </div>
+      </div>
+    )}
+
+    {!minimal && (
+      <div id="mega-idiomas" class="nb-mega" data-mega data-open="false">
+        <div class="nb-mega__clip">
+          <div class="nb-mega__inner">
+            <div class="nb-mega__col">
+              <p class="nb-mega__head">{t('lang.label')}</p>
+              <ul class="nb-mega__list">
+                {langOptions.map((o) => (
+                  <li>
+                    <a
+                      href={o.path}
+                      lang={o.htmlLang}
+                      hreflang={o.htmlLang}
+                      class="nb-mega__link"
+                      aria-current={o.current ? 'true' : undefined}
+                    >
+                      <span class="nb-mega__code" aria-hidden="true">
+                        {o.short}
+                      </span>
+                      <span>{o.name}</span>
+                    </a>
+                  </li>
+                ))}
+              </ul>
+            </div>
+            <div class="nb-mega__col">
+              <p class="nb-mega__head">{t('footer.contact')}</p>
+              <ul class="nb-mega__list">
+                <li>
+                  <a href={`tel:${site.phone.replace(/\s/g, '')}`} class="nb-mega__link">
+                    <span>{site.phone}</span>
+                  </a>
+                </li>
+                <li>
+                  <a href={`mailto:${site.email}`} class="nb-mega__link">
+                    <span>{site.email}</span>
+                  </a>
+                </li>
+              </ul>
+              <p class="nb-mega__info">
+                {site.address.street}, {site.address.postalCode} {site.address.city}
+                <br />
+                {t('footer.hours')}
+              </p>
+            </div>
+            <a href={bookingCta.href} class="nb-mega__promo" data-surface="dark">
+              <Picture
+                src={promoPhoto}
+                formats={['avif', 'webp']}
+                widths={[480, 720]}
+                sizes="360px"
+                alt=""
+                loading="lazy"
+                quality={70}
+                class="nb-mega__promo-img"
+              />
+              <span class="nb-mega__promo-body">
+                <span class="nb-mega__promo-title">{t('home.cta.title')}</span>
+                <span class="nb-mega__promo-text">{t('home.cta.text')}</span>
+                <span class="nb-mega__promo-cta">
+                  {bookingCta.label} <span aria-hidden="true">→</span>
                 </span>
               </span>
             </a>
@@ -226,6 +352,20 @@ const isCurrent = (href: string) => path === href || (href !== '/' && path.start
             </span>
             <span>{bookingCta.label}</span>
           </a>
+          <ul class="nb-mobile__langs" aria-label={t('lang.label')}>
+            {langOptions.map((o) => (
+              <li>
+                <a
+                  href={o.path}
+                  lang={o.htmlLang}
+                  hreflang={o.htmlLang}
+                  aria-current={o.current ? 'true' : undefined}
+                >
+                  {o.short}
+                </a>
+              </li>
+            ))}
+          </ul>
         </nav>
       </div>
     )}
@@ -269,21 +409,20 @@ const isCurrent = (href: string) => path === href || (href !== '/' && path.start
     justify-content: space-between;
     gap: 16px;
     height: var(--header-h);
-    padding-inline: 20px;
+    padding-inline: 24px;
   }
-  @media (min-width: 1024px) {
+  @media (min-width: 1200px) {
     .nb-bar__row {
       display: grid;
-      grid-template-columns: 1fr auto 1fr;
-      padding-inline: 24px;
+      grid-template-columns: minmax(max-content, 1fr) auto minmax(max-content, 1fr);
+      padding-inline: clamp(32px, 3.6vw, 56px);
     }
   }
   .nb-bar__logo {
     display: inline-flex;
     align-items: center;
     min-height: 44px;
-    padding: 4px 8px;
-    margin-left: -8px;
+    padding: 4px 0;
   }
   .nb-bar__logo-img {
     display: block;
@@ -300,7 +439,7 @@ const isCurrent = (href: string) => path === href || (href !== '/' && path.start
   .nb-nav {
     display: none;
   }
-  @media (min-width: 1024px) {
+  @media (min-width: 1200px) {
     .nb-nav {
       display: block;
     }
@@ -311,6 +450,7 @@ const isCurrent = (href: string) => path === href || (href !== '/' && path.start
     padding: 0.5rem 1rem;
     font-size: 1rem;
     font-weight: 500;
+    white-space: nowrap;
     color: var(--piedra-700);
     text-decoration: none;
     transition: color var(--dur-fast) var(--ease-out);
@@ -353,7 +493,7 @@ const isCurrent = (href: string) => path === href || (href !== '/' && path.start
   .nb-mega {
     display: none;
   }
-  @media (min-width: 1024px) {
+  @media (min-width: 1200px) {
     .js .nb-mega {
       display: grid;
       grid-template-rows: 0fr;
@@ -378,8 +518,8 @@ const isCurrent = (href: string) => path === href || (href !== '/' && path.start
     display: grid;
     grid-template-columns: 1fr 1fr minmax(300px, 400px);
     gap: 24px 56px;
-    margin: 0 24px;
-    padding: 32px 24px 28px;
+    margin-inline: clamp(32px, 3.6vw, 56px);
+    padding: 32px 0 28px;
     border-top: 1px solid var(--rule);
   }
   .nb-mega__head {
@@ -500,6 +640,100 @@ const isCurrent = (href: string) => path === href || (href !== '/' && path.start
     text-decoration-thickness: 1px;
     text-underline-offset: 3px;
   }
+  /* Idiomas: mismo desplegable que Servicios; el código del idioma ocupa el sitio del icono. */
+  .nb-mega__code {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    width: 34px;
+    height: 26px;
+    border: 1px solid var(--rule);
+    border-radius: var(--radius-tag, 2px);
+    font-family: var(--font-sans);
+    font-size: 0.75rem;
+    font-weight: 600;
+    letter-spacing: 0.08em;
+    color: var(--piedra-700);
+    transition:
+      color var(--dur-fast) var(--ease-out),
+      border-color var(--dur-fast) var(--ease-out);
+  }
+  .nb-mega__link:hover .nb-mega__code,
+  .nb-mega__link:focus-visible .nb-mega__code {
+    border-color: var(--salvia-600);
+    color: var(--salvia-600);
+  }
+  .nb-mega__link[aria-current] .nb-mega__code {
+    border-color: var(--navy-800);
+    background: var(--navy-800);
+    color: var(--white);
+  }
+  .nb-mega__info {
+    margin: 18px 0 0;
+    font-size: 0.9375rem;
+    line-height: 1.6;
+    color: var(--piedra-700);
+  }
+  .nb-lang__trigger {
+    display: none;
+    align-items: center;
+    gap: 6px;
+    min-height: 44px;
+    cursor: pointer;
+    background: none;
+    border: 0;
+    font: inherit;
+    font-size: 0.9375rem;
+    font-weight: 600;
+    letter-spacing: 0.06em;
+  }
+  .nb-lang__trigger[aria-expanded='true'] .nb-nav__chev {
+    transform: rotate(180deg);
+  }
+  .nb-lang__nojs,
+  .nb-mobile__langs {
+    display: flex;
+    gap: 4px;
+    margin: 0;
+    padding: 0;
+    list-style: none;
+  }
+  .nb-lang__nojs a,
+  .nb-mobile__langs a {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    min-width: 44px;
+    min-height: 44px;
+    font-size: 0.8125rem;
+    font-weight: 600;
+    letter-spacing: 0.06em;
+    color: var(--piedra-700);
+    text-decoration: none;
+  }
+  .nb-lang__nojs a[aria-current],
+  .nb-mobile__langs a[aria-current] {
+    color: var(--navy-800);
+    text-decoration: underline;
+    text-underline-offset: 4px;
+  }
+  .nb-mobile__langs {
+    margin-top: 20px;
+    padding-top: 12px;
+    border-top: 1px solid var(--piedra-200);
+  }
+  .nb-lang__nojs {
+    display: none;
+  }
+  @media (min-width: 1200px) {
+    .js .nb-lang__trigger {
+      display: inline-flex;
+    }
+    html:not(.js) .nb-lang__nojs {
+      display: flex;
+    }
+  }
+
   .nb-header[data-mega-open] .nb-bar {
     border-color: var(--piedra-100);
     box-shadow: 0 10px 32px rgb(21 39 66 / 0.1);
@@ -576,7 +810,7 @@ const isCurrent = (href: string) => path === href || (href !== '/' && path.start
   .js .nb-menu-btn {
     display: inline-flex;
   }
-  @media (min-width: 1024px) {
+  @media (min-width: 1200px) {
     .js .nb-menu-btn {
       display: none;
     }
@@ -638,52 +872,68 @@ const isCurrent = (href: string) => path === href || (href !== '/' && path.start
     onScroll();
     window.addEventListener('scroll', onScroll, { passive: true });
 
-    // ── Desplegable de Servicios ──
-    const megaTrigger = header.querySelector<HTMLButtonElement>('[data-mega-trigger]');
-    const mega = header.querySelector<HTMLElement>('[data-mega]');
-    const desktop = window.matchMedia('(min-width: 1024px)');
-    if (megaTrigger && mega) {
-      const item = megaTrigger.closest('li')!;
+    // ── Desplegables (Servicios e Idiomas): la barra crece hacia abajo; solo uno abierto a la vez ──
+    const desktop = window.matchMedia('(min-width: 1200px)');
+    const hoverable = () => desktop.matches && window.matchMedia('(hover: hover)').matches;
+    const megas = [...header.querySelectorAll<HTMLButtonElement>('[data-mega-trigger]')]
+      .map((trigger) => ({
+        trigger,
+        panel: document.getElementById(trigger.getAttribute('aria-controls') ?? ''),
+        item: trigger.closest<HTMLElement>('[data-mega-item]'),
+      }))
+      .filter((m): m is { trigger: HTMLButtonElement; panel: HTMLElement; item: HTMLElement } =>
+        Boolean(m.panel && m.item),
+      );
+    type Mega = (typeof megas)[number];
+    if (megas.length) {
+      let current: Mega | null = null;
       let timer: number | undefined;
-      const setMega = (open: boolean, returnFocus = false) => {
+      const setMega = (target: Mega | null, returnFocus = false) => {
         window.clearTimeout(timer);
-        megaTrigger.setAttribute('aria-expanded', String(open));
-        mega.dataset.open = String(open);
-        header.toggleAttribute('data-mega-open', open);
-        if (!open && returnFocus) megaTrigger.focus();
+        const previous = current;
+        current = target;
+        for (const m of megas) {
+          const open = m === target;
+          m.trigger.setAttribute('aria-expanded', String(open));
+          m.panel.dataset.open = String(open);
+        }
+        header.toggleAttribute('data-mega-open', Boolean(target));
+        if (!target && returnFocus) previous?.trigger.focus();
       };
-      const later = (open: boolean, ms: number) => {
+      const later = (target: Mega | null, ms: number) => {
         window.clearTimeout(timer);
-        timer = window.setTimeout(() => setMega(open), ms);
+        timer = window.setTimeout(() => setMega(target), ms);
       };
-      const hoverable = () => desktop.matches && window.matchMedia('(hover: hover)').matches;
 
-      megaTrigger.addEventListener('click', (e) => {
-        const open = megaTrigger.getAttribute('aria-expanded') !== 'true';
-        setMega(open);
-        // Con teclado (Enter o Espacio), el foco pasa al primer enlace del panel.
-        if (open && (e as MouseEvent).detail === 0)
-          mega.querySelector<HTMLElement>('a[href]')?.focus();
-      });
-      item.addEventListener('mouseenter', () => hoverable() && later(true, 80));
-      item.addEventListener('mouseleave', () => hoverable() && later(false, 220));
-      mega.addEventListener('mouseenter', () => hoverable() && window.clearTimeout(timer));
-      mega.addEventListener('mouseleave', () => hoverable() && later(false, 220));
+      for (const m of megas) {
+        m.trigger.addEventListener('click', (e) => {
+          const open = current !== m;
+          setMega(open ? m : null);
+          // Con teclado (Enter o Espacio), el foco pasa al primer enlace del panel.
+          if (open && (e as MouseEvent).detail === 0)
+            m.panel.querySelector<HTMLElement>('a[href]')?.focus();
+        });
+        m.item.addEventListener('mouseenter', () => hoverable() && later(m, current ? 0 : 80));
+        m.item.addEventListener('mouseleave', () => hoverable() && later(null, 220));
+        m.panel.addEventListener('mouseenter', () => hoverable() && window.clearTimeout(timer));
+        m.panel.addEventListener('mouseleave', () => hoverable() && later(null, 220));
+      }
       document.addEventListener('keydown', (e) => {
-        if (e.key === 'Escape' && megaTrigger.getAttribute('aria-expanded') === 'true') {
+        if (e.key === 'Escape' && current) {
           e.preventDefault();
           // Si el foco estaba dentro, vuelve al botón; si solo había ratón, no se roba el foco.
-          setMega(false, header.contains(document.activeElement));
+          setMega(null, header.contains(document.activeElement));
         }
       });
       header.addEventListener('focusout', (e) => {
         const next = e.relatedTarget as Node | null;
-        if (next && !item.contains(next) && !mega.contains(next)) setMega(false);
+        if (current && next && !current.item.contains(next) && !current.panel.contains(next))
+          setMega(null);
       });
       document.addEventListener('click', (e) => {
-        if (!header.contains(e.target as Node)) setMega(false);
+        if (!header.contains(e.target as Node)) setMega(null);
       });
-      desktop.addEventListener('change', () => setMega(false));
+      desktop.addEventListener('change', () => setMega(null));
     }
 
     if (btn && panel) {
@@ -732,7 +982,7 @@ const isCurrent = (href: string) => path === href || (href !== '/' && path.start
       });
 
       // Al pasar a escritorio, cerrar el menú.
-      window.matchMedia('(min-width: 1024px)').addEventListener('change', (m) => {
+      window.matchMedia('(min-width: 1200px)').addEventListener('change', (m) => {
         if (m.matches) setOpen(false, false);
       });
     }
