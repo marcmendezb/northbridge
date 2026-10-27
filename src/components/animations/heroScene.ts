@@ -64,10 +64,20 @@ export function heroScene({ gsap, ScrollTrigger }: AnimationKit) {
       const s = Math.max(w / 1280, h / 720);
       const iw = 1280 * s;
       const ih = 720 * s;
-      const winX = (w - iw) * 0.18 + 0.655 * iw;
-      const winY = (h - ih) * 0.5 + 0.4 * ih;
+      // En pantallas verticales la ventana puede caer fuera: el punto de zoom se mantiene dentro.
+      const winX = Math.min(Math.max((w - iw) * 0.18 + 0.655 * iw, w * 0.15), w * 0.85);
+      const winY = Math.min(Math.max((h - ih) * 0.5 + 0.4 * ih, h * 0.15), h * 0.85);
       const archH = h - top - bottom;
-      const scale = Math.max(1, Math.min(archW / (0.3 * iw), archH / (0.62 * ih)));
+      // Escala de encuadre (la ventana llena el arco) y mínima para que la foto, centrada en la
+      // ventana, cubra el arco por los cuatro lados en cualquier proporción de pantalla.
+      const frame = Math.min(archW / (0.3 * iw), archH / (0.62 * ih));
+      const cover = Math.max(
+        archW / 2 / Math.max(1, winX),
+        archW / 2 / Math.max(1, w - winX),
+        archH / 2 / Math.max(1, winY),
+        archH / 2 / Math.max(1, h - winY),
+      );
+      const scale = Math.max(1, frame, cover * 1.02);
       return {
         left,
         bottom,
