@@ -348,6 +348,10 @@ export const de: Messages = {
     cta: {
       title: '20 Minuten, um deine Zahlen zu ordnen.',
       text: 'Unverbindlich. Danach ein Fixpreis.',
+      clockLabel: 'So laufen die 20 Minuten',
+      min: 'Min.',
+      after: '+24 Std.',
+      orCall: 'Oder ruf uns an: {phone}',
     },
   },
   calculator: {

@@ -349,6 +349,10 @@ export const it: Messages = {
     cta: {
       title: '20 minuti per mettere ordine nei tuoi numeri.',
       text: 'Senza impegno. Il prezzo fisso, dopo.',
+      clockLabel: 'Come sono i 20 minuti',
+      min: 'min',
+      after: '+24 h',
+      orCall: 'Oppure chiamaci al {phone}',
     },
   },
   calculator: {

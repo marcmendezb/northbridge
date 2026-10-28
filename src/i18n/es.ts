@@ -346,6 +346,10 @@ export const es = {
     cta: {
       title: '20 minutos para ordenar tus números.',
       text: 'Sin compromiso. Precio cerrado después.',
+      clockLabel: 'Así son los 20 minutos',
+      min: 'min',
+      after: '+24 h',
+      orCall: 'O llámanos al {phone}',
     },
   },
   calculator: {

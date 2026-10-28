@@ -347,6 +347,10 @@ export const fr: Messages = {
     cta: {
       title: '20 minutes pour mettre de l’ordre dans vos chiffres.',
       text: 'Sans engagement. Prix fixe ensuite.',
+      clockLabel: 'Vos 20 minutes, étape par étape',
+      min: 'min',
+      after: '+24 h',
+      orCall: 'Ou appelez-nous au {phone}',
     },
   },
   calculator: {

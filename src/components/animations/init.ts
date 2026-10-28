@@ -1,5 +1,6 @@
 import { aboutScene } from './aboutScene';
 import { calcPreview } from './calcPreview';
+import { clockScene } from './clockScene';
 import { contactScene } from './contactScene';
 import { countUp } from './countUp';
 import { finalScene } from './finalScene';
@@ -43,6 +44,7 @@ export async function initPage() {
     aboutScene(kit);
     contactScene(kit);
     serviceScene(kit);
+    clockScene(kit);
     void splitReveal(kit);
   });
 
