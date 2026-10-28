@@ -83,8 +83,8 @@ describe('timeline del calendario suizo', () => {
     expect(next?.due).toEqual({ y: 2026, m: 11, d: 30 });
     expect(next?.daysLeft).toBe(33);
   });
-  it('en diciembre salta al año siguiente: AVS el lunes 1-2-2027 (el 30 de enero es sábado)', () => {
+  it('en diciembre salta al año siguiente: cuotas AVS el lunes 11-1-2027 (el 10 es domingo)', () => {
     const next = nextDeadline(rules, { y: 2026, m: 12, d: 15 });
-    expect(next).toMatchObject({ year: 2027, id: 'ahv-salaries', due: { y: 2027, m: 2, d: 1 } });
+    expect(next).toMatchObject({ year: 2027, id: 'ahv-advance-q4', due: { y: 2027, m: 1, d: 11 } });
   });
 });

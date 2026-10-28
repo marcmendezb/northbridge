@@ -56,13 +56,15 @@ const mentionsVat = JSON.stringify(d).includes('MWST');
 /* ── Firma del servicio de IVA: el año fiscal como una regla, con la fecha exacta de cada plazo ── */
 const y = tRaw<Messages['services']['detail']['year']>('services.detail.year');
 const showYear = key === 'iva-y-fiscalidad';
-type Cat = 'vat' | 'tax' | 'payroll';
+type Cat = 'vat' | 'tax' | 'pay' | 'payroll';
 const catOf = (id: string): Cat =>
   id.startsWith('vat')
     ? 'vat'
     : id.startsWith('ahv') || id.startsWith('salary')
       ? 'payroll'
-      : 'tax';
+      : id === 'federal-tax' || id === 'cantonal-tax'
+        ? 'pay'
+        : 'tax';
 const calendar = FISCAL_CALENDARS.CH ?? [];
 /** Reglas legales de cada plazo: el navegador recalcula con ellas el año en curso. */
 const ruled = calendar.flatMap((e) => (e.rule ? [{ id: e.id, rule: e.rule }] : []));
@@ -75,14 +77,16 @@ const items = timeline(ruled, buildYear).map((it) => {
     cat: catOf(it.id),
     short: (e.short ?? e.what)[locale],
     extends: e.extends,
+    minor: Boolean(e.minor),
     when: e.when[locale],
     what: e.what[locale],
     need: e.need[locale],
   };
 });
-const lanes = (['vat', 'tax', 'payroll'] as const).map((cat) => ({
+/** En el gráfico no va la ventana sin fecha legal (certificados): solo en la lista. */
+const lanes = (['vat', 'tax', 'pay', 'payroll'] as const).map((cat) => ({
   cat,
-  items: items.filter((it) => it.cat === cat),
+  items: items.filter((it) => it.cat === cat && !it.window),
 }));
 /** Cerca del final del año, la etiqueta va a la izquierda de su bandera. */
 const FLIP_AT = 0.8;
@@ -240,18 +244,21 @@ const faqJsonLd = {
                             aria-hidden="true"
                           />
                         )}
-                        <span
-                          class="nb-chart__runway"
-                          data-yr-alert={it.id}
-                          style={`--from:${pct(it.remindAt)};--at:${pct(it.at)}`}
-                          aria-hidden="true"
-                        />
+                        {!it.minor && (
+                          <span
+                            class="nb-chart__runway"
+                            data-yr-alert={it.id}
+                            style={`--from:${pct(it.remindAt)};--at:${pct(it.at)}`}
+                            aria-hidden="true"
+                          />
+                        )}
                         <a
                           href={`#plazo-${it.id}`}
                           class:list={[
                             'nb-chart__flag',
                             it.window && 'is-window',
                             it.extends && 'is-extension',
+                            it.minor && 'is-minor',
                             !it.window && it.at > FLIP_AT && 'is-flip',
                           ]}
                           data-yr-dot
@@ -289,6 +296,10 @@ const faqJsonLd = {
             <li>
               <span class="nb-chart__legend-runway" />
               {y.alert}
+            </li>
+            <li>
+              <span class="nb-chart__legend-minor" />
+              {y.minor}
             </li>
             <li>
               <span class="nb-chart__legend-today" />
@@ -814,7 +825,7 @@ const faqJsonLd = {
 
   /* ── El gráfico del año: tres carriles (IVA, impuestos, nóminas) sobre los doce meses ── */
   .nb-chart {
-    --lane: 96px;
+    --lane: 84px;
     --names: 132px;
     --head: 44px;
     margin-top: clamp(48px, 7vw, 88px);
@@ -834,7 +845,7 @@ const faqJsonLd = {
   }
   .nb-chart__names {
     display: grid;
-    grid-template-rows: var(--head) repeat(3, var(--lane));
+    grid-template-rows: var(--head) repeat(4, var(--lane));
     margin: 0;
     padding: 0;
     list-style: none;
@@ -868,6 +879,9 @@ const faqJsonLd = {
   .nb-chart__name--tax .nb-chart__swatch {
     background: var(--white);
   }
+  .nb-chart__name--pay .nb-chart__swatch {
+    border-radius: 2px;
+  }
   .nb-chart__name--payroll .nb-chart__swatch {
     border-color: var(--piedra-500);
     background: var(--piedra-300);
@@ -876,7 +890,7 @@ const faqJsonLd = {
   .nb-chart__plot {
     position: relative;
     display: grid;
-    grid-template-rows: var(--head) repeat(3, var(--lane));
+    grid-template-rows: var(--head) repeat(4, var(--lane));
   }
   /* Meses: bandas alternas a toda altura, el actual marcado. */
   .nb-chart__months {
@@ -896,9 +910,6 @@ const faqJsonLd = {
   }
   .nb-chart__month:nth-child(even) {
     background: var(--piedra-50);
-  }
-  .nb-chart__month.is-now {
-    background: var(--salvia-50);
   }
   .nb-chart__month span {
     display: block;
@@ -921,8 +932,11 @@ const faqJsonLd = {
   .nb-chart__lane--tax {
     grid-row: 3;
   }
-  .nb-chart__lane--payroll {
+  .nb-chart__lane--pay {
     grid-row: 4;
+  }
+  .nb-chart__lane--payroll {
+    grid-row: 5;
   }
   /* Carril: la línea base del año a 26 px del fondo. */
   .nb-chart__lane::after {
@@ -940,8 +954,8 @@ const faqJsonLd = {
     bottom: 25px;
     left: var(--from);
     width: calc(var(--at) - var(--from));
-    height: 3px;
-    background: var(--salvia-500);
+    height: 2px;
+    background: var(--salvia-400);
     transform-origin: right center;
   }
   /* Ventana sin fecha legal (certificados): una banda de enero a febrero. */
@@ -1062,6 +1076,40 @@ const faqJsonLd = {
   }
   .nb-chart__flag.is-next .nb-chart__next {
     display: block;
+  }
+  /* Pagos: punto cuadrado, para distinguirlos de las declaraciones. */
+  .nb-chart__lane--pay .nb-chart__pin {
+    border-radius: 2px;
+  }
+  /* Cuota recurrente: marca pequeña en la línea, sin mástil ni etiqueta (ficha al pasar). */
+  .nb-chart__flag.is-minor {
+    height: 0;
+  }
+  .nb-chart__flag.is-minor :is(.nb-chart__stem, .nb-chart__tag) {
+    display: none;
+  }
+  .nb-chart__flag.is-minor .nb-chart__pin {
+    bottom: -5px;
+    left: -5px;
+    width: 10px;
+    height: 10px;
+    border: 0;
+    border-radius: 0;
+    background: var(--piedra-500);
+    transform: rotate(45deg);
+  }
+  .nb-chart__flag.is-minor:hover .nb-chart__pin,
+  .nb-chart__flag.is-minor:focus-visible .nb-chart__pin {
+    transform: rotate(45deg) scale(1.3);
+  }
+  .nb-chart__flag.is-minor .nb-chart__tip {
+    bottom: calc(100% + 16px);
+  }
+  .nb-chart__legend-minor {
+    width: 9px;
+    height: 9px;
+    background: var(--piedra-500);
+    transform: rotate(45deg);
   }
   /* Prórroga: continuación discontinua del plazo base; su nombre va debajo, a la izquierda. */
   .nb-chart__extension {

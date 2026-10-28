@@ -18,4 +18,6 @@ export interface FiscalEvent {
   rule?: DeadlineRule;
   /** Prórroga de otro plazo (id): se dibuja como su continuación. */
   extends?: string;
+  /** Plazo menor y recurrente (cuotas a cuenta): marca pequeña, sin etiqueta, en el gráfico. */
+  minor?: boolean;
 }
