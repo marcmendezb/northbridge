@@ -1,30 +1,50 @@
 ---
 import type { CollectionEntry } from 'astro:content';
+import type { ImageMetadata } from 'astro';
+import { Picture } from 'astro:assets';
 import BaseLayout from '../layouts/BaseLayout.astro';
-import PageHeader from '../components/layout/PageHeader.astro';
-import Section from '../components/ui/Section.astro';
-import Card from '../components/ui/Card.astro';
+import Breadcrumbs from '../components/layout/Breadcrumbs.astro';
 import Button from '../components/ui/Button.astro';
-import CheckList from '../components/ui/CheckList.astro';
 import PriceTag from '../components/ui/PriceTag.astro';
 import Accordion from '../components/ui/Accordion.astro';
 import Icon from '../components/brand/Icon.astro';
+import Arrow from '../components/brand/Arrow.astro';
 import ProcessSteps from '../components/sections/ProcessSteps.astro';
 import CtaBand from '../components/sections/CtaBand.astro';
-import { useI18n } from '../i18n';
-import { entryKey } from '../lib/content';
+import contabilidad from '../assets/img/services/contabilidad.jpeg';
+import iva from '../assets/img/services/iva.jpeg';
+import nominas from '../assets/img/services/nominas.jpeg';
+import constitucion from '../assets/img/services/constitucion.jpeg';
+import startups from '../assets/img/services/startup.jpeg';
+import { useI18n, type Messages } from '../i18n';
+import { entryKey, getArticles, getServices, guideFor } from '../lib/content';
 import { getBookingCta } from '../lib/site';
 import { describePricing } from '../lib/pricing/display';
 import { byCountry, currencyOf } from '../lib/country';
+import { FISCAL_CALENDARS } from '../data/fiscal-calendar';
 
 interface Props {
   entry: CollectionEntry<'servicios'>;
   related: CollectionEntry<'servicios'>[];
 }
 const { entry, related } = Astro.props;
-const { t, lp, locale } = useI18n(Astro.currentLocale);
+const { t, tRaw, lp, locale } = useI18n(Astro.currentLocale);
 const bookingCta = getBookingCta(locale);
 const d = entry.data;
+const key = entryKey(entry);
+const all = await getServices(locale);
+const index = all.findIndex((s) => entryKey(s) === key) + 1;
+const two = (n: number) => String(n).padStart(2, '0');
+
+const photos: Record<string, ImageMetadata> = {
+  'contabilidad-y-cierres': contabilidad,
+  'iva-y-fiscalidad': iva,
+  'nominas-y-seguros-sociales': nominas,
+  'constitucion-de-empresas': constitucion,
+  'asesoria-para-startups': startups,
+};
+const photo = photos[key] ?? contabilidad;
+
 /** El detalle puede citar un importe: una variante por país (moneda). */
 const prices = d.pricing.map((p) => {
   const base = describePricing(p, locale);
@@ -34,6 +54,40 @@ const prices = d.pricing.map((p) => {
   return { ...p, ...base, detail };
 });
 const mentionsVat = JSON.stringify(d).includes('MWST');
+
+/* ── Firma del servicio de IVA: el año fiscal como una regla, con cada plazo en su mes ── */
+const y = tRaw<Messages['services']['detail']['year']>('services.detail.year');
+const showYear = key === 'iva-y-fiscalidad';
+type Cat = 'vat' | 'tax' | 'payroll';
+const catOf = (id: string): Cat =>
+  id.startsWith('vat')
+    ? 'vat'
+    : id.startsWith('ahv') || id.startsWith('salary')
+      ? 'payroll'
+      : 'tax';
+const events = (FISCAL_CALENDARS.CH ?? []).map((e) => ({
+  id: e.id,
+  month: e.month,
+  cat: catOf(e.id),
+  when: e.when[locale],
+  what: e.what[locale],
+  need: e.need[locale],
+}));
+const monthName = (m: number, month: 'short' | 'long') =>
+  new Intl.DateTimeFormat(locale, { month, timeZone: 'UTC' })
+    .format(new Date(Date.UTC(2026, m - 1, 15)))
+    .replace('.', '');
+const months = Array.from({ length: 12 }, (_, i) => ({
+  n: i + 1,
+  short: monthName(i + 1, 'short'),
+  long: monthName(i + 1, 'long'),
+  events: events.filter((e) => e.month === i + 1),
+}));
+/** Posición en la regla (0–100 %): el plazo, en el centro de su mes; varios en un mes, en columna. */
+const at = (month: number) => ((month - 0.5) / 12) * 100;
+const alertAt = (month: number) => ((month - 0.5 - 1 / 3) / 12) * 100;
+const articles = showYear ? await getArticles(locale) : [];
+const guide = guideFor(articles, 'calendario', 'CH');
 
 const faqJsonLd = {
   '@context': 'https://schema.org',
@@ -46,108 +100,1213 @@ const faqJsonLd = {
 };
 ---
 
-<BaseLayout title={d.seo.title} description={d.seo.description}>
-  <PageHeader
-    title={d.title}
-    lead={d.summary}
-    crumbs={[{ label: t('nav.services'), href: lp('/servicios') }, { label: d.title }]}
-  >
-    <div class="flex flex-wrap items-center gap-4 pt-2">
-      <Icon name={d.icon} size={48} class="mr-2" />
-      <Button href={bookingCta.href} arrow>
-        {bookingCta.label}
-      </Button>
-      <Button variant="ghost" href={lp('/calculadora')}>
-        {t('services.detail.priceCalc')}
-      </Button>
-    </div>
-  </PageHeader>
-
-  <Section label={t('services.detail.labelScope')} rule>
-    <div class="grid gap-12 md:grid-cols-[1.4fr_1fr] md:gap-16">
-      <div data-reveal>
-        <h2 class="mb-6">{t('services.detail.includes')}</h2>
-        <CheckList items={d.includes} />
+<BaseLayout title={d.seo.title} description={d.seo.description} overlayHeader>
+  <!-- 1 · Cabecera: el servicio en grande y su foto, que se abre al bajar -->
+  <header class="nb-sx" data-surface="dark" data-service-hero>
+    <div class="nb-container nb-sx__inner">
+      <Breadcrumbs
+        items={[{ label: t('nav.services'), href: lp('/servicios') }, { label: d.title }]}
+        tone="dark"
+      />
+      <p class="nb-sx__index" data-reveal>
+        <Icon name={d.icon} size={28} />
+        <span>{t('services.detail.index', { n: two(index), total: two(all.length) })}</span>
+      </p>
+      <h1 class="nb-sx__title" data-split>
+        {d.title}
+      </h1>
+      <div class="nb-sx__foot">
+        <p class="nb-sx__lead" data-reveal>
+          {d.summary}
+        </p>
+        <div class="nb-sx__actions" data-reveal>
+          <Button href={bookingCta.href} on="dark" arrow>
+            {bookingCta.label}
+          </Button>
+          <Button variant="ghost" on="dark" href={lp('/calculadora')}>
+            {t('services.detail.priceCalc')}
+          </Button>
+        </div>
       </div>
-      <div data-reveal>
-        <h2 class="mb-6">{t('services.detail.forWhom')}</h2>
-        <ul class="m-0 flex list-none flex-col gap-4 p-0">
-          {d.forWhom.map((w) => (
-            <li class="t-body border-l-[1.5px] border-navy-800 pl-4">{w}</li>
+    </div>
+    <div class="nb-container">
+      <figure class="nb-sx__photo" data-sx-photo aria-hidden="true">
+        <Picture
+          src={photo}
+          formats={['avif', 'webp']}
+          widths={[640, 1024, 1440, 2048]}
+          sizes="(min-width: 1360px) 1280px, 94vw"
+          alt=""
+          loading="eager"
+          fetchpriority="high"
+          quality={74}
+          class="nb-sx__img"
+        />
+      </figure>
+    </div>
+  </header>
+
+  {showYear && (
+    <section class="nb-yr" aria-labelledby="year-title" data-year>
+      <div class="nb-container">
+        <div class="nb-yr__head">
+          <div class="nb-yr__intro">
+            <p class="nb-yr__eyebrow">{y.label}</p>
+            <h2 id="year-title" class="nb-yr__title" data-split>
+              {y.title}
+            </h2>
+            <p class="nb-yr__lead" data-reveal>
+              {y.lead}
+            </p>
+          </div>
+          <aside class="nb-yr__next" data-yr-next hidden aria-live="polite">
+            <p class="nb-yr__next-label">{y.next}</p>
+            <p class="nb-yr__next-month" data-yr-next-month />
+            <p class="nb-yr__next-what" data-yr-next-what />
+            <p class="nb-yr__next-when" data-yr-next-when />
+            <p class="nb-yr__next-need">
+              <span>{y.need}</span>
+              <span data-yr-next-need />
+            </p>
+          </aside>
+        </div>
+
+        <div
+          class="nb-yr__ruler"
+          data-yr-ruler
+          role="img"
+          aria-label={t('services.detail.year.ruler', { count: events.length })}
+        >
+          <span class="nb-yr__line" data-yr-line />
+          {months.map((m) => (
+            <span class="nb-yr__tick" style={`--at:${((m.n - 1) / 12) * 100}%`} />
           ))}
+          {events.map((e) => (
+            <span class="nb-yr__alert" data-yr-alert style={`--at:${alertAt(e.month)}%`} />
+          ))}
+          {months.map((m) =>
+            m.events.map((e, i) => (
+              <span
+                class:list={['nb-yr__dot', `nb-yr__dot--${e.cat}`]}
+                data-yr-dot
+                data-id={e.id}
+                data-month={e.month}
+                style={`--at:${at(e.month)}%;--row:${i}`}
+              />
+            )),
+          )}
+          <span class="nb-yr__today" data-yr-today hidden>
+            <span>{y.today}</span>
+          </span>
+          <ol class="nb-yr__months" role="list" aria-hidden="true">
+            {months.map((m) => (
+              <li data-month-label={m.n}>{m.short}</li>
+            ))}
+          </ol>
+        </div>
+
+        <ul class="nb-yr__legend" role="list">
+          {(['vat', 'tax', 'payroll'] as const).map((c) => (
+            <li>
+              <span class:list={['nb-yr__dot', 'nb-yr__dot--static', `nb-yr__dot--${c}`]} />
+              {y.cats[c]}
+            </li>
+          ))}
+          <li>
+            <span class="nb-yr__alert nb-yr__alert--static" />
+            {y.alert}
+          </li>
         </ul>
+
+        <ol class="nb-yr__list" role="list">
+          {months
+            .filter((m) => m.events.length)
+            .map((m) => (
+              <li class="nb-yr__month" data-reveal>
+                <h3 class="nb-yr__month-name">{m.long}</h3>
+                <ul class="nb-yr__events" role="list">
+                  {m.events.map((e) => (
+                    <li
+                      class="nb-yr__event"
+                      id={`plazo-${e.id}`}
+                      data-yr-event={e.id}
+                      data-month={e.month}
+                      data-month-name={m.long}
+                    >
+                      <span class:list={['nb-yr__cat', `nb-yr__cat--${e.cat}`]}>
+                        {y.cats[e.cat]}
+                      </span>
+                      <p class="nb-yr__what">{e.what}</p>
+                      <p class="nb-yr__when">{e.when}</p>
+                      <p class="nb-yr__need">{e.need}</p>
+                    </li>
+                  ))}
+                </ul>
+              </li>
+            ))}
+        </ol>
+
+        <div class="nb-yr__foot">
+          <p>{y.note}</p>
+          {guide && (
+            <a href={lp(`/recursos/${entryKey(guide)}`)} class="nb-yr__guide">
+              {y.guide}
+              <Arrow size={18} />
+            </a>
+          )}
+        </div>
       </div>
+    </section>
+  )}
+
+  <!-- 2 · Qué incluye: un libro mayor, una línea por cosa que hacemos -->
+  <section class="nb-scope" aria-labelledby="includes-title">
+    <div class="nb-container nb-scope__grid">
+      <div class="nb-scope__aside">
+        <p class="nb-scope__eyebrow">{t('services.detail.labelScope')}</p>
+        <h2 id="includes-title" class="nb-scope__title" data-split>
+          {t('services.detail.includes')}
+        </h2>
+        <p class="nb-scope__count" aria-hidden="true">
+          {two(d.includes.length)}
+        </p>
+      </div>
+      <ol class="nb-incl" role="list">
+        {d.includes.map((item, i) => (
+          <li class="nb-incl__row" data-incl-row>
+            <span class="nb-incl__rule" data-incl-rule aria-hidden="true" />
+            <span class="nb-incl__n" aria-hidden="true">
+              {two(i + 1)}
+            </span>
+            <span class="nb-incl__text">{item}</span>
+          </li>
+        ))}
+      </ol>
     </div>
-  </Section>
+  </section>
 
-  <Section
-    tone="base"
-    label={t('services.detail.process')}
-    title={t('services.detail.process')}
-    rule
-  >
-    <ProcessSteps steps={d.process} />
-  </Section>
+  <!-- 3 · Para quién: tres frases en las que reconocerse -->
+  <section class="nb-who" aria-labelledby="who-title">
+    <div class="nb-container">
+      <div class="nb-who__head">
+        <h2 id="who-title" class="nb-who__title" data-split>
+          {t('services.detail.forWhom')}
+        </h2>
+        <p class="nb-who__lead" data-reveal>
+          {t('services.detail.forWhomLead')}
+        </p>
+      </div>
+      <ul class="nb-who__list" role="list" data-who>
+        {d.forWhom.map((w) => (
+          <li class="nb-who__item">
+            <svg class="nb-who__mark" viewBox="4 11 40 26" aria-hidden="true">
+              <path d="M4 13H44" />
+              <path d="M10 37V29A14 14 0 0 1 38 29V37" />
+            </svg>
+            <p>{w}</p>
+          </li>
+        ))}
+      </ul>
+    </div>
+  </section>
 
-  <Section label={t('services.detail.labelPrice')} rule>
-    <div class="grid gap-8 md:grid-cols-[1fr_1fr] md:gap-16">
-      <div data-reveal class="flex flex-col gap-4">
-        <h2 class="m-0">{t('services.detail.price')}</h2>
-        <p class="t-body m-0">
+  <!-- 4 · Proceso: el viaducto de la marca, un arco por paso -->
+  <section class="nb-proc" aria-labelledby="process-title">
+    <div class="nb-container">
+      <p class="nb-scope__eyebrow">{t('services.detail.labelProcess')}</p>
+      <h2 id="process-title" class="nb-proc__title" data-split>
+        {t('services.detail.process')}
+      </h2>
+      <ProcessSteps steps={d.process} />
+    </div>
+  </section>
+
+  <!-- 5 · Precio: un recibo, con lo que cuesta y lo que se cierra después -->
+  <section class="nb-receipt-wrap" aria-labelledby="price-title">
+    <div class="nb-container nb-receipt-wrap__grid">
+      <div class="nb-receipt-wrap__text">
+        <p class="nb-scope__eyebrow">{t('services.detail.labelPrice')}</p>
+        <h2 id="price-title" class="nb-receipt-wrap__title" data-split>
+          {t('services.detail.price')}
+        </h2>
+        <p class="nb-receipt-wrap__note" data-reveal>
           {prices.some((p) => p.mode === 'fixed')
             ? t('services.detail.priceFixedNote')
             : t('home.calculator.note')}
         </p>
-        <div class="pt-2">
+        <div data-reveal>
           <Button variant="ghost" href={lp('/calculadora')} arrow>
             {t('services.detail.priceCalc')}
           </Button>
         </div>
       </div>
-      <ul class="m-0 grid list-none gap-4 p-0">
-        {prices.map((p, i) => (
+      <div class="nb-receipt" data-receipt>
+        <div class="nb-receipt__head">
+          <svg class="nb-receipt__mark" viewBox="4 11 40 26" aria-hidden="true">
+            <path d="M4 13H44" />
+            <path d="M10 37V29A14 14 0 0 1 38 29V37" />
+          </svg>
+          <span>{d.title}</span>
+        </div>
+        <ul class="nb-receipt__rows" role="list">
+          {prices.map((p, i) => (
+            <li class="nb-receipt__row">
+              <div class="nb-receipt__line">
+                {p.label !== d.title && <span class="nb-receipt__label">{p.label}</span>}
+                <span class="nb-receipt__value">
+                  {p.amount ? (
+                    <PriceTag amount={p.amount} once={p.once} firstVat={!mentionsVat && i === 0} />
+                  ) : (
+                    p.headline
+                  )}
+                </span>
+              </div>
+              {p.detail && <p class="nb-receipt__detail" set:html={p.detail} />}
+            </li>
+          ))}
+        </ul>
+        <p class="nb-receipt__foot">{t('services.detail.priceFixedNote')}</p>
+      </div>
+    </div>
+  </section>
+
+  <!-- 6 · Preguntas -->
+  <section class="nb-sfaq" aria-labelledby="faq-title">
+    <div class="nb-container nb-sfaq__grid">
+      <div class="nb-sfaq__aside">
+        <p class="nb-scope__eyebrow">{t('services.detail.labelFaq')}</p>
+        <h2 id="faq-title" class="nb-sfaq__title" data-split>
+          {t('services.detail.faq')}
+        </h2>
+      </div>
+      <Accordion items={d.faq} level="h3" openFirst />
+    </div>
+    <script type="application/ld+json" set:html={JSON.stringify(faqJsonLd)} />
+  </section>
+
+  <!-- 7 · Relacionados: con su foto -->
+  <section class="nb-rel" aria-labelledby="related-title">
+    <div class="nb-container">
+      <div class="nb-rel__head">
+        <h2 id="related-title" class="nb-rel__title" data-split>
+          {t('services.detail.related')}
+        </h2>
+        <a href={lp('/servicios')} class="nb-rel__all">
+          {t('services.detail.seeAll')}
+          <Arrow size={18} />
+        </a>
+      </div>
+      <ul class="nb-rel__list" role="list">
+        {related.map((r) => (
           <li data-reveal>
-            <Card class="flex flex-col gap-2 p-6">
-              <p class="t-label m-0 text-piedra-600">{p.label}</p>
-              {p.amount ? (
-                <PriceTag amount={p.amount} once={p.once} firstVat={!mentionsVat && i === 0} />
-              ) : (
-                <p class="t-price m-0 text-[1.75rem] text-navy-800">{p.headline}</p>
-              )}
-              {p.detail && <p class="t-small m-0" set:html={p.detail} />}
-            </Card>
+            <a href={lp(`/servicios/${entryKey(r)}`)} class="nb-rel__card">
+              <span class="nb-rel__media">
+                <Picture
+                  src={photos[entryKey(r)] ?? contabilidad}
+                  formats={['avif', 'webp']}
+                  widths={[480, 800, 1200]}
+                  sizes="(min-width: 768px) 46vw, 92vw"
+                  alt=""
+                  quality={72}
+                  class="nb-rel__img"
+                />
+              </span>
+              <span class="nb-rel__body">
+                <span class="nb-rel__name">{r.data.title}</span>
+                <span class="nb-rel__summary">{r.data.summary}</span>
+              </span>
+              <span class="nb-rel__arrow">
+                <Arrow size={24} />
+              </span>
+            </a>
           </li>
         ))}
       </ul>
     </div>
-  </Section>
-
-  <Section tone="piedra" label={t('services.detail.labelFaq')} rule>
-    <div class="grid gap-10 md:grid-cols-[1fr_1.6fr] md:gap-16">
-      <h2 class="m-0">{t('services.detail.faq')}</h2>
-      <Accordion items={d.faq} level="h3" openFirst />
-    </div>
-    <script type="application/ld+json" set:html={JSON.stringify(faqJsonLd)} />
-  </Section>
-
-  <Section label={t('services.detail.labelRelated')} rule>
-    <ul class="m-0 grid list-none gap-6 p-0 md:grid-cols-2">
-      {related.map((r) => (
-        <li data-reveal class="flex">
-          <Card href={lp(`/servicios/${entryKey(r)}`)} class="flex w-full flex-col gap-4 p-8">
-            <Icon name={r.data.icon} size={40} />
-            <h3 class="m-0 text-[1.5rem]">{r.data.title}</h3>
-            <p class="t-small m-0 !text-piedra-700">{r.data.summary}</p>
-          </Card>
-        </li>
-      ))}
-    </ul>
-    <div data-reveal class="mt-10">
-      <Button variant="ghost" href={lp('/servicios')} arrow>
-        {t('services.detail.seeAll')}
-      </Button>
-    </div>
-  </Section>
+  </section>
 
   <CtaBand />
 </BaseLayout>
+
+<script>
+  import { zurichNow } from '../lib/contact/office';
+
+  // Hoy en la regla del año y el próximo plazo (por mes, en hora de Zúrich). Sin JS, solo la lista.
+  const ruler = document.querySelector<HTMLElement>('[data-yr-ruler]');
+  if (ruler) {
+    const z = zurichNow(new Date());
+    const days = new Date(Date.UTC(z.y, z.m, 0)).getUTCDate();
+    const today = ruler.querySelector<HTMLElement>('[data-yr-today]');
+    if (today) {
+      today.style.setProperty('--at', `${((z.m - 1 + (z.d - 1) / days) / 12) * 100}%`);
+      today.hidden = false;
+    }
+    ruler.querySelector(`[data-month-label="${z.m}"]`)?.classList.add('is-now');
+
+    const rows = Array.from(document.querySelectorAll<HTMLElement>('[data-yr-event]'));
+    const next = rows.find((r) => Number(r.dataset.month) >= z.m) ?? rows[0];
+    const panel = document.querySelector<HTMLElement>('[data-yr-next]');
+    if (next && panel) {
+      const text = (sel: string) => next.querySelector(sel)?.textContent ?? '';
+      const set = (sel: string, value: string) => {
+        const el = panel.querySelector(sel);
+        if (el) el.textContent = value;
+      };
+      set('[data-yr-next-month]', next.dataset.monthName ?? '');
+      set('[data-yr-next-what]', text('.nb-yr__what'));
+      set('[data-yr-next-when]', text('.nb-yr__when'));
+      set('[data-yr-next-need]', text('.nb-yr__need'));
+      panel.hidden = false;
+      // La ficha cambia la altura de la página: las escenas de scroll vuelven a medir.
+      window.dispatchEvent(new Event('resize'));
+      next.classList.add('is-next');
+      ruler
+        .querySelector(`[data-yr-dot][data-id="${next.dataset.yrEvent}"]`)
+        ?.classList.add('is-next');
+    }
+  }
+</script>
+
+<style is:global>
+  /* ── 1 · Cabecera ── */
+  .nb-sx {
+    position: relative;
+    background: var(--navy-800);
+    color: var(--navy-100);
+  }
+  /* El navy baja hasta la mitad de la foto; la otra mitad ya es la página. */
+  .nb-sx::after {
+    content: '';
+    position: absolute;
+    inset: auto 0 0;
+    height: clamp(120px, 18vw, 260px);
+    background: var(--white);
+  }
+  .nb-sx__inner {
+    position: relative;
+    z-index: 1;
+    display: grid;
+    gap: 24px;
+    padding-block: calc(var(--header-h) + 40px) clamp(40px, 5vw, 72px);
+  }
+  .nb-sx__index {
+    display: flex;
+    align-items: center;
+    gap: 12px;
+    margin: 8px 0 0;
+    font-size: 0.8125rem;
+    font-weight: 600;
+    letter-spacing: 0.16em;
+    text-transform: uppercase;
+    color: var(--salvia-300);
+  }
+  .nb-sx__index svg {
+    color: var(--white);
+  }
+  .nb-sx__title {
+    margin: 0;
+    max-width: 16ch;
+    font-family: var(--font-display);
+    font-optical-sizing: auto;
+    font-size: clamp(3rem, 0.8rem + 7vw, 8.5rem);
+    font-weight: 300;
+    line-height: 0.94;
+    letter-spacing: -0.04em;
+    color: var(--white);
+    text-wrap: balance;
+  }
+  .nb-sx__foot {
+    display: grid;
+    gap: 28px;
+    padding-top: 28px;
+    border-top: 1px solid rgb(255 255 255 / 0.22);
+  }
+  @media (min-width: 900px) {
+    .nb-sx__foot {
+      grid-template-columns: minmax(0, 1.2fr) minmax(0, 1fr);
+      align-items: end;
+    }
+    .nb-sx__actions {
+      justify-self: end;
+    }
+  }
+  .nb-sx__lead {
+    margin: 0;
+    max-width: 36rem;
+    font-family: var(--font-display);
+    font-size: clamp(1.375rem, 1rem + 0.9vw, 1.875rem);
+    font-weight: 300;
+    line-height: 1.3;
+    color: var(--white);
+  }
+  .nb-sx__actions {
+    display: flex;
+    flex-wrap: wrap;
+    align-items: center;
+    gap: 12px 20px;
+  }
+  .nb-sx__photo {
+    position: relative;
+    z-index: 1;
+    margin: 0;
+    aspect-ratio: 21 / 9;
+    overflow: hidden;
+    border-radius: var(--radius-card, 8px);
+    background: var(--navy-700);
+  }
+  @media (max-width: 767px) {
+    .nb-sx__photo {
+      aspect-ratio: 4 / 3;
+    }
+  }
+  .nb-sx__photo picture {
+    display: contents;
+  }
+  .nb-sx__img {
+    width: 100%;
+    height: 100%;
+    object-fit: cover;
+  }
+
+  /* ── IVA · El año fiscal ── */
+  .nb-yr {
+    padding-block: var(--section-y);
+    background: var(--white);
+  }
+  .nb-yr__head {
+    display: grid;
+    gap: 40px;
+    align-items: end;
+  }
+  @media (min-width: 1024px) {
+    .nb-yr__head {
+      grid-template-columns: minmax(0, 1.3fr) minmax(0, 1fr);
+      gap: clamp(48px, 6vw, 112px);
+    }
+  }
+  .nb-yr__intro {
+    display: grid;
+    gap: 20px;
+  }
+  .nb-yr__eyebrow,
+  .nb-scope__eyebrow {
+    margin: 0;
+    font-size: 0.8125rem;
+    font-weight: 600;
+    letter-spacing: 0.16em;
+    text-transform: uppercase;
+    color: var(--salvia-600);
+  }
+  .nb-yr__title {
+    margin: 0;
+    max-width: 14ch;
+    font-family: var(--font-display);
+    font-size: clamp(2.5rem, 1rem + 4vw, 5.25rem);
+    font-weight: 300;
+    line-height: 0.98;
+    letter-spacing: -0.03em;
+    color: var(--navy-800);
+  }
+  .nb-yr__lead {
+    margin: 0;
+    max-width: 34rem;
+    font-size: 1.125rem;
+    line-height: 1.6;
+    color: var(--piedra-800);
+  }
+  /* Próximo plazo: ficha navy, la única pieza oscura de la sección. */
+  .nb-yr__next {
+    display: grid;
+    gap: 8px;
+    padding: clamp(24px, 3vw, 36px);
+    border-radius: var(--radius-card, 8px);
+    background: var(--navy-800);
+    color: var(--navy-100);
+  }
+  .nb-yr__next[hidden] {
+    display: none;
+  }
+  .nb-yr__next p {
+    margin: 0;
+  }
+  .nb-yr__next-label {
+    font-size: 0.75rem;
+    font-weight: 600;
+    letter-spacing: 0.16em;
+    text-transform: uppercase;
+    color: var(--salvia-300);
+  }
+  .nb-yr__next-month {
+    font-family: var(--font-display);
+    font-size: clamp(2.5rem, 1.5rem + 2vw, 3.5rem);
+    font-weight: 300;
+    font-style: italic;
+    line-height: 1;
+    text-transform: capitalize;
+    color: var(--white);
+  }
+  .nb-yr__next-what {
+    font-size: 1.0625rem;
+    font-weight: 600;
+    line-height: 1.4;
+    color: var(--white);
+  }
+  .nb-yr__next-when {
+    font-size: 0.9375rem;
+  }
+  .nb-yr__next-need {
+    display: grid;
+    gap: 2px;
+    margin-top: 8px !important;
+    padding-top: 14px;
+    border-top: 1px solid var(--navy-600);
+    font-size: 0.9375rem;
+  }
+  .nb-yr__next-need span:first-child {
+    font-size: 0.6875rem;
+    font-weight: 600;
+    letter-spacing: 0.14em;
+    text-transform: uppercase;
+    color: var(--navy-200);
+  }
+
+  /* La regla: doce meses sobre un filete; los plazos cuelgan por encima. */
+  .nb-yr__ruler {
+    position: relative;
+    height: 150px;
+    margin-top: clamp(48px, 7vw, 96px);
+  }
+  .nb-yr__line {
+    position: absolute;
+    inset: auto 0 40px;
+    height: 1.5px;
+    background: var(--navy-800);
+    transform-origin: left center;
+  }
+  .nb-yr__tick {
+    position: absolute;
+    bottom: 34px;
+    left: var(--at);
+    width: 1px;
+    height: 13px;
+    background: var(--navy-800);
+  }
+  .nb-yr__alert {
+    position: absolute;
+    bottom: 41px;
+    left: var(--at);
+    width: 2px;
+    height: 12px;
+    background: var(--salvia-500);
+    transform: translateX(-50%);
+  }
+  .nb-yr__dot {
+    position: absolute;
+    bottom: calc(52px + var(--row, 0) * 26px);
+    left: var(--at);
+    width: 16px;
+    height: 16px;
+    margin-left: -8px;
+    border: 2px solid var(--navy-800);
+    border-radius: 9999px;
+    background: var(--navy-800);
+    transition: transform var(--dur-base) var(--ease-out);
+  }
+  .nb-yr__dot--tax {
+    background: var(--white);
+  }
+  .nb-yr__dot--payroll {
+    border-color: var(--piedra-500);
+    background: var(--piedra-300);
+  }
+  /* Próximo plazo: anillo salvia alrededor (nunca texto blanco sobre salvia). */
+  .nb-yr__dot.is-next {
+    box-shadow:
+      0 0 0 4px var(--white),
+      0 0 0 6px var(--salvia-500);
+  }
+  .nb-yr__today {
+    position: absolute;
+    top: 0;
+    bottom: 34px;
+    left: var(--at);
+    width: 1px;
+    background: var(--salvia-600);
+  }
+  .nb-yr__today[hidden] {
+    display: none;
+  }
+  .nb-yr__today span {
+    position: absolute;
+    top: -6px;
+    left: 8px;
+    font-size: 0.6875rem;
+    font-weight: 600;
+    letter-spacing: 0.14em;
+    text-transform: uppercase;
+    white-space: nowrap;
+    color: var(--salvia-600);
+  }
+  .nb-yr__months {
+    position: absolute;
+    inset: auto 0 0;
+    display: grid;
+    grid-template-columns: repeat(12, minmax(0, 1fr));
+    margin: 0;
+    padding: 0;
+    list-style: none;
+  }
+  .nb-yr__months li {
+    padding-left: 6px;
+    font-size: 0.8125rem;
+    font-weight: 600;
+    text-transform: capitalize;
+    color: var(--piedra-600);
+  }
+  .nb-yr__months li.is-now {
+    color: var(--navy-800);
+  }
+  @media (max-width: 639px) {
+    .nb-yr__months li {
+      padding-left: 2px;
+      font-size: 0.625rem;
+      letter-spacing: -0.02em;
+    }
+    .nb-yr__dot {
+      width: 12px;
+      height: 12px;
+      margin-left: -6px;
+      bottom: calc(50px + var(--row, 0) * 18px);
+    }
+  }
+  .nb-yr__legend {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 12px 28px;
+    margin: 20px 0 0;
+    padding: 0;
+    list-style: none;
+    font-size: 0.875rem;
+    color: var(--piedra-700);
+  }
+  .nb-yr__legend li {
+    display: inline-flex;
+    align-items: center;
+    gap: 10px;
+  }
+  .nb-yr__dot--static,
+  .nb-yr__alert--static {
+    position: static;
+    margin: 0;
+    transform: none;
+  }
+  .nb-yr__dot--static {
+    width: 12px;
+    height: 12px;
+  }
+
+  /* Lista por meses: el contenido accesible de la regla. */
+  .nb-yr__list {
+    display: grid;
+    gap: 0 clamp(24px, 4vw, 64px);
+    margin: clamp(48px, 6vw, 80px) 0 0;
+    padding: 0;
+    list-style: none;
+  }
+  @media (min-width: 768px) {
+    .nb-yr__list {
+      grid-template-columns: repeat(2, minmax(0, 1fr));
+    }
+  }
+  @media (min-width: 1200px) {
+    .nb-yr__list {
+      grid-template-columns: repeat(3, minmax(0, 1fr));
+    }
+  }
+  .nb-yr__month {
+    display: grid;
+    align-content: start;
+    gap: 16px;
+    padding-block: 28px;
+    border-top: 1px solid var(--piedra-300);
+  }
+  .nb-yr__month-name {
+    margin: 0;
+    font-family: var(--font-display);
+    font-size: 2rem;
+    font-weight: 300;
+    line-height: 1;
+    text-transform: capitalize;
+    color: var(--navy-800);
+  }
+  .nb-yr__events {
+    display: grid;
+    gap: 22px;
+    margin: 0;
+    padding: 0;
+    list-style: none;
+  }
+  .nb-yr__event {
+    display: grid;
+    gap: 6px;
+    scroll-margin-top: calc(var(--header-h) + 24px);
+  }
+  .nb-yr__event p {
+    margin: 0;
+  }
+  .nb-yr__cat {
+    justify-self: start;
+    padding: 3px 8px;
+    border: 1px solid var(--navy-800);
+    border-radius: 2px;
+    font-size: 0.6875rem;
+    font-weight: 600;
+    letter-spacing: 0.12em;
+    text-transform: uppercase;
+    color: var(--navy-800);
+  }
+  .nb-yr__cat--vat {
+    background: var(--navy-800);
+    color: var(--white);
+  }
+  .nb-yr__cat--payroll {
+    border-color: var(--piedra-400);
+    background: var(--piedra-100);
+    color: var(--piedra-800);
+  }
+  .nb-yr__what {
+    font-size: 1.0625rem;
+    font-weight: 600;
+    line-height: 1.4;
+    color: var(--navy-800);
+  }
+  .nb-yr__when {
+    font-size: 0.9375rem;
+    color: var(--navy-600);
+  }
+  .nb-yr__need {
+    font-size: 0.9375rem;
+    line-height: 1.5;
+    color: var(--piedra-700);
+  }
+  .nb-yr__event.is-next .nb-yr__what::after {
+    content: '';
+    display: inline-block;
+    width: 8px;
+    height: 8px;
+    margin-left: 10px;
+    border-radius: 9999px;
+    background: var(--salvia-500);
+    vertical-align: middle;
+  }
+  .nb-yr__foot {
+    display: flex;
+    flex-wrap: wrap;
+    justify-content: space-between;
+    gap: 12px 32px;
+    padding-top: 24px;
+    border-top: 1px solid var(--piedra-300);
+    font-size: 0.875rem;
+    color: var(--piedra-600);
+  }
+  .nb-yr__foot p {
+    margin: 0;
+  }
+  .nb-yr__guide {
+    display: inline-flex;
+    align-items: center;
+    gap: 8px;
+    font-weight: 600;
+    color: var(--navy-800);
+    text-decoration: none;
+  }
+  .nb-yr__guide:hover {
+    color: var(--salvia-600);
+  }
+
+  /* ── 2 · Qué incluye ── */
+  .nb-scope {
+    padding-block: var(--section-y);
+    background: var(--piedra-50);
+  }
+  .nb-scope__grid {
+    display: grid;
+    gap: 40px;
+  }
+  @media (min-width: 1024px) {
+    .nb-scope__grid {
+      grid-template-columns: minmax(0, 0.8fr) minmax(0, 1.2fr);
+      gap: clamp(48px, 6vw, 112px);
+      align-items: start;
+    }
+    .nb-scope__aside {
+      position: sticky;
+      top: calc(var(--header-h) + 40px);
+    }
+  }
+  .nb-scope__aside {
+    display: grid;
+    gap: 16px;
+  }
+  .nb-scope__title,
+  .nb-proc__title,
+  .nb-receipt-wrap__title,
+  .nb-sfaq__title,
+  .nb-rel__title,
+  .nb-who__title {
+    margin: 0;
+    font-family: var(--font-display);
+    font-size: clamp(2.25rem, 1rem + 3vw, 4rem);
+    font-weight: 300;
+    line-height: 1;
+    letter-spacing: -0.025em;
+    color: var(--navy-800);
+  }
+  /* El total, monumental y discreto. */
+  .nb-scope__count {
+    margin: 0;
+    font-family: var(--font-display);
+    font-size: clamp(6rem, 3rem + 8vw, 12rem);
+    font-weight: 300;
+    line-height: 0.9;
+    letter-spacing: -0.05em;
+    font-variant-numeric: tabular-nums;
+    color: var(--piedra-500);
+  }
+  .nb-incl {
+    margin: 0;
+    padding: 0;
+    list-style: none;
+    border-bottom: 1px solid var(--navy-800);
+  }
+  .nb-incl__row {
+    position: relative;
+    display: grid;
+    grid-template-columns: 48px minmax(0, 1fr);
+    gap: 16px;
+    align-items: baseline;
+    padding-block: clamp(20px, 2.4vw, 30px);
+  }
+  .nb-incl__rule {
+    position: absolute;
+    inset: 0 0 auto;
+    height: 1px;
+    background: var(--navy-800);
+    transform-origin: left center;
+  }
+  .nb-incl__n {
+    font-size: 0.8125rem;
+    font-weight: 600;
+    letter-spacing: 0.14em;
+    font-variant-numeric: tabular-nums;
+    color: var(--salvia-600);
+  }
+  .nb-incl__text {
+    font-family: var(--font-display);
+    font-size: clamp(1.375rem, 1rem + 0.9vw, 1.875rem);
+    font-weight: 300;
+    line-height: 1.25;
+    color: var(--navy-800);
+  }
+
+  /* ── 3 · Para quién ── */
+  .nb-who {
+    padding-block: var(--section-y);
+    background: var(--navy-800);
+    color: var(--navy-100);
+  }
+  .nb-who .nb-who__title {
+    color: var(--white);
+  }
+  .nb-who__head {
+    display: grid;
+    gap: 16px;
+    margin-bottom: clamp(40px, 5vw, 72px);
+  }
+  @media (min-width: 900px) {
+    .nb-who__head {
+      grid-template-columns: minmax(0, 1fr) minmax(0, 1fr);
+      align-items: end;
+    }
+  }
+  .nb-who__lead {
+    margin: 0;
+    max-width: 30rem;
+    font-size: 1.0625rem;
+    line-height: 1.6;
+  }
+  .nb-who__list {
+    display: grid;
+    gap: 0;
+    margin: 0;
+    padding: 0;
+    list-style: none;
+  }
+  @media (min-width: 900px) {
+    .nb-who__list {
+      grid-template-columns: repeat(3, minmax(0, 1fr));
+    }
+  }
+  .nb-who__item {
+    display: grid;
+    align-content: start;
+    gap: 28px;
+    padding: 32px 0;
+    border-top: 1px solid var(--navy-600);
+  }
+  @media (min-width: 900px) {
+    .nb-who__item {
+      padding: 36px clamp(20px, 2.5vw, 40px) 8px;
+      border-top: 0;
+      border-left: 1px solid var(--navy-600);
+    }
+    .nb-who__item:first-child {
+      padding-left: 0;
+      border-left: 0;
+    }
+  }
+  .nb-who__mark {
+    width: 40px;
+    height: 26px;
+    fill: none;
+    stroke: var(--salvia-300);
+    stroke-width: 4;
+  }
+  .nb-who__item p {
+    margin: 0;
+    font-family: var(--font-display);
+    font-size: clamp(1.5rem, 1rem + 1vw, 2rem);
+    font-weight: 300;
+    line-height: 1.25;
+    color: var(--white);
+  }
+
+  /* ── 4 · Proceso ── */
+  .nb-proc {
+    padding-block: var(--section-y);
+    background: var(--white);
+  }
+  .nb-proc__title {
+    margin: 16px 0 clamp(40px, 5vw, 64px);
+  }
+
+  /* ── 5 · Precio ── */
+  .nb-receipt-wrap {
+    padding-block: var(--section-y);
+    background: var(--piedra-100);
+  }
+  .nb-receipt-wrap__grid {
+    display: grid;
+    gap: 40px;
+    align-items: center;
+  }
+  @media (min-width: 1024px) {
+    .nb-receipt-wrap__grid {
+      grid-template-columns: minmax(0, 1fr) minmax(0, 1fr);
+      gap: clamp(48px, 6vw, 112px);
+    }
+  }
+  .nb-receipt-wrap__text {
+    display: grid;
+    justify-items: start;
+    gap: 20px;
+  }
+  .nb-receipt-wrap__note {
+    margin: 0;
+    max-width: 30rem;
+    font-size: 1.0625rem;
+    line-height: 1.6;
+    color: var(--piedra-800);
+  }
+  .nb-receipt {
+    display: grid;
+    gap: 24px;
+    padding: clamp(24px, 4vw, 48px);
+    border-radius: var(--radius-card, 8px);
+    background: var(--white);
+    box-shadow: 0 1px 2px rgb(21 39 66 / 0.06);
+  }
+  .nb-receipt__head {
+    display: flex;
+    align-items: center;
+    gap: 14px;
+    padding-bottom: 20px;
+    border-bottom: 1.5px solid var(--navy-800);
+    font-size: 0.75rem;
+    font-weight: 600;
+    letter-spacing: 0.14em;
+    text-transform: uppercase;
+    color: var(--navy-800);
+  }
+  .nb-receipt__mark {
+    width: 31px;
+    height: 20px;
+    fill: none;
+    stroke: var(--navy-800);
+    stroke-width: 4;
+  }
+  .nb-receipt__rows {
+    display: grid;
+    gap: 22px;
+    margin: 0;
+    padding: 0;
+    list-style: none;
+  }
+  /* Concepto arriba, importe debajo: cabe cualquier texto, también «Incluido desde Essential». */
+  .nb-receipt__line {
+    display: grid;
+    gap: 6px;
+  }
+  .nb-receipt__label {
+    font-size: 0.75rem;
+    font-weight: 600;
+    letter-spacing: 0.14em;
+    text-transform: uppercase;
+    color: var(--piedra-600);
+  }
+  .nb-receipt__value {
+    font-family: var(--font-display);
+    font-size: clamp(1.75rem, 1.2rem + 1.2vw, 2.5rem);
+    font-weight: 300;
+    line-height: 1.1;
+    color: var(--navy-800);
+  }
+  .nb-receipt__row + .nb-receipt__row {
+    padding-top: 22px;
+    border-top: 1px dashed var(--piedra-300);
+  }
+  .nb-receipt__detail {
+    margin: 8px 0 0;
+    font-size: 0.875rem;
+    color: var(--piedra-600);
+  }
+  .nb-receipt__foot {
+    margin: 0;
+    padding-top: 18px;
+    border-top: 1px dashed var(--piedra-300);
+    font-size: 0.875rem;
+    color: var(--piedra-700);
+  }
+
+  /* ── 6 · Preguntas ── */
+  .nb-sfaq {
+    padding-block: var(--section-y);
+    background: var(--white);
+  }
+  .nb-sfaq__grid {
+    display: grid;
+    gap: 40px;
+  }
+  @media (min-width: 1024px) {
+    .nb-sfaq__grid {
+      grid-template-columns: minmax(0, 0.8fr) minmax(0, 1.2fr);
+      gap: clamp(48px, 6vw, 112px);
+      align-items: start;
+    }
+    .nb-sfaq__aside {
+      position: sticky;
+      top: calc(var(--header-h) + 40px);
+    }
+  }
+  .nb-sfaq__aside {
+    display: grid;
+    gap: 16px;
+  }
+
+  /* ── 7 · Relacionados ── */
+  .nb-rel {
+    padding-block: var(--section-y);
+    background: var(--piedra-50);
+  }
+  .nb-rel__head {
+    display: flex;
+    flex-wrap: wrap;
+    justify-content: space-between;
+    align-items: end;
+    gap: 16px 32px;
+    margin-bottom: clamp(32px, 4vw, 56px);
+  }
+  .nb-rel__all {
+    display: inline-flex;
+    align-items: center;
+    gap: 8px;
+    font-weight: 600;
+    color: var(--navy-800);
+    text-decoration: none;
+  }
+  .nb-rel__all:hover {
+    color: var(--salvia-600);
+  }
+  .nb-rel__list {
+    display: grid;
+    gap: 24px;
+    margin: 0;
+    padding: 0;
+    list-style: none;
+  }
+  @media (min-width: 768px) {
+    .nb-rel__list {
+      grid-template-columns: repeat(2, minmax(0, 1fr));
+    }
+  }
+  .nb-rel__card {
+    position: relative;
+    display: grid;
+    height: 100%;
+    overflow: hidden;
+    border: 1px solid var(--piedra-200);
+    border-radius: var(--radius-card, 8px);
+    background: var(--white);
+    color: var(--navy-800);
+    text-decoration: none;
+    transition: border-color var(--dur-base) var(--ease-out);
+  }
+  .nb-rel__card:hover {
+    border-color: var(--navy-800);
+  }
+  .nb-rel__card:focus-visible {
+    outline: 2px solid var(--navy-600);
+    outline-offset: 3px;
+  }
+  .nb-rel__media {
+    display: block;
+    aspect-ratio: 16 / 9;
+    overflow: hidden;
+    background: var(--piedra-100);
+  }
+  .nb-rel__media picture {
+    display: contents;
+  }
+  .nb-rel__img {
+    width: 100%;
+    height: 100%;
+    object-fit: cover;
+    transition: transform 1400ms var(--ease-out);
+  }
+  .nb-rel__card:hover .nb-rel__img {
+    transform: scale(1.04);
+  }
+  .nb-rel__body {
+    display: grid;
+    gap: 10px;
+    padding: clamp(24px, 3vw, 36px) clamp(24px, 3vw, 36px) 32px;
+    padding-right: 72px;
+  }
+  .nb-rel__name {
+    font-family: var(--font-display);
+    font-size: clamp(1.5rem, 1rem + 1vw, 2.125rem);
+    font-weight: 300;
+    line-height: 1.1;
+  }
+  .nb-rel__summary {
+    font-size: 0.9375rem;
+    line-height: 1.55;
+    color: var(--piedra-700);
+  }
+  .nb-rel__arrow {
+    position: absolute;
+    right: clamp(24px, 3vw, 36px);
+    bottom: 32px;
+    display: inline-flex;
+  }
+</style>

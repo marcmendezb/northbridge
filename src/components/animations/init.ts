@@ -10,6 +10,7 @@ import { mediaReveal } from './mediaReveal';
 import { priceDeck } from './priceDeck';
 import { pricingScene } from './pricingScene';
 import { revealOnScroll } from './revealOnScroll';
+import { serviceScene } from './serviceScene';
 import { splitReveal } from './splitReveal';
 import { getSmoothScroll } from './smoothScroll';
 
@@ -41,6 +42,7 @@ export async function initPage() {
     pricingScene(kit);
     aboutScene(kit);
     contactScene(kit);
+    serviceScene(kit);
     void splitReveal(kit);
   });
 
