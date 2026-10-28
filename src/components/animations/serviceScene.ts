@@ -7,6 +7,7 @@ import type { AnimationKit } from './types';
  * - Para quién: las tres frases entran en cascada y su símbolo se dibuja.
  * - IVA: en el gráfico del año, las banderas se levantan por orden de fecha, las pistas de aviso
  *   se tienden y la línea de hoy baja.
+ * - Proceso: la línea entre pasos se rellena y cada arco se enciende al alcanzarlo.
  * - Precio: el recibo se posa y sus conceptos entran uno a uno.
  * Solo transform, opacity, clip-path y trazos. Con movimiento reducido no se registra.
  */
@@ -114,44 +115,28 @@ export function serviceScene({ gsap, ScrollTrigger }: AnimationKit) {
       );
   }
 
-  // Proceso: cruzar el puente (solo en escritorio; en móvil se queda la versión estática).
-  const cross = document.querySelector<HTMLElement>('[data-cross]');
-  if (cross && window.matchMedia('(min-width: 900px)').matches) {
-    const steps = Array.from(cross.querySelectorAll<HTMLElement>('[data-cross-step]'));
-    const labels = Array.from(cross.querySelectorAll<HTMLElement>('[data-cross-label]'));
-    const arches = Array.from(cross.querySelectorAll<SVGPathElement>('[data-cross-arch]'));
-    const deck = cross.querySelector<SVGPathElement>('[data-cross-deck]');
-    const walker = cross.querySelector<SVGRectElement>('[data-cross-walker]');
-    const n = steps.length;
-    cross.classList.add('is-pinned');
-    cross.style.setProperty('--steps', String(n));
-    gsap.set([deck, ...arches], { strokeDasharray: 1, strokeDashoffset: 1 });
-    let current = -1;
-    const show = (i: number) => {
-      if (i === current) return;
-      current = i;
-      steps.forEach((s, k) => s.classList.toggle('is-active', k === i));
-      labels.forEach((l, k) => {
-        l.classList.toggle('is-active', k === i);
-        l.classList.toggle('is-done', k < i);
+  // Proceso: la línea se rellena con el scroll y cada paso se enciende al alcanzarlo.
+  const path = document.querySelector<HTMLElement>('[data-steps-path]');
+  if (path) {
+    const fill = path.querySelector('[data-steps-fill]');
+    const list = path.querySelector('ol');
+    if (fill && list)
+      gsap.fromTo(
+        fill,
+        { scaleY: 0 },
+        {
+          scaleY: 1,
+          ease: 'none',
+          scrollTrigger: { trigger: list, start: 'top 65%', end: 'bottom 65%', scrub: 0.5 },
+        },
+      );
+    path.querySelectorAll<HTMLElement>('[data-steps-item]').forEach((step) => {
+      ScrollTrigger.create({
+        trigger: step,
+        start: 'top 68%',
+        onEnter: () => step.classList.add('is-on'),
+        onLeaveBack: () => step.classList.remove('is-on'),
       });
-    };
-    show(0);
-    ScrollTrigger.create({
-      trigger: cross,
-      start: 'top top',
-      end: 'bottom bottom',
-      scrub: 0.5,
-      onUpdate: ({ progress: p }) => {
-        // El tablero se tiende primero; cada arco se levanta en su tramo; la marca cruza.
-        if (deck) gsap.set(deck, { strokeDashoffset: 1 - Math.min(1, p / 0.94) });
-        arches.forEach((a, i) => {
-          const local = Math.min(1, Math.max(0, (p - i / n) * n * 1.15));
-          gsap.set(a, { strokeDashoffset: 1 - local });
-        });
-        if (walker) gsap.set(walker, { x: p * (1200 - 16) });
-        show(Math.min(n - 1, Math.floor(p * n)));
-      },
     });
   }
 
