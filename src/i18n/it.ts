@@ -122,7 +122,6 @@ export const it: Messages = {
       faq: 'Domande frequenti',
       related: 'Servizi correlati',
       seeAll: 'Vedi tutti i servizi',
-      index: 'Servizio {n} di {total}',
       forWhomLead: 'Se ti riconosci in una di queste frasi, fa per te.',
       year: {
         label: 'Calendario',
@@ -135,6 +134,13 @@ export const it: Messages = {
         note: 'PMI con esercizio uguale all’anno civile, nel cantone di Zurigo.',
         guide: 'Leggi la guida al calendario fiscale',
         ruler: 'Linea dell’anno con {count} scadenze',
+        shifted:
+          'La data di legge cade nel fine settimana o in un giorno festivo: vale il giorno lavorativo successivo.',
+        window: 'Finestra abituale, senza data di legge.',
+        remind: 'Ti avvisiamo il {date}.',
+        leftToday: 'Scade oggi',
+        leftOne: 'Scade domani',
+        leftMany: 'Mancano {n} giorni',
         cats: { vat: 'IVA', tax: 'Imposte', payroll: 'Stipendi' },
       },
     },

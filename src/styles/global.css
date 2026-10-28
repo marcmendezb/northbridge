@@ -210,7 +210,7 @@ html.lenis body {
   .js.motion:not(.anim-fail) [data-yr-line] {
     transform: scaleX(0);
   }
-  .js.motion:not(.anim-fail) [data-incl-row] :is(.nb-incl__n, .nb-incl__text),
+  .js.motion:not(.anim-fail) [data-incl-row] .nb-incl__text,
   .js.motion:not(.anim-fail) [data-who] .nb-who__item,
   .js.motion:not(.anim-fail) [data-yr-dot],
   .js.motion:not(.anim-fail) [data-yr-alert],

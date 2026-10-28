@@ -122,7 +122,6 @@ export const de: Messages = {
       faq: 'Häufige Fragen',
       related: 'Weitere Leistungen',
       seeAll: 'Alle Leistungen ansehen',
-      index: 'Leistung {n} von {total}',
       forWhomLead: 'Erkennst du dich in einem dieser Sätze wieder, ist es für dich.',
       year: {
         label: 'Kalender',
@@ -135,6 +134,13 @@ export const de: Messages = {
         note: 'KMU mit Geschäftsjahr gleich Kalenderjahr, im Kanton Zürich.',
         guide: 'Zum Ratgeber Steuerkalender',
         ruler: 'Jahreslinie mit {count} Fristen',
+        shifted:
+          'Der gesetzliche Tag fällt auf ein Wochenende oder einen Feiertag: Es gilt der nächste Werktag.',
+        window: 'Übliches Zeitfenster, ohne gesetzliche Frist.',
+        remind: 'Wir erinnern dich am {date}.',
+        leftToday: 'Heute fällig',
+        leftOne: 'Morgen fällig',
+        leftMany: 'Noch {n} Tage',
         cats: { vat: 'MWST', tax: 'Steuern', payroll: 'Lohn' },
       },
     },

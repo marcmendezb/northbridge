@@ -34,9 +34,9 @@ export function serviceScene({ gsap, ScrollTrigger }: AnimationKit) {
     const tl = gsap.timeline({ scrollTrigger: { trigger: row, start: 'top 90%', once: true } });
     if (rule) tl.fromTo(rule, { scaleX: 0 }, { scaleX: 1, duration: 1.1, ease: 'power2.inOut' }, 0);
     tl.fromTo(
-      row.querySelectorAll('.nb-incl__n, .nb-incl__text'),
+      row.querySelector('.nb-incl__text'),
       { opacity: 0, y: 18 },
-      { opacity: 1, y: 0, duration: 0.9, stagger: 0.08, ease },
+      { opacity: 1, y: 0, duration: 0.9, ease },
       0.2,
     );
   });

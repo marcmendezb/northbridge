@@ -122,7 +122,6 @@ export const en: Messages = {
       faq: 'Frequently asked questions',
       related: 'Related services',
       seeAll: 'See all services',
-      index: 'Service {n} of {total}',
       forWhomLead: 'If you recognise yourself in one of these, it is for you.',
       year: {
         label: 'Calendar',
@@ -135,6 +134,13 @@ export const en: Messages = {
         note: 'SME with a financial year equal to the calendar year, in the canton of Zurich.',
         guide: 'Read the tax calendar guide',
         ruler: 'Timeline of the year with {count} deadlines',
+        shifted:
+          'The legal date falls on a weekend or public holiday: the next working day applies.',
+        window: 'Usual window, no legal date.',
+        remind: 'We remind you on {date}.',
+        leftToday: 'Due today',
+        leftOne: 'Due tomorrow',
+        leftMany: '{n} days left',
         cats: { vat: 'VAT', tax: 'Taxes', payroll: 'Payroll' },
       },
     },

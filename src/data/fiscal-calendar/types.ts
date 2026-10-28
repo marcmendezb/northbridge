@@ -1,4 +1,5 @@
 import type { Locale } from '../../i18n/locales';
+import type { DeadlineRule } from '../../lib/fiscal/deadlines';
 
 /** Texto en los cinco idiomas de la web. */
 export type Text = Record<Locale, string>;
@@ -11,4 +12,6 @@ export interface FiscalEvent {
   when: Text;
   what: Text;
   need: Text;
+  /** Regla legal para calcular la fecha exacta de cada año (src/lib/fiscal/deadlines.ts). */
+  rule?: DeadlineRule;
 }

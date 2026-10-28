@@ -122,7 +122,6 @@ export const fr: Messages = {
       faq: 'Questions fréquentes',
       related: 'Services liés',
       seeAll: 'Voir tous les services',
-      index: 'Service {n} sur {total}',
       forWhomLead: 'Si vous vous reconnaissez dans l’une de ces phrases, c’est pour vous.',
       year: {
         label: 'Calendrier',
@@ -135,6 +134,13 @@ export const fr: Messages = {
         note: 'PME dont l’exercice correspond à l’année civile, dans le canton de Zurich.',
         guide: 'Lire le guide du calendrier fiscal',
         ruler: 'Ligne de l’année avec {count} échéances',
+        shifted:
+          'La date légale tombe un week-end ou un jour férié : le jour ouvrable suivant s’applique.',
+        window: 'Période habituelle, sans date légale.',
+        remind: 'Nous vous prévenons le {date}.',
+        leftToday: 'Échéance aujourd’hui',
+        leftOne: 'Échéance demain',
+        leftMany: 'Encore {n} jours',
         cats: { vat: 'TVA', tax: 'Impôts', payroll: 'Salaires' },
       },
     },
