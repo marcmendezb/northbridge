@@ -9,9 +9,13 @@ export interface FiscalEvent {
   id: string;
   /** Mes (1–12) en que vence, para ordenar y para mostrar «lo que viene». */
   month: number;
+  /** Nombre corto para la regla del año («4.º trimestre», «Sociedades»). */
+  short?: Text;
   when: Text;
   what: Text;
   need: Text;
   /** Regla legal para calcular la fecha exacta de cada año (src/lib/fiscal/deadlines.ts). */
   rule?: DeadlineRule;
+  /** Prórroga de otro plazo (id): se dibuja como su continuación. */
+  extends?: string;
 }

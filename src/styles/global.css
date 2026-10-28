@@ -207,13 +207,13 @@ html.lenis body {
     clip-path: inset(0 9% 0 9% round 8px);
   }
   .js.motion:not(.anim-fail) [data-incl-rule],
-  .js.motion:not(.anim-fail) [data-yr-line] {
+  .js.motion:not(.anim-fail) [data-yr-alert] {
     transform: scaleX(0);
   }
   .js.motion:not(.anim-fail) [data-incl-row] .nb-incl__text,
   .js.motion:not(.anim-fail) [data-who] .nb-who__item,
   .js.motion:not(.anim-fail) [data-yr-dot],
-  .js.motion:not(.anim-fail) [data-yr-alert],
+  .js.motion:not(.anim-fail) [data-yr-span],
   .js.motion:not(.anim-fail) [data-receipt] {
     opacity: 0;
   }

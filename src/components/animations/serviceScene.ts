@@ -5,8 +5,8 @@ import type { AnimationKit } from './types';
  * - Cabecera: la foto se abre de los márgenes al ancho completo y se asienta (scrub).
  * - Qué incluye: cada línea del libro mayor traza su filete y entra.
  * - Para quién: las tres frases entran en cascada y su símbolo se dibuja.
- * - IVA: la regla del año se traza de enero a diciembre con el scroll; cada plazo y su aviso
- *   aparecen cuando la línea los alcanza, y la marca de hoy cae en su sitio.
+ * - IVA: en el gráfico del año, las banderas se levantan por orden de fecha, las pistas de aviso
+ *   se tienden y la línea de hoy baja.
  * - Precio: el recibo se posa y sus conceptos entran uno a uno.
  * Solo transform, opacity, clip-path y trazos. Con movimiento reducido no se registra.
  */
@@ -58,32 +58,45 @@ export function serviceScene({ gsap, ScrollTrigger }: AnimationKit) {
       .to(marks, { strokeDashoffset: 0, duration: 0.8, stagger: 0.08, ease: 'power2.inOut' }, 0.3);
   }
 
-  // IVA: la regla del año.
+  // IVA: el gráfico del año. Las banderas se levantan por orden de fecha, cada pista de aviso se
+  // tiende hacia su plazo y la línea de hoy baja al final.
   const ruler = document.querySelector<HTMLElement>('[data-yr-ruler]');
   if (ruler) {
-    const line = ruler.querySelector('[data-yr-line]');
     const pos = (el: HTMLElement) => {
       const at = parseFloat(el.style.getPropertyValue('--at')) || 0;
       return Math.min(Math.max(at / 100, 0), 1);
     };
     const tl = gsap.timeline({
       defaults: { ease: 'none' },
-      scrollTrigger: { trigger: ruler, start: 'top 92%', end: 'top 55%', scrub: 0.6 },
+      scrollTrigger: { trigger: ruler, start: 'top 88%', end: 'top 45%', scrub: 0.6 },
     });
-    if (line) tl.fromTo(line, { scaleX: 0 }, { scaleX: 1, duration: 1 }, 0);
-    ruler.querySelectorAll<HTMLElement>('[data-yr-alert]').forEach((a) => {
-      tl.fromTo(a, { opacity: 0 }, { opacity: 1, duration: 0.04 }, pos(a));
-    });
-    ruler.querySelectorAll<HTMLElement>('[data-yr-dot]').forEach((dot) => {
+    ruler.querySelectorAll<HTMLElement>('[data-yr-alert]').forEach((r) => {
       tl.fromTo(
-        dot,
-        { opacity: 0, scale: 0.3 },
-        { opacity: 1, scale: 1, duration: 0.06, ease: 'power3.out' },
-        pos(dot) + 0.01,
+        r,
+        { scaleX: 0, transformOrigin: 'left center' },
+        { scaleX: 1, duration: 0.08 },
+        pos(r) * 0.85,
+      );
+    });
+    ruler.querySelectorAll<HTMLElement>('[data-yr-span]').forEach((w) => {
+      tl.fromTo(w, { opacity: 0 }, { opacity: 1, duration: 0.1 }, 0);
+    });
+    ruler.querySelectorAll<HTMLElement>('[data-yr-dot]').forEach((flag) => {
+      tl.fromTo(
+        flag,
+        { opacity: 0, y: 18 },
+        { opacity: 1, y: 0, duration: 0.1, ease: 'power3.out' },
+        pos(flag) * 0.85 + 0.04,
       );
     });
     const today = ruler.querySelector('[data-yr-today]');
-    if (today) tl.fromTo(today, { opacity: 0, y: -16 }, { opacity: 1, y: 0, duration: 0.1 }, 0.9);
+    if (today)
+      tl.fromTo(
+        today,
+        { scaleY: 0, transformOrigin: '50% 0%' },
+        { scaleY: 1, duration: 0.12, ease: 'power2.out' },
+        0.88,
+      );
     tl.to({}, { duration: 0.001 }, 1);
   }
 

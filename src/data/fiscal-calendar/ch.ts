@@ -7,6 +7,13 @@ import type { FiscalEvent } from './types';
 export const events: FiscalEvent[] = [
   {
     id: 'ahv-salaries',
+    short: {
+      es: 'Declaración AVS',
+      en: 'AHV salary return',
+      de: 'AHV-Lohnmeldung',
+      fr: 'Déclaration AVS',
+      it: 'Dichiarazione AVS',
+    },
     rule: { type: 'fixed', m: 1, d: 30, shift: true },
     month: 1,
     when: {
@@ -33,6 +40,13 @@ export const events: FiscalEvent[] = [
   },
   {
     id: 'salary-certificates',
+    short: {
+      es: 'Certificados de salario',
+      en: 'Salary certificates',
+      de: 'Lohnausweise',
+      fr: 'Certificats de salaire',
+      it: 'Certificati di salario',
+    },
     rule: { type: 'range', from: { m: 1, d: 1 }, to: 'endFeb' },
     month: 2,
     when: {
@@ -59,6 +73,13 @@ export const events: FiscalEvent[] = [
   },
   {
     id: 'vat-q4',
+    short: {
+      es: '4.º trimestre',
+      en: 'Q4',
+      de: '4. Quartal',
+      fr: '4e trimestre',
+      it: '4° trimestre',
+    },
     rule: { type: 'afterPeriod', endM: 12, endD: 31, days: 60, shift: true },
     month: 3,
     when: {
@@ -85,6 +106,13 @@ export const events: FiscalEvent[] = [
   },
   {
     id: 'individuals',
+    short: {
+      es: 'Personas físicas',
+      en: 'Individuals',
+      de: 'Natürliche Personen',
+      fr: 'Personnes physiques',
+      it: 'Persone fisiche',
+    },
     rule: { type: 'fixed', m: 3, d: 31, shift: false },
     month: 3,
     when: {
@@ -111,6 +139,13 @@ export const events: FiscalEvent[] = [
   },
   {
     id: 'vat-q1',
+    short: {
+      es: '1.er trimestre',
+      en: 'Q1',
+      de: '1. Quartal',
+      fr: '1er trimestre',
+      it: '1° trimestre',
+    },
     rule: { type: 'afterPeriod', endM: 3, endD: 31, days: 60, shift: true },
     month: 5,
     when: {
@@ -137,6 +172,13 @@ export const events: FiscalEvent[] = [
   },
   {
     id: 'vat-q2',
+    short: {
+      es: '2.º trimestre',
+      en: 'Q2',
+      de: '2. Quartal',
+      fr: '2e trimestre',
+      it: '2° trimestre',
+    },
     rule: { type: 'afterPeriod', endM: 6, endD: 30, days: 60, shift: true },
     month: 8,
     when: {
@@ -163,6 +205,13 @@ export const events: FiscalEvent[] = [
   },
   {
     id: 'companies',
+    short: {
+      es: 'Sociedades',
+      en: 'Companies',
+      de: 'Gesellschaften',
+      fr: 'Sociétés',
+      it: 'Società',
+    },
     rule: { type: 'fixed', m: 9, d: 30, shift: false },
     month: 9,
     when: {
@@ -189,6 +238,13 @@ export const events: FiscalEvent[] = [
   },
   {
     id: 'vat-q3',
+    short: {
+      es: '3.er trimestre',
+      en: 'Q3',
+      de: '3. Quartal',
+      fr: '3e trimestre',
+      it: '3° trimestre',
+    },
     rule: { type: 'afterPeriod', endM: 9, endD: 30, days: 60, shift: true },
     month: 11,
     when: {
@@ -215,6 +271,14 @@ export const events: FiscalEvent[] = [
   },
   {
     id: 'companies-extension',
+    extends: 'companies',
+    short: {
+      es: 'Prórroga',
+      en: 'Extension',
+      de: 'Fristerstreckung',
+      fr: 'Prolongation',
+      it: 'Proroga',
+    },
     rule: { type: 'fixed', m: 11, d: 30, shift: false },
     month: 11,
     when: {
