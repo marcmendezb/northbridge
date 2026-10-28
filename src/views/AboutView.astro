@@ -16,6 +16,8 @@ import marc from '../assets/img/about/team/marc-bernasconi.jpeg';
 import { useI18n } from '../i18n';
 import { entryKey, getTeam } from '../lib/content';
 import { getBookingCta, site } from '../lib/site';
+import { byCountry, COUNTRIES } from '../lib/country';
+import { OFFICES } from '../data/offices';
 
 const { t, tRaw, lp, locale } = useI18n(Astro.currentLocale);
 const team = await getTeam(locale);
@@ -222,16 +224,22 @@ const splitFact = (v: string) => {
     <div class="nb-container nb-office__grid">
       <div class="nb-office__text">
         <p class="nb-office__label">{t('about.officeLabel')}</p>
-        <h2 class="nb-office__title" id="office-title" data-split>
-          {t('about.officeTitle')}
-        </h2>
-        <p class="nb-office__p" data-reveal>
-          {t('about.officeText')}
-        </p>
+        <!-- La oficina depende del país (src/data/offices.ts): una variante por país. -->
+        <h2
+          class="nb-office__title"
+          id="office-title"
+          data-reveal
+          set:html={byCountry((c) => OFFICES[c].title[locale])}
+        />
+        <p class="nb-office__p" data-reveal set:html={byCountry((c) => OFFICES[c].text[locale])} />
         <address class="nb-office__address" data-reveal>
-          {site.address.street}
-          <br />
-          {`${site.address.postalCode} ${site.address.city}`}
+          {COUNTRIES.map((c) => (
+            <span data-cc={c}>
+              {OFFICES[c].street}
+              <br />
+              {`${OFFICES[c].postalCode} ${OFFICES[c].city}`}
+            </span>
+          ))}
         </address>
         <a href={lp('/contacto')} class="nb-office__cta" data-reveal>
           {t('about.officeCta')}

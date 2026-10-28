@@ -482,9 +482,6 @@ export const it: Messages = {
       { value: '1', label: 'Persona di contatto per cliente' },
     ],
     officeLabel: 'Ufficio',
-    officeTitle: 'A Seefeld, vicino al lago.',
-    officeText:
-      'A sei minuti a piedi dalla stazione di Stadelhofen. Se preferisci parlare di persona, ti accogliamo qui.',
     officeCta: 'Come arrivare',
   },
   resources: {

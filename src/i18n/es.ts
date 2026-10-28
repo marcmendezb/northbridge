@@ -479,9 +479,6 @@ export const es = {
       { value: '1', label: 'Persona de contacto por cliente' },
     ],
     officeLabel: 'Oficina',
-    officeTitle: 'En Seefeld, junto al lago.',
-    officeText:
-      'Estamos a seis minutos a pie de la estación de Stadelhofen. Si prefieres hablar en persona, te recibimos aquí.',
     officeCta: 'Cómo llegar',
   },
   resources: {

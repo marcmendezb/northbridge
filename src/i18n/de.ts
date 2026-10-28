@@ -481,9 +481,6 @@ export const de: Messages = {
       { value: '1', label: 'Ansprechperson pro Kunde' },
     ],
     officeLabel: 'Büro',
-    officeTitle: 'Im Seefeld, nahe am See.',
-    officeText:
-      'Sechs Gehminuten vom Bahnhof Stadelhofen. Wenn du lieber persönlich sprichst, empfangen wir dich hier.',
     officeCta: 'Anfahrt',
   },
   resources: {
