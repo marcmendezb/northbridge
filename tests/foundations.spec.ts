@@ -4,6 +4,8 @@ import { expect, test } from '@playwright/test';
 for (const path of ['/', '/_brand']) {
   test(`axe: sin errores en ${path}`, async ({ page }) => {
     await page.goto(path, { waitUntil: 'networkidle' });
+    // Axe mide el estado final: la entrada del hero (fundidos de opacidad) dura unos 2 s.
+    await page.waitForTimeout(2600);
     // Las muestras de contraste de /_brand incluyen a propósito parejas límite o prohibidas.
     const results = await new AxeBuilder({ page })
       .exclude('[data-contrast-demo]')

@@ -98,6 +98,7 @@ export const en: Messages = {
       guideLead: 'Choose your situation and we’ll tell you where to start.',
       guideProfile: 'Your situation',
       guideServices: 'Services that fit you',
+      startHere: 'Start here',
       seoTitle: 'Services',
       seoDescription:
         'Accounting, VAT, payroll, company formation and startup advisory in Zurich. Five services at a fixed price, with one dedicated contact person.',

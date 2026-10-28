@@ -98,6 +98,7 @@ export const it: Messages = {
       guideLead: 'Scegli il tuo caso e ti diciamo da dove cominciare.',
       guideProfile: 'Il tuo caso',
       guideServices: 'I servizi adatti a te',
+      startHere: 'Inizia da qui',
       seoTitle: 'Servizi',
       seoDescription:
         'Contabilità, IVA, salari, costituzione di società e consulenza per startup a Zurigo. Cinque servizi a prezzo fisso, con un referente dedicato.',

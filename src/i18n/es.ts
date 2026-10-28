@@ -96,6 +96,7 @@ export const es = {
       guideLead: 'Elige tu caso y te decimos por dónde empezar.',
       guideProfile: 'Tu caso',
       guideServices: 'Servicios que te encajan',
+      startHere: 'Empieza por aquí',
       seoTitle: 'Servicios',
       seoDescription:
         'Contabilidad, IVA, nóminas, constitución de empresas y asesoría para startups en Zúrich. Cinco servicios con precio cerrado y una persona de contacto fija.',

@@ -98,6 +98,7 @@ export const fr: Messages = {
       guideLead: 'Choisissez votre cas, nous vous disons par où commencer.',
       guideProfile: 'Votre cas',
       guideServices: 'Les services adaptés',
+      startHere: 'Commencez ici',
       seoTitle: 'Services',
       seoDescription:
         'Comptabilité, TVA, salaires, création d’entreprise et conseil aux start-up à Zurich. Cinq services à prix fixe, avec une personne de contact attitrée.',

@@ -98,6 +98,7 @@ export const de: Messages = {
       guideLead: 'Wähle deine Situation. Wir sagen dir, womit du beginnst.',
       guideProfile: 'Deine Situation',
       guideServices: 'Passende Leistungen',
+      startHere: 'Hier beginnen',
       seoTitle: 'Leistungen',
       seoDescription:
         'Buchhaltung, MWST, Lohnbuchhaltung, Firmengründung und Startup-Beratung in Zürich. Fünf Leistungen zum Fixpreis, mit einer festen Ansprechperson.',

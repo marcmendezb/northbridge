@@ -1,17 +1,60 @@
 ---
+import type { ImageMetadata } from 'astro';
+import { Picture } from 'astro:assets';
 import BaseLayout from '../layouts/BaseLayout.astro';
-import PageHeader from '../components/layout/PageHeader.astro';
-import Section from '../components/ui/Section.astro';
-import Card from '../components/ui/Card.astro';
+import Breadcrumbs from '../components/layout/Breadcrumbs.astro';
 import Icon from '../components/brand/Icon.astro';
+import Arrow from '../components/brand/Arrow.astro';
 import CtaBand from '../components/sections/CtaBand.astro';
+import contabilidad from '../assets/img/services/contabilidad.jpeg';
+import iva from '../assets/img/services/iva.jpeg';
+import nominas from '../assets/img/services/nominas.jpeg';
+import constitucion from '../assets/img/services/constitucion.jpeg';
+import startups from '../assets/img/services/startup.jpeg';
 import { useI18n, type MessageKey } from '../i18n';
 import { entryKey, getServices } from '../lib/content';
+import { byCountry, currencyOf } from '../lib/country';
+import { formatNumber } from '../lib/format';
+import { convert } from '../lib/pricing/currency';
+import { describePricing, priceUnit } from '../lib/pricing/display';
 
 const { t, lp, locale } = useI18n(Astro.currentLocale);
 const services = await getServices(locale);
-const byIcon = Object.fromEntries(services.map((s) => [s.data.icon, s]));
 
+const photos: Record<string, ImageMetadata> = {
+  'contabilidad-y-cierres': contabilidad,
+  'iva-y-fiscalidad': iva,
+  'nominas-y-seguros-sociales': nominas,
+  'constitucion-de-empresas': constitucion,
+  'asesoria-para-startups': startups,
+};
+
+/** Precio orientativo del servicio en la moneda del país (config.ts, nunca escrito a mano). */
+const priceOf = (s: (typeof services)[number]) => {
+  const p = s.data.pricing[0];
+  const base = describePricing(p, locale);
+  if (base.amount === undefined) return base.headline;
+  const amount = base.amount;
+  return byCountry(
+    (c) =>
+      `${t('price.from')} ${formatNumber(convert(amount, currencyOf(c)), locale)} ${priceUnit(currencyOf(c), locale, base.once)}`,
+  );
+};
+
+const rows = services.map((s) => ({
+  key: entryKey(s),
+  href: lp(`/servicios/${entryKey(s)}`),
+  title: s.data.title,
+  summary: s.data.summary,
+  forWhom: s.data.forWhom[0],
+  includes: s.data.includes.slice(0, 3),
+  icon: s.data.icon,
+  photo: photos[entryKey(s)] ?? contabilidad,
+  price: priceOf(s),
+}));
+const byIcon = Object.fromEntries(rows.map((r) => [r.icon, r]));
+
+/** Por dónde empezar según el caso (docs/05): el primero es el punto de partida. */
 const profiles = [
   { key: 'autonomo', icons: ['contabilidad', 'iva', 'nominas', 'constitucion'] },
   { key: 'startup', icons: ['startups', 'constitucion', 'contabilidad', 'iva'] },
@@ -19,79 +62,649 @@ const profiles = [
 ] as const;
 ---
 
-<BaseLayout title={t('services.index.seoTitle')} description={t('services.index.seoDescription')}>
-  <PageHeader
-    title={t('services.index.title')}
-    lead={t('services.index.lead')}
-    crumbs={[{ label: t('nav.services') }]}
-  />
+<BaseLayout
+  title={t('services.index.seoTitle')}
+  description={t('services.index.seoDescription')}
+  overlayHeader
+>
+  <!-- 1 · Cabecera -->
+  <header class="nb-si" data-surface="dark">
+    <div class="nb-container nb-si__inner">
+      <Breadcrumbs items={[{ label: t('nav.services') }]} tone="dark" />
+      <h1 class="nb-si__eyebrow">{t('services.index.title')}</h1>
+      <p class="nb-si__statement" data-reveal>
+        {t('services.index.lead')}
+      </p>
+    </div>
+  </header>
 
-  <Section>
-    <ul class="m-0 grid list-none gap-6 p-0 md:grid-cols-2 lg:grid-cols-3">
-      {services.map((s) => (
-        <li data-reveal class="flex">
-          <Card href={lp(`/servicios/${entryKey(s)}`)} class="flex w-full flex-col gap-4 p-8">
-            <Icon name={s.data.icon} size={40} />
-            <h2 class="m-0 text-[1.5rem] leading-tight font-medium">{s.data.title}</h2>
-            <p class="t-small m-0 !text-piedra-700">{s.data.summary}</p>
-            <p class="t-small m-0 mt-auto border-t border-piedra-200 pt-4">
-              <span class="t-label mr-2 !text-[0.6875rem] text-piedra-600">
-                {t('services.index.forWhomLabel')}
+  <!-- 2 · El índice: cinco filas y, al lado, la foto y lo que incluye el servicio señalado -->
+  <section class="nb-index" aria-labelledby="index-title" data-index>
+    <h2 id="index-title" class="sr-only">
+      {t('services.index.title')}
+    </h2>
+    <div class="nb-container nb-index__grid">
+      <ol class="nb-index__list" role="list">
+        {rows.map((r, i) => (
+          <li class:list={['nb-index__row', i === 0 && 'is-active']} data-index-row={r.key}>
+            <a href={r.href} class="nb-index__link">
+              <span class="nb-index__thumb" aria-hidden="true">
+                <Picture
+                  src={r.photo}
+                  formats={['avif', 'webp']}
+                  widths={[320, 640]}
+                  sizes="(min-width: 1024px) 1px, 92vw"
+                  alt=""
+                  quality={70}
+                />
               </span>
-              {s.data.forWhom[0]}
-            </p>
-          </Card>
-        </li>
-      ))}
-    </ul>
-  </Section>
+              <span class="nb-index__head">
+                <span class="nb-index__icon" aria-hidden="true">
+                  <Icon name={r.icon} size={26} />
+                </span>
+                <span class="nb-index__title">{r.title}</span>
+                <span class="nb-index__arrow" aria-hidden="true">
+                  <Arrow size={26} />
+                </span>
+              </span>
+              <span class="nb-index__summary">{r.summary}</span>
+              <span class="nb-index__meta">
+                <span class="nb-index__for">
+                  <span class="nb-index__label">{t('services.index.forWhomLabel')}</span>
+                  {r.forWhom}
+                </span>
+                <span class="nb-index__price" set:html={r.price} />
+              </span>
+            </a>
+          </li>
+        ))}
+      </ol>
 
-  <Section
-    tone="piedra"
-    label={t('services.index.guideLabel')}
-    title={t('services.index.guideTitle')}
-    lead={t('services.index.guideLead')}
-    rule
-  >
-    <div class="overflow-x-auto rounded-card border border-piedra-200 bg-white">
-      <table class="w-full min-w-[560px] border-collapse text-left">
-        <caption class="sr-only">{t('services.index.guideTitle')}</caption>
-        <thead>
-          <tr class="border-b border-piedra-200 text-piedra-600">
-            <th scope="col" class="t-label p-4 md:p-5">
-              {t('services.index.guideProfile')}
-            </th>
-            <th scope="col" class="t-label p-4 md:p-5">
-              {t('services.index.guideServices')}
-            </th>
-          </tr>
-        </thead>
-        <tbody>
-          {profiles.map((p) => (
-            <tr class="border-b border-piedra-200 align-top last:border-0">
-              <th
-                scope="row"
-                class="p-4 font-serif text-[1.25rem] font-medium text-navy-800 md:p-5"
-              >
-                {t(`services.profiles.${p.key}` as MessageKey)}
-              </th>
-              <td class="p-4 md:p-5">
-                <ul class="m-0 flex list-none flex-col gap-1 p-0">
-                  {p.icons.map((icon) => (
-                    <li>
-                      <a href={lp(`/servicios/${entryKey(byIcon[icon])}`)}>
-                        {byIcon[icon].data.title}
-                      </a>
-                    </li>
+      <aside class="nb-index__pane" aria-hidden="true">
+        <div class="nb-index__frame">
+          {rows.map((r, i) => (
+            <figure class:list={['nb-index__shot', i === 0 && 'is-active']} data-index-shot={r.key}>
+              <Picture
+                src={r.photo}
+                formats={['avif', 'webp']}
+                widths={[480, 800, 1200]}
+                sizes="(min-width: 1024px) 36vw, 1px"
+                alt=""
+                loading={i === 0 ? 'eager' : 'lazy'}
+                quality={74}
+              />
+              <figcaption class="nb-index__card">
+                <span class="nb-index__card-title">{r.title}</span>
+                <ul role="list">
+                  {r.includes.map((inc) => (
+                    <li>{inc}</li>
                   ))}
                 </ul>
-              </td>
-            </tr>
+              </figcaption>
+            </figure>
           ))}
-        </tbody>
-      </table>
+        </div>
+      </aside>
     </div>
-  </Section>
+    <p class="nb-container nb-index__vat">{t('price.vatNote')}</p>
+  </section>
+
+  <!-- 3 · Por dónde empiezo: elige tu caso y ves tu camino -->
+  <section class="nb-path" aria-labelledby="path-title" data-path>
+    <div class="nb-container">
+      <div class="nb-path__head">
+        <p class="nb-path__eyebrow">{t('services.index.guideLabel')}</p>
+        <h2 id="path-title" class="nb-path__title" data-split>
+          {t('services.index.guideTitle')}
+        </h2>
+        <p class="nb-path__lead" data-reveal>
+          {t('services.index.guideLead')}
+        </p>
+      </div>
+
+      <div class="nb-path__tabs" role="tablist" aria-labelledby="path-title" data-path-tabs hidden>
+        {profiles.map((p, i) => (
+          <button
+            type="button"
+            role="tab"
+            id={`path-tab-${p.key}`}
+            aria-controls={`path-${p.key}`}
+            aria-selected={i === 0 ? 'true' : 'false'}
+            tabindex={i === 0 ? 0 : -1}
+            class="nb-path__tab"
+            data-path-tab={p.key}
+          >
+            {t(`services.profiles.${p.key}` as MessageKey)}
+          </button>
+        ))}
+      </div>
+
+      <div class="nb-path__panels">
+        {profiles.map((p) => (
+          <div
+            class="nb-path__panel"
+            id={`path-${p.key}`}
+            role="tabpanel"
+            aria-labelledby={`path-tab-${p.key}`}
+            data-path-panel={p.key}
+          >
+            <h3 class="nb-path__panel-title">{t(`services.profiles.${p.key}` as MessageKey)}</h3>
+            <ol class="nb-path__steps" role="list" style={`--n:${p.icons.length}`}>
+              {p.icons.map((icon, i) => {
+                const r = byIcon[icon];
+                return (
+                  <li class:list={['nb-path__step', i === 0 && 'is-first']}>
+                    <a href={r.href} class="nb-path__link">
+                      {i === 0 && (
+                        <span class="nb-path__start">{t('services.index.startHere')}</span>
+                      )}
+                      <span class="nb-path__step-icon" aria-hidden="true">
+                        <Icon name={r.icon} size={28} />
+                      </span>
+                      <span class="nb-path__step-title">{r.title}</span>
+                      <span class="nb-path__step-text">{r.summary}</span>
+                    </a>
+                  </li>
+                );
+              })}
+            </ol>
+          </div>
+        ))}
+      </div>
+    </div>
+  </section>
 
   <CtaBand />
 </BaseLayout>
+
+<script>
+  // Índice: la foto del panel sigue a la fila señalada (ratón o teclado).
+  const index = document.querySelector<HTMLElement>('[data-index]');
+  if (index) {
+    const rows = Array.from(index.querySelectorAll<HTMLElement>('[data-index-row]'));
+    const shots = Array.from(index.querySelectorAll<HTMLElement>('[data-index-shot]'));
+    const show = (key: string) => {
+      rows.forEach((r) => r.classList.toggle('is-active', r.dataset.indexRow === key));
+      shots.forEach((s) => s.classList.toggle('is-active', s.dataset.indexShot === key));
+    };
+    rows.forEach((r) => {
+      const key = r.dataset.indexRow ?? '';
+      r.addEventListener('pointerenter', () => show(key));
+      r.addEventListener('focusin', () => show(key));
+    });
+  }
+
+  // Por dónde empiezo: pestañas accesibles (flechas, Inicio y Fin). Sin JS se ven los tres caminos.
+  const path = document.querySelector<HTMLElement>('[data-path]');
+  const tablist = path?.querySelector<HTMLElement>('[data-path-tabs]');
+  if (path && tablist) {
+    const tabs = Array.from(tablist.querySelectorAll<HTMLButtonElement>('[data-path-tab]'));
+    const panels = Array.from(path.querySelectorAll<HTMLElement>('[data-path-panel]'));
+    const select = (i: number, focus = false) => {
+      tabs.forEach((tab, k) => {
+        tab.setAttribute('aria-selected', String(k === i));
+        tab.tabIndex = k === i ? 0 : -1;
+      });
+      panels.forEach((p, k) => (p.hidden = k !== i));
+      if (focus) tabs[i]?.focus();
+    };
+    tabs.forEach((tab, i) => {
+      tab.addEventListener('click', () => select(i));
+      tab.addEventListener('keydown', (e) => {
+        const last = tabs.length - 1;
+        const to =
+          e.key === 'ArrowRight'
+            ? i === last
+              ? 0
+              : i + 1
+            : e.key === 'ArrowLeft'
+              ? i === 0
+                ? last
+                : i - 1
+              : e.key === 'Home'
+                ? 0
+                : e.key === 'End'
+                  ? last
+                  : -1;
+        if (to < 0) return;
+        e.preventDefault();
+        select(to, true);
+      });
+    });
+    path.classList.add('is-tabbed');
+    tablist.hidden = false;
+    select(0);
+  }
+</script>
+
+<style is:global>
+  /* ── 1 · Cabecera ── */
+  .nb-si {
+    background: var(--navy-800);
+    color: var(--navy-100);
+  }
+  .nb-si__inner {
+    display: grid;
+    gap: 20px;
+    padding-block: calc(var(--header-h) + 40px) clamp(56px, 7vw, 112px);
+  }
+  .nb-si__eyebrow {
+    margin: 12px 0 0;
+    font-family: var(--font-text, inherit);
+    font-size: 0.8125rem;
+    font-weight: 600;
+    letter-spacing: 0.16em;
+    text-transform: uppercase;
+    color: var(--salvia-300);
+  }
+  .nb-si__statement {
+    margin: 0;
+    max-width: 22ch;
+    font-family: var(--font-display);
+    font-optical-sizing: auto;
+    font-size: clamp(2.5rem, 1rem + 4.6vw, 6rem);
+    font-weight: 300;
+    line-height: 1;
+    letter-spacing: -0.03em;
+    color: var(--white);
+    text-wrap: balance;
+  }
+
+  /* ── 2 · El índice ── */
+  .nb-index {
+    padding-block: clamp(48px, 6vw, 96px) var(--section-y);
+    background: var(--white);
+  }
+  .nb-index__grid {
+    display: grid;
+    gap: 48px;
+    align-items: start;
+  }
+  @media (min-width: 1024px) {
+    .nb-index__grid {
+      grid-template-columns: minmax(0, 1.25fr) minmax(0, 0.75fr);
+      gap: clamp(40px, 5vw, 96px);
+    }
+  }
+  .nb-index__list {
+    margin: 0;
+    padding: 0;
+    list-style: none;
+    border-bottom: 1px solid var(--navy-800);
+  }
+  .nb-index__row {
+    border-top: 1px solid var(--navy-800);
+  }
+  .nb-index__link {
+    position: relative;
+    display: grid;
+    gap: 12px;
+    padding-block: clamp(24px, 3vw, 36px);
+    color: var(--navy-800);
+    text-decoration: none;
+  }
+  .nb-index__link:focus-visible {
+    outline: 2px solid var(--navy-600);
+    outline-offset: 4px;
+  }
+  .nb-index__head {
+    display: grid;
+    grid-template-columns: auto minmax(0, 1fr) auto;
+    align-items: center;
+    gap: 16px;
+  }
+  .nb-index__icon {
+    display: inline-flex;
+    color: var(--piedra-500);
+    transition: color var(--dur-base) var(--ease-out);
+  }
+  .nb-index__title {
+    font-family: var(--font-display);
+    font-size: clamp(1.875rem, 1rem + 2vw, 3.25rem);
+    font-weight: 300;
+    line-height: 1.05;
+    letter-spacing: -0.02em;
+    transition: transform var(--dur-base) var(--ease-out);
+  }
+  .nb-index__arrow {
+    display: inline-flex;
+    opacity: 0.35;
+    transition: opacity var(--dur-base) var(--ease-out);
+  }
+  .nb-index__summary {
+    max-width: 40rem;
+    font-size: 1.0625rem;
+    line-height: 1.6;
+    color: var(--piedra-800);
+  }
+  .nb-index__meta {
+    display: flex;
+    flex-wrap: wrap;
+    justify-content: space-between;
+    gap: 8px 32px;
+    font-size: 0.9375rem;
+    color: var(--piedra-700);
+  }
+  .nb-index__label {
+    margin-right: 8px;
+    font-size: 0.6875rem;
+    font-weight: 600;
+    letter-spacing: 0.14em;
+    text-transform: uppercase;
+    color: var(--piedra-600);
+  }
+  .nb-index__price {
+    font-weight: 600;
+    color: var(--navy-800);
+    white-space: nowrap;
+  }
+  /* Fila señalada: el icono en navy, el título se desplaza y la flecha se completa. */
+  .nb-index__row.is-active .nb-index__icon {
+    color: var(--navy-800);
+  }
+  .nb-index__row.is-active .nb-index__arrow,
+  .nb-index__link:hover .nb-index__arrow {
+    opacity: 1;
+  }
+  .nb-index__link:hover .nb-index__title,
+  .nb-index__link:focus-visible .nb-index__title {
+    transform: translateX(8px);
+  }
+  .nb-index__vat {
+    margin: 20px auto 0;
+    font-size: 0.8125rem;
+    color: var(--piedra-600);
+  }
+
+  /* Miniatura en cada fila (móvil y tableta); en escritorio la sustituye el panel. */
+  .nb-index__thumb {
+    display: block;
+    aspect-ratio: 16 / 9;
+    overflow: hidden;
+    border-radius: var(--radius-card, 8px);
+    background: var(--piedra-100);
+  }
+  .nb-index__thumb picture {
+    display: contents;
+  }
+  .nb-index__thumb img {
+    width: 100%;
+    height: 100%;
+    object-fit: cover;
+  }
+  @media (min-width: 1024px) {
+    .nb-index__thumb {
+      display: none;
+    }
+  }
+
+  /* Panel: la foto del servicio señalado, en arco, con lo que incluye. */
+  .nb-index__pane {
+    display: none;
+  }
+  @media (min-width: 1024px) {
+    .nb-index__pane {
+      position: sticky;
+      top: calc(var(--header-h) + 32px);
+      display: block;
+    }
+  }
+  .nb-index__frame {
+    position: relative;
+    aspect-ratio: 3 / 4;
+    max-height: calc(100svh - var(--header-h) - 64px);
+    margin-left: auto;
+    overflow: hidden;
+    border-radius: 9999px 9999px 0 0;
+    background: var(--navy-800);
+  }
+  .nb-index__shot {
+    position: absolute;
+    inset: 0;
+    margin: 0;
+    opacity: 0;
+    transition: opacity 600ms var(--ease-out);
+  }
+  .nb-index__shot.is-active {
+    opacity: 1;
+  }
+  .nb-index__shot picture {
+    display: contents;
+  }
+  .nb-index__shot img {
+    width: 100%;
+    height: 100%;
+    object-fit: cover;
+    transform: scale(1.06);
+    transition: transform 1600ms var(--ease-out);
+  }
+  .nb-index__shot.is-active img {
+    transform: scale(1);
+  }
+  .nb-index__card {
+    position: absolute;
+    inset: auto 16px 16px;
+    display: grid;
+    gap: 10px;
+    padding: 20px 22px;
+    border-radius: var(--radius-button, 4px);
+    background: var(--navy-800);
+    color: var(--navy-100);
+    opacity: 0;
+    transform: translateY(12px);
+    transition:
+      opacity 500ms var(--ease-out) 150ms,
+      transform 700ms var(--ease-out) 150ms;
+  }
+  .nb-index__shot.is-active .nb-index__card {
+    opacity: 1;
+    transform: none;
+  }
+  .nb-index__card-title {
+    font-family: var(--font-display);
+    font-size: 1.375rem;
+    line-height: 1.15;
+    color: var(--white);
+  }
+  .nb-index__card ul {
+    display: grid;
+    gap: 6px;
+    margin: 0;
+    padding: 0;
+    list-style: none;
+    font-size: 0.875rem;
+    line-height: 1.45;
+  }
+  .nb-index__card li {
+    display: grid;
+    grid-template-columns: 14px minmax(0, 1fr);
+    gap: 10px;
+  }
+  .nb-index__card li::before {
+    content: '';
+    width: 10px;
+    height: 6px;
+    margin-top: 5px;
+    border-bottom: 1.5px solid var(--salvia-300);
+    border-left: 1.5px solid var(--salvia-300);
+    transform: rotate(-45deg);
+  }
+
+  /* ── 3 · Por dónde empiezo ── */
+  .nb-path {
+    padding-block: var(--section-y);
+    background: var(--piedra-100);
+  }
+  .nb-path__head {
+    display: grid;
+    gap: 16px;
+    max-width: 44rem;
+  }
+  .nb-path__eyebrow {
+    margin: 0;
+    font-size: 0.8125rem;
+    font-weight: 600;
+    letter-spacing: 0.16em;
+    text-transform: uppercase;
+    color: var(--salvia-600);
+  }
+  .nb-path__title {
+    margin: 0;
+    font-family: var(--font-display);
+    font-size: clamp(2.25rem, 1rem + 3vw, 4rem);
+    font-weight: 300;
+    line-height: 1;
+    letter-spacing: -0.025em;
+    color: var(--navy-800);
+  }
+  .nb-path__lead {
+    margin: 0;
+    font-size: 1.125rem;
+    line-height: 1.6;
+    color: var(--piedra-800);
+  }
+  .nb-path__tabs {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 8px;
+    margin-top: clamp(28px, 4vw, 48px);
+  }
+  .nb-path__tabs[hidden] {
+    display: none;
+  }
+  .nb-path__tab {
+    min-height: 48px;
+    padding: 0 22px;
+    border: 1px solid var(--navy-800);
+    border-radius: var(--radius-button, 4px);
+    background: transparent;
+    font: inherit;
+    font-size: 1rem;
+    font-weight: 600;
+    color: var(--navy-800);
+    cursor: pointer;
+    transition:
+      background-color var(--dur-fast) var(--ease-out),
+      color var(--dur-fast) var(--ease-out);
+  }
+  .nb-path__tab:hover {
+    background: var(--white);
+  }
+  .nb-path__tab[aria-selected='true'] {
+    background: var(--navy-800);
+    color: var(--white);
+  }
+  .nb-path__tab:focus-visible {
+    outline: 2px solid var(--navy-600);
+    outline-offset: 3px;
+  }
+  .nb-path__panels {
+    display: grid;
+    gap: 48px;
+    margin-top: 32px;
+  }
+  .nb-path__panel[hidden] {
+    display: none;
+  }
+  /* Con pestañas, el título del panel ya está en la pestaña. */
+  .nb-path.is-tabbed .nb-path__panel-title {
+    position: absolute;
+    width: 1px;
+    height: 1px;
+    overflow: hidden;
+    clip-path: inset(50%);
+    white-space: nowrap;
+  }
+  .nb-path__panel-title {
+    margin: 0 0 16px;
+    font-family: var(--font-display);
+    font-size: 1.75rem;
+    font-weight: 300;
+    color: var(--navy-800);
+  }
+  /* El camino: los servicios en orden, unidos por una línea; el primero, «empieza por aquí». */
+  .nb-path__steps {
+    position: relative;
+    display: grid;
+    gap: 16px;
+    margin: 0;
+    padding: 0;
+    list-style: none;
+  }
+  @media (min-width: 900px) {
+    .nb-path__steps {
+      grid-template-columns: repeat(var(--n, 4), minmax(0, 1fr));
+      grid-auto-flow: column;
+    }
+  }
+  .nb-path__link {
+    position: relative;
+    display: grid;
+    align-content: start;
+    gap: 12px;
+    height: 100%;
+    padding: 28px 24px 32px;
+    border: 1px solid var(--piedra-200);
+    border-radius: var(--radius-card, 8px);
+    background: var(--white);
+    color: var(--navy-800);
+    text-decoration: none;
+    transition: border-color var(--dur-base) var(--ease-out);
+  }
+  .nb-path__link:hover {
+    border-color: var(--navy-800);
+  }
+  .nb-path__link:focus-visible {
+    outline: 2px solid var(--navy-600);
+    outline-offset: 3px;
+  }
+  .nb-path__step.is-first .nb-path__link {
+    border-color: var(--navy-800);
+    background: var(--navy-800);
+    color: var(--white);
+  }
+  .nb-path__start {
+    justify-self: start;
+    padding: 3px 8px;
+    border-radius: 2px;
+    background: var(--salvia-300);
+    font-size: 0.6875rem;
+    font-weight: 600;
+    letter-spacing: 0.12em;
+    text-transform: uppercase;
+    color: var(--navy-800);
+  }
+  .nb-path__step-icon {
+    display: inline-flex;
+    color: var(--piedra-500);
+  }
+  .nb-path__step.is-first .nb-path__step-icon {
+    color: var(--salvia-300);
+  }
+  .nb-path__step-title {
+    font-family: var(--font-display);
+    font-size: 1.5rem;
+    line-height: 1.15;
+  }
+  .nb-path__step-text {
+    font-size: 0.9375rem;
+    line-height: 1.55;
+    color: var(--piedra-700);
+  }
+  .nb-path__step.is-first .nb-path__step-text {
+    color: var(--navy-100);
+  }
+  /* Conector entre pasos (escritorio): una flecha fina hacia el siguiente. */
+  @media (min-width: 900px) {
+    .nb-path__step:not(:last-child) .nb-path__link::after {
+      content: '';
+      position: absolute;
+      top: 50%;
+      right: -14px;
+      z-index: 1;
+      width: 12px;
+      height: 1.5px;
+      background: var(--navy-800);
+    }
+  }
+</style>
