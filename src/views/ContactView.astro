@@ -9,6 +9,8 @@ import ContactForm from '../components/islands/ContactForm.tsx';
 import { useI18n, type Messages } from '../i18n';
 import { getTeam } from '../lib/content';
 import { getBookingCta, site } from '../lib/site';
+import { byCountry, COUNTRIES } from '../lib/country';
+import { OFFICES } from '../data/offices';
 
 const { t, tRaw, lp, locale } = useI18n(Astro.currentLocale);
 const bookingCta = getBookingCta(locale);
@@ -180,8 +182,11 @@ const arch = 'M10 37V29A14 14 0 0 1 38 29V37';
             <div>
               <dt>{c.letterTo}</dt>
               <dd>
-                {site.legalName}, {site.address.street}, {site.address.postalCode}{' '}
-                {site.address.city}
+                {COUNTRIES.map((cc) => (
+                  <span data-cc={cc}>
+                    {`${site.legalName}, ${OFFICES[cc].street}, ${OFFICES[cc].postalCode} ${OFFICES[cc].city}`}
+                  </span>
+                ))}
               </dd>
             </div>
             <div data-letter-date hidden>
@@ -214,20 +219,28 @@ const arch = 'M10 37V29A14 14 0 0 1 38 29V37';
     </div>
   </section>
 
-  <!-- 4 · La oficina: dirección, horario con el día de hoy y el camino desde Stadelhofen -->
+  <!-- 4 · La oficina del país: dirección, horario con el día de hoy y el camino desde su estación -->
   <section class="nb-visit" data-surface="dark" aria-labelledby="visit-title">
     <div class="nb-container nb-visit__grid">
       <div class="nb-visit__info">
         <p class="nb-visit__eyebrow">{c.visitLabel}</p>
-        <h2 id="visit-title" class="nb-visit__title" data-split>
-          {c.visitTitle}
-        </h2>
+        <!-- Oficina del país activo (src/data/offices.ts). -->
+        <h2
+          id="visit-title"
+          class="nb-visit__title"
+          data-reveal
+          set:html={byCountry((cc) => c.visitTitle.replace('{city}', OFFICES[cc].cityName[locale]))}
+        />
         <address class="nb-visit__addr" data-reveal>
-          {site.legalName}
-          <br />
-          {site.address.street}
-          <br />
-          {`${site.address.postalCode} ${site.address.city}`}
+          {COUNTRIES.map((cc) => (
+            <span data-cc={cc}>
+              {site.legalName}
+              <br />
+              {OFFICES[cc].street}
+              <br />
+              {`${OFFICES[cc].postalCode} ${OFFICES[cc].city}`}
+            </span>
+          ))}
         </address>
         <dl class="nb-visit__data" data-reveal>
           <div>
@@ -269,12 +282,15 @@ const arch = 'M10 37V29A14 14 0 0 1 38 29V37';
       </div>
 
       <figure class="nb-map" data-map>
-        <svg viewBox="0 0 600 460" role="img" aria-label={c.mapLabel}>
+        <svg viewBox="0 0 600 460" role="img" aria-labelledby="nb-map-caption">
           <rect width="600" height="460" class="nb-map__land"></rect>
-          <path
-            class="nb-map__lake"
-            d="M0 250 C 70 240 140 268 200 312 C 262 358 300 410 330 460 L 0 460 Z"
-          ></path>
+          {(['water', 'park'] as const).map((kind) => (
+            <path
+              class:list={['nb-map__lake', kind === 'park' && 'nb-map__lake--park']}
+              data-cc={COUNTRIES.filter((cc) => OFFICES[cc].landmarkKind === kind).join(' ')}
+              d="M0 250 C 70 240 140 268 200 312 C 262 358 300 410 330 460 L 0 460 Z"
+            />
+          ))}
           <g class="nb-map__streets" data-map-streets>
             <path d="M40 0 C 110 70 190 120 290 190 S 470 330 600 372"></path>
             <path d="M180 0 C 230 60 300 110 400 160 S 540 230 600 250"></path>
@@ -289,11 +305,13 @@ const arch = 'M10 37V29A14 14 0 0 1 38 29V37';
             class="nb-map__main"
             d="M150 112 C 220 168 300 214 380 262 S 470 318 500 336"
           ></path>
-          <text class="nb-map__street">
-            <textPath href="#nb-map-seefeld" startOffset="22%">
-              Seefeldstrasse
-            </textPath>
-          </text>
+          {COUNTRIES.map((cc) => (
+            <text class="nb-map__street" data-cc={cc}>
+              <textPath href="#nb-map-seefeld" startOffset="18%">
+                {OFFICES[cc].streetLabel}
+              </textPath>
+            </text>
+          ))}
           <path
             class="nb-map__route"
             d="M150 112 C 220 168 300 214 380 262 S 452 306 468 316"
@@ -303,13 +321,20 @@ const arch = 'M10 37V29A14 14 0 0 1 38 29V37';
           <g class="nb-map__station" transform="translate(150 112)">
             <rect x="-34" y="-9" width="68" height="18" rx="1"></rect>
           </g>
-          <text x="150" y="84" class="nb-map__label" text-anchor="middle">
-            {c.mapStation}
-          </text>
-          <text x="90" y="400" class="nb-map__label nb-map__label--lake">
-            {c.mapLake}
-          </text>
-          <g transform="translate(286 276)">
+          {COUNTRIES.map((cc) => (
+            <text x="150" y="84" class="nb-map__label" text-anchor="middle" data-cc={cc}>
+              {OFFICES[cc].station}
+            </text>
+          ))}
+          {COUNTRIES.map((cc) => (
+            <text x="56" y="400" class="nb-map__label nb-map__label--lake" data-cc={cc}>
+              {OFFICES[cc].landmark[locale]}
+            </text>
+          ))}
+          <g
+            transform="translate(286 276)"
+            data-cc={COUNTRIES.filter((cc) => OFFICES[cc].walkMinutes).join(' ')}
+          >
             <g class="nb-map__grow">
               <g class="nb-map__walk" data-map-walk>
                 <rect x="-56" y="-16" width="112" height="32" rx="2"></rect>
@@ -331,7 +356,13 @@ const arch = 'M10 37V29A14 14 0 0 1 38 29V37';
             </g>
           </g>
         </svg>
-        <figcaption>{c.directions}</figcaption>
+        <figcaption
+          id="nb-map-caption"
+          set:html={byCountry(
+            (cc) =>
+              `${site.legalName}, ${OFFICES[cc].street}, ${OFFICES[cc].postalCode} ${OFFICES[cc].city}. ${OFFICES[cc].directions[locale]}`,
+          )}
+        />
       </figure>
     </div>
   </section>
@@ -1051,6 +1082,9 @@ const arch = 'M10 37V29A14 14 0 0 1 38 29V37';
   }
   .nb-map__lake {
     fill: var(--navy-900);
+  }
+  .nb-map__lake--park {
+    fill: var(--navy-600);
   }
   .nb-map__streets path {
     fill: none;

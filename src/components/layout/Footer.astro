@@ -4,6 +4,8 @@ import Button from '../ui/Button.astro';
 import { useI18n } from '../../i18n';
 import { getBookingCta, getLegalLinks, getMainNav, getServiceLinks, site } from '../../lib/site';
 import { entryKey, getArticles, guideCountries } from '../../lib/content';
+import { COUNTRIES } from '../../lib/country';
+import { OFFICES } from '../../data/offices';
 const { t, lp, locale } = useI18n(Astro.currentLocale);
 const bookingCta = getBookingCta(locale);
 const mainNav = getMainNav(locale);
@@ -73,10 +75,14 @@ const columns: { id: string; title: string; links: FooterLink[] }[] = [
         <div>
           <h2 class="nb-footer__title">{t('footer.contact')}</h2>
           <address class="m-0 flex flex-col gap-1 text-[0.9375rem] not-italic leading-relaxed text-piedra-700">
-            <span>{site.address.street}</span>
-            <span>
-              {site.address.postalCode} {site.address.city}
-            </span>
+            {/* Oficina del país activo (src/data/offices.ts). */}
+            {COUNTRIES.map((cc) => (
+              <span data-cc={cc}>
+                {OFFICES[cc].street}
+                <br />
+                {`${OFFICES[cc].postalCode} ${OFFICES[cc].city}`}
+              </span>
+            ))}
             <a class="nb-footer__link mt-3" href={`tel:${site.phone.replace(/\s/g, '')}`}>
               {site.phone}
             </a>

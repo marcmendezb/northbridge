@@ -12,10 +12,39 @@ export interface Office {
   city: string;
   title: Text;
   text: Text;
+  /** Nombre de la ciudad en cada idioma («Visítanos en Zúrich.»). */
+  cityName: Text;
+  /** Mapa estilizado: estación, calle de la oficina y la referencia (lago, río o parque). */
+  station: string;
+  streetLabel: string;
+  landmark: Text;
+  landmarkKind: 'water' | 'park';
+  /** Minutos a pie desde la estación, solo donde los damos (Zúrich). */
+  walkMinutes?: number;
+  directions: Text;
 }
 
 export const OFFICES: Record<Country, Office> = {
   CH: {
+    cityName: { es: 'Zúrich', en: 'Zurich', de: 'Zürich', fr: 'Zurich', it: 'Zurigo' },
+    station: 'Stadelhofen',
+    streetLabel: 'Seefeldstrasse',
+    landmark: {
+      es: 'Lago de Zúrich',
+      en: 'Lake Zurich',
+      de: 'Zürichsee',
+      fr: 'Lac de Zurich',
+      it: 'Lago di Zurigo',
+    },
+    landmarkKind: 'water',
+    walkMinutes: 6,
+    directions: {
+      es: 'A 6 minutos a pie de la estación de Stadelhofen.',
+      en: 'A 6-minute walk from Stadelhofen station.',
+      de: '6 Minuten zu Fuss vom Bahnhof Stadelhofen.',
+      fr: 'À 6 minutes à pied de la gare de Stadelhofen.',
+      it: 'A 6 minuti a piedi dalla stazione di Stadelhofen.',
+    },
     street: 'Seefeldstrasse 45',
     postalCode: '8008',
     city: 'Zürich',
@@ -35,6 +64,24 @@ export const OFFICES: Record<Country, Office> = {
     },
   },
   ES: {
+    cityName: { es: 'Madrid', en: 'Madrid', de: 'Madrid', fr: 'Madrid', it: 'Madrid' },
+    station: 'Serrano',
+    streetLabel: 'Calle de Serrano',
+    landmark: {
+      es: 'Parque del Retiro',
+      en: 'Retiro Park',
+      de: 'Retiro-Park',
+      fr: 'Parc du Retiro',
+      it: 'Parco del Retiro',
+    },
+    landmarkKind: 'park',
+    directions: {
+      es: 'A pocos minutos a pie del metro Serrano.',
+      en: 'A few minutes on foot from Serrano metro station.',
+      de: 'Wenige Gehminuten von der Metrostation Serrano.',
+      fr: 'À quelques minutes à pied du métro Serrano.',
+      it: 'A pochi minuti a piedi dalla metro Serrano.',
+    },
     street: 'Calle de Serrano 45',
     postalCode: '28001',
     city: 'Madrid',
@@ -54,6 +101,18 @@ export const OFFICES: Record<Country, Office> = {
     },
   },
   DE: {
+    cityName: { es: 'Berlín', en: 'Berlin', de: 'Berlin', fr: 'Berlin', it: 'Berlino' },
+    station: 'Friedrichstraße',
+    streetLabel: 'Unter den Linden',
+    landmark: { es: 'Spree', en: 'Spree', de: 'Spree', fr: 'Spree', it: 'Sprea' },
+    landmarkKind: 'water',
+    directions: {
+      es: 'A pocos minutos a pie de la estación de Friedrichstraße.',
+      en: 'A few minutes on foot from Friedrichstraße station.',
+      de: 'Wenige Gehminuten vom Bahnhof Friedrichstraße.',
+      fr: 'À quelques minutes à pied de la gare de Friedrichstraße.',
+      it: 'A pochi minuti a piedi dalla stazione di Friedrichstraße.',
+    },
     street: 'Unter den Linden 21',
     postalCode: '10117',
     city: 'Berlin',
@@ -73,6 +132,18 @@ export const OFFICES: Record<Country, Office> = {
     },
   },
   FR: {
+    cityName: { es: 'París', en: 'Paris', de: 'Paris', fr: 'Paris', it: 'Parigi' },
+    station: 'Madeleine',
+    streetLabel: 'Rue du Faubourg Saint-Honoré',
+    landmark: { es: 'Sena', en: 'Seine', de: 'Seine', fr: 'Seine', it: 'Senna' },
+    landmarkKind: 'water',
+    directions: {
+      es: 'A pocos minutos a pie del metro Madeleine.',
+      en: 'A few minutes on foot from Madeleine metro station.',
+      de: 'Wenige Gehminuten von der Metrostation Madeleine.',
+      fr: 'À quelques minutes à pied du métro Madeleine.',
+      it: 'A pochi minuti a piedi dalla metro Madeleine.',
+    },
     street: '45 rue du Faubourg Saint-Honoré',
     postalCode: '75008',
     city: 'Paris',
@@ -92,6 +163,24 @@ export const OFFICES: Record<Country, Office> = {
     },
   },
   IT: {
+    cityName: { es: 'Roma', en: 'Rome', de: 'Rom', fr: 'Rome', it: 'Roma' },
+    station: 'Barberini',
+    streetLabel: 'Via Vittorio Veneto',
+    landmark: {
+      es: 'Villa Borghese',
+      en: 'Villa Borghese',
+      de: 'Villa Borghese',
+      fr: 'Villa Borghèse',
+      it: 'Villa Borghese',
+    },
+    landmarkKind: 'park',
+    directions: {
+      es: 'A pocos minutos a pie del metro Barberini.',
+      en: 'A few minutes on foot from Barberini metro station.',
+      de: 'Wenige Gehminuten von der Metrostation Barberini.',
+      fr: 'À quelques minutes à pied du métro Barberini.',
+      it: 'A pochi minuti a piedi dalla metro Barberini.',
+    },
     street: 'Via Vittorio Veneto 45',
     postalCode: '00187',
     city: 'Roma',
