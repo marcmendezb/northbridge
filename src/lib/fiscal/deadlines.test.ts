@@ -17,25 +17,35 @@ const vat = (endM: number, endD: number): DeadlineRule => ({
   shift: true,
 });
 
-describe('deadlineIn: IVA, 60 días tras el periodo (art. 71 y 86 MWSTG)', () => {
-  it('4.º trimestre: 1 de marzo, o 29 de febrero en bisiesto', () => {
-    expect(deadlineIn(vat(12, 31), 2027).due).toEqual({ y: 2027, m: 3, d: 1 });
-    expect(deadlineIn(vat(12, 31), 2028).due).toEqual({ y: 2028, m: 2, d: 29 });
+describe('IVA suizo: fin del segundo mes tras el periodo (ESTV, «fällig am 31. Mai»)', () => {
+  const end = (m: number): DeadlineRule => ({ type: 'monthEnd', m, shift: false });
+  it('trimestres: 31 de mayo, 31 de agosto, 30 de noviembre', () => {
+    expect(deadlineIn(end(5), 2026).due).toEqual({ y: 2026, m: 5, d: 31 });
+    expect(deadlineIn(end(8), 2026).due).toEqual({ y: 2026, m: 8, d: 31 });
+    expect(deadlineIn(end(11), 2026).due).toEqual({ y: 2026, m: 11, d: 30 });
   });
-  it('1.er a 3.er trimestre: 30 de mayo, 29 de agosto y 29 de noviembre', () => {
-    expect(deadlineIn(vat(3, 31), 2025).due).toEqual({ y: 2025, m: 5, d: 30 });
-    expect(deadlineIn(vat(6, 30), 2025).due).toEqual({ y: 2025, m: 8, d: 29 });
-    expect(deadlineIn(vat(9, 30), 2027).due).toEqual({ y: 2027, m: 11, d: 29 });
+  it('4.º trimestre: 28 de febrero, o 29 en bisiesto; sin mover por fin de semana', () => {
+    expect(deadlineIn(end(2), 2027).due).toEqual({ y: 2027, m: 2, d: 28 }); // domingo
+    expect(deadlineIn(end(2), 2028).due).toEqual({ y: 2028, m: 2, d: 29 });
+    expect(deadlineIn(end(2), 2027).shifted).toBe(false);
   });
-  it('si cae en fin de semana, pasa al siguiente día hábil (art. 20.3 VwVG)', () => {
+});
+
+describe('traslado al siguiente día hábil', () => {
+  const vat = (endM: number, endD: number): DeadlineRule => ({
+    type: 'afterPeriod',
+    endM,
+    endD,
+    days: 60,
+    shift: true,
+  });
+  it('si cae en fin de semana, pasa al lunes', () => {
     // 29-11-2026 es domingo → lunes 30.
     expect(deadlineIn(vat(9, 30), 2026)).toEqual({
       start: { y: 2026, m: 11, d: 30 },
       due: { y: 2026, m: 11, d: 30 },
       shifted: true,
     });
-    // 30-05-2026 es sábado → lunes 1 de junio.
-    expect(deadlineIn(vat(3, 31), 2026).due).toEqual({ y: 2026, m: 6, d: 1 });
   });
 });
 
@@ -73,9 +83,9 @@ describe('timeline del calendario suizo', () => {
   it('todos los plazos tienen regla', () => {
     expect(rules).toHaveLength(CH.length);
   });
-  it('2026: el IVA del 3.er trimestre vence el lunes 30 de noviembre', () => {
+  it('2026: el IVA del 3.er trimestre vence el 30 de noviembre', () => {
     const q3 = timeline(rules, 2026).find((t) => t.id === 'vat-q3');
-    expect(q3).toMatchObject({ due: { y: 2026, m: 11, d: 30 }, shifted: true });
+    expect(q3).toMatchObject({ due: { y: 2026, m: 11, d: 30 }, shifted: false });
     expect(q3?.remind).toEqual({ y: 2026, m: 11, d: 20 });
   });
   it('desde el 28-10-2026, el próximo vence el 30 de noviembre, en 33 días', () => {

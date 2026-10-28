@@ -3,7 +3,13 @@
  * La usan el servidor (año de compilación, sin JS) y el navegador (año en curso, en hora de Zúrich).
  */
 import { addDays, type CivilDate } from '../contact/office';
-import { daysBetween, deadlineIn, yearFraction, type DeadlineRule } from './deadlines';
+import {
+  daysBetween,
+  deadlineIn,
+  yearFraction,
+  type DeadlineRule,
+  type HolidayCalendar,
+} from './deadlines';
 
 /** Días de antelación del aviso (docs/08: «te avisamos 10 días antes»). */
 export const REMINDER_DAYS = 10;
@@ -28,10 +34,14 @@ export interface TimelineItem {
   row: number;
 }
 
-export function timeline(events: RuledEvent[], year: number): TimelineItem[] {
+export function timeline(
+  events: RuledEvent[],
+  year: number,
+  holidays?: HolidayCalendar,
+): TimelineItem[] {
   const items = events
     .map((e) => {
-      const { start, due, shifted } = deadlineIn(e.rule, year);
+      const { start, due, shifted } = deadlineIn(e.rule, year, holidays);
       const remind = addDays(due, -REMINDER_DAYS);
       return {
         id: e.id,
@@ -73,9 +83,9 @@ export function monthMarks(year: number): { m: number; at: number; w: number }[]
 }
 
 /** El primer plazo que aún no ha vencido (puede ser del año siguiente) y los días que quedan. */
-export function nextDeadline(events: RuledEvent[], today: CivilDate) {
+export function nextDeadline(events: RuledEvent[], today: CivilDate, holidays?: HolidayCalendar) {
   for (const year of [today.y, today.y + 1]) {
-    const found = timeline(events, year).find((t) => daysBetween(today, t.due) >= 0);
+    const found = timeline(events, year, holidays).find((t) => daysBetween(today, t.due) >= 0);
     if (found) return { ...found, year, daysLeft: daysBetween(today, found.due) };
   }
   return undefined;

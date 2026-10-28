@@ -7,14 +7,18 @@ import { addDays, type CivilDate, weekdayOf, easterSunday } from '../contact/off
 
 /**
  * - `fixed`: un día fijo del año (31 de marzo).
+ * - `monthEnd`: el último día de un mes (IVA suizo: la ESTV fija el 1.er trimestre «fällig am
+ *   31. Mai»; los demás, 31 de agosto, 30 de noviembre y finales de febrero).
  * - `afterPeriod`: N días tras el fin de un periodo (IVA: 60 días tras el trimestre). Si el periodo
  *   termina el 31 de diciembre, es el del año anterior.
  * - `range`: una ventana de práctica, sin fecha legal (certificados de salario en enero o febrero).
- * `shift`: si el último día es sábado, domingo o festivo legal, el plazo pasa al siguiente día hábil
- * (art. 20.3 VwVG para el IVA; art. 38.3 ATSG para la AVS).
+ * `shift`: si el último día es sábado, domingo o festivo, el plazo pasa al siguiente día hábil del
+ * país (Suiza: art. 38.3 ATSG para la AVS; España: art. 30 Ley 39/2015 y LGT). Los festivos de cada
+ * país están en `HOLIDAYS`.
  */
 export type DeadlineRule =
   | { type: 'fixed'; m: number; d: number; shift: boolean }
+  | { type: 'monthEnd'; m: number; shift: boolean }
   | { type: 'afterPeriod'; endM: number; endD: number; days: number; shift: boolean }
   | { type: 'range'; from: { m: number; d: number }; to: { m: number; d: number } | 'endFeb' };
 
@@ -47,22 +51,54 @@ export function zurichLegalHolidays(y: number): Set<string> {
   );
 }
 
-export function isLegalWorkday(date: CivilDate): boolean {
+/** Festivos nacionales de España (BOE, fiestas laborales de ámbito nacional no sustituibles). */
+export function spainNationalHolidays(y: number): Set<string> {
+  const easter = easterSunday(y);
+  return new Set(
+    [
+      { y, m: 1, d: 1 },
+      { y, m: 1, d: 6 },
+      addDays(easter, -2), // Viernes Santo
+      { y, m: 5, d: 1 },
+      { y, m: 8, d: 15 },
+      { y, m: 10, d: 12 },
+      { y, m: 11, d: 1 },
+      { y, m: 12, d: 6 },
+      { y, m: 12, d: 8 },
+      { y, m: 12, d: 25 },
+    ].map(key),
+  );
+}
+
+export type HolidayCalendar = (y: number) => Set<string>;
+export const HOLIDAYS: Record<'CH' | 'ES', HolidayCalendar> = {
+  CH: zurichLegalHolidays,
+  ES: spainNationalHolidays,
+};
+
+export function isLegalWorkday(date: CivilDate, holidays: HolidayCalendar = zurichLegalHolidays) {
   const wd = weekdayOf(date);
-  return wd !== 0 && wd !== 6 && !zurichLegalHolidays(date.y).has(key(date));
+  return wd !== 0 && wd !== 6 && !holidays(date.y).has(key(date));
 }
 
 /** El mismo día si es hábil; si no, el siguiente hábil. */
-export function onOrNextWorkday(date: CivilDate): CivilDate {
+export function onOrNextWorkday(
+  date: CivilDate,
+  holidays: HolidayCalendar = zurichLegalHolidays,
+): CivilDate {
   let d = date;
-  while (!isLegalWorkday(d)) d = addDays(d, 1);
+  while (!isLegalWorkday(d, holidays)) d = addDays(d, 1);
   return d;
 }
 
 const isLeap = (y: number) => (y % 4 === 0 && y % 100 !== 0) || y % 400 === 0;
 
 /** Plazo de la regla dentro del año `year` (el año en que vence). */
-export function deadlineIn(rule: DeadlineRule, year: number): Deadline {
+export function deadlineIn(
+  rule: DeadlineRule,
+  year: number,
+  holidays: HolidayCalendar = zurichLegalHolidays,
+): Deadline {
   if (rule.type === 'range') {
     const to = rule.to === 'endFeb' ? { m: 2, d: isLeap(year) ? 29 : 28 } : rule.to;
     const start = { y: year, ...rule.from };
@@ -71,11 +107,17 @@ export function deadlineIn(rule: DeadlineRule, year: number): Deadline {
   const legal =
     rule.type === 'fixed'
       ? { y: year, m: rule.m, d: rule.d }
-      : addDays(
-          { y: rule.endM === 12 && rule.endD === 31 ? year - 1 : year, m: rule.endM, d: rule.endD },
-          rule.days,
-        );
-  const due = rule.shift ? onOrNextWorkday(legal) : legal;
+      : rule.type === 'monthEnd'
+        ? { y: year, m: rule.m, d: new Date(Date.UTC(year, rule.m, 0)).getUTCDate() }
+        : addDays(
+            {
+              y: rule.endM === 12 && rule.endD === 31 ? year - 1 : year,
+              m: rule.endM,
+              d: rule.endD,
+            },
+            rule.days,
+          );
+  const due = rule.shift ? onOrNextWorkday(legal, holidays) : legal;
   return { start: due, due, shifted: key(due) !== key(legal) };
 }
 
