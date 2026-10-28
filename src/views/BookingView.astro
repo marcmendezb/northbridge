@@ -1,6 +1,7 @@
 ---
 import { Picture } from 'astro:assets';
 import BaseLayout from '../layouts/BaseLayout.astro';
+import Breadcrumbs from '../components/layout/Breadcrumbs.astro';
 import Accordion from '../components/ui/Accordion.astro';
 import BookingEmbed from '../components/islands/BookingEmbed.tsx';
 import lea from '../assets/img/about/team/lea-brunner.jpeg';
@@ -15,9 +16,10 @@ const tel = `tel:${site.phone.replace(/\s/g, '')}`;
 const calLink = import.meta.env.PUBLIC_CAL_LINK as string | undefined;
 ---
 
-<BaseLayout title={s.seoTitle} description={s.seoDescription} minimalHeader>
+<BaseLayout title={s.seoTitle} description={s.seoDescription}>
   <section class="nb-bk nb-container">
     <div class="nb-bk__intro">
+      <Breadcrumbs items={[{ label: s.label }]} />
       <p class="nb-bk__label">{s.label}</p>
       <h1 class="nb-bk__title" data-split>
         {t('home.cta.title')}
