@@ -27,11 +27,13 @@ const { steps, label, title } = Astro.props;
     </div>
 
     <ol class="nb-way-steps__list" role="list">
-      <span class="nb-way-steps__rail" aria-hidden="true">
-        <span data-steps-fill></span>
-      </span>
-      {steps.map((s) => (
+      {steps.map((s, i) => (
         <li class="nb-way-steps__step" data-steps-item>
+          {i < steps.length - 1 && (
+            <span class="nb-way-steps__rail" aria-hidden="true">
+              <span data-steps-fill />
+            </span>
+          )}
           <svg class="nb-way-steps__mark" viewBox="4 11 40 26" aria-hidden="true">
             <path d="M4 13H44" />
             <path d="M10 37V29A14 14 0 0 1 38 29V37" />
@@ -87,28 +89,18 @@ const { steps, label, title } = Astro.props;
     color: var(--white);
   }
 
-  /* Pasos: una línea vertical une los arcos; lo recorrido se rellena en blanco. */
+  /* Pasos: cada arco se une al siguiente con un tramo que se rellena en blanco.
+     Arco y tramo comparten --mark para quedar siempre centrados. */
   .nb-way-steps__list {
+    --mark: 48px;
+    --gutter: 72px;
+    --gap: clamp(40px, 5vw, 64px);
     position: relative;
     display: grid;
-    gap: clamp(40px, 5vw, 64px);
+    gap: var(--gap);
     margin: 0;
-    padding: 0 0 0 72px;
+    padding: 0 0 0 var(--gutter);
     list-style: none;
-  }
-  .nb-way-steps__rail {
-    position: absolute;
-    top: 30px;
-    bottom: 30px;
-    left: 23px;
-    width: 2px;
-    background: var(--navy-600);
-  }
-  .nb-way-steps__rail > span {
-    position: absolute;
-    inset: 0;
-    background: var(--white);
-    transform-origin: top;
   }
   .nb-way-steps__step {
     position: relative;
@@ -117,16 +109,28 @@ const { steps, label, title } = Astro.props;
   }
   .nb-way-steps__mark {
     position: absolute;
-    top: -2px;
-    left: -76px;
-    width: 48px;
-    height: 32px;
-    padding: 4px;
-    background: var(--navy-800);
+    top: 0;
+    left: calc(-1 * var(--gutter));
+    width: var(--mark);
+    height: calc(var(--mark) * 0.65);
     fill: none;
     stroke: var(--navy-500);
     stroke-width: 4;
     transition: stroke var(--dur-base) var(--ease-out);
+  }
+  .nb-way-steps__rail {
+    position: absolute;
+    top: calc(var(--mark) * 0.65 + 8px);
+    left: calc(-1 * var(--gutter) + var(--mark) / 2 - 1px);
+    width: 2px;
+    height: calc(100% + var(--gap) - var(--mark) * 0.65 - 16px);
+    background: var(--navy-600);
+  }
+  .nb-way-steps__rail > span {
+    position: absolute;
+    inset: 0;
+    background: var(--white);
+    transform-origin: top;
   }
   .nb-way-steps__step-title {
     margin: 0;
@@ -161,15 +165,8 @@ const { steps, label, title } = Astro.props;
   }
   @media (max-width: 639px) {
     .nb-way-steps__list {
-      padding-left: 56px;
-    }
-    .nb-way-steps__rail {
-      left: 17px;
-    }
-    .nb-way-steps__mark {
-      left: -58px;
-      width: 36px;
-      height: 24px;
+      --mark: 36px;
+      --gutter: 56px;
     }
   }
 </style>

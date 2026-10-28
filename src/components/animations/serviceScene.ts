@@ -115,22 +115,21 @@ export function serviceScene({ gsap, ScrollTrigger }: AnimationKit) {
       );
   }
 
-  // Proceso: la línea se rellena con el scroll y cada paso se enciende al alcanzarlo.
+  // Proceso: cada tramo entre arcos se rellena con el scroll y cada paso se enciende al alcanzarlo.
   const path = document.querySelector<HTMLElement>('[data-steps-path]');
   if (path) {
-    const fill = path.querySelector('[data-steps-fill]');
-    const list = path.querySelector('ol');
-    if (fill && list)
-      gsap.fromTo(
-        fill,
-        { scaleY: 0 },
-        {
-          scaleY: 1,
-          ease: 'none',
-          scrollTrigger: { trigger: list, start: 'top 65%', end: 'bottom 65%', scrub: 0.5 },
-        },
-      );
     path.querySelectorAll<HTMLElement>('[data-steps-item]').forEach((step) => {
+      const fill = step.querySelector('[data-steps-fill]');
+      if (fill)
+        gsap.fromTo(
+          fill,
+          { scaleY: 0 },
+          {
+            scaleY: 1,
+            ease: 'none',
+            scrollTrigger: { trigger: step, start: 'top 62%', end: 'bottom 50%', scrub: 0.5 },
+          },
+        );
       ScrollTrigger.create({
         trigger: step,
         start: 'top 68%',
