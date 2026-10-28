@@ -101,5 +101,46 @@ export function serviceScene({ gsap, ScrollTrigger }: AnimationKit) {
       );
   }
 
+  // Proceso: cruzar el puente (solo en escritorio; en móvil se queda la versión estática).
+  const cross = document.querySelector<HTMLElement>('[data-cross]');
+  if (cross && window.matchMedia('(min-width: 900px)').matches) {
+    const steps = Array.from(cross.querySelectorAll<HTMLElement>('[data-cross-step]'));
+    const labels = Array.from(cross.querySelectorAll<HTMLElement>('[data-cross-label]'));
+    const arches = Array.from(cross.querySelectorAll<SVGPathElement>('[data-cross-arch]'));
+    const deck = cross.querySelector<SVGPathElement>('[data-cross-deck]');
+    const walker = cross.querySelector<SVGRectElement>('[data-cross-walker]');
+    const n = steps.length;
+    cross.classList.add('is-pinned');
+    cross.style.setProperty('--steps', String(n));
+    gsap.set([deck, ...arches], { strokeDasharray: 1, strokeDashoffset: 1 });
+    let current = -1;
+    const show = (i: number) => {
+      if (i === current) return;
+      current = i;
+      steps.forEach((s, k) => s.classList.toggle('is-active', k === i));
+      labels.forEach((l, k) => {
+        l.classList.toggle('is-active', k === i);
+        l.classList.toggle('is-done', k < i);
+      });
+    };
+    show(0);
+    ScrollTrigger.create({
+      trigger: cross,
+      start: 'top top',
+      end: 'bottom bottom',
+      scrub: 0.5,
+      onUpdate: ({ progress: p }) => {
+        // El tablero se tiende primero; cada arco se levanta en su tramo; la marca cruza.
+        if (deck) gsap.set(deck, { strokeDashoffset: 1 - Math.min(1, p / 0.94) });
+        arches.forEach((a, i) => {
+          const local = Math.min(1, Math.max(0, (p - i / n) * n * 1.15));
+          gsap.set(a, { strokeDashoffset: 1 - local });
+        });
+        if (walker) gsap.set(walker, { x: p * (1200 - 16) });
+        show(Math.min(n - 1, Math.floor(p * n)));
+      },
+    });
+  }
+
   ScrollTrigger.refresh();
 }

@@ -8,7 +8,7 @@ import Button from '../components/ui/Button.astro';
 import PriceTag from '../components/ui/PriceTag.astro';
 import Accordion from '../components/ui/Accordion.astro';
 import Arrow from '../components/brand/Arrow.astro';
-import ProcessSteps from '../components/sections/ProcessSteps.astro';
+import ServiceProcess from '../components/sections/ServiceProcess.astro';
 import CtaBand from '../components/sections/CtaBand.astro';
 import contabilidad from '../assets/img/services/contabilidad.jpeg';
 import iva from '../assets/img/services/iva.jpeg';
@@ -324,16 +324,12 @@ const faqJsonLd = {
     </div>
   </section>
 
-  <!-- 4 · Proceso: el viaducto de la marca, un arco por paso -->
-  <section class="nb-proc" aria-labelledby="process-title">
-    <div class="nb-container">
-      <p class="nb-scope__eyebrow">{t('services.detail.labelProcess')}</p>
-      <h2 id="process-title" class="nb-proc__title" data-split>
-        {t('services.detail.process')}
-      </h2>
-      <ProcessSteps steps={d.process} />
-    </div>
-  </section>
+  <!-- 4 · Proceso: cruzar el puente, un arco por paso -->
+  <ServiceProcess
+    steps={d.process}
+    label={t('services.detail.labelProcess')}
+    title={t('services.detail.process')}
+  />
 
   <!-- 5 · Precio: un recibo, con lo que cuesta y lo que se cierra después -->
   <section class="nb-receipt-wrap" aria-labelledby="price-title">
@@ -1057,7 +1053,6 @@ const faqJsonLd = {
     gap: 16px;
   }
   .nb-scope__title,
-  .nb-proc__title,
   .nb-receipt-wrap__title,
   .nb-sfaq__title,
   .nb-rel__title,
@@ -1166,15 +1161,6 @@ const faqJsonLd = {
     font-weight: 300;
     line-height: 1.25;
     color: var(--white);
-  }
-
-  /* ── 4 · Proceso ── */
-  .nb-proc {
-    padding-block: var(--section-y);
-    background: var(--white);
-  }
-  .nb-proc__title {
-    margin: 16px 0 clamp(40px, 5vw, 64px);
   }
 
   /* ── 5 · Precio ── */

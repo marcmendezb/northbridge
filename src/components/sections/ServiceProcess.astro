@@ -1,0 +1,255 @@
+---
+/**
+ * «Cómo lo hacemos» de la ficha de servicio: cruzar el puente.
+ * Escritorio con movimiento: la sección se queda fija mientras se construye el tablero, cada paso
+ * levanta su arco y una marca cruza el puente; el texto del paso en curso cambia al lado
+ * (serviceScene.ts añade `is-pinned`). Sin JS, con movimiento reducido o en móvil: el puente
+ * construido y los cuatro pasos debajo. Sin numeraciones.
+ */
+interface Step {
+  title: string;
+  text: string;
+}
+interface Props {
+  steps: Step[];
+  label: string;
+  title: string;
+}
+const { steps, label, title } = Astro.props;
+
+// Geometría del puente (unidades del viewBox): tablero arriba y un arco por paso, como el símbolo.
+const W = 1200;
+const H = 300;
+const deckY = 22;
+const stroke = 6;
+const gap = 10;
+const span = W / steps.length;
+const inset = 26;
+const arches = steps.map((_, i) => {
+  const x1 = i * span + inset;
+  const x2 = (i + 1) * span - inset;
+  const r = (x2 - x1) / 2;
+  const top = deckY + stroke / 2 + gap + stroke / 2;
+  const cy = top + r;
+  return `M${x1} ${H}V${cy}A${r} ${r} 0 0 1 ${x2} ${cy}V${H}`;
+});
+const deck = `M0 ${deckY}H${W}`;
+---
+
+<section class="nb-cross" data-cross aria-labelledby="process-title">
+  <div class="nb-cross__pin">
+    <div class="nb-container nb-cross__inner">
+      <div class="nb-cross__head">
+        <p class="nb-cross__eyebrow">{label}</p>
+        <h2 id="process-title" class="nb-cross__title" data-split>
+          {title}
+        </h2>
+      </div>
+
+      <ol class="nb-cross__steps" role="list">
+        {steps.map((s, i) => (
+          <li class:list={['nb-cross__step', i === 0 && 'is-active']} data-cross-step>
+            <h3 class="nb-cross__step-title">{s.title}</h3>
+            <p class="nb-cross__step-text">{s.text}</p>
+          </li>
+        ))}
+      </ol>
+
+      <div class="nb-cross__bridge" aria-hidden="true">
+        <svg viewBox={`0 0 ${W} ${H}`} fill="none">
+          <path class="nb-cross__ghost" d={deck} />
+          {arches.map((d) => (
+            <path class="nb-cross__ghost" d={d} />
+          ))}
+          <path class="nb-cross__built" d={deck} pathLength="1" data-cross-deck />
+          {arches.map((d) => (
+            <path class="nb-cross__built" d={d} pathLength="1" data-cross-arch />
+          ))}
+          <rect
+            class="nb-cross__walker"
+            x="0"
+            y={deckY - stroke / 2 - 16}
+            width="16"
+            height="16"
+            data-cross-walker
+          />
+        </svg>
+        <ol class="nb-cross__labels" role="list">
+          {steps.map((s, i) => (
+            <li class:list={[i === 0 && 'is-active']} data-cross-label>
+              {s.title}
+            </li>
+          ))}
+        </ol>
+      </div>
+    </div>
+  </div>
+</section>
+
+<style is:global>
+  .nb-cross {
+    position: relative;
+    background: var(--white);
+  }
+  .nb-cross__inner {
+    display: grid;
+    gap: clamp(32px, 4vw, 56px);
+    padding-block: var(--section-y);
+  }
+  .nb-cross__head {
+    display: grid;
+    gap: 16px;
+  }
+  .nb-cross__eyebrow {
+    margin: 0;
+    font-size: 0.8125rem;
+    font-weight: 600;
+    letter-spacing: 0.16em;
+    text-transform: uppercase;
+    color: var(--salvia-600);
+  }
+  .nb-cross__title {
+    margin: 0;
+    font-family: var(--font-display);
+    font-size: clamp(2.25rem, 1rem + 3vw, 4rem);
+    font-weight: 300;
+    line-height: 1;
+    letter-spacing: -0.025em;
+    color: var(--navy-800);
+  }
+
+  /* Puente: tablero y arcos «previstos» en piedra; lo construido, en navy. */
+  .nb-cross__bridge svg {
+    display: block;
+    width: 100%;
+    height: auto;
+    overflow: visible;
+  }
+  .nb-cross__ghost {
+    stroke: var(--piedra-300);
+    stroke-width: 2;
+  }
+  .nb-cross__built {
+    stroke: var(--navy-800);
+    stroke-width: 6;
+  }
+  .nb-cross__walker {
+    fill: var(--salvia-500);
+    opacity: 0;
+  }
+  .nb-cross__labels {
+    display: none;
+  }
+
+  /* Estático (sin JS, movimiento reducido o móvil): los pasos debajo del puente. */
+  .nb-cross__steps {
+    display: grid;
+    gap: 28px clamp(20px, 3vw, 40px);
+    margin: 0;
+    padding: 0;
+    list-style: none;
+  }
+  @media (min-width: 768px) {
+    .nb-cross__steps {
+      grid-template-columns: repeat(4, minmax(0, 1fr));
+    }
+  }
+  .nb-cross:not(.is-pinned) .nb-cross__steps {
+    order: 3;
+  }
+  .nb-cross__step {
+    display: grid;
+    align-content: start;
+    gap: 10px;
+    padding-top: 20px;
+    border-top: 1px solid var(--navy-800);
+  }
+  .nb-cross__step-title {
+    margin: 0;
+    font-family: var(--font-display);
+    font-size: clamp(1.375rem, 1rem + 0.8vw, 1.75rem);
+    font-weight: 300;
+    line-height: 1.15;
+    color: var(--navy-800);
+  }
+  .nb-cross__step-text {
+    margin: 0;
+    font-size: 1rem;
+    line-height: 1.6;
+    color: var(--piedra-800);
+  }
+
+  /* Fijo (escritorio con movimiento): la sección se queda mientras se cruza el puente. */
+  .nb-cross.is-pinned {
+    height: 340vh;
+  }
+  .nb-cross.is-pinned .nb-cross__pin {
+    position: sticky;
+    top: 0;
+    display: flex;
+    align-items: center;
+    height: 100svh;
+  }
+  .nb-cross.is-pinned .nb-cross__inner {
+    grid-template-columns: minmax(0, 1fr) minmax(0, 1fr);
+    align-items: end;
+    width: 100%;
+    padding-block: calc(var(--header-h) + 24px) 40px;
+  }
+  .nb-cross.is-pinned .nb-cross__bridge {
+    grid-column: 1 / -1;
+  }
+  .nb-cross.is-pinned .nb-cross__steps {
+    display: grid;
+    grid-template-columns: 1fr;
+    min-height: 9.5rem;
+  }
+  .nb-cross.is-pinned .nb-cross__step {
+    grid-area: 1 / 1;
+    padding-top: 0;
+    border-top: 0;
+    opacity: 0;
+    transform: translateY(14px);
+    transition:
+      opacity var(--dur-base) var(--ease-out),
+      transform var(--dur-base) var(--ease-out);
+  }
+  .nb-cross.is-pinned .nb-cross__step.is-active {
+    opacity: 1;
+    transform: none;
+  }
+  .nb-cross.is-pinned .nb-cross__step-title {
+    font-size: clamp(1.75rem, 1rem + 1.6vw, 2.75rem);
+  }
+  .nb-cross.is-pinned .nb-cross__step-text {
+    max-width: 32rem;
+    font-size: 1.0625rem;
+  }
+  .nb-cross.is-pinned .nb-cross__walker {
+    opacity: 1;
+  }
+  .nb-cross.is-pinned .nb-cross__labels {
+    display: grid;
+    grid-template-columns: repeat(var(--steps, 4), minmax(0, 1fr));
+    margin: 18px 0 0;
+    padding: 0;
+    list-style: none;
+  }
+  .nb-cross.is-pinned .nb-cross__labels li {
+    padding: 10px 26px 0;
+    border-top: 2px solid transparent;
+    font-size: 0.875rem;
+    font-weight: 600;
+    color: var(--piedra-500);
+    transition:
+      color var(--dur-base) var(--ease-out),
+      border-color var(--dur-base) var(--ease-out);
+  }
+  .nb-cross.is-pinned .nb-cross__labels li.is-done {
+    color: var(--navy-800);
+  }
+  .nb-cross.is-pinned .nb-cross__labels li.is-active {
+    border-color: var(--salvia-500);
+    color: var(--navy-800);
+  }
+</style>
