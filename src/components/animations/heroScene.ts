@@ -4,8 +4,9 @@ import type { AnimationKit } from './types';
 /**
  * Escena del hero.
  * 1) Entrada: el puente se dibuja, el título sube por líneas, aparecen subtítulo, botones y prueba.
- * 2) Arco-portal (escritorio): al hacer scroll, la foto a sangre se encoge hasta quedar recortada en el
- *    arco de la marca, el texto de entrada sale y aparece la promesa.
+ * 2) Arco-portal (escritorio): al empezar a bajar, la foto a sangre se encoge hasta quedar recortada
+ *    en el arco de la marca, el texto de entrada sale y aparece la promesa. La transición se completa
+ *    sola (no va ligada al scroll) para que nunca quede a medias.
  */
 export function heroScene({ gsap, ScrollTrigger }: AnimationKit) {
   const hero = document.querySelector<HTMLElement>('[data-hero]');
@@ -93,14 +94,17 @@ export function heroScene({ gsap, ScrollTrigger }: AnimationKit) {
     gsap.set(photo, { clipPath: 'inset(0px 0px 0px 0px round 0px 0px 0px 0px)' });
     const tl = gsap.timeline({
       defaults: { ease: 'none' },
+      // Al empezar a bajar, la transición se completa sola (y se deshace al volver arriba):
+      // con scrub, parar a medias dejaba el arco en una forma intermedia (techo plano).
       scrollTrigger: {
         trigger: hero,
-        start: 'top top',
+        start: 'top+=24 top',
         end: 'bottom bottom',
-        scrub: 0.9,
+        toggleActions: 'play none none reverse',
         invalidateOnRefresh: true,
       },
     });
+    tl.timeScale(0.6);
     tl.to(photo, { clipPath: arch, ease: 'power2.inOut', duration: 0.62 }, 0.04)
       .to(
         img ?? photo,
