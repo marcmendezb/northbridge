@@ -2,12 +2,15 @@
 import Section from '../ui/Section.astro';
 import { useI18n } from '../../i18n';
 const { t } = useI18n(Astro.currentLocale);
+/** «Años en Zúrich» en Suiza; «de experiencia» en los demás países. */
+const yearsLabel = byCountry((c) => t(c === 'CH' ? 'home.stats.years' : 'home.stats.yearsIntl'));
 
 const stats = [
   { value: 200, suffix: '+', label: t('home.stats.clients'), count: true },
-  { value: 10, suffix: '+', label: t('home.stats.years'), count: true },
+  { value: 10, suffix: '+', label: yearsLabel, count: true },
   { value: 1, suffix: '', label: t('home.stats.contact'), count: false },
 ];
+import { byCountry } from '../../lib/country';
 ---
 
 <Section tone="navy" class="nb-statement">
@@ -15,13 +18,13 @@ const stats = [
   <dl class="m-0 flex flex-col">
     {stats.map((s) => (
       <div data-reveal class="nb-stat">
-        <dt class="sr-only">{`${s.value}${s.suffix} ${s.label}`}</dt>
+        <dt class="sr-only" set:html={`${s.value}${s.suffix} ${s.label}`} />
         <dd class="m-0" aria-hidden="true">
           <span class="nb-stat__num t-figure">
             <span data-count={s.count ? s.value : undefined}>{s.value}</span>
             {s.suffix}
           </span>
-          <span class="nb-stat__label">{s.label}</span>
+          <span class="nb-stat__label" set:html={s.label} />
         </dd>
       </div>
     ))}

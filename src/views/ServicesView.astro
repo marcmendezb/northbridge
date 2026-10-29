@@ -12,8 +12,8 @@ import nominas from '../assets/img/services/nominas.jpeg';
 import constitucion from '../assets/img/services/constitucion.jpeg';
 import startups from '../assets/img/services/startup.jpeg';
 import { useI18n, type MessageKey } from '../i18n';
-import { entryKey, getServices } from '../lib/content';
-import { byCountry, currencyOf } from '../lib/country';
+import { entryKey, getServiceVariants, getServices } from '../lib/content';
+import { byCountry, currencyOf, type Country } from '../lib/country';
 import { formatNumber } from '../lib/format';
 import { convert } from '../lib/pricing/currency';
 import { describePricing, priceUnit } from '../lib/pricing/display';
@@ -41,17 +41,26 @@ const priceOf = (s: (typeof services)[number]) => {
   );
 };
 
-const rows = services.map((s) => ({
+/** Textos de la versión de cada país (servicios-pais); los demás países ven la suiza. */
+const variantsOf = await Promise.all(services.map((s) => getServiceVariants(s, locale)));
+const rows = services.map((s, i) => ({
   key: entryKey(s),
   href: lp(`/servicios/${entryKey(s)}`),
-  title: s.data.title,
-  summary: s.data.summary,
-  forWhom: s.data.forWhom[0],
-  includes: s.data.includes.slice(0, 3),
+  title: byCountry((c) => textIn(variantsOf[i], c).title),
+  summary: byCountry((c) => textIn(variantsOf[i], c).summary),
+  forWhom: byCountry((c) => textIn(variantsOf[i], c).forWhom[0] ?? ''),
+  includes: variantsOf[i].map((v) => ({
+    cc: v.countries.join(' '),
+    items: v.text.includes.slice(0, 3),
+  })),
   icon: s.data.icon,
   photo: photos[entryKey(s)] ?? contabilidad,
   price: priceOf(s),
 }));
+/** Para cada grupo de países, sus textos. */
+function textIn(groups: Awaited<ReturnType<typeof getServiceVariants>>, c: Country) {
+  return groups.find((g) => g.countries.includes(c))!.text;
+}
 const byIcon = Object.fromEntries(rows.map((r) => [r.icon, r]));
 
 /** Por dónde empezar según el caso (docs/05): el primero es el punto de partida. */
@@ -102,16 +111,16 @@ const profiles = [
                 <span class="nb-index__icon" aria-hidden="true">
                   <Icon name={r.icon} size={26} />
                 </span>
-                <span class="nb-index__title">{r.title}</span>
+                <span class="nb-index__title" set:html={r.title} />
                 <span class="nb-index__arrow" aria-hidden="true">
                   <Arrow size={26} />
                 </span>
               </span>
-              <span class="nb-index__summary">{r.summary}</span>
+              <span class="nb-index__summary" set:html={r.summary} />
               <span class="nb-index__meta">
                 <span class="nb-index__for">
                   <span class="nb-index__label">{t('services.index.forWhomLabel')}</span>
-                  {r.forWhom}
+                  <Fragment set:html={r.forWhom} />
                 </span>
                 <span class="nb-index__price" set:html={r.price} />
               </span>
@@ -134,11 +143,13 @@ const profiles = [
                 quality={74}
               />
               <figcaption class="nb-index__card">
-                <span class="nb-index__card-title">{r.title}</span>
+                <span class="nb-index__card-title" set:html={r.title} />
                 <ul role="list">
-                  {r.includes.map((inc) => (
-                    <li>{inc}</li>
-                  ))}
+                  {r.includes.flatMap((g) =>
+                    g.items.map((inc) => (
+                      <li data-cc={r.includes.length > 1 ? g.cc : undefined}>{inc}</li>
+                    )),
+                  )}
                 </ul>
               </figcaption>
             </figure>
@@ -201,8 +212,8 @@ const profiles = [
                       <span class="nb-path__step-icon" aria-hidden="true">
                         <Icon name={r.icon} size={28} />
                       </span>
-                      <span class="nb-path__step-title">{r.title}</span>
-                      <span class="nb-path__step-text">{r.summary}</span>
+                      <span class="nb-path__step-title" set:html={r.title} />
+                      <span class="nb-path__step-text" set:html={r.summary} />
                     </a>
                   </li>
                 );

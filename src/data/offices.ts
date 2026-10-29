@@ -200,3 +200,7 @@ export const OFFICES: Record<Country, Office> = {
     },
   },
 };
+
+/** Cambia la ciudad suiza de un texto por la de la oficina del país («en Zúrich» → «en Madrid»). */
+export const withCity = (text: string, country: Country, locale: keyof Text): string =>
+  text.replace(OFFICES.CH.cityName[locale], OFFICES[country].cityName[locale]);

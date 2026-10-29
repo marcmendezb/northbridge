@@ -37,6 +37,26 @@ const servicios = defineCollection({
   }),
 });
 
+/**
+ * Versión de un servicio para otro país (España, Alemania, Francia, Italia): mismos campos de texto,
+ * con su normativa, sus impuestos y su moneda. El servicio suizo (`servicios`) es la base y la versión
+ * de los países que aún no tienen la suya. Ruta: idioma/país/servicio.md.
+ */
+const serviciosPais = defineCollection({
+  loader: glob({ pattern: '*/*/*.{md,mdx}', base: './src/content/servicios-pais' }),
+  schema: z.object({
+    country: z.enum(['ES', 'DE', 'FR', 'IT']),
+    title: z.string(),
+    summary: z.string(),
+    includes: z.array(z.string()),
+    forWhom: z.array(z.string()),
+    process: z.array(z.object({ title: z.string(), text: z.string() })).length(4),
+    faq: z.array(z.object({ q: z.string(), a: z.string() })).length(4),
+    /** Fecha en que se comprobaron sus datos legales y fuentes (docs/DECISIONES.md). */
+    checkedAt: z.coerce.date(),
+  }),
+});
+
 const testimonios = defineCollection({
   loader: glob({ pattern: '*/*.json', base: './src/content/testimonios' }),
   schema: z.object({
@@ -100,4 +120,4 @@ const legal = defineCollection({
   }),
 });
 
-export const collections = { servicios, testimonios, equipo, blog, legal };
+export const collections = { servicios, serviciosPais, testimonios, equipo, blog, legal };

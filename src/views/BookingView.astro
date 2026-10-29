@@ -14,6 +14,8 @@ const s = tRaw<Messages['booking']>('booking');
 const tel = `tel:${site.phone.replace(/\s/g, '')}`;
 /** Cal.com solo si hay un enlace real configurado (PUBLIC_CAL_LINK); si no, demostración. */
 const calLink = import.meta.env.PUBLIC_CAL_LINK as string | undefined;
+import { byCountry } from '../lib/country';
+import { OFFICES } from '../data/offices';
 ---
 
 <BaseLayout title={s.seoTitle} description={s.seoDescription}>
@@ -81,7 +83,10 @@ const calLink = import.meta.env.PUBLIC_CAL_LINK as string | undefined;
 
     <div class="nb-bk__panel" id="reservar">
       <h2 class="nb-bk__h nb-bk__h--panel">{s.calendarTitle}</h2>
-      <p class="nb-bk__panel-lead">{s.calendarLead}</p>
+      <p
+        class="nb-bk__panel-lead"
+        set:html={byCountry((c) => s.calendarLead.replace('{city}', OFFICES[c].cityName[locale]))}
+      />
       <BookingEmbed
         client:load
         s={s}

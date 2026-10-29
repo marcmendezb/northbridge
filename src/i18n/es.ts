@@ -130,7 +130,6 @@ export const es = {
         next: 'Próximo plazo',
         alert: 'Nuestro aviso, 10 días antes',
         need: 'Qué necesitamos de ti',
-        note: 'Pyme con ejercicio igual al año natural, en el cantón de Zúrich.',
         guide: 'Leer la guía del calendario fiscal',
         ruler: 'Línea del año con {count} plazos',
         shifted: 'El día legal cae en fin de semana o festivo: vale el siguiente día hábil.',
@@ -286,6 +285,7 @@ export const es = {
       line1: 'Tus números,',
       line2: 'bajo control.',
       proof: '+10 años en Zúrich / 200+ clientes',
+      proofIntl: '+10 años de experiencia / 200+ clientes',
       scroll: 'Desliza',
     },
     proposal: {
@@ -307,6 +307,7 @@ export const es = {
       title: 'Una firma pequeña, con experiencia',
       clients: 'Clientes activos',
       years: 'Años en Zúrich, desde 2014',
+      yearsIntl: 'Años de experiencia, desde 2014',
       contact: 'Persona de contacto fija',
     },
     process: {
@@ -418,6 +419,7 @@ export const es = {
       'Northbridge Advisory es una fiduciaria fundada en Zúrich en 2014: una persona de contacto fija, avisos antes de cada plazo y precio cerrado. Conoce al equipo.',
     title: 'Una firma pequeña, con el rigor de una grande.',
     lead: 'Desde 2014 llevamos la contabilidad, el IVA y las nóminas de más de 200 empresas en Zúrich.',
+    leadIntl: 'Desde 2014 llevamos la contabilidad, el IVA y las nóminas de más de 200 empresas.',
     storyLabel: 'Historia',
     storyTitle: 'Por qué existe Northbridge',
     story: [
@@ -519,7 +521,7 @@ export const es = {
     askField: 'Tu pregunta',
     askExamples: [
       '¿Tengo que darme de alta en el IVA?',
-      '¿Me conviene una GmbH o una empresa individual?',
+      '¿Me conviene crear una sociedad o seguir como autónomo?',
       '¿Qué pasa si presento tarde la declaración?',
       '¿Cómo me pago un salario como socio?',
     ],
@@ -663,7 +665,7 @@ export const es = {
       'Te atiende Lea Brunner, socia fundadora y contable certificada. Si tu empresa es una startup, te llama Marc Bernasconi.',
     guarantees: ['Sin compromiso', 'Precio cerrado después', 'Una persona de contacto fija'],
     calendarTitle: 'Elige día y hora',
-    calendarLead: 'Todas las horas son de Zúrich. La llamada dura 20 minutos.',
+    calendarLead: 'Todas las horas son en horario de {city}. La llamada dura 20 minutos.',
     day: 'Día',
     time: 'Hora',
     confirm: 'Confirmar la consulta',

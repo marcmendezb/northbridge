@@ -20,4 +20,8 @@ export interface FiscalEvent {
   extends?: string;
   /** Plazo menor y recurrente (cuotas a cuenta): marca pequeña, sin etiqueta, en el gráfico. */
   minor?: boolean;
+  /** Carril del gráfico (si falta, se deduce del id). */
+  cat?: 'vat' | 'tax' | 'pay' | 'payroll';
+  /** Plazo que se repite cada mes: va solo en la lista, sin fecha concreta. */
+  recurring?: boolean;
 }

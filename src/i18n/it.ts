@@ -132,7 +132,6 @@ export const it: Messages = {
         next: 'Prossima scadenza',
         alert: 'Il nostro avviso, 10 giorni prima',
         need: 'Cosa ci serve da te',
-        note: 'PMI con esercizio uguale all’anno civile, nel cantone di Zurigo.',
         guide: 'Leggi la guida al calendario fiscale',
         ruler: 'Linea dell’anno con {count} scadenze',
         shifted:
@@ -289,6 +288,7 @@ export const it: Messages = {
       line1: 'I tuoi numeri,',
       line2: 'sotto controllo.',
       proof: '+10 anni a Zurigo / 200+ clienti',
+      proofIntl: '+10 anni di esperienza / 200+ clienti',
       scroll: 'Scorri',
     },
     proposal: {
@@ -310,6 +310,7 @@ export const it: Messages = {
       title: 'Uno studio piccolo, con esperienza',
       clients: 'Clienti attivi',
       years: 'Anni a Zurigo, dal 2014',
+      yearsIntl: 'Anni di esperienza, dal 2014',
       contact: 'Referente fisso',
     },
     process: {
@@ -421,6 +422,7 @@ export const it: Messages = {
       'Northbridge Advisory è una fiduciaria fondata a Zurigo nel 2014: un referente fisso, avvisi prima di ogni scadenza e prezzo fisso. Scopri il team.',
     title: 'Uno studio piccolo, con il rigore di uno grande.',
     lead: 'Dal 2014 teniamo la contabilità, l’IVA e i salari di oltre 200 aziende a Zurigo.',
+    leadIntl: 'Dal 2014 teniamo la contabilità, l’IVA e i salari di oltre 200 aziende.',
     storyLabel: 'Storia',
     storyTitle: 'Perché esiste Northbridge',
     story: [
@@ -521,7 +523,7 @@ export const it: Messages = {
     askField: 'La tua domanda',
     askExamples: [
       'Devo iscrivermi all’IVA?',
-      'Mi conviene una GmbH o una ditta individuale?',
+      'Mi conviene creare una società o restare autonomo?',
       'Cosa succede se presento tardi la dichiarazione?',
       'Come mi pago uno stipendio da socio?',
     ],
@@ -665,7 +667,7 @@ export const it: Messages = {
       'Ti risponde Lea Brunner, socia fondatrice e contabile diplomata. Se la tua azienda è una startup, ti chiama Marc Bernasconi.',
     guarantees: ['Senza impegno', 'Prezzo fisso, dopo', 'Un referente fisso'],
     calendarTitle: 'Scegli giorno e ora',
-    calendarLead: 'Tutti gli orari sono di Zurigo. La chiamata dura 20 minuti.',
+    calendarLead: 'Tutti gli orari sono nell’ora di {city}. La chiamata dura 20 minuti.',
     day: 'Giorno',
     time: 'Ora',
     confirm: 'Conferma la consulenza',

@@ -13,6 +13,7 @@ import Arrow from '../components/brand/Arrow.astro';
 import { useI18n, type MessageKey } from '../i18n';
 import { getBookingCta } from '../lib/site';
 import { byCountry, currencyOf, legalForm } from '../lib/country';
+import { vatFor } from '../lib/vat';
 import { formatMoney } from '../lib/pricing/currency';
 import {
   COMPARISON,
@@ -96,7 +97,7 @@ const faq = tRaw<{ q: string; a: string }[]>('pricing.faq');
               <svg viewBox="0 0 16 16" aria-hidden="true">
                 <path d="M2.5 8.5l3.5 3.5 7.5-8" pathLength="1" data-pr-check />
               </svg>
-              {f}
+              <Fragment set:html={byCountry((c) => vatFor(f, c, locale))} />
             </li>
           ))}
         </ul>
@@ -166,7 +167,7 @@ const faq = tRaw<{ q: string; a: string }[]>('pricing.faq');
                         <svg viewBox="0 0 16 16" aria-hidden="true">
                           <path d="M2.5 8.5l3.5 3.5 7.5-8" pathLength="1" data-pr-check />
                         </svg>
-                        {h}
+                        <Fragment set:html={byCountry((c) => vatFor(h, c, locale))} />
                       </li>
                     ))}
                   </ul>
@@ -180,7 +181,10 @@ const faq = tRaw<{ q: string; a: string }[]>('pricing.faq');
           })}
         </ul>
       </div>
-      <p class="nb-pk__vat">{t('price.vatNoteFirst')}</p>
+      <p
+        class="nb-pk__vat"
+        set:html={byCountry((c) => vatFor(t('price.vatNoteFirst'), c, locale))}
+      />
     </div>
   </section>
 
@@ -218,7 +222,7 @@ const faq = tRaw<{ q: string; a: string }[]>('pricing.faq');
             </tr>
             {g.rows.map((rid) => (
               <tr>
-                <th scope="row">{rowLabel(rid)}</th>
+                <th scope="row" set:html={byCountry((c) => vatFor(rowLabel(rid), c, locale))} />
                 {ids.map((id) => (
                   <td class:list={[PACKAGES[id].recommended && 'nb-cmp__cell--featured']}>
                     <ComparisonCell cell={rowById[rid][id]} />

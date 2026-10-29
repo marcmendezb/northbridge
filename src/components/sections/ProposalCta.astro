@@ -12,6 +12,7 @@ import { PACKAGES } from '../../lib/pricing/config';
 import { convert } from '../../lib/pricing/currency';
 import { priceUnit } from '../../lib/pricing/display';
 import { byCountry, currencyOf } from '../../lib/country';
+import { vatFor } from '../../lib/vat';
 import { formatNumber } from '../../lib/format';
 
 const { t, lp, locale } = useI18n(Astro.currentLocale);
@@ -79,7 +80,10 @@ const rows = [
             <span class="nb-doc__amount" set:html={amount} data-doc-amount />
             <span class="nb-doc__unit" set:html={unit} />
           </span>
-          <span class="nb-doc__vat">{t('pricing.docVat')}</span>
+          <span
+            class="nb-doc__vat"
+            set:html={byCountry((c) => vatFor(t('pricing.docVat'), c, locale))}
+          />
         </div>
         <footer class="nb-doc__foot">
           <div class="nb-doc__sign">

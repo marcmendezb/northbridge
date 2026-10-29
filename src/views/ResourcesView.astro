@@ -38,7 +38,10 @@ const upcoming = COUNTRIES.map((c) => {
   const guide = guideFor(articles, 'calendario', country);
   return {
     c,
-    events: [...(FISCAL_CALENDARS[country] ?? [])].sort((a, b) => a.month - b.month),
+    // Sin los plazos de cada mes ni las cuotas menores: aquí solo los vencimientos principales.
+    events: (FISCAL_CALENDARS[country] ?? [])
+      .filter((e) => !e.recurring && !e.minor)
+      .sort((a, b) => a.month - b.month),
     href: guide ? lp(`/recursos/${entryKey(guide)}`) : lp('/recursos'),
   };
 });

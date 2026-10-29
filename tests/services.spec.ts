@@ -87,7 +87,8 @@ test.describe('sin JS', () => {
   test.use({ javaScriptEnabled: false });
   test('FAQ y tabla de precios completas', async ({ page }) => {
     await page.goto('/servicios/iva-y-fiscalidad');
-    await expect(page.getByText('No la contestes todavía')).toBeVisible();
+    // Una versión por país: sin JS se ve la suiza (la del país por defecto).
+    await expect(page.getByText('No la contestes todavía').filter({ visible: true })).toBeVisible();
     await page.goto('/precios');
     await expect(page.getByText('Hay intereses', { exact: false })).toHaveCount(0);
     await expect(page.getByText('Te avisamos cuando tus facturas')).toBeVisible();

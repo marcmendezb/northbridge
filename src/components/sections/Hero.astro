@@ -6,9 +6,14 @@ import Container from '../ui/Container.astro';
 import { useI18n } from '../../i18n';
 import { getBookingCta } from '../../lib/site';
 const { t, lp, locale } = useI18n(Astro.currentLocale);
-const facts = t('home.hero.proof').split(' / ');
+/** Credenciales: «+10 años en Zúrich» en Suiza; «de experiencia» en los demás países. */
+const proofOf = (c: Country) =>
+  t(c === 'CH' ? 'home.hero.proof' : 'home.hero.proofIntl').split(' / ');
+const facts = proofOf('CH').map((_, i) => byCountry((c) => proofOf(c)[i] ?? ''));
 const bookingCta = getBookingCta(locale);
 const posterFile = await getImage({ src: heroPoster, format: 'webp', width: 1920, quality: 76 });
+import { byCountry, type Country } from '../../lib/country';
+import { withCity } from '../../data/offices';
 ---
 
 <section data-hero class="hero" aria-labelledby="hero-title">
@@ -52,7 +57,7 @@ const posterFile = await getImage({ src: heroPoster, format: 'webp', width: 1920
         <div class="hero__band-inner">
           <ul class="hero__facts">
             {facts.map((f) => (
-              <li>{f}</li>
+              <li set:html={f} />
             ))}
           </ul>
           <span class="hero__scroll" aria-hidden="true">
@@ -87,7 +92,7 @@ const posterFile = await getImage({ src: heroPoster, format: 'webp', width: 1920
         </h1>
         <div class="hero__aside">
           <p data-hero-fade="0.5" class="hero__sub m-0 font-serif font-light text-navy-100">
-            {t('brand.descriptor')}
+            <Fragment set:html={byCountry((c) => withCity(t('brand.descriptor'), c, locale))} />
           </p>
           <div data-hero-fade="0.62" class="flex flex-wrap items-center gap-4">
             <Button href={bookingCta.href} on="dark" arrow>

@@ -132,7 +132,6 @@ export const de: Messages = {
         next: 'Nächste Frist',
         alert: 'Unsere Erinnerung, 10 Tage vorher',
         need: 'Was wir von dir brauchen',
-        note: 'KMU mit Geschäftsjahr gleich Kalenderjahr, im Kanton Zürich.',
         guide: 'Zum Ratgeber Steuerkalender',
         ruler: 'Jahreslinie mit {count} Fristen',
         shifted:
@@ -285,6 +284,7 @@ export const de: Messages = {
       line1: 'Deine Zahlen',
       line2: 'im Griff.',
       proof: 'Über 10 Jahre in Zürich / 200+ Kunden',
+      proofIntl: 'Über 10 Jahre Erfahrung / 200+ Kunden',
       scroll: 'Scrollen',
     },
     proposal: {
@@ -306,6 +306,7 @@ export const de: Messages = {
       title: 'Eine kleine Firma mit Erfahrung',
       clients: 'Aktive Kunden',
       years: 'Jahre in Zürich, seit 2014',
+      yearsIntl: 'Jahre Erfahrung, seit 2014',
       contact: 'Feste Ansprechperson',
     },
     process: {
@@ -420,6 +421,7 @@ export const de: Messages = {
       'Northbridge Advisory ist eine Treuhandfirma, 2014 in Zürich gegründet: eine feste Ansprechperson, Erinnerungen vor jeder Frist und Fixpreise. Lerne das Team kennen.',
     title: 'Eine kleine Firma mit der Sorgfalt einer grossen.',
     lead: 'Seit 2014 führen wir Buchhaltung, MWST und Löhne für über 200 Unternehmen in Zürich.',
+    leadIntl: 'Seit 2014 führen wir Buchhaltung, MWST und Löhne für über 200 Unternehmen.',
     storyLabel: 'Geschichte',
     storyTitle: 'Warum es Northbridge gibt',
     story: [
@@ -521,7 +523,7 @@ export const de: Messages = {
     askField: 'Deine Frage',
     askExamples: [
       'Muss ich mich für die MWST anmelden?',
-      'Lohnt sich für mich eine GmbH oder eine Einzelfirma?',
+      'Lohnt sich für mich eine Gesellschaft oder bleibe ich selbstständig?',
       'Was passiert, wenn ich die Steuererklärung zu spät einreiche?',
       'Wie zahle ich mir als Gesellschafter einen Lohn?',
     ],
@@ -665,7 +667,7 @@ export const de: Messages = {
       'Du sprichst mit Lea Brunner, Gründungspartnerin und diplomierte Buchhalterin. Ist deine Firma ein Startup, ruft dich Marc Bernasconi an.',
     guarantees: ['Unverbindlich', 'Danach ein Fixpreis', 'Eine feste Ansprechperson'],
     calendarTitle: 'Wähle Tag und Uhrzeit',
-    calendarLead: 'Alle Zeiten sind Zürcher Zeit. Das Gespräch dauert 20 Minuten.',
+    calendarLead: 'Alle Zeiten in Ortszeit {city}. Das Gespräch dauert 20 Minuten.',
     day: 'Tag',
     time: 'Uhrzeit',
     confirm: 'Erstgespräch bestätigen',

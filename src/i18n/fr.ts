@@ -132,7 +132,6 @@ export const fr: Messages = {
         next: 'Prochaine échéance',
         alert: 'Notre rappel, 10 jours avant',
         need: 'Ce dont nous avons besoin',
-        note: 'PME dont l’exercice correspond à l’année civile, dans le canton de Zurich.',
         guide: 'Lire le guide du calendrier fiscal',
         ruler: 'Ligne de l’année avec {count} échéances',
         shifted:
@@ -284,6 +283,7 @@ export const fr: Messages = {
       line1: 'Vos chiffres,',
       line2: 'sous contrôle.',
       proof: '+10 ans à Zurich / 200+ clients',
+      proofIntl: '+10 ans d’expérience / 200+ clients',
       scroll: 'Défiler',
     },
     proposal: {
@@ -305,6 +305,7 @@ export const fr: Messages = {
       title: 'Un cabinet à taille humaine, une solide expérience',
       clients: 'Clients actifs',
       years: 'Années à Zurich, depuis 2014',
+      yearsIntl: 'Années d’expérience, depuis 2014',
       contact: 'Personne de contact attitrée',
     },
     process: {
@@ -419,6 +420,7 @@ export const fr: Messages = {
       'Northbridge Advisory est une fiduciaire fondée à Zurich en 2014 : une personne de contact attitrée, un rappel avant chaque échéance et un prix fixe. Découvrez l’équipe.',
     title: 'Un petit cabinet, avec la rigueur d’un grand.',
     lead: 'Depuis 2014, nous tenons la comptabilité, la TVA et les salaires de plus de 200 entreprises à Zurich.',
+    leadIntl: 'Depuis 2014, nous tenons la comptabilité, la TVA et les salaires de plus de 200 entreprises.',
     storyLabel: 'Histoire',
     storyTitle: 'Pourquoi Northbridge existe',
     story: [
@@ -520,7 +522,7 @@ export const fr: Messages = {
     askField: 'Votre question',
     askExamples: [
       'Dois-je m’inscrire à la TVA ?',
-      'Une GmbH ou une entreprise individuelle : que choisir ?',
+      'Créer une société ou rester indépendant : que choisir ?',
       'Que se passe-t-il si je dépose ma déclaration en retard ?',
       'Comment me verser un salaire en tant qu’associé ?',
     ],
@@ -665,7 +667,7 @@ export const fr: Messages = {
       'C’est Lea Brunner, associée fondatrice et comptable diplômée, qui s’entretient avec vous. Si votre entreprise est une start-up, c’est Marc Bernasconi qui vous appelle.',
     guarantees: ['Sans engagement', 'Prix fixe ensuite', 'Une personne de contact attitrée'],
     calendarTitle: 'Choisissez le jour et l’heure',
-    calendarLead: 'Toutes les heures sont indiquées à l’heure de Zurich. L’appel dure 20 minutes.',
+    calendarLead: 'Toutes les heures sont à l’heure de {city}. L’appel dure 20 minutes.',
     day: 'Jour',
     time: 'Heure',
     confirm: 'Confirmer la consultation',

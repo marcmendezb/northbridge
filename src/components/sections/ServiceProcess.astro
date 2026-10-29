@@ -13,15 +13,29 @@ interface Props {
   steps: Step[];
   label: string;
   title: string;
+  /** Países que ven esta versión (`data-cc`); sin valor, todos. */
+  countries?: string;
+  uid?: string;
 }
-const { steps, label, title } = Astro.props;
+const { steps, label, title, countries, uid = '0' } = Astro.props;
 ---
 
-<section class="nb-way-steps" data-surface="dark" data-steps-path aria-labelledby="process-title">
+<section
+  class="nb-way-steps"
+  data-surface="dark"
+  data-steps-path
+  data-cc={countries}
+  aria-labelledby={`process-title-${uid}`}
+>
   <div class="nb-container nb-way-steps__grid">
     <div class="nb-way-steps__head">
       <p class="nb-way-steps__eyebrow">{label}</p>
-      <h2 id="process-title" class="nb-way-steps__title" data-split>
+      <h2
+        id={`process-title-${uid}`}
+        class="nb-way-steps__title"
+        data-split={countries ? undefined : ''}
+        data-reveal={countries ? '' : undefined}
+      >
         {title}
       </h2>
     </div>

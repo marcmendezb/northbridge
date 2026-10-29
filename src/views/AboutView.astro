@@ -65,9 +65,11 @@ const splitFact = (v: string) => {
       <h1 class="nb-ah__title" data-split>
         {t('about.title')}
       </h1>
-      <p class="nb-ah__lead" data-reveal>
-        {t('about.lead')}
-      </p>
+      <p
+        class="nb-ah__lead"
+        data-reveal
+        set:html={byCountry((c) => t(c === 'CH' ? 'about.lead' : 'about.leadIntl'))}
+      />
       <dl class="nb-ah__facts" data-reveal>
         {facts.map((f) => {
           const { n, suffix } = splitFact(f.value);

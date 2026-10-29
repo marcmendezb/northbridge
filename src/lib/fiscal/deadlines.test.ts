@@ -1,6 +1,7 @@
 import { describe, expect, it } from 'vitest';
 import {
   daysBetween,
+  spainNationalHolidays,
   deadlineIn,
   isLegalWorkday,
   yearFraction,
@@ -8,14 +9,7 @@ import {
 } from './deadlines';
 import { nextDeadline, timeline } from './timeline';
 import { events as CH } from '../../data/fiscal-calendar/ch';
-
-const vat = (endM: number, endD: number): DeadlineRule => ({
-  type: 'afterPeriod',
-  endM,
-  endD,
-  days: 60,
-  shift: true,
-});
+import { events as ES } from '../../data/fiscal-calendar/es';
 
 describe('IVA suizo: fin del segundo mes tras el periodo (ESTV, «fällig am 31. Mai»)', () => {
   const end = (m: number): DeadlineRule => ({ type: 'monthEnd', m, shift: false });
@@ -96,5 +90,22 @@ describe('timeline del calendario suizo', () => {
   it('en diciembre salta al año siguiente: cuotas AVS el lunes 11-1-2027 (el 10 es domingo)', () => {
     const next = nextDeadline(rules, { y: 2026, m: 12, d: 15 });
     expect(next).toMatchObject({ year: 2027, id: 'ahv-advance-q4', due: { y: 2027, m: 1, d: 11 } });
+  });
+});
+
+describe('España: calendario de la Agencia Tributaria 2026', () => {
+  const ES_EVENTS = ES.flatMap((e) => (e.rule && !e.recurring ? [{ id: e.id, rule: e.rule }] : []));
+  const due = (id: string) =>
+    timeline(ES_EVENTS, 2026, spainNationalHolidays).find((t) => t.id === id)?.due;
+  it('coincide con las fechas publicadas por la AEAT (sábados y domingos trasladados)', () => {
+    expect(due('es-wh-q4')).toEqual({ y: 2026, m: 1, d: 20 });
+    expect(due('es-vat-q4')).toEqual({ y: 2026, m: 1, d: 30 });
+    expect(due('es-wh-annual')).toEqual({ y: 2026, m: 2, d: 2 }); // 31-1 sábado
+    expect(due('es-347')).toEqual({ y: 2026, m: 3, d: 2 }); // 28-2 sábado
+    expect(due('es-vat-q1')).toEqual({ y: 2026, m: 4, d: 20 });
+    expect(due('es-income')).toEqual({ y: 2026, m: 6, d: 30 });
+    expect(due('es-corporate')).toEqual({ y: 2026, m: 7, d: 27 }); // 25-7 sábado
+    expect(due('es-vat-q3')).toEqual({ y: 2026, m: 10, d: 20 });
+    expect(due('es-pay-dec')).toEqual({ y: 2026, m: 12, d: 21 }); // 20-12 domingo
   });
 });

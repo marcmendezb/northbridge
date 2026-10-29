@@ -132,7 +132,6 @@ export const en: Messages = {
         next: 'Next deadline',
         alert: 'Our reminder, 10 days before',
         need: 'What we need from you',
-        note: 'SME with a financial year equal to the calendar year, in the canton of Zurich.',
         guide: 'Read the tax calendar guide',
         ruler: 'Timeline of the year with {count} deadlines',
         shifted:
@@ -285,6 +284,7 @@ export const en: Messages = {
       line1: 'Your numbers,',
       line2: 'under control.',
       proof: '10+ years in Zurich / 200+ clients',
+      proofIntl: '10+ years of experience / 200+ clients',
       scroll: 'Scroll',
     },
     proposal: {
@@ -306,6 +306,7 @@ export const en: Messages = {
       title: 'A small firm, with experience',
       clients: 'Active clients',
       years: 'Years in Zurich, since 2014',
+      yearsIntl: 'Years of experience, since 2014',
       contact: 'Dedicated contact person',
     },
     process: {
@@ -420,6 +421,7 @@ export const en: Messages = {
       'Northbridge Advisory is a fiduciary firm founded in Zurich in 2014: one dedicated contact person, reminders before every deadline and a fixed price. Meet the team.',
     title: 'A small firm, with the rigour of a large one.',
     lead: 'Since 2014 we have handled the accounting, VAT and payroll of more than 200 companies in Zurich.',
+    leadIntl: 'Since 2014 we have handled the accounting, VAT and payroll of more than 200 companies.',
     storyLabel: 'Story',
     storyTitle: 'Why Northbridge exists',
     story: [
@@ -521,7 +523,7 @@ export const en: Messages = {
     askField: 'Your question',
     askExamples: [
       'Do I need to register for VAT?',
-      'Is a GmbH or a sole proprietorship better for me?',
+      'Should I set up a company or stay self-employed?',
       'What happens if I file my tax return late?',
       'How do I pay myself a salary as a partner?',
     ],
@@ -662,7 +664,7 @@ export const en: Messages = {
       'You will speak with Lea Brunner, founding partner and certified accountant. If your company is a startup, Marc Bernasconi will call you.',
     guarantees: ['No commitment', 'A fixed price afterwards', 'One dedicated contact person'],
     calendarTitle: 'Choose a day and time',
-    calendarLead: 'All times are Zurich time. The call lasts 20 minutes.',
+    calendarLead: 'All times are {city} time. The call lasts 20 minutes.',
     day: 'Day',
     time: 'Time',
     confirm: 'Confirm the consultation',

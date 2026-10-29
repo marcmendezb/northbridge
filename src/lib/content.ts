@@ -13,6 +13,55 @@ export async function getServices(locale: Locale): Promise<CollectionEntry<'serv
   );
 }
 
+/** Textos de un servicio que cambian con el país. */
+export type ServiceText = Pick<
+  CollectionEntry<'servicios'>['data'],
+  'title' | 'summary' | 'includes' | 'forWhom' | 'process' | 'faq'
+>;
+
+/**
+ * Lo que ve cada país de un servicio: su versión (servicios-pais) o, si aún no la tiene, la suiza.
+ * Devuelve los países agrupados por texto idéntico, para pintar una variante por grupo (`data-cc`).
+ */
+export async function getServiceVariants(
+  service: CollectionEntry<'servicios'>,
+  locale: Locale,
+): Promise<{ countries: Country[]; text: ServiceText }[]> {
+  const key = entryKey(service);
+  const base: ServiceText = {
+    title: service.data.title,
+    summary: service.data.summary,
+    includes: service.data.includes,
+    forWhom: service.data.forWhom,
+    process: service.data.process,
+    faq: service.data.faq,
+  };
+  const own = await getCollection(
+    'serviciosPais',
+    (e) => e.id.startsWith(`${locale}/`) && e.id.endsWith(`/${key}`),
+  );
+  const textOf = (c: Country): ServiceText => {
+    const v = own.find((e) => e.data.country === c)?.data;
+    return v
+      ? {
+          title: v.title,
+          summary: v.summary,
+          includes: v.includes,
+          forWhom: v.forWhom,
+          process: v.process,
+          faq: v.faq,
+        }
+      : base;
+  };
+  const groups = new Map<string, { countries: Country[]; text: ServiceText }>();
+  for (const c of COUNTRIES) {
+    const text = textOf(c);
+    const k = JSON.stringify(text);
+    groups.set(k, { countries: [...(groups.get(k)?.countries ?? []), c], text });
+  }
+  return [...groups.values()];
+}
+
 export async function getTestimonials(locale: Locale): Promise<CollectionEntry<'testimonios'>[]> {
   return (await getCollection('testimonios', (e) => ofLocale(e, locale))).sort(
     (a, b) => a.data.order - b.data.order,

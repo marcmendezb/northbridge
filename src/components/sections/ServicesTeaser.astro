@@ -11,11 +11,24 @@ import nominas from '../../assets/img/services/nominas.jpeg';
 import constitucion from '../../assets/img/services/constitucion.jpeg';
 import startups from '../../assets/img/services/startup.jpeg';
 import { useI18n } from '../../i18n';
-import { entryKey, getServices } from '../../lib/content';
+import { entryKey, getServiceVariants, getServices } from '../../lib/content';
+import { byCountry, type Country } from '../../lib/country';
 const { t, lp, locale } = useI18n(Astro.currentLocale);
 
 const featured = ['contabilidad', 'iva', 'nominas'];
-const services = (await getServices(locale)).filter((s) => featured.includes(s.data.icon));
+const services = await Promise.all(
+  (await getServices(locale))
+    .filter((s) => featured.includes(s.data.icon))
+    .map(async (s) => {
+      // Título y resumen de la versión de cada país (servicios-pais).
+      const v = await getServiceVariants(s, locale);
+      const of = (c: Country) => v.find((g) => g.countries.includes(c))!.text;
+      return Object.assign(s, {
+        titleHtml: byCountry((c) => of(c).title),
+        summaryHtml: byCountry((c) => of(c).summary),
+      });
+    }),
+);
 /** Foto de cada servicio: aparece sobre el cursor al pasar por su fila (solo con ratón). */
 const photos: Record<string, ImageMetadata> = {
   contabilidad,
@@ -36,8 +49,8 @@ const photos: Record<string, ImageMetadata> = {
           data-row-photo={s.data.icon}
         >
           <span class="nb-row__main">
-            <span class="nb-row__title">{s.data.title}</span>
-            <span class="nb-row__sum">{s.data.summary}</span>
+            <span class="nb-row__title" set:html={s.titleHtml} />
+            <span class="nb-row__sum" set:html={s.summaryHtml} />
           </span>
           <Icon name={s.data.icon} size={44} class="nb-row__icon" />
           <span class="nb-row__arrow">

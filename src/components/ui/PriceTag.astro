@@ -1,6 +1,7 @@
 ---
 import { formatNumber } from '../../lib/format';
 import { byCountry, currencyOf } from '../../lib/country';
+import { vatFor } from '../../lib/vat';
 import { convert } from '../../lib/pricing/currency';
 import { priceUnit } from '../../lib/pricing/display';
 import { useI18n } from '../../i18n';
@@ -42,6 +43,11 @@ const unit = byCountry((c) => priceUnit(currencyOf(c), locale, once));
     <span class="font-sans text-sm text-piedra-600" set:html={unit} />
   </p>
   {!hideVatNote && (
-    <p class="t-small m-0">{firstVat ? t('price.vatNoteFirst') : t('price.vatNote')}</p>
+    <p
+      class="t-small m-0"
+      set:html={byCountry((c) =>
+        vatFor(firstVat ? t('price.vatNoteFirst') : t('price.vatNote'), c, locale),
+      )}
+    />
   )}
 </div>

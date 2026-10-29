@@ -14,6 +14,7 @@ import {
 import { BASE, EXCHANGE_RATES, PACKAGES, type Currency } from '../../lib/pricing/config';
 import { CURRENCY_SYMBOL, convert } from '../../lib/pricing/currency';
 import { ByCountry } from './ByCountry';
+import { vatFor } from '../../lib/vat';
 
 type Strings = Messages['calculator'];
 
@@ -310,7 +311,9 @@ export default function Calculator({
               </span>
               <span className="nb-calcx__unit">{unit}</span>
             </p>
-            <p className="nb-calcx__vat">{vatNote}</p>
+            <p className="nb-calcx__vat">
+              <ByCountry render={(c) => vatFor(vatNote, c, locale)} />
+            </p>
 
             <div className="nb-calcx__packages" role="list" aria-label={s.recommended}>
               {(Object.keys(PACKAGES) as (keyof typeof PACKAGES)[]).map((p) => (

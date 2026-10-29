@@ -43,8 +43,7 @@ export function serviceScene({ gsap, ScrollTrigger }: AnimationKit) {
   });
 
   // Para quién.
-  const who = document.querySelector<HTMLElement>('[data-who]');
-  if (who) {
+  document.querySelectorAll<HTMLElement>('[data-who]').forEach((who) => {
     const items = who.querySelectorAll('.nb-who__item');
     const marks = who.querySelectorAll('.nb-who__mark path');
     gsap.set(marks, { strokeDasharray: 1, strokeDashoffset: 1, attr: { pathLength: 1 } });
@@ -57,12 +56,11 @@ export function serviceScene({ gsap, ScrollTrigger }: AnimationKit) {
         0,
       )
       .to(marks, { strokeDashoffset: 0, duration: 0.8, stagger: 0.08, ease: 'power2.inOut' }, 0.3);
-  }
+  });
 
   // IVA: el gráfico del año. Las banderas se levantan por orden de fecha, cada pista de aviso se
   // tiende hacia su plazo y la línea de hoy baja al final.
-  const ruler = document.querySelector<HTMLElement>('[data-yr-ruler]');
-  if (ruler) {
+  document.querySelectorAll<HTMLElement>('[data-yr-ruler]').forEach((ruler) => {
     const pos = (el: HTMLElement) => {
       const at = parseFloat(el.style.getPropertyValue('--at')) || 0;
       return Math.min(Math.max(at / 100, 0), 1);
@@ -99,7 +97,7 @@ export function serviceScene({ gsap, ScrollTrigger }: AnimationKit) {
         0.88,
       );
     tl.to({}, { duration: 0.001 }, 1);
-  }
+  });
 
   // Precio: el recibo.
   const receipt = document.querySelector<HTMLElement>('[data-receipt]');
@@ -116,8 +114,7 @@ export function serviceScene({ gsap, ScrollTrigger }: AnimationKit) {
   }
 
   // Proceso: cada tramo entre arcos se rellena con el scroll y cada paso se enciende al alcanzarlo.
-  const path = document.querySelector<HTMLElement>('[data-steps-path]');
-  if (path) {
+  document.querySelectorAll<HTMLElement>('[data-steps-path]').forEach((path) => {
     path.querySelectorAll<HTMLElement>('[data-steps-item]').forEach((step) => {
       const fill = step.querySelector('[data-steps-fill]');
       if (fill)
@@ -137,7 +134,7 @@ export function serviceScene({ gsap, ScrollTrigger }: AnimationKit) {
         onLeaveBack: () => step.classList.remove('is-on'),
       });
     });
-  }
+  });
 
   ScrollTrigger.refresh();
 }

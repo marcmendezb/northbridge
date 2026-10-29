@@ -15,24 +15,42 @@ import iva from '../assets/img/services/iva.jpeg';
 import nominas from '../assets/img/services/nominas.jpeg';
 import constitucion from '../assets/img/services/constitucion.jpeg';
 import startups from '../assets/img/services/startup.jpeg';
-import { useI18n, type Messages } from '../i18n';
-import { entryKey, getArticles, guideFor } from '../lib/content';
-import { getBookingCta } from '../lib/site';
+import { useI18n } from '../i18n';
+import { entryKey, getArticles, getServiceVariants, guideFor } from '../lib/content';
+import { getBookingCta, getServiceLinks } from '../lib/site';
 import { describePricing } from '../lib/pricing/display';
-import { byCountry, currencyOf } from '../lib/country';
-import { FISCAL_CALENDARS } from '../data/fiscal-calendar';
-import { zurichNow, type CivilDate } from '../lib/contact/office';
-import { monthMarks, timeline } from '../lib/fiscal/timeline';
+import { byCountry, COUNTRIES, currencyOf, legalForm, type Country } from '../lib/country';
+import { FISCAL_CALENDARS, type CalendarCountry } from '../data/fiscal-calendar';
+import YearCalendar from '../components/sections/YearCalendar.astro';
 
 interface Props {
   entry: CollectionEntry<'servicios'>;
   related: CollectionEntry<'servicios'>[];
 }
 const { entry, related } = Astro.props;
-const { t, tRaw, lp, locale } = useI18n(Astro.currentLocale);
+const { t, lp, locale } = useI18n(Astro.currentLocale);
 const bookingCta = getBookingCta(locale);
 const d = entry.data;
 const key = entryKey(entry);
+/** Textos por país (servicios-pais); los países sin versión propia ven la suiza. */
+const variants = await getServiceVariants(entry, locale);
+const textOf = (c: Country) => variants.find((v) => v.countries.includes(c))!.text;
+const ccOf = (countries: Country[]) => (variants.length > 1 ? countries.join(' ') : undefined);
+const titleHtml = byCountry((c) => textOf(c).title);
+const titleVaries = new Set(variants.map((v) => v.text.title)).size > 1;
+/** Migas: el nombre neutro del servicio (el título puede llevar formas jurídicas de un país). */
+const crumbLabel = getServiceLinks(locale).find((l) => l.key === key)?.label ?? d.title;
+const relatedHtml = await Promise.all(
+  related.map(async (r) => {
+    const rv = await getServiceVariants(r, locale);
+    const rt = (c: Country) => rv.find((v) => v.countries.includes(c))!.text;
+    return {
+      entry: r,
+      title: byCountry((c) => rt(c).title),
+      summary: byCountry((c) => rt(c).summary),
+    };
+  }),
+);
 
 const photos: Record<string, ImageMetadata> = {
   'contabilidad-y-cierres': contabilidad,
@@ -49,60 +67,27 @@ const prices = d.pricing.map((p) => {
   const detail = base.detail
     ? byCountry((c) => describePricing(p, locale, currencyOf(c)).detail ?? '')
     : undefined;
-  return { ...p, ...base, detail };
+  const labelHtml =
+    p.ref === 'gmbh' || p.ref === 'ag'
+      ? byCountry((c) => legalForm(c, p.ref as 'gmbh' | 'ag'))
+      : p.label;
+  return { ...p, ...base, detail, labelHtml };
 });
 const mentionsVat = JSON.stringify(d).includes('MWST');
 
-/* ── Firma del servicio de IVA: el año fiscal como una regla, con la fecha exacta de cada plazo ── */
-const y = tRaw<Messages['services']['detail']['year']>('services.detail.year');
+/* ── Firma del servicio de IVA: el año fiscal de cada país (YearCalendar) ── */
 const showYear = key === 'iva-y-fiscalidad';
-type Cat = 'vat' | 'tax' | 'pay' | 'payroll';
-const catOf = (id: string): Cat =>
-  id.startsWith('vat')
-    ? 'vat'
-    : id.startsWith('ahv') || id.startsWith('salary')
-      ? 'payroll'
-      : id === 'federal-tax' || id === 'cantonal-tax'
-        ? 'pay'
-        : 'tax';
-const calendar = FISCAL_CALENDARS.CH ?? [];
-/** Reglas legales de cada plazo: el navegador recalcula con ellas el año en curso. */
-const ruled = calendar.flatMap((e) => (e.rule ? [{ id: e.id, rule: e.rule }] : []));
-/** Sin JS se ve el año de compilación; con JS, el año en curso (hora de Zúrich). */
-const buildYear = zurichNow(new Date()).y;
-const items = timeline(ruled, buildYear).map((it) => {
-  const e = calendar.find((c) => c.id === it.id)!;
-  return {
-    ...it,
-    cat: catOf(it.id),
-    short: (e.short ?? e.what)[locale],
-    extends: e.extends,
-    minor: Boolean(e.minor),
-    when: e.when[locale],
-    what: e.what[locale],
-    need: e.need[locale],
-  };
-});
-/** En el gráfico no va la ventana sin fecha legal (certificados): solo en la lista. */
-const lanes = (['vat', 'tax', 'pay', 'payroll'] as const).map((cat) => ({
-  cat,
-  items: items.filter((it) => it.cat === cat && !it.window),
-}));
-/** Cerca del final del año, la etiqueta va a la izquierda de su bandera. */
-const FLIP_AT = 0.8;
-const marks = monthMarks(buildYear);
-const dateTag = locale === 'en' ? 'en-GB' : locale;
-const fmt = (d: CivilDate, o: Intl.DateTimeFormatOptions) =>
-  new Intl.DateTimeFormat(dateTag, { timeZone: 'UTC', ...o }).format(
-    new Date(Date.UTC(d.y, d.m - 1, d.d, 12)),
-  );
-const dayMonth = (d: CivilDate) => fmt(d, { day: 'numeric', month: 'long' });
-const monthShort = (m: number) =>
-  fmt({ y: buildYear, m, d: 15 }, { month: 'short' }).replace('.', '');
-const pct = (f: number) => `${(f * 100).toFixed(3)}%`;
-const dayShort = (d: CivilDate) => fmt(d, { day: 'numeric', month: 'short' }).replace('.', '');
+/** Calendario de cada país; los que aún no tienen el suyo ven el suizo. */
+const calendarOf = (c: Country): CalendarCountry =>
+  c in FISCAL_CALENDARS ? (c as CalendarCountry) : 'CH';
 const articles = showYear ? await getArticles(locale) : [];
-const guide = guideFor(articles, 'calendario', 'CH');
+const yearGroups = (['CH', 'ES'] as const)
+  .map((calendar) => ({
+    calendar,
+    countries: COUNTRIES.filter((c) => calendarOf(c) === calendar),
+    guide: guideFor(articles, 'calendario', calendar),
+  }))
+  .filter((g) => g.countries.length);
 
 const faqJsonLd = {
   '@context': 'https://schema.org',
@@ -120,16 +105,18 @@ const faqJsonLd = {
   <header class="nb-sx" data-surface="dark" data-service-hero>
     <div class="nb-container nb-sx__inner">
       <Breadcrumbs
-        items={[{ label: t('nav.services'), href: lp('/servicios') }, { label: d.title }]}
+        items={[{ label: t('nav.services'), href: lp('/servicios') }, { label: crumbLabel }]}
         tone="dark"
       />
-      <h1 class="nb-sx__title" data-split>
-        {d.title}
-      </h1>
+      {titleVaries ? (
+        <h1 class="nb-sx__title" data-reveal set:html={titleHtml} />
+      ) : (
+        <h1 class="nb-sx__title" data-split>
+          {d.title}
+        </h1>
+      )}
       <div class="nb-sx__foot">
-        <p class="nb-sx__lead" data-reveal>
-          {d.summary}
-        </p>
+        <p class="nb-sx__lead" data-reveal set:html={byCountry((c) => textOf(c).summary)} />
         <div class="nb-sx__actions" data-reveal>
           <Button href={bookingCta.href} on="dark" arrow>
             {bookingCta.label}
@@ -157,204 +144,14 @@ const faqJsonLd = {
     </div>
   </header>
 
-  {showYear && (
-    <section class="nb-yr" aria-labelledby="year-title" data-year>
-      <div class="nb-container">
-        <div class="nb-yr__head">
-          <div class="nb-yr__intro">
-            <p class="nb-yr__eyebrow">{y.label}</p>
-            <h2 id="year-title" class="nb-yr__title" data-split>
-              {y.title}
-            </h2>
-            <p class="nb-yr__lead" data-reveal>
-              {y.lead}
-            </p>
-          </div>
-          <aside class="nb-yr__next" data-yr-next hidden aria-live="polite">
-            <p class="nb-yr__next-label">{y.next}</p>
-            <p class="nb-yr__next-date" data-yr-next-date />
-            <p class="nb-yr__next-left" data-yr-next-left />
-            <p class="nb-yr__next-what" data-yr-next-what />
-            <p class="nb-yr__next-when" data-yr-next-when />
-            <p class="nb-yr__next-need">
-              <span>{y.need}</span>
-              <span data-yr-next-need />
-            </p>
-          </aside>
-        </div>
-
-        <div
-          class="nb-chart"
-          data-yr-ruler
-          data-year={buildYear}
-          data-locale={locale}
-          data-events={JSON.stringify(ruled)}
-          data-remind={y.remind}
-          data-left-today={y.leftToday}
-          data-left-one={y.leftOne}
-          data-left-many={y.leftMany}
-          role="group"
-          aria-label={t('services.detail.year.ruler', { count: items.length })}
-        >
-          <div class="nb-chart__scroll" data-lenis-prevent-horizontal>
-            <div class="nb-chart__frame">
-              <ul class="nb-chart__names" role="list" aria-hidden="true">
-                <li class="nb-chart__year" data-yr-year>
-                  {buildYear}
-                </li>
-                {lanes.map((l) => (
-                  <li class:list={['nb-chart__name', `nb-chart__name--${l.cat}`]}>
-                    <span class="nb-chart__swatch" />
-                    {y.cats[l.cat]}
-                  </li>
-                ))}
-              </ul>
-
-              <div class="nb-chart__plot">
-                <ol class="nb-chart__months" role="list" aria-hidden="true">
-                  {marks.map((mk) => (
-                    <li
-                      class="nb-chart__month"
-                      data-month-label={mk.m}
-                      style={`--at:${pct(mk.at)};--w:${pct(mk.w)}`}
-                    >
-                      <span>{monthShort(mk.m)}</span>
-                    </li>
-                  ))}
-                </ol>
-
-                {lanes.map((l) => (
-                  <div class:list={['nb-chart__lane', `nb-chart__lane--${l.cat}`]}>
-                    {l.items.map((it) => (
-                      <>
-                        {it.extends && (
-                          <span
-                            class="nb-chart__extension"
-                            data-yr-ext={it.id}
-                            data-from={it.extends}
-                            style={`--from:${pct(l.items.find((b) => b.id === it.extends)?.at ?? it.at)};--at:${pct(it.at)}`}
-                            aria-hidden="true"
-                          />
-                        )}
-                        {it.window && (
-                          <span
-                            class="nb-chart__window"
-                            data-yr-span={it.id}
-                            style={`--from:${pct(it.startAt)};--at:${pct(it.at)}`}
-                            aria-hidden="true"
-                          />
-                        )}
-                        {!it.minor && (
-                          <span
-                            class="nb-chart__runway"
-                            data-yr-alert={it.id}
-                            style={`--from:${pct(it.remindAt)};--at:${pct(it.at)}`}
-                            aria-hidden="true"
-                          />
-                        )}
-                        <a
-                          href={`#plazo-${it.id}`}
-                          class:list={[
-                            'nb-chart__flag',
-                            it.window && 'is-window',
-                            it.extends && 'is-extension',
-                            it.minor && 'is-minor',
-                            !it.window && it.at > FLIP_AT && 'is-flip',
-                          ]}
-                          data-yr-dot
-                          data-id={it.id}
-                          style={`--at:${pct(it.window ? it.startAt : it.at)}`}
-                          aria-label={`${it.what}: ${it.window ? it.when : dayMonth(it.due)}`}
-                        >
-                          <span class="nb-chart__stem" aria-hidden="true" />
-                          <span class="nb-chart__pin" aria-hidden="true" />
-                          <span class="nb-chart__tag" aria-hidden="true">
-                            <span class="nb-chart__next">{y.next}</span>
-                            <strong data-yr-flag-date>
-                              {it.window ? it.when : dayShort(it.due)}
-                            </strong>
-                            <span>{it.short}</span>
-                          </span>
-                          <span class="nb-chart__tip" aria-hidden="true">
-                            <span class="nb-chart__tip-what">{it.what}</span>
-                            <span class="nb-chart__tip-need">{it.need}</span>
-                          </span>
-                        </a>
-                      </>
-                    ))}
-                  </div>
-                ))}
-
-                <span class="nb-chart__today" data-yr-today hidden aria-hidden="true">
-                  <span>{y.today}</span>
-                </span>
-              </div>
-            </div>
-          </div>
-
-          <ul class="nb-chart__legend" role="list">
-            <li>
-              <span class="nb-chart__legend-runway" />
-              {y.alert}
-            </li>
-            <li>
-              <span class="nb-chart__legend-minor" />
-              {y.minor}
-            </li>
-            <li>
-              <span class="nb-chart__legend-today" />
-              {y.today}
-            </li>
-            <li>
-              <span class="nb-chart__legend-next" />
-              {y.next}
-            </li>
-          </ul>
-        </div>
-
-        <ol class="nb-yr__list" role="list" data-yr-list>
-          {items.map((it) => (
-            <li
-              class="nb-yr__event"
-              id={`plazo-${it.id}`}
-              data-yr-event={it.id}
-              data-window={it.window ? '' : undefined}
-              data-reveal
-            >
-              <p class="nb-yr__date">
-                <span data-yr-date>{it.window ? it.when : dayMonth(it.due)}</span>
-                {!it.window && (
-                  <span class="nb-yr__weekday" data-yr-weekday>
-                    {fmt(it.due, { weekday: 'long' })}
-                  </span>
-                )}
-              </p>
-              <span class:list={['nb-yr__cat', `nb-yr__cat--${it.cat}`]}>{y.cats[it.cat]}</span>
-              <p class="nb-yr__what">{it.what}</p>
-              <p class="nb-yr__when">{it.window ? y.window : it.when}</p>
-              <p class="nb-yr__shifted" data-yr-shifted hidden={!it.shifted}>
-                {y.shifted}
-              </p>
-              <p class="nb-yr__need">{it.need}</p>
-              <p class="nb-yr__remind" data-yr-remind>
-                {y.remind.replace('{date}', dayMonth(it.remind))}
-              </p>
-            </li>
-          ))}
-        </ol>
-
-        <div class="nb-yr__foot">
-          <p>{y.note}</p>
-          {guide && (
-            <a href={lp(`/recursos/${entryKey(guide)}`)} class="nb-yr__guide">
-              {y.guide}
-              <Arrow size={18} />
-            </a>
-          )}
-        </div>
-      </div>
-    </section>
-  )}
+  {showYear &&
+    yearGroups.map((g) => (
+      <YearCalendar
+        calendar={g.calendar}
+        countries={g.countries}
+        guideHref={g.guide ? lp(`/recursos/${entryKey(g.guide)}`) : undefined}
+      />
+    ))}
 
   <!-- 2 · Qué incluye: un libro mayor, una línea por cosa que hacemos -->
   <section class="nb-scope" aria-labelledby="includes-title">
@@ -365,14 +162,18 @@ const faqJsonLd = {
           {t('services.detail.includes')}
         </h2>
       </div>
-      <ul class="nb-incl" role="list">
-        {d.includes.map((item) => (
-          <li class="nb-incl__row" data-incl-row>
-            <span class="nb-incl__rule" data-incl-rule aria-hidden="true" />
-            <span class="nb-incl__text">{item}</span>
-          </li>
+      <div>
+        {variants.map((v) => (
+          <ul class="nb-incl" role="list" data-cc={ccOf(v.countries)}>
+            {v.text.includes.map((item) => (
+              <li class="nb-incl__row" data-incl-row>
+                <span class="nb-incl__rule" data-incl-rule aria-hidden="true" />
+                <span class="nb-incl__text">{item}</span>
+              </li>
+            ))}
+          </ul>
         ))}
-      </ul>
+      </div>
     </div>
   </section>
 
@@ -387,26 +188,32 @@ const faqJsonLd = {
           {t('services.detail.forWhomLead')}
         </p>
       </div>
-      <ul class="nb-who__list" role="list" data-who>
-        {d.forWhom.map((w) => (
-          <li class="nb-who__item">
-            <svg class="nb-who__mark" viewBox="4 11 40 26" aria-hidden="true">
-              <path d="M4 13H44" />
-              <path d="M10 37V29A14 14 0 0 1 38 29V37" />
-            </svg>
-            <p>{w}</p>
-          </li>
-        ))}
-      </ul>
+      {variants.map((v) => (
+        <ul class="nb-who__list" role="list" data-who data-cc={ccOf(v.countries)}>
+          {v.text.forWhom.map((w) => (
+            <li class="nb-who__item">
+              <svg class="nb-who__mark" viewBox="4 11 40 26" aria-hidden="true">
+                <path d="M4 13H44" />
+                <path d="M10 37V29A14 14 0 0 1 38 29V37" />
+              </svg>
+              <p>{w}</p>
+            </li>
+          ))}
+        </ul>
+      ))}
     </div>
   </section>
 
   <!-- 4 · Proceso: cruzar el puente, un arco por paso -->
-  <ServiceProcess
-    steps={d.process}
-    label={t('services.detail.labelProcess')}
-    title={t('services.detail.process')}
-  />
+  {variants.map((v, i) => (
+    <ServiceProcess
+      steps={v.text.process}
+      label={t('services.detail.labelProcess')}
+      title={t('services.detail.process')}
+      countries={ccOf(v.countries)}
+      uid={String(i)}
+    />
+  ))}
 
   <!-- 5 · Precio: un recibo, con lo que cuesta y lo que se cierra después -->
   <section class="nb-receipt-wrap" aria-labelledby="price-title">
@@ -433,13 +240,13 @@ const faqJsonLd = {
             <path d="M4 13H44" />
             <path d="M10 37V29A14 14 0 0 1 38 29V37" />
           </svg>
-          <span>{d.title}</span>
+          <span set:html={titleHtml} />
         </div>
         <ul class="nb-receipt__rows" role="list">
           {prices.map((p, i) => (
             <li class="nb-receipt__row">
               <div class="nb-receipt__line">
-                {p.label !== d.title && <span class="nb-receipt__label">{p.label}</span>}
+                {p.label !== d.title && <span class="nb-receipt__label" set:html={p.labelHtml} />}
                 <span class="nb-receipt__value">
                   {p.amount ? (
                     <PriceTag amount={p.amount} once={p.once} firstVat={!mentionsVat && i === 0} />
@@ -466,7 +273,13 @@ const faqJsonLd = {
           {t('services.detail.faq')}
         </h2>
       </div>
-      <Accordion items={d.faq} level="h3" openFirst />
+      <div>
+        {variants.map((v) => (
+          <div data-cc={ccOf(v.countries)}>
+            <Accordion items={v.text.faq} level="h3" openFirst />
+          </div>
+        ))}
+      </div>
     </div>
     <script type="application/ld+json" set:html={JSON.stringify(faqJsonLd)} />
   </section>
@@ -484,7 +297,7 @@ const faqJsonLd = {
         </a>
       </div>
       <ul class="nb-rel__list" role="list">
-        {related.map((r) => (
+        {relatedHtml.map(({ entry: r, title, summary }) => (
           <li data-reveal>
             <a href={lp(`/servicios/${entryKey(r)}`)} class="nb-rel__card">
               <span class="nb-rel__media">
@@ -499,8 +312,8 @@ const faqJsonLd = {
                 />
               </span>
               <span class="nb-rel__body">
-                <span class="nb-rel__name">{r.data.title}</span>
-                <span class="nb-rel__summary">{r.data.summary}</span>
+                <span class="nb-rel__name" set:html={title} />
+                <span class="nb-rel__summary" set:html={summary} />
               </span>
               <span class="nb-rel__arrow">
                 <Arrow size={24} />
@@ -514,120 +327,6 @@ const faqJsonLd = {
 
   <CtaBand />
 </BaseLayout>
-
-<script>
-  import { zurichNow, type CivilDate } from '../lib/contact/office';
-  import { daysBetween, yearFraction } from '../lib/fiscal/deadlines';
-  import { monthMarks, nextDeadline, timeline, type RuledEvent } from '../lib/fiscal/timeline';
-
-  // El año fiscal en curso (hora de Zúrich): fechas exactas, hoy y el próximo plazo.
-  // Sin JS queda el año de compilación, también con fechas exactas.
-  const ruler = document.querySelector<HTMLElement>('[data-yr-ruler]');
-  if (ruler) {
-    const ds = ruler.dataset;
-    const events = JSON.parse(ds.events ?? '[]') as RuledEvent[];
-    const tag = ds.locale === 'en' ? 'en-GB' : (ds.locale ?? 'es');
-    const fmt = (d: CivilDate, o: Intl.DateTimeFormatOptions) =>
-      new Intl.DateTimeFormat(tag, { timeZone: 'UTC', ...o }).format(
-        new Date(Date.UTC(d.y, d.m - 1, d.d, 12)),
-      );
-    const dayMonth = (d: CivilDate) => fmt(d, { day: 'numeric', month: 'long' });
-    const pct = (f: number) => `${(f * 100).toFixed(3)}%`;
-    const z = zurichNow(new Date());
-    const today = { y: z.y, m: z.m, d: z.d };
-    const items = timeline(events, today.y);
-    const q = <T extends Element = HTMLElement>(sel: string) => ruler.querySelector<T>(sel);
-
-    // Regla del año en curso.
-    const year = q('[data-yr-year]');
-    if (year) year.textContent = String(today.y);
-    monthMarks(today.y).forEach((mk) => {
-      const label = q(`[data-month-label="${mk.m}"]`);
-      label?.style.setProperty('--at', pct(mk.at));
-      label?.style.setProperty('--w', pct(mk.w));
-      label?.classList.toggle('is-now', mk.m === today.m);
-    });
-    const dayShort = (d: CivilDate) => fmt(d, { day: 'numeric', month: 'short' }).replace('.', '');
-    const list = document.querySelector<HTMLElement>('[data-yr-list]');
-    items.forEach((it) => {
-      const runway = q(`[data-yr-alert="${it.id}"]`);
-      runway?.style.setProperty('--from', pct(it.remindAt));
-      runway?.style.setProperty('--at', pct(it.at));
-      const span = q(`[data-yr-span="${it.id}"]`);
-      span?.style.setProperty('--from', pct(it.startAt));
-      span?.style.setProperty('--at', pct(it.at));
-      const ext = q(`[data-yr-ext="${it.id}"]`);
-      const base = ext && items.find((b) => b.id === ext.dataset.from);
-      if (ext && base) {
-        ext.style.setProperty('--from', pct(base.at));
-        ext.style.setProperty('--at', pct(it.at));
-      }
-      // Bandera: posición, fecha corta, lado de la etiqueta y si ya ha vencido.
-      const flag = q(`[data-yr-dot][data-id="${it.id}"]`);
-      if (flag) {
-        flag.style.setProperty('--at', pct(it.window ? it.startAt : it.at));
-        flag.classList.toggle('is-flip', !it.window && it.at > 0.8);
-        flag.classList.toggle('is-past', daysBetween(today, it.due) < 0);
-        const short = flag.querySelector('[data-yr-flag-date]');
-        if (short && !it.window) short.textContent = dayShort(it.due);
-      }
-      // Lista: fecha, día de la semana, aviso y nota de fin de semana; en orden de vencimiento.
-      const row = list?.querySelector<HTMLElement>(`[data-yr-event="${it.id}"]`);
-      if (!row) return;
-      if (!('window' in row.dataset)) {
-        const date = row.querySelector('[data-yr-date]');
-        const weekday = row.querySelector('[data-yr-weekday]');
-        if (date) date.textContent = dayMonth(it.due);
-        if (weekday) weekday.textContent = fmt(it.due, { weekday: 'long' });
-      }
-      const shifted = row.querySelector<HTMLElement>('[data-yr-shifted]');
-      if (shifted) shifted.hidden = !it.shifted;
-      const remind = row.querySelector('[data-yr-remind]');
-      if (remind) remind.textContent = (ds.remind ?? '').replace('{date}', dayMonth(it.remind));
-      list?.append(row);
-    });
-
-    // Hoy.
-    const mark = q('[data-yr-today]');
-    if (mark) {
-      mark.style.setProperty('--at', pct(yearFraction(today)));
-      mark.hidden = false;
-    }
-
-    // Próximo plazo (puede ser del año siguiente) y los días que quedan.
-    const next = nextDeadline(events, today);
-    const panel = document.querySelector<HTMLElement>('[data-yr-next]');
-    const source = next && list?.querySelector<HTMLElement>(`[data-yr-event="${next.id}"]`);
-    if (next && panel && source) {
-      const text = (sel: string) => source.querySelector(sel)?.textContent?.trim() ?? '';
-      const set = (sel: string, value: string) => {
-        const el = panel.querySelector(sel);
-        if (el) el.textContent = value;
-      };
-      const left =
-        next.daysLeft === 0
-          ? ds.leftToday
-          : next.daysLeft === 1
-            ? ds.leftOne
-            : (ds.leftMany ?? '').replace('{n}', String(next.daysLeft));
-      set(
-        '[data-yr-next-date]',
-        next.year === today.y
-          ? dayMonth(next.due)
-          : fmt(next.due, { day: 'numeric', month: 'long', year: 'numeric' }),
-      );
-      set('[data-yr-next-left]', `${left ?? ''} / ${fmt(next.due, { weekday: 'long' })}`);
-      set('[data-yr-next-what]', text('.nb-yr__what'));
-      set('[data-yr-next-when]', text('.nb-yr__when'));
-      set('[data-yr-next-need]', text('.nb-yr__need'));
-      panel.hidden = false;
-      source.classList.add('is-next');
-      if (next.year === today.y) q(`[data-yr-dot][data-id="${next.id}"]`)?.classList.add('is-next');
-      // La ficha cambia la altura de la página: las escenas de scroll vuelven a medir.
-      window.dispatchEvent(new Event('resize'));
-    }
-  }
-</script>
 
 <style is:global>
   /* ── 1 · Cabecera ── */
@@ -714,713 +413,6 @@ const faqJsonLd = {
     width: 100%;
     height: 100%;
     object-fit: cover;
-  }
-
-  /* ── IVA · El año fiscal ── */
-  .nb-yr {
-    padding-block: var(--section-y);
-    background: var(--white);
-  }
-  .nb-yr__head {
-    display: grid;
-    gap: 40px;
-    align-items: end;
-  }
-  @media (min-width: 1024px) {
-    .nb-yr__head {
-      grid-template-columns: minmax(0, 1.3fr) minmax(0, 1fr);
-      gap: clamp(48px, 6vw, 112px);
-    }
-  }
-  .nb-yr__intro {
-    display: grid;
-    gap: 20px;
-  }
-  .nb-yr__eyebrow,
-  .nb-scope__eyebrow {
-    margin: 0;
-    font-size: 0.8125rem;
-    font-weight: 600;
-    letter-spacing: 0.16em;
-    text-transform: uppercase;
-    color: var(--salvia-600);
-  }
-  .nb-yr__title {
-    margin: 0;
-    max-width: 14ch;
-    font-family: var(--font-display);
-    font-size: clamp(2.5rem, 1rem + 4vw, 5.25rem);
-    font-weight: 300;
-    line-height: 0.98;
-    letter-spacing: -0.03em;
-    color: var(--navy-800);
-  }
-  .nb-yr__lead {
-    margin: 0;
-    max-width: 34rem;
-    font-size: 1.125rem;
-    line-height: 1.6;
-    color: var(--piedra-800);
-  }
-  /* Próximo plazo: ficha navy, la única pieza oscura de la sección. */
-  .nb-yr__next {
-    display: grid;
-    gap: 8px;
-    padding: clamp(24px, 3vw, 36px);
-    border-radius: var(--radius-card, 8px);
-    background: var(--navy-800);
-    color: var(--navy-100);
-  }
-  .nb-yr__next[hidden] {
-    display: none;
-  }
-  .nb-yr__next p {
-    margin: 0;
-  }
-  .nb-yr__next-label {
-    font-size: 0.75rem;
-    font-weight: 600;
-    letter-spacing: 0.16em;
-    text-transform: uppercase;
-    color: var(--salvia-300);
-  }
-  .nb-yr__next-date {
-    font-family: var(--font-display);
-    font-size: clamp(2.25rem, 1.4rem + 1.8vw, 3.25rem);
-    font-weight: 300;
-    font-style: italic;
-    line-height: 1.05;
-    color: var(--white);
-  }
-  .nb-yr__next-left {
-    margin-bottom: 6px !important;
-    font-size: 0.9375rem;
-    font-weight: 600;
-    color: var(--salvia-300);
-  }
-  .nb-yr__next-what {
-    font-size: 1.0625rem;
-    font-weight: 600;
-    line-height: 1.4;
-    color: var(--white);
-  }
-  .nb-yr__next-when {
-    font-size: 0.9375rem;
-  }
-  .nb-yr__next-need {
-    display: grid;
-    gap: 2px;
-    margin-top: 8px !important;
-    padding-top: 14px;
-    border-top: 1px solid var(--navy-600);
-    font-size: 0.9375rem;
-  }
-  .nb-yr__next-need span:first-child {
-    font-size: 0.6875rem;
-    font-weight: 600;
-    letter-spacing: 0.14em;
-    text-transform: uppercase;
-    color: var(--navy-200);
-  }
-
-  /* ── El gráfico del año: tres carriles (IVA, impuestos, nóminas) sobre los doce meses ── */
-  .nb-chart {
-    --lane: 84px;
-    --names: 132px;
-    --head: 44px;
-    margin-top: clamp(48px, 7vw, 88px);
-  }
-  /* En pantallas estrechas el año se desliza dentro de su marco (la página no). */
-  .nb-chart__scroll {
-    overflow-x: auto;
-    overscroll-behavior-x: contain;
-    scrollbar-width: thin;
-  }
-  .nb-chart__frame {
-    display: grid;
-    grid-template-columns: var(--names) minmax(0, 1fr);
-    min-width: 960px;
-    border-top: 1.5px solid var(--navy-800);
-    border-bottom: 1.5px solid var(--navy-800);
-  }
-  .nb-chart__names {
-    display: grid;
-    grid-template-rows: var(--head) repeat(4, var(--lane));
-    margin: 0;
-    padding: 0;
-    list-style: none;
-  }
-  .nb-chart__year {
-    align-self: center;
-    font-size: 0.75rem;
-    font-weight: 600;
-    letter-spacing: 0.16em;
-    font-variant-numeric: tabular-nums;
-    color: var(--piedra-600);
-  }
-  .nb-chart__name {
-    display: flex;
-    align-items: center;
-    gap: 10px;
-    border-top: 1px solid var(--piedra-200);
-    font-size: 0.8125rem;
-    font-weight: 600;
-    letter-spacing: 0.12em;
-    text-transform: uppercase;
-    color: var(--navy-800);
-  }
-  .nb-chart__swatch {
-    width: 12px;
-    height: 12px;
-    border: 2px solid var(--navy-800);
-    border-radius: 9999px;
-    background: var(--navy-800);
-  }
-  .nb-chart__name--tax .nb-chart__swatch {
-    background: var(--white);
-  }
-  .nb-chart__name--pay .nb-chart__swatch {
-    border-radius: 2px;
-  }
-  .nb-chart__name--payroll .nb-chart__swatch {
-    border-color: var(--piedra-500);
-    background: var(--piedra-300);
-  }
-
-  .nb-chart__plot {
-    position: relative;
-    display: grid;
-    grid-template-rows: var(--head) repeat(4, var(--lane));
-  }
-  /* Meses: bandas alternas a toda altura, el actual marcado. */
-  .nb-chart__months {
-    position: absolute;
-    inset: 0;
-    margin: 0;
-    padding: 0;
-    list-style: none;
-  }
-  .nb-chart__month {
-    position: absolute;
-    top: 0;
-    bottom: 0;
-    left: var(--at);
-    width: var(--w);
-    border-left: 1px solid var(--piedra-200);
-  }
-  .nb-chart__month:nth-child(even) {
-    background: var(--piedra-50);
-  }
-  .nb-chart__month span {
-    display: block;
-    padding: 14px 0 0 10px;
-    font-size: 0.8125rem;
-    font-weight: 600;
-    text-transform: capitalize;
-    color: var(--piedra-600);
-  }
-  .nb-chart__month.is-now span {
-    color: var(--navy-800);
-  }
-  .nb-chart__lane {
-    position: relative;
-    border-top: 1px solid var(--piedra-200);
-  }
-  .nb-chart__lane--vat {
-    grid-row: 2;
-  }
-  .nb-chart__lane--tax {
-    grid-row: 3;
-  }
-  .nb-chart__lane--pay {
-    grid-row: 4;
-  }
-  .nb-chart__lane--payroll {
-    grid-row: 5;
-  }
-  /* Carril: la línea base del año a 26 px del fondo. */
-  .nb-chart__lane::after {
-    content: '';
-    position: absolute;
-    inset: auto 0 26px;
-    height: 1px;
-    background: var(--piedra-300);
-  }
-
-  /* Pista de aviso: los 10 días antes del plazo, en salvia sobre la línea base. */
-  .nb-chart__runway {
-    position: absolute;
-    z-index: 1;
-    bottom: 25px;
-    left: var(--from);
-    width: calc(var(--at) - var(--from));
-    height: 2px;
-    background: var(--salvia-400);
-    transform-origin: right center;
-  }
-  /* Ventana sin fecha legal (certificados): una banda de enero a febrero. */
-  .nb-chart__window {
-    position: absolute;
-    z-index: 1;
-    bottom: 20px;
-    left: var(--from);
-    width: calc(var(--at) - var(--from));
-    height: 13px;
-    border: 1px solid var(--piedra-400);
-    border-radius: 2px;
-    background: var(--piedra-100);
-  }
-
-  /* Bandera: mástil, punto en su fecha y etiqueta con la fecha corta y el nombre. */
-  .nb-chart__flag {
-    position: absolute;
-    z-index: 2;
-    bottom: 26px;
-    left: var(--at);
-    display: block;
-    width: 0;
-    height: calc(var(--lane) - 34px);
-    color: var(--navy-800);
-    text-decoration: none;
-  }
-  .nb-chart__stem {
-    position: absolute;
-    bottom: 0;
-    left: -0.5px;
-    width: 1px;
-    height: 100%;
-    background: var(--navy-800);
-  }
-  .nb-chart__pin {
-    position: absolute;
-    bottom: -7px;
-    left: -7px;
-    width: 14px;
-    height: 14px;
-    border: 2px solid var(--navy-800);
-    border-radius: 9999px;
-    background: var(--navy-800);
-    transition: transform var(--dur-fast) var(--ease-out);
-  }
-  .nb-chart__lane--tax .nb-chart__pin {
-    background: var(--white);
-  }
-  .nb-chart__lane--payroll .nb-chart__pin {
-    border-color: var(--piedra-500);
-    background: var(--piedra-300);
-  }
-  .nb-chart__lane--payroll .nb-chart__stem {
-    background: var(--piedra-500);
-  }
-  .nb-chart__tag {
-    position: absolute;
-    top: 0;
-    left: 8px;
-    display: grid;
-    gap: 1px;
-    padding-left: 2px;
-    white-space: nowrap;
-    line-height: 1.2;
-  }
-  .nb-chart__flag.is-flip .nb-chart__tag {
-    right: 8px;
-    left: auto;
-    justify-items: end;
-    padding: 0 2px 0 0;
-    text-align: right;
-  }
-  .nb-chart__tag strong {
-    font-family: var(--font-display);
-    font-size: 1.125rem;
-    font-weight: 400;
-    color: var(--navy-800);
-  }
-  .nb-chart__tag > span:last-child {
-    font-size: 0.75rem;
-    font-weight: 600;
-    color: var(--piedra-700);
-  }
-  .nb-chart__next {
-    display: none;
-    justify-self: start;
-    margin-bottom: 2px;
-    padding: 1px 6px;
-    border-radius: 2px;
-    background: var(--navy-800);
-    font-size: 0.625rem;
-    font-weight: 600;
-    letter-spacing: 0.12em;
-    text-transform: uppercase;
-    color: var(--white);
-  }
-  .nb-chart__flag.is-flip .nb-chart__next {
-    justify-self: end;
-  }
-  /* Ya vencido: en piedra (legible, pero en segundo plano). */
-  .nb-chart__flag.is-past .nb-chart__stem {
-    background: var(--piedra-300);
-  }
-  .nb-chart__flag.is-past .nb-chart__pin {
-    border-color: var(--piedra-400);
-    background: var(--piedra-200);
-  }
-  .nb-chart__flag.is-past .nb-chart__tag strong,
-  .nb-chart__flag.is-past .nb-chart__tag > span:last-child {
-    color: var(--piedra-600);
-  }
-  /* Próximo: anillo salvia y etiqueta «Próximo plazo». */
-  .nb-chart__flag.is-next .nb-chart__pin {
-    box-shadow:
-      0 0 0 3px var(--white),
-      0 0 0 5px var(--salvia-500);
-  }
-  .nb-chart__flag.is-next .nb-chart__next {
-    display: block;
-  }
-  /* Pagos: punto cuadrado, para distinguirlos de las declaraciones. */
-  .nb-chart__lane--pay .nb-chart__pin {
-    border-radius: 2px;
-  }
-  /* Cuota recurrente: marca pequeña en la línea, sin mástil ni etiqueta (ficha al pasar). */
-  .nb-chart__flag.is-minor {
-    height: 0;
-  }
-  .nb-chart__flag.is-minor :is(.nb-chart__stem, .nb-chart__tag) {
-    display: none;
-  }
-  .nb-chart__flag.is-minor .nb-chart__pin {
-    bottom: -5px;
-    left: -5px;
-    width: 10px;
-    height: 10px;
-    border: 0;
-    border-radius: 0;
-    background: var(--piedra-500);
-    transform: rotate(45deg);
-  }
-  .nb-chart__flag.is-minor:hover .nb-chart__pin,
-  .nb-chart__flag.is-minor:focus-visible .nb-chart__pin {
-    transform: rotate(45deg) scale(1.3);
-  }
-  .nb-chart__flag.is-minor .nb-chart__tip {
-    bottom: calc(100% + 16px);
-  }
-  .nb-chart__legend-minor {
-    width: 9px;
-    height: 9px;
-    background: var(--piedra-500);
-    transform: rotate(45deg);
-  }
-  /* Prórroga: continuación discontinua del plazo base; su nombre va debajo, a la izquierda. */
-  .nb-chart__extension {
-    position: absolute;
-    z-index: 1;
-    bottom: 26px;
-    left: var(--from);
-    width: calc(var(--at) - var(--from));
-    border-top: 2px dashed var(--navy-400);
-  }
-  .nb-chart__flag.is-extension {
-    height: 0;
-  }
-  .nb-chart__flag.is-extension .nb-chart__stem {
-    display: none;
-  }
-  .nb-chart__flag.is-extension .nb-chart__pin {
-    bottom: -6px;
-    left: -6px;
-    width: 12px;
-    height: 12px;
-  }
-  .nb-chart__flag.is-extension .nb-chart__tag {
-    top: 12px;
-    display: flex;
-    gap: 8px;
-    align-items: baseline;
-  }
-  .nb-chart__flag.is-extension .nb-chart__tag strong {
-    font-family: inherit;
-    font-size: 0.75rem;
-    font-weight: 600;
-  }
-  .nb-chart__flag.is-extension .nb-chart__tip {
-    bottom: calc(100% + 24px);
-  }
-  /* Ventana: sin mástil ni punto; su nombre va debajo de la banda, desde enero. */
-  .nb-chart__flag.is-window {
-    height: 0;
-  }
-  .nb-chart__flag.is-window :is(.nb-chart__stem, .nb-chart__pin) {
-    display: none;
-  }
-  .nb-chart__flag.is-window .nb-chart__tag {
-    top: 12px;
-    left: 0;
-    display: flex;
-    gap: 8px;
-    align-items: baseline;
-  }
-  .nb-chart__flag.is-window .nb-chart__tag strong {
-    font-family: inherit;
-    font-size: 0.75rem;
-    font-weight: 600;
-    color: var(--piedra-700);
-  }
-  .nb-chart__flag.is-window .nb-chart__tip {
-    bottom: calc(100% + 24px);
-    left: 0;
-  }
-  /* Ficha al pasar o con el teclado: qué es y qué necesitamos. */
-  .nb-chart__tip {
-    position: absolute;
-    bottom: calc(100% + 12px);
-    left: -24px;
-    z-index: 3;
-    display: grid;
-    gap: 6px;
-    width: 280px;
-    padding: 14px 16px;
-    border-radius: var(--radius-button, 4px);
-    background: var(--navy-800);
-    color: var(--navy-100);
-    font-size: 0.8125rem;
-    line-height: 1.45;
-    white-space: normal;
-    opacity: 0;
-    pointer-events: none;
-    transform: translateY(6px);
-    transition:
-      opacity var(--dur-fast) var(--ease-out),
-      transform var(--dur-fast) var(--ease-out);
-  }
-  .nb-chart__flag.is-flip .nb-chart__tip {
-    right: -24px;
-    left: auto;
-  }
-  .nb-chart__tip-what {
-    font-weight: 600;
-    color: var(--white);
-  }
-  .nb-chart__flag:hover,
-  .nb-chart__flag:focus-visible {
-    z-index: 4;
-  }
-  .nb-chart__flag:hover .nb-chart__tip,
-  .nb-chart__flag:focus-visible .nb-chart__tip {
-    opacity: 1;
-    transform: none;
-  }
-  .nb-chart__flag:hover .nb-chart__pin,
-  .nb-chart__flag:focus-visible .nb-chart__pin {
-    transform: scale(1.25);
-  }
-  .nb-chart__flag:focus-visible {
-    outline: none;
-  }
-  .nb-chart__flag:focus-visible .nb-chart__pin {
-    outline: 2px solid var(--navy-600);
-    outline-offset: 3px;
-  }
-
-  /* Hoy: una línea que cruza los tres carriles. */
-  .nb-chart__today {
-    position: absolute;
-    z-index: 1;
-    top: 0;
-    bottom: 0;
-    left: var(--at);
-    width: 2px;
-    margin-left: -1px;
-    background: var(--salvia-600);
-    pointer-events: none;
-  }
-  .nb-chart__today[hidden] {
-    display: none;
-  }
-  .nb-chart__today span {
-    position: absolute;
-    top: 10px;
-    left: 0;
-    padding: 2px 8px;
-    border-radius: 2px;
-    background: var(--salvia-700);
-    font-size: 0.6875rem;
-    font-weight: 600;
-    letter-spacing: 0.14em;
-    text-transform: uppercase;
-    color: var(--white);
-    transform: translateX(-50%);
-  }
-
-  .nb-chart__legend {
-    display: flex;
-    flex-wrap: wrap;
-    gap: 12px 28px;
-    margin: 16px 0 0;
-    padding: 0;
-    list-style: none;
-    font-size: 0.875rem;
-    color: var(--piedra-700);
-  }
-  .nb-chart__legend li {
-    display: inline-flex;
-    align-items: center;
-    gap: 10px;
-  }
-  .nb-chart__legend-runway {
-    width: 22px;
-    height: 3px;
-    background: var(--salvia-500);
-  }
-  .nb-chart__legend-today {
-    width: 2px;
-    height: 16px;
-    background: var(--salvia-600);
-  }
-  .nb-chart__legend-next {
-    width: 12px;
-    height: 12px;
-    border-radius: 9999px;
-    background: var(--navy-800);
-    box-shadow:
-      0 0 0 2px var(--white),
-      0 0 0 4px var(--salvia-500);
-  }
-
-  /* Lista por fecha: el contenido accesible de la regla, en orden de vencimiento. */
-  .nb-yr__list {
-    display: grid;
-    gap: 0 clamp(24px, 4vw, 64px);
-    margin: clamp(48px, 6vw, 80px) 0 0;
-    padding: 0;
-    list-style: none;
-  }
-  @media (min-width: 768px) {
-    .nb-yr__list {
-      grid-template-columns: repeat(2, minmax(0, 1fr));
-    }
-  }
-  @media (min-width: 1200px) {
-    .nb-yr__list {
-      grid-template-columns: repeat(3, minmax(0, 1fr));
-    }
-  }
-  .nb-yr__event {
-    display: grid;
-    align-content: start;
-    gap: 8px;
-    padding-block: 28px;
-    border-top: 1px solid var(--piedra-300);
-    scroll-margin-top: calc(var(--header-h) + 24px);
-  }
-  .nb-yr__event p {
-    margin: 0;
-  }
-  .nb-yr__date {
-    display: grid;
-    gap: 4px;
-    margin-bottom: 6px !important;
-  }
-  .nb-yr__date [data-yr-date] {
-    font-family: var(--font-display);
-    font-size: clamp(1.75rem, 1.3rem + 1vw, 2.25rem);
-    font-weight: 300;
-    line-height: 1.05;
-    color: var(--navy-800);
-  }
-  .nb-yr__weekday {
-    font-size: 0.8125rem;
-    color: var(--piedra-600);
-  }
-  .nb-yr__shifted {
-    font-size: 0.875rem;
-    font-style: italic;
-    color: var(--navy-600);
-  }
-  .nb-yr__remind {
-    display: flex;
-    align-items: center;
-    gap: 10px;
-    margin-top: 4px !important;
-    font-size: 0.875rem;
-    font-weight: 600;
-    color: var(--salvia-700);
-  }
-  .nb-yr__remind::before {
-    content: '';
-    flex: none;
-    width: 2px;
-    height: 12px;
-    background: var(--salvia-500);
-  }
-  .nb-yr__cat {
-    justify-self: start;
-    padding: 3px 8px;
-    border: 1px solid var(--navy-800);
-    border-radius: 2px;
-    font-size: 0.6875rem;
-    font-weight: 600;
-    letter-spacing: 0.12em;
-    text-transform: uppercase;
-    color: var(--navy-800);
-  }
-  .nb-yr__cat--vat {
-    background: var(--navy-800);
-    color: var(--white);
-  }
-  .nb-yr__cat--payroll {
-    border-color: var(--piedra-400);
-    background: var(--piedra-100);
-    color: var(--piedra-800);
-  }
-  .nb-yr__what {
-    font-size: 1.0625rem;
-    font-weight: 600;
-    line-height: 1.4;
-    color: var(--navy-800);
-  }
-  .nb-yr__when {
-    font-size: 0.9375rem;
-    color: var(--navy-600);
-  }
-  .nb-yr__need {
-    font-size: 0.9375rem;
-    line-height: 1.5;
-    color: var(--piedra-700);
-  }
-  .nb-yr__event.is-next [data-yr-date]::after {
-    content: '';
-    display: inline-block;
-    width: 8px;
-    height: 8px;
-    margin-left: 10px;
-    border-radius: 9999px;
-    background: var(--salvia-500);
-    vertical-align: middle;
-  }
-  .nb-yr__foot {
-    display: flex;
-    flex-wrap: wrap;
-    justify-content: space-between;
-    gap: 12px 32px;
-    padding-top: 24px;
-    border-top: 1px solid var(--piedra-300);
-    font-size: 0.875rem;
-    color: var(--piedra-600);
-  }
-  .nb-yr__foot p {
-    margin: 0;
-  }
-  .nb-yr__guide {
-    display: inline-flex;
-    align-items: center;
-    gap: 8px;
-    font-weight: 600;
-    color: var(--navy-800);
-    text-decoration: none;
-  }
-  .nb-yr__guide:hover {
-    color: var(--salvia-600);
   }
 
   /* ── 2 · Qué incluye ── */
