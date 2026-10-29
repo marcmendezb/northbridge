@@ -16,6 +16,7 @@ import {
 } from '../../data/fiscal-calendar';
 import { zurichNow, type CivilDate } from '../../lib/contact/office';
 import { HOLIDAYS } from '../../lib/fiscal/deadlines';
+import { vatFor } from '../../lib/vat';
 import { monthMarks, timeline } from '../../lib/fiscal/timeline';
 
 interface Props {
@@ -27,6 +28,10 @@ const { calendar, countries, guideHref } = Astro.props;
 const cal = calendar.toLowerCase();
 const { t, tRaw, locale } = useI18n(Astro.currentLocale);
 const y = tRaw<Messages['services']['detail']['year']>('services.detail.year');
+/** Nombres de los carriles con el nombre del IVA del país («MwSt.» fuera de Suiza, en alemán). */
+const cats = Object.fromEntries(
+  Object.entries(y.cats).map(([k, v]) => [k, vatFor(v, calendar, locale)]),
+) as typeof y.cats;
 const note = CALENDAR_NOTES[calendar][locale];
 
 type Cat = 'vat' | 'tax' | 'pay' | 'payroll';
@@ -144,7 +149,7 @@ const pct = (f: number) => `${(f * 100).toFixed(3)}%`;
             {lanes.map((l) => (
               <li class:list={['nb-chart__name', `nb-chart__name--${l.cat}`]}>
                 <span class="nb-chart__swatch" />
-                {y.cats[l.cat]}
+                {cats[l.cat]}
               </li>
             ))}
           </ul>
@@ -269,7 +274,7 @@ const pct = (f: number) => `${(f * 100).toFixed(3)}%`;
               </span>
             )}
           </p>
-          <span class:list={['nb-yr__cat', `nb-yr__cat--${it.cat}`]}>{y.cats[it.cat]}</span>
+          <span class:list={['nb-yr__cat', `nb-yr__cat--${it.cat}`]}>{cats[it.cat]}</span>
           <p class="nb-yr__what">{it.what}</p>
           <p class="nb-yr__when">{it.window ? y.window : it.when}</p>
           <p class="nb-yr__shifted" data-yr-shifted hidden={!it.shifted}>
@@ -286,7 +291,7 @@ const pct = (f: number) => `${(f * 100).toFixed(3)}%`;
           <p class="nb-yr__date">
             <span>{e.when}</span>
           </p>
-          <span class:list={['nb-yr__cat', `nb-yr__cat--${e.cat}`]}>{y.cats[e.cat]}</span>
+          <span class:list={['nb-yr__cat', `nb-yr__cat--${e.cat}`]}>{cats[e.cat]}</span>
           <p class="nb-yr__what">{e.what}</p>
           <p class="nb-yr__need">{e.need}</p>
         </li>

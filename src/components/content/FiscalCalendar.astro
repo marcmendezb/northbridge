@@ -13,7 +13,10 @@ interface Props {
 }
 const { when, what, need, caption, country = 'CH' } = Astro.props;
 const { locale } = useI18n(Astro.currentLocale);
-const rows = [...(FISCAL_CALENDARS[country] ?? [])].sort((a, b) => a.month - b.month);
+/** Por mes; los plazos de cada mes (cotizaciones), al final. */
+const rows = [...(FISCAL_CALENDARS[country] ?? [])].sort(
+  (a, b) => Number(Boolean(a.recurring)) - Number(Boolean(b.recurring)) || a.month - b.month,
+);
 ---
 
 <div class="nb-table">

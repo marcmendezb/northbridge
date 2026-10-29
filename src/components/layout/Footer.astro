@@ -35,6 +35,8 @@ const columns: { id: string; title: string; links: FooterLink[] }[] = [
   },
   { id: 'company', title: t('footer.company'), links: companyLinks },
 ];
+import { vatFor } from '../../lib/vat';
+import { byCountry } from '../../lib/country';
 ---
 
 <footer class="nb-footer">
@@ -65,7 +67,7 @@ const columns: { id: string; title: string; links: FooterLink[] }[] = [
               {c.links.map((l) => (
                 <li data-cc={l.cc}>
                   <a class="nb-footer__link" href={l.href}>
-                    {l.label}
+                    <Fragment set:html={byCountry((c) => vatFor(l.label, c, locale))} />
                   </a>
                 </li>
               ))}
@@ -99,7 +101,7 @@ const columns: { id: string; title: string; links: FooterLink[] }[] = [
           {legalLinks.map((l) => (
             <li>
               <a class="nb-footer__link" href={l.href}>
-                {l.label}
+                <Fragment set:html={byCountry((c) => vatFor(l.label, c, locale))} />
               </a>
             </li>
           ))}

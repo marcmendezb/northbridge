@@ -40,6 +40,7 @@ interface Props {
 const { minimal = false } = Astro.props;
 const path = Astro.url.pathname.replace(/\/$/, '') || '/';
 const isCurrent = (href: string) => path === href || (href !== '/' && path.startsWith(`${href}/`));
+import { vatFor } from '../../lib/vat';
 ---
 
 <header class="nb-header" data-minimal={minimal ? '' : undefined}>
@@ -83,7 +84,7 @@ const isCurrent = (href: string) => path === href || (href !== '/' && path.start
                         class="nb-nav__link nb-nav__nojs"
                         aria-current={isCurrent(l.href) ? 'page' : undefined}
                       >
-                        {l.label}
+                        <Fragment set:html={byCountry((c) => vatFor(l.label, c, locale))} />
                       </a>
                       <button
                         type="button"
@@ -93,7 +94,7 @@ const isCurrent = (href: string) => path === href || (href !== '/' && path.start
                         aria-current={isCurrent(l.href) ? 'page' : undefined}
                         data-mega-trigger
                       >
-                        {l.label}
+                        <Fragment set:html={byCountry((c) => vatFor(l.label, c, locale))} />
                         <svg
                           class="nb-nav__chev"
                           viewBox="0 0 16 16"
@@ -114,7 +115,7 @@ const isCurrent = (href: string) => path === href || (href !== '/' && path.start
                       class="nb-nav__link"
                       aria-current={isCurrent(l.href) ? 'page' : undefined}
                     >
-                      {l.label}
+                      <Fragment set:html={byCountry((c) => vatFor(l.label, c, locale))} />
                     </a>
                   )}
                 </li>
@@ -217,7 +218,9 @@ const isCurrent = (href: string) => path === href || (href !== '/' && path.start
                   <li>
                     <a href={l.href} class="nb-mega__link">
                       <Icon name={l.icon} size={22} />
-                      <span>{l.label}</span>
+                      <span>
+                        <Fragment set:html={byCountry((c) => vatFor(l.label, c, locale))} />
+                      </span>
                     </a>
                   </li>
                 ))}
@@ -356,7 +359,7 @@ const isCurrent = (href: string) => path === href || (href !== '/' && path.start
                   class="nb-mobile__link"
                   aria-current={isCurrent(l.href) ? 'page' : undefined}
                 >
-                  {l.label}
+                  <Fragment set:html={byCountry((c) => vatFor(l.label, c, locale))} />
                 </a>
               </li>
             ))}

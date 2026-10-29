@@ -27,14 +27,14 @@ const vat = (
     ? T(
         `IVA del ${quarter.es} (modelo 303) y resumen anual (modelo 390)`,
         `VAT for ${quarter.en} (form 303) and annual summary (form 390)`,
-        `MWST ${quarter.de} (Modell 303) und Jahreszusammenfassung (Modell 390)`,
+        `MwSt. ${quarter.de} (Modell 303) und Jahreszusammenfassung (Modell 390)`,
         `TVA du ${quarter.fr} (modèle 303) et récapitulatif annuel (modèle 390)`,
         `IVA del ${quarter.it} (modello 303) e riepilogo annuale (modello 390)`,
       )
     : T(
         `IVA del ${quarter.es} (modelo 303)`,
         `VAT for ${quarter.en} (form 303)`,
-        `MWST ${quarter.de} (Modell 303)`,
+        `MwSt. ${quarter.de} (Modell 303)`,
         `TVA du ${quarter.fr} (modèle 303)`,
         `IVA del ${quarter.it} (modello 303)`,
       ),

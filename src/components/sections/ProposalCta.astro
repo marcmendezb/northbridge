@@ -69,7 +69,7 @@ const rows = [
           {rows.map((r) => (
             <div class="nb-doc__row" data-doc-row>
               <dt>{r.label}</dt>
-              <dd>{r.value}</dd>
+              <dd set:html={byCountry((c) => vatFor(r.value, c, locale))} />
               <span class="nb-doc__rule" aria-hidden="true" data-doc-rule></span>
             </div>
           ))}

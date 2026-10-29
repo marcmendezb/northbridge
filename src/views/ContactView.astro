@@ -11,6 +11,7 @@ import { getTeam } from '../lib/content';
 import { getBookingCta, site } from '../lib/site';
 import { byCountry, COUNTRIES } from '../lib/country';
 import { OFFICES } from '../data/offices';
+import { vatFor } from '../lib/vat';
 
 const { t, tRaw, lp, locale } = useI18n(Astro.currentLocale);
 const bookingCta = getBookingCta(locale);
@@ -158,9 +159,9 @@ const arch = 'M10 37V29A14 14 0 0 1 38 29V37';
           </div>
         </div>
         <p class="nb-reader__text" data-reveal>
-          {readerBefore}
+          <Fragment set:html={byCountry((cc) => vatFor(readerBefore ?? '', cc, locale))} />
           <strong>{readerName}</strong>
-          {readerAfter}
+          <Fragment set:html={byCountry((cc) => vatFor(readerAfter ?? '', cc, locale))} />
         </p>
         <ol class="nb-steps" role="list" data-steps>
           <span class="nb-steps__line" aria-hidden="true">

@@ -71,6 +71,25 @@ const segments: Record<string, Partial<Record<Locale, string>>> = {
     fr: '5-erreurs-comptables-des-startups',
     it: '5-errori-contabili-delle-startup',
   },
+  // Guías de España
+  'como-constituir-una-sl-en-espana': {
+    en: 'how-to-set-up-an-sl-in-spain',
+    de: 'sl-in-spanien-gruenden',
+    fr: 'creer-une-sl-en-espagne',
+    it: 'come-costituire-una-sl-in-spagna',
+  },
+  'calendario-fiscal-para-pymes-en-espana': {
+    en: 'tax-calendar-for-smes-in-spain',
+    de: 'steuerkalender-fuer-kmu-in-spanien',
+    fr: 'calendrier-fiscal-pour-pme-en-espagne',
+    it: 'calendario-fiscale-per-pmi-in-spagna',
+  },
+  '5-errores-contables-de-las-startups-en-espana': {
+    en: '5-accounting-mistakes-startups-make-in-spain',
+    de: '5-buchhaltungsfehler-von-startups-in-spanien',
+    fr: '5-erreurs-comptables-des-startups-en-espagne',
+    it: '5-errori-contabili-delle-startup-in-spagna',
+  },
 };
 
 const forward = (segment: string, locale: Locale) =>
