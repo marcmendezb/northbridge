@@ -70,10 +70,30 @@ export function spainNationalHolidays(y: number): Set<string> {
   );
 }
 
+/** Festivos legales en Berlín (los nueve federales y el 8 de marzo); la oficina alemana está allí. */
+export function berlinHolidays(y: number): Set<string> {
+  const easter = easterSunday(y);
+  return new Set(
+    [
+      { y, m: 1, d: 1 },
+      { y, m: 3, d: 8 }, // Internationaler Frauentag (Berlín)
+      addDays(easter, -2),
+      addDays(easter, 1),
+      { y, m: 5, d: 1 },
+      addDays(easter, 39),
+      addDays(easter, 50),
+      { y, m: 10, d: 3 },
+      { y, m: 12, d: 25 },
+      { y, m: 12, d: 26 },
+    ].map(key),
+  );
+}
+
 export type HolidayCalendar = (y: number) => Set<string>;
-export const HOLIDAYS: Record<'CH' | 'ES', HolidayCalendar> = {
+export const HOLIDAYS: Record<'CH' | 'ES' | 'DE', HolidayCalendar> = {
   CH: zurichLegalHolidays,
   ES: spainNationalHolidays,
+  DE: berlinHolidays,
 };
 
 export function isLegalWorkday(date: CivilDate, holidays: HolidayCalendar = zurichLegalHolidays) {

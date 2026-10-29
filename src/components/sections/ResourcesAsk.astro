@@ -13,10 +13,24 @@ import nora from '../../assets/img/about/team/nora-steiner.jpeg';
 import marc from '../../assets/img/about/team/marc-bernasconi.jpeg';
 import { useI18n } from '../../i18n';
 import { getBookingCta } from '../../lib/site';
+import { byCountry, COUNTRIES, type Country } from '../../lib/country';
+import { vatFor } from '../../lib/vat';
 
 const { t, tRaw, lp, locale } = useI18n(Astro.currentLocale);
 const bookingCta = getBookingCta(locale);
 const examples = tRaw<string[]>('resources.askExamples');
+/** Cada ejemplo con su nombre del IVA por país: una etiqueta por variante, con `data-cc` si varía. */
+const chips = examples.flatMap((q) => {
+  const groups = new Map<string, Country[]>();
+  for (const c of COUNTRIES) {
+    const text = vatFor(q, c, locale);
+    groups.set(text, [...(groups.get(text) ?? []), c]);
+  }
+  return [...groups].map(([text, cs]) => ({
+    text,
+    cc: groups.size > 1 ? cs.join(' ') : undefined,
+  }));
+});
 const team: { name: string; src: ImageMetadata }[] = [
   { name: 'Lea Brunner', src: lea },
   { name: 'Tobias Vogel', src: tobias },
@@ -68,15 +82,18 @@ const team: { name: string; src: ImageMetadata }[] = [
           placeholder={examples[0]}
           data-ask-input
         ></textarea>
-        <span class="nb-ask__hint" aria-hidden="true" data-ask-hint>
-          {examples[0]}
-        </span>
+        <span
+          class="nb-ask__hint"
+          aria-hidden="true"
+          data-ask-hint
+          set:html={byCountry((c) => vatFor(examples[0], c, locale))}
+        />
         <span class="nb-ask__line" aria-hidden="true"></span>
       </div>
       <div class="nb-ask__chips" role="group" aria-label={t('resources.askField')}>
-        {examples.map((q) => (
-          <button type="button" class="nb-ask__chip" data-ask-chip>
-            {q}
+        {chips.map((q) => (
+          <button type="button" class="nb-ask__chip" data-ask-chip data-cc={q.cc}>
+            {q.text}
           </button>
         ))}
       </div>
@@ -304,7 +321,10 @@ const team: { name: string; src: ImageMetadata }[] = [
     const hint = root.querySelector<HTMLElement>('[data-ask-hint]');
     const chips = [...root.querySelectorAll<HTMLButtonElement>('[data-ask-chip]')];
     if (!input || !hint) return;
-    const examples = chips.map((c) => c.textContent?.trim() ?? '');
+    // Solo las etiquetas del país activo (las demás están ocultas con `data-cc`).
+    const visible = () => chips.filter((c) => c.offsetParent !== null);
+    const examples = () => visible().map((c) => c.textContent?.trim() ?? '');
+    input.placeholder = examples()[0] ?? input.placeholder;
 
     for (const chip of chips) {
       chip.addEventListener('click', () => {
@@ -314,15 +334,16 @@ const team: { name: string; src: ImageMetadata }[] = [
       });
     }
 
-    if (matchMedia('(prefers-reduced-motion: reduce)').matches || examples.length < 2) return;
+    if (matchMedia('(prefers-reduced-motion: reduce)').matches || chips.length < 2) return;
     let i = 0;
     let timer = 0;
     const next = () => {
       if (input.value || document.activeElement === input) return;
       hint.setAttribute('data-hidden', '');
       window.setTimeout(() => {
-        i = (i + 1) % examples.length;
-        hint.textContent = examples[i];
+        const list = examples();
+        i = (i + 1) % list.length;
+        hint.textContent = list[i];
         hint.removeAttribute('data-hidden');
       }, 500);
     };

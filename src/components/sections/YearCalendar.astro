@@ -90,9 +90,9 @@ const fmt = (d: CivilDate, o: Intl.DateTimeFormatOptions) =>
     new Date(Date.UTC(d.y, d.m - 1, d.d, 12)),
   );
 const dayMonth = (d: CivilDate) => fmt(d, { day: 'numeric', month: 'long' });
-const dayShort = (d: CivilDate) => fmt(d, { day: 'numeric', month: 'short' }).replace('.', '');
+const dayShort = (d: CivilDate) => fmt(d, { day: 'numeric', month: 'short' }).replace(/\.$/, '');
 const monthShort = (m: number) =>
-  fmt({ y: buildYear, m, d: 15 }, { month: 'short' }).replace('.', '');
+  fmt({ y: buildYear, m, d: 15 }, { month: 'short' }).replace(/\.$/, '');
 const pct = (f: number) => `${(f * 100).toFixed(3)}%`;
 ---
 
@@ -344,7 +344,8 @@ const pct = (f: number) => `${(f * 100).toFixed(3)}%`;
       label?.style.setProperty('--w', pct(mk.w));
       label?.classList.toggle('is-now', mk.m === today.m);
     });
-    const dayShort = (d: CivilDate) => fmt(d, { day: 'numeric', month: 'short' }).replace('.', '');
+    const dayShort = (d: CivilDate) =>
+      fmt(d, { day: 'numeric', month: 'short' }).replace(/\.$/, '');
     const list = section.querySelector<HTMLElement>('[data-yr-list]');
     items.forEach((it) => {
       const runway = q(`[data-yr-alert="${it.id}"]`);

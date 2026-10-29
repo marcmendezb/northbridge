@@ -6,6 +6,8 @@ const { t, lp } = useI18n(Astro.currentLocale);
 interface Crumb {
   label: string;
   href?: string;
+  /** Variante por país (HTML de byCountry); los datos estructurados usan `label`. */
+  html?: string;
 }
 interface Props {
   items: Crumb[];
@@ -43,7 +45,7 @@ const jsonLd = {
           <a href={c.href}>{c.label}</a>
         ) : (
           <span aria-current="page" class="text-navy-800">
-            {c.label}
+            {c.html ? <Fragment set:html={c.html} /> : c.label}
           </span>
         )}
       </li>

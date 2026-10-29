@@ -234,7 +234,7 @@ const faq = tRaw<{ q: string; a: string }[]>('pricing.faq');
         ))}
       </table>
     </div>
-    <p class="nb-cmp__note">{t('price.vatNote')}</p>
+    <p class="nb-cmp__note" set:html={byCountry((c) => vatFor(t('price.vatNote'), c, locale))} />
   </Section>
 
   <Section label={t('pricing.guaranteesLabel')} title={t('pricing.guaranteesTitle')}>

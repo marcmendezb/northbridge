@@ -2,6 +2,7 @@ import { describe, expect, it } from 'vitest';
 import {
   daysBetween,
   spainNationalHolidays,
+  berlinHolidays,
   deadlineIn,
   isLegalWorkday,
   yearFraction,
@@ -10,6 +11,7 @@ import {
 import { nextDeadline, timeline } from './timeline';
 import { events as CH } from '../../data/fiscal-calendar/ch';
 import { events as ES } from '../../data/fiscal-calendar/es';
+import { events as DE } from '../../data/fiscal-calendar/de';
 
 describe('IVA suizo: fin del segundo mes tras el periodo (ESTV, «fällig am 31. Mai»)', () => {
   const end = (m: number): DeadlineRule => ({ type: 'monthEnd', m, shift: false });
@@ -107,5 +109,23 @@ describe('España: calendario de la Agencia Tributaria 2026', () => {
     expect(due('es-corporate')).toEqual({ y: 2026, m: 7, d: 27 }); // 25-7 sábado
     expect(due('es-vat-q3')).toEqual({ y: 2026, m: 10, d: 20 });
     expect(due('es-pay-dec')).toEqual({ y: 2026, m: 12, d: 21 }); // 20-12 domingo
+  });
+});
+
+describe('Alemania: § 108 AO con festivos de Berlín, 2026', () => {
+  const DE_EVENTS = DE.flatMap((e) => (e.rule && !e.recurring ? [{ id: e.id, rule: e.rule }] : []));
+  const due = (id: string) =>
+    timeline(DE_EVENTS, 2026, berlinHolidays).find((t) => t.id === id)?.due;
+  it('Voranmeldung el día 10, trasladada si cae en fin de semana', () => {
+    expect(due('de-vat-q4')).toEqual({ y: 2026, m: 1, d: 12 }); // 10-1 sábado
+    expect(due('de-vat-q1')).toEqual({ y: 2026, m: 4, d: 10 });
+    expect(due('de-vat-q3')).toEqual({ y: 2026, m: 10, d: 12 }); // 10-10 sábado
+  });
+  it('pagos a cuenta, impuesto industrial, declaraciones y certificados', () => {
+    expect(due('de-prepay-mar')).toEqual({ y: 2026, m: 3, d: 10 });
+    expect(due('de-trade-feb')).toEqual({ y: 2026, m: 2, d: 16 }); // 15-2 domingo
+    expect(due('de-trade-aug')).toEqual({ y: 2026, m: 8, d: 17 }); // 15-8 sábado
+    expect(due('de-returns')).toEqual({ y: 2026, m: 7, d: 31 });
+    expect(due('de-wage-certificates')).toEqual({ y: 2026, m: 3, d: 2 }); // 28-2 sábado
   });
 });

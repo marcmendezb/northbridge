@@ -13,6 +13,7 @@ import { formatNumber } from '../../lib/format';
 import { COUNTRIES, byCountry, currencyOf, legalForm } from '../../lib/country';
 import { convert } from '../../lib/pricing/currency';
 import { priceUnit } from '../../lib/pricing/display';
+import { vatFor } from '../../lib/vat';
 const { t, lp, locale } = useI18n(Astro.currentLocale);
 
 // Ejemplo de docs/07: Pyme (GmbH), 60 facturas, 5 empleados.
@@ -118,7 +119,10 @@ const unit = byCountry((c) => priceUnit(currencyOf(c), locale));
           </span>
           <span class="nb-calc__unit" set:html={unit} />
         </span>
-        <span class="nb-calc__vat">{t('price.vatNote')}</span>
+        <span
+          class="nb-calc__vat"
+          set:html={byCountry((c) => vatFor(t('price.vatNote'), c, locale))}
+        />
       </div>
     </a>
   </div>

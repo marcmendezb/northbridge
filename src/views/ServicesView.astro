@@ -14,6 +14,7 @@ import startups from '../assets/img/services/startup.jpeg';
 import { useI18n, type MessageKey } from '../i18n';
 import { entryKey, getServiceVariants, getServices } from '../lib/content';
 import { byCountry, currencyOf, type Country } from '../lib/country';
+import { vatFor } from '../lib/vat';
 import { formatNumber } from '../lib/format';
 import { convert } from '../lib/pricing/currency';
 import { describePricing, priceUnit } from '../lib/pricing/display';
@@ -157,7 +158,10 @@ const profiles = [
         </div>
       </aside>
     </div>
-    <p class="nb-container nb-index__vat">{t('price.vatNote')}</p>
+    <p
+      class="nb-container nb-index__vat"
+      set:html={byCountry((c) => vatFor(t('price.vatNote'), c, locale))}
+    />
   </section>
 
   <!-- 3 · Por dónde empiezo: elige tu caso y ves tu camino -->

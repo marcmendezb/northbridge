@@ -90,6 +90,25 @@ const segments: Record<string, Partial<Record<Locale, string>>> = {
     fr: '5-erreurs-comptables-des-startups-en-espagne',
     it: '5-errori-contabili-delle-startup-in-spagna',
   },
+  // Guías de Alemania
+  'como-constituir-una-gmbh-en-alemania': {
+    en: 'how-to-set-up-a-gmbh-in-germany',
+    de: 'gmbh-in-deutschland-gruenden',
+    fr: 'creer-une-gmbh-en-allemagne',
+    it: 'come-costituire-una-gmbh-in-germania',
+  },
+  'calendario-fiscal-para-pymes-en-alemania': {
+    en: 'tax-calendar-for-smes-in-germany',
+    de: 'steuerkalender-fuer-kmu-in-deutschland',
+    fr: 'calendrier-fiscal-pour-pme-en-allemagne',
+    it: 'calendario-fiscale-per-pmi-in-germania',
+  },
+  '5-errores-contables-de-las-startups-en-alemania': {
+    en: '5-accounting-mistakes-startups-make-in-germany',
+    de: '5-buchhaltungsfehler-von-startups-in-deutschland',
+    fr: '5-erreurs-comptables-des-startups-en-allemagne',
+    it: '5-errori-contabili-delle-startup-in-germania',
+  },
 };
 
 const forward = (segment: string, locale: Locale) =>

@@ -20,6 +20,7 @@ import { entryKey, getArticles, getServiceVariants, guideFor } from '../lib/cont
 import { getBookingCta, getServiceLinks } from '../lib/site';
 import { describePricing } from '../lib/pricing/display';
 import { byCountry, COUNTRIES, currencyOf, legalForm, type Country } from '../lib/country';
+import { vatFor } from '../lib/vat';
 import { FISCAL_CALENDARS, type CalendarCountry } from '../data/fiscal-calendar';
 import YearCalendar from '../components/sections/YearCalendar.astro';
 
@@ -81,7 +82,7 @@ const showYear = key === 'iva-y-fiscalidad';
 const calendarOf = (c: Country): CalendarCountry =>
   c in FISCAL_CALENDARS ? (c as CalendarCountry) : 'CH';
 const articles = showYear ? await getArticles(locale) : [];
-const yearGroups = (['CH', 'ES'] as const)
+const yearGroups = (['CH', 'ES', 'DE'] as const)
   .map((calendar) => ({
     calendar,
     countries: COUNTRIES.filter((c) => calendarOf(c) === calendar),
@@ -105,7 +106,10 @@ const faqJsonLd = {
   <header class="nb-sx" data-surface="dark" data-service-hero>
     <div class="nb-container nb-sx__inner">
       <Breadcrumbs
-        items={[{ label: t('nav.services'), href: lp('/servicios') }, { label: crumbLabel }]}
+        items={[
+          { label: t('nav.services'), href: lp('/servicios') },
+          { label: crumbLabel, html: byCountry((c) => vatFor(crumbLabel, c, locale)) },
+        ]}
         tone="dark"
       />
       {titleVaries ? (

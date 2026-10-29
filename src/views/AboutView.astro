@@ -18,6 +18,7 @@ import { entryKey, getTeam } from '../lib/content';
 import { getBookingCta, site } from '../lib/site';
 import { byCountry, COUNTRIES } from '../lib/country';
 import { OFFICES } from '../data/offices';
+import { vatFor } from '../lib/vat';
 
 const { t, tRaw, lp, locale } = useI18n(Astro.currentLocale);
 const team = await getTeam(locale);
@@ -68,7 +69,9 @@ const splitFact = (v: string) => {
       <p
         class="nb-ah__lead"
         data-reveal
-        set:html={byCountry((c) => t(c === 'CH' ? 'about.lead' : 'about.leadIntl'))}
+        set:html={byCountry((c) =>
+          vatFor(t(c === 'CH' ? 'about.lead' : 'about.leadIntl'), c, locale),
+        )}
       />
       <dl class="nb-ah__facts" data-reveal>
         {facts.map((f) => {
@@ -208,7 +211,7 @@ const splitFact = (v: string) => {
                 <p class="nb-crew__role">{m.data.role}</p>
                 <p class="nb-crew__spec">
                   <span class="nb-crew__spec-label">{t('about.specialty')}</span>
-                  {m.data.specialty}
+                  <Fragment set:html={byCountry((c) => vatFor(m.data.specialty, c, locale))} />
                 </p>
                 <blockquote class="nb-crew__quote">
                   <p>{m.data.quote}</p>
