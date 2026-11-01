@@ -705,6 +705,13 @@ export const es = {
     ],
   },
   thanks: {
+    you: 'Tú',
+    countdown: 'Te respondemos, como tarde, en',
+    countdownBooked: 'Tu consulta empieza en',
+    hours: 'horas',
+    minutes: 'minutos',
+    seconds: 'segundos',
+    countdownSr: '{label} {h} horas y {m} minutos.',
     seoTitle: 'Gracias',
     title: 'Recibido. Nos encargamos.',
     titleBooked: 'Reservado. Te esperamos.',

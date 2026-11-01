@@ -708,6 +708,13 @@ export const fr: Messages = {
     ],
   },
   thanks: {
+    you: 'Vous',
+    countdown: 'Nous vous répondons au plus tard dans',
+    countdownBooked: 'Votre consultation commence dans',
+    hours: 'heures',
+    minutes: 'minutes',
+    seconds: 'secondes',
+    countdownSr: '{label} {h} heures et {m} minutes.',
     seoTitle: 'Merci',
     title: 'Bien reçu. Nous nous en chargeons.',
     titleBooked: 'C’est réservé. À bientôt.',

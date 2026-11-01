@@ -705,6 +705,13 @@ export const en: Messages = {
     ],
   },
   thanks: {
+    you: 'You',
+    countdown: 'We reply, at the latest, in',
+    countdownBooked: 'Your consultation starts in',
+    hours: 'hours',
+    minutes: 'minutes',
+    seconds: 'seconds',
+    countdownSr: '{label} {h} hours and {m} minutes.',
     seoTitle: 'Thank you',
     title: 'Received. We’ll take it from here.',
     titleBooked: 'Booked. We look forward to it.',
