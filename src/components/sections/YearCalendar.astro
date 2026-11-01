@@ -17,7 +17,7 @@ import {
 import { zurichNow, type CivilDate } from '../../lib/contact/office';
 import { HOLIDAYS } from '../../lib/fiscal/deadlines';
 import { vatFor } from '../../lib/vat';
-import { monthMarks, nextDeadline, timeline } from '../../lib/fiscal/timeline';
+import { monthMarks, timeline } from '../../lib/fiscal/timeline';
 
 interface Props {
   calendar: CalendarCountry;
@@ -94,23 +94,6 @@ const dayShort = (d: CivilDate) => fmt(d, { day: 'numeric', month: 'short' }).re
 const monthShort = (m: number) =>
   fmt({ y: buildYear, m, d: 15 }, { month: 'short' }).replace(/\.$/, '');
 const pct = (f: number) => `${(f * 100).toFixed(3)}%`;
-/**
- * Próximo plazo a la fecha de compilación: rellena la ficha (invisible) para que ocupe ya su sitio;
- * el navegador solo cambia los textos y la página no cambia de altura (sin recálculo de las escenas).
- */
-const buildToday = (() => {
-  const z = zurichNow(new Date());
-  return { y: z.y, m: z.m, d: z.d };
-})();
-const nextAtBuild = nextDeadline(ruled, buildToday, HOLIDAYS[calendar]);
-const nextEvent = nextAtBuild && events.find((e) => e.id === nextAtBuild.id);
-const nextLeft = !nextAtBuild
-  ? ''
-  : nextAtBuild.daysLeft === 0
-    ? y.leftToday
-    : nextAtBuild.daysLeft === 1
-      ? y.leftOne
-      : y.leftMany.replace('{n}', String(nextAtBuild.daysLeft));
 ---
 
 <section
@@ -131,26 +114,15 @@ const nextLeft = !nextAtBuild
           {y.lead}
         </p>
       </div>
-      <aside class="nb-yr__next" data-yr-next data-pending aria-live="polite">
+      <aside class="nb-yr__next" data-yr-next hidden aria-live="polite">
         <p class="nb-yr__next-label">{y.next}</p>
-        <p class="nb-yr__next-date" data-yr-next-date>
-          {nextAtBuild &&
-            (nextAtBuild.year === buildToday.y
-              ? dayMonth(nextAtBuild.due)
-              : fmt(nextAtBuild.due, { day: 'numeric', month: 'long', year: 'numeric' }))}
-        </p>
-        <p class="nb-yr__next-left" data-yr-next-left>
-          {nextAtBuild && `${nextLeft} / ${fmt(nextAtBuild.due, { weekday: 'long' })}`}
-        </p>
-        <p class="nb-yr__next-what" data-yr-next-what>
-          {nextEvent && vatFor(nextEvent.what[locale], calendar, locale)}
-        </p>
-        <p class="nb-yr__next-when" data-yr-next-when>
-          {nextEvent?.when[locale]}
-        </p>
+        <p class="nb-yr__next-date" data-yr-next-date />
+        <p class="nb-yr__next-left" data-yr-next-left />
+        <p class="nb-yr__next-what" data-yr-next-what />
+        <p class="nb-yr__next-when" data-yr-next-when />
         <p class="nb-yr__next-need">
           <span>{y.need}</span>
-          <span data-yr-next-need>{nextEvent?.need[locale]}</span>
+          <span data-yr-next-need />
         </p>
       </aside>
     </div>
@@ -458,10 +430,11 @@ const nextLeft = !nextAtBuild
       set('[data-yr-next-what]', text('.nb-yr__what'));
       set('[data-yr-next-when]', text('.nb-yr__when'));
       set('[data-yr-next-need]', text('.nb-yr__need'));
-      // La ficha ya ocupaba su sitio (rellena al compilar): solo se hace visible, sin recalcular.
-      delete panel.dataset.pending;
+      panel.hidden = false;
       source.classList.add('is-next');
       if (next.year === today.y) q(`[data-yr-dot][data-id="${next.id}"]`)?.classList.add('is-next');
+      // La ficha cambia la altura de la página: las escenas de scroll vuelven a medir.
+      window.dispatchEvent(new Event('resize'));
     }
   };
   document.querySelectorAll<HTMLElement>('section[data-year]').forEach(setup);
@@ -519,14 +492,6 @@ const nextLeft = !nextAtBuild
     color: var(--piedra-800);
   }
   /* Próximo plazo: ficha navy, la única pieza oscura de la sección. */
-  /* Sin JS no se muestra (sería el plazo de la fecha de compilación); con JS, invisible hasta que
-     el navegador pone el del día. */
-  html:not(.js) .nb-yr__next {
-    display: none;
-  }
-  .nb-yr__next[data-pending] {
-    visibility: hidden;
-  }
   .nb-yr__next {
     display: grid;
     gap: 8px;
@@ -552,7 +517,7 @@ const nextLeft = !nextAtBuild
     font-family: var(--font-display);
     font-size: clamp(2.25rem, 1.4rem + 1.8vw, 3.25rem);
     font-weight: 300;
-    font-style: italic;
+    /* Redonda: la cursiva (144 KB) se descargaría solo por esta fecha y retrasa el LCP. */
     line-height: 1.05;
     color: var(--white);
   }

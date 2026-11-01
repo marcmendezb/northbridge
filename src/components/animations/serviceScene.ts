@@ -160,6 +160,5 @@ export function serviceScene({ gsap, ScrollTrigger }: AnimationKit) {
     });
   });
 
-  // Sin refresh() propio: ScrollTrigger recalcula al cargar la página (cada uno cuesta un recálculo
-  // completo de maquetación, decenas de milisegundos en móvil).
+  ScrollTrigger.refresh();
 }
