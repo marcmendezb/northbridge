@@ -177,9 +177,6 @@ html.lenis body {
 
 /* Contacto (contactScene.ts): estados iniciales solo con JS y movimiento permitido. */
 @media (prefers-reduced-motion: no-preference) {
-  .js.motion:not(.anim-fail) [data-cx-arch] {
-    clip-path: inset(100% 0 0 0);
-  }
   .js.motion:not(.anim-fail) [data-map-route] {
     stroke-dasharray: 1;
     stroke-dashoffset: 1;
@@ -355,5 +352,57 @@ html.lenis body {
 @keyframes nb-demo-fade {
   from {
     opacity: 0;
+  }
+}
+
+/*
+ * Entrada de la primera pantalla (`data-enter`): solo CSS, sin esperar a GSAP, para que el texto
+ * de cabecera (a menudo el LCP) se pinte con el primer fotograma. Sin JS o con movimiento
+ * reducido, visible desde el principio.
+ */
+@media (prefers-reduced-motion: no-preference) {
+  .js.motion:not(.anim-fail) [data-enter] {
+    animation: nb-enter 1.1s var(--ease-out) var(--enter-delay, 0.3s) both;
+  }
+}
+@keyframes nb-enter {
+  from {
+    opacity: 0;
+    transform: translateY(20px);
+  }
+}
+
+/*
+ * Transiciones entre páginas: View Transitions nativas entre documentos (sin router). La página
+ * saliente sube y se desvanece; la nueva entra desde abajo con la frenada de la marca. El header se
+ * queda en su sitio. Navegadores sin soporte navegan como siempre; con movimiento reducido, nada.
+ */
+@media (prefers-reduced-motion: no-preference) {
+  @view-transition {
+    navigation: auto;
+  }
+  .nb-header {
+    view-transition-name: nb-header;
+  }
+  ::view-transition-old(root) {
+    animation: nb-vt-out 280ms var(--ease-in-out) both;
+  }
+  ::view-transition-new(root) {
+    animation: nb-vt-in 620ms var(--ease-out) 80ms both;
+  }
+  ::view-transition-group(nb-header) {
+    animation-duration: 0s;
+  }
+}
+@keyframes nb-vt-out {
+  to {
+    opacity: 0;
+    transform: translateY(-12px);
+  }
+}
+@keyframes nb-vt-in {
+  from {
+    opacity: 0;
+    transform: translateY(18px);
   }
 }

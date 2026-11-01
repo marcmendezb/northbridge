@@ -211,17 +211,23 @@ test('desplegable de Servicios: abre al pasar el ratón, enlaza y se cierra con 
   await expect(mega.getByRole('link').first()).toBeFocused();
 });
 
-test('desplegable de Servicios: sin JS el enlace lleva a /servicios', async ({ browser }) => {
-  const ctx = await browser.newContext({
-    javaScriptEnabled: false,
-    viewport: { width: 1440, height: 900 },
-  });
-  const page = await ctx.newPage();
-  await page.goto('/');
-  const link = page.locator('.nb-nav__nojs');
-  await expect(link).toBeVisible();
-  await expect(link).toHaveAttribute('href', '/servicios');
-  await ctx.close();
+test('Servicios en el header: el nombre lleva a /servicios, con y sin JS', async ({ browser }) => {
+  for (const javaScriptEnabled of [true, false]) {
+    const ctx = await browser.newContext({
+      javaScriptEnabled,
+      viewport: { width: 1440, height: 900 },
+    });
+    const page = await ctx.newPage();
+    await page.goto('/');
+    const link = page.locator('.nb-nav__split');
+    await expect(link).toBeVisible();
+    await expect(link).toHaveAttribute('href', '/servicios');
+    if (javaScriptEnabled) {
+      await link.click();
+      await expect(page).toHaveURL(/\/servicios$/);
+    }
+    await ctx.close();
+  }
 });
 
 test('scroll con rueda de ratón: la página avanza con Lenis activo', async ({ page }) => {

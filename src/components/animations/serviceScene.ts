@@ -15,6 +15,21 @@ export function serviceScene({ gsap, ScrollTrigger }: AnimationKit) {
   const hero = document.querySelector<HTMLElement>('[data-service-hero]');
   if (!hero) return;
   const ease = 'expo.out';
+  /**
+   * Variantes de otros países (ocultas con `data-cc`): sin ScrollTrigger, que cuesta mucho con
+   * cinco calendarios en la página; se dejan en su estado final por si se cambia de país.
+   */
+  // Una sola pasada de lectura (sin alternar con escrituras, que forzarían maquetación).
+  const off = new Set(
+    Array.from(
+      document.querySelectorAll('[data-incl-row], [data-who], [data-yr-ruler], [data-steps-path]'),
+    ).filter((el) => el.getClientRects().length === 0),
+  );
+  const hidden = (el: Element) => off.has(el);
+  const settle = (root: Element, opacity: string, scale: string[]) => {
+    if (opacity) gsap.set(root.querySelectorAll(opacity), { opacity: 1, y: 0 });
+    scale.forEach((sel) => gsap.set(root.querySelectorAll(sel), { scaleX: 1, scaleY: 1 }));
+  };
 
   // Cabecera: la foto se abre.
   const photo = hero.querySelector<HTMLElement>('[data-sx-photo]');
@@ -31,6 +46,7 @@ export function serviceScene({ gsap, ScrollTrigger }: AnimationKit) {
 
   // Qué incluye.
   document.querySelectorAll<HTMLElement>('[data-incl-row]').forEach((row) => {
+    if (hidden(row)) return settle(row, '.nb-incl__text', ['[data-incl-rule]']);
     const rule = row.querySelector('[data-incl-rule]');
     const tl = gsap.timeline({ scrollTrigger: { trigger: row, start: 'top 90%', once: true } });
     if (rule) tl.fromTo(rule, { scaleX: 0 }, { scaleX: 1, duration: 1.1, ease: 'power2.inOut' }, 0);
@@ -44,6 +60,7 @@ export function serviceScene({ gsap, ScrollTrigger }: AnimationKit) {
 
   // Para quién.
   document.querySelectorAll<HTMLElement>('[data-who]').forEach((who) => {
+    if (hidden(who)) return settle(who, '.nb-who__item', []);
     const items = who.querySelectorAll('.nb-who__item');
     const marks = who.querySelectorAll('.nb-who__mark path');
     gsap.set(marks, { strokeDasharray: 1, strokeDashoffset: 1, attr: { pathLength: 1 } });
@@ -61,6 +78,8 @@ export function serviceScene({ gsap, ScrollTrigger }: AnimationKit) {
   // IVA: el gráfico del año. Las banderas se levantan por orden de fecha, cada pista de aviso se
   // tiende hacia su plazo y la línea de hoy baja al final.
   document.querySelectorAll<HTMLElement>('[data-yr-ruler]').forEach((ruler) => {
+    if (hidden(ruler))
+      return settle(ruler, '[data-yr-dot], [data-yr-span]', ['[data-yr-alert]', '[data-yr-today]']);
     const pos = (el: HTMLElement) => {
       const at = parseFloat(el.style.getPropertyValue('--at')) || 0;
       return Math.min(Math.max(at / 100, 0), 1);
@@ -115,6 +134,11 @@ export function serviceScene({ gsap, ScrollTrigger }: AnimationKit) {
 
   // Proceso: cada tramo entre arcos se rellena con el scroll y cada paso se enciende al alcanzarlo.
   document.querySelectorAll<HTMLElement>('[data-steps-path]').forEach((path) => {
+    if (hidden(path)) {
+      settle(path, '', ['[data-steps-fill]']);
+      path.querySelectorAll('[data-steps-item]').forEach((step) => step.classList.add('is-on'));
+      return;
+    }
     path.querySelectorAll<HTMLElement>('[data-steps-item]').forEach((step) => {
       const fill = step.querySelector('[data-steps-fill]');
       if (fill)

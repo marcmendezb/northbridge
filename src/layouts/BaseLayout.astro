@@ -37,7 +37,7 @@ const {
   jsonLd,
 } = Astro.props;
 
-const fullTitle = title ? `${title} / ${site.name}` : `${site.name} / ${t('brand.claim')}`;
+const fullTitle = title ? `${title} | ${site.name}` : `${site.name} | ${t('brand.claim')}`;
 const canonical = new URL(Astro.url.pathname, Astro.site ?? site.url);
 const shareImage = ogImage(locale, Astro.site ?? site.url);
 const alternateLinks = alternates(parsePath(Astro.url.pathname).canonical).map((a) => ({

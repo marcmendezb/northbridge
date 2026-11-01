@@ -62,8 +62,7 @@ import { vatFor } from '../../lib/vat';
           aria-hidden="true"
         />
         <span class="nb-bar__wordmark" aria-hidden="true">
-          <span class="nb-bar__name">Northbridge</span>
-          <span class="nb-bar__sub">Advisory</span>
+          <span class="nb-bar__name">Northbridge</span> <span class="nb-bar__sub">Advisory</span>
         </span>
       </a>
 
@@ -79,9 +78,11 @@ import { vatFor } from '../../lib/vat';
                 >
                   {hasMega ? (
                     <>
+                      {/* El nombre lleva a todos los servicios; la flecha abre el desplegable
+                          (también se abre al pasar el ratón). */}
                       <a
                         href={l.href}
-                        class="nb-nav__link nb-nav__nojs"
+                        class="nb-nav__link nb-nav__split"
                         aria-current={isCurrent(l.href) ? 'page' : undefined}
                       >
                         <Fragment set:html={byCountry((c) => vatFor(l.label, c, locale))} />
@@ -91,10 +92,11 @@ import { vatFor } from '../../lib/vat';
                         class="nb-nav__link nb-nav__trigger"
                         aria-expanded="false"
                         aria-controls="mega-servicios"
-                        aria-current={isCurrent(l.href) ? 'page' : undefined}
                         data-mega-trigger
                       >
-                        <Fragment set:html={byCountry((c) => vatFor(l.label, c, locale))} />
+                        <span class="sr-only">
+                          {l.label}: {t('nav.openMenu').toLowerCase()}
+                        </span>
                         <svg
                           class="nb-nav__chev"
                           viewBox="0 0 16 16"
@@ -557,11 +559,14 @@ import { vatFor } from '../../lib/vat';
     font-size: 1rem;
     font-weight: 500;
   }
+  /* Con JS, el enlace «Servicios» queda pegado a su flecha, que es un botón aparte. */
   .js .nb-nav__trigger {
     display: inline-flex;
+    margin-left: -0.75rem;
+    padding-inline: 0.5rem;
   }
-  .js .nb-nav__nojs {
-    display: none;
+  .js .nb-nav__split {
+    padding-right: 0.5rem;
   }
   .nb-nav__chev {
     transition: transform var(--dur-base) var(--ease-out);

@@ -135,7 +135,7 @@ const chevron = (dir: 'prev' | 'next') => (dir === 'prev' ? 'M15 5l-7 7 7 7' : '
     font-family: var(--font-display);
     font-optical-sizing: auto;
     font-size: clamp(1.625rem, 1rem + 2.2vw, 2.75rem);
-    font-style: italic;
+    /* Redonda: la cursiva (144 KB) se descargaría en la Home solo por esta cita y retrasa el LCP. */
     font-weight: 300;
     line-height: 1.22;
     letter-spacing: -0.012em;

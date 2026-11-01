@@ -149,13 +149,64 @@ const faqJsonLd = {
   </header>
 
   {showYear &&
-    yearGroups.map((g) => (
-      <YearCalendar
-        calendar={g.calendar}
-        countries={g.countries}
-        guideHref={g.guide ? lp(`/recursos/${entryKey(g.guide)}`) : undefined}
-      />
-    ))}
+    yearGroups.map((g) =>
+      g.calendar === 'CH' ? (
+        <YearCalendar
+          calendar={g.calendar}
+          countries={g.countries}
+          guideHref={g.guide ? lp(`/recursos/${entryKey(g.guide)}`) : undefined}
+        />
+      ) : (
+        <template data-year-template={g.countries.join(' ')}>
+          <YearCalendar
+            calendar={g.calendar}
+            countries={g.countries}
+            guideHref={g.guide ? lp(`/recursos/${entryKey(g.guide)}`) : undefined}
+          />
+        </template>
+      ),
+    )}
+  {showYear && <script is:inline>
+    // Calendarios de otros países en <template> (inertes: sin estilo, maquetación ni animación).
+    // Se monta solo el del país elegido, antes de los demás scripts; si se cambia de país más
+    // tarde, el nuevo entra ya en su estado final (sin la animación de entrada).
+    (() => {
+      const root = document.documentElement;
+      let late = false;
+      // El suizo se pinta en el HTML (sin JS se ve ese); si el país es otro, también pasa a
+      // <template> para que no pese oculto.
+      const ch = document.querySelector('section[data-year][data-calendar="CH"]');
+      if (ch && (root.dataset.country || 'CH') !== 'CH') {
+        const tpl = document.createElement('template');
+        tpl.dataset.yearTemplate = ch.dataset.cc || 'CH';
+        ch.before(tpl);
+        tpl.content.append(ch);
+      }
+      const mount = () => {
+        const country = root.dataset.country || 'CH';
+        document.querySelectorAll('template[data-year-template]').forEach((tpl) => {
+          if (tpl.dataset.mounted || !tpl.dataset.yearTemplate.split(' ').includes(country)) return;
+          const frag = tpl.content.cloneNode(true);
+          if (late)
+            frag
+              .querySelectorAll(
+                '[data-reveal], [data-yr-dot], [data-yr-span], [data-yr-alert], [data-yr-today]',
+              )
+              .forEach((el) => {
+                el.style.opacity = '1';
+                el.style.transform = 'none';
+              });
+          const section = frag.firstElementChild;
+          tpl.after(frag);
+          tpl.dataset.mounted = '1';
+          if (late) document.dispatchEvent(new CustomEvent('nb:year-mounted', { detail: section }));
+        });
+        late = true;
+      };
+      mount();
+      new MutationObserver(mount).observe(root, { attributeFilter: ['data-country'] });
+    })();
+  </script>}
 
   <!-- 2 · Qué incluye: un libro mayor, una línea por cosa que hacemos -->
   <section class="nb-scope" aria-labelledby="includes-title">

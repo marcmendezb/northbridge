@@ -37,7 +37,7 @@ import { withCity } from '../../data/offices';
         <video
           class="hero__video"
           data-hero-video
-          poster={posterFile.src}
+          data-poster={posterFile.src}
           muted
           loop
           playsinline
@@ -475,7 +475,9 @@ import { withCity } from '../../data/offices';
     });
 
     // El vídeo no compite con el póster (LCP): empieza a cargarse cuando la página ya ha terminado de cargar.
+    // El póster va por JS: en HTML descargaría una segunda imagen, tapada por la foto, antes del LCP.
     const start = () => {
+      if (video.dataset.poster) video.poster = video.dataset.poster;
       video.preload = 'auto';
       play();
     };

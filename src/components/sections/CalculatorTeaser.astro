@@ -59,12 +59,8 @@ const unit = byCountry((c) => priceUnit(currencyOf(c), locale));
       </div>
     </div>
 
-    <a
-      href={lp('/calculadora')}
-      class="nb-calc__card nb-calc__card--preview"
-      data-calc-preview
-      aria-label={t('cta.calculate')}
-    >
+    <a href={lp('/calculadora')} class="nb-calc__card nb-calc__card--preview" data-calc-preview>
+      <span class="sr-only">{t('cta.calculate')}:</span>
       <div class="nb-calc__field">
         <span class="nb-calc__label">{t('home.calculator.preview.type')}</span>
         <span class="nb-calc__chips" style={`--active:${active}`}>

@@ -15,22 +15,13 @@ export function contactScene({ gsap, ScrollTrigger }: AnimationKit) {
   if (!hero) return;
   const ease = 'expo.out';
 
-  // 1 · Puerta: arco que sube desde la base, foto que se asienta y filete que la contornea.
+  // 1 · Puerta: la foto se asienta dentro del arco y el filete la contornea. El arco se ve desde
+  // el primer momento (sin recorte de entrada): es el LCP de la página y no debe esperar.
   const arch = hero.querySelector<HTMLElement>('[data-cx-arch]');
   const img = arch?.querySelector('img');
   const outline = hero.querySelector('[data-cx-outline]');
   if (arch) {
     const intro = gsap.timeline({ defaults: { ease } });
-    intro.fromTo(
-      arch,
-      { clipPath: 'inset(100% 0% 0% 0% round 9999px 9999px 0px 0px)' },
-      {
-        clipPath: 'inset(0% 0% 0% 0% round 9999px 9999px 0px 0px)',
-        duration: 1.6,
-        ease: 'expo.inOut',
-      },
-      0.1,
-    );
     if (img) intro.fromTo(img, { scale: 1.25 }, { scale: 1, duration: 2.2 }, 0.1);
     if (outline)
       intro.fromTo(

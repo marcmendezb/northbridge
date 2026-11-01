@@ -26,10 +26,10 @@ import { OFFICES } from '../data/offices';
       <h1 class="nb-bk__title" data-split>
         {t('home.cta.title')}
       </h1>
-      <p class="nb-bk__lead" data-reveal>
+      <p class="nb-bk__lead" data-enter>
         {s.lead}
       </p>
-      <ul class="nb-bk__guarantees" data-reveal>
+      <ul class="nb-bk__guarantees" data-enter style="--enter-delay: 0.45s">
         {s.guarantees.map((g) => (
           <li>
             <svg viewBox="0 0 16 16" aria-hidden="true">
@@ -88,7 +88,7 @@ import { OFFICES } from '../data/offices';
         set:html={byCountry((c) => s.calendarLead.replace('{city}', OFFICES[c].cityName[locale]))}
       />
       <BookingEmbed
-        client:load
+        client:visible
         s={s}
         demo={tRaw<Messages['demo']>('demo')}
         intl={localeMeta[locale].intl}

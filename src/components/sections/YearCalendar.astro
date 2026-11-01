@@ -325,9 +325,11 @@ const pct = (f: number) => `${(f * 100).toFixed(3)}%`;
 
   // El año fiscal en curso (hora de Zúrich): fechas exactas, hoy y el próximo plazo.
   // Sin JS queda el año de compilación, también con fechas exactas.
-  document.querySelectorAll<HTMLElement>('[data-year]').forEach((section) => {
+  // Cada calendario montado (los de otros países llegan desde <template> al cambiar de país).
+  const setup = (section: HTMLElement) => {
     const ruler = section.querySelector<HTMLElement>('[data-yr-ruler]');
-    if (!ruler) return;
+    if (!ruler || section.dataset.yearReady) return;
+    section.dataset.yearReady = '1';
     const holidays = HOLIDAYS[(section.dataset.calendar ?? 'CH') as keyof typeof HOLIDAYS];
     const ds = ruler.dataset;
     const events = JSON.parse(ds.events ?? '[]') as RuledEvent[];
@@ -434,6 +436,11 @@ const pct = (f: number) => `${(f * 100).toFixed(3)}%`;
       // La ficha cambia la altura de la página: las escenas de scroll vuelven a medir.
       window.dispatchEvent(new Event('resize'));
     }
+  };
+  document.querySelectorAll<HTMLElement>('section[data-year]').forEach(setup);
+  document.addEventListener('nb:year-mounted', (e) => {
+    const section = (e as CustomEvent).detail;
+    if (section instanceof HTMLElement) setup(section);
   });
 </script>
 
