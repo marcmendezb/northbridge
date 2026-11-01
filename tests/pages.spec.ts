@@ -21,7 +21,9 @@ test('calculadora: lee la URL, recalcula y la actualiza al cambiar', async ({ pa
   await expect(result).toContainText('propuesta a medida');
 });
 
-test('contacto: valida con mensajes claros y, completo, lleva a gracias', async ({ page }) => {
+test('contacto: valida con mensajes claros y, completo, avisa de que la web es ficticia', async ({
+  page,
+}) => {
   await page.goto('/contacto');
   await page.locator('.nb-form').scrollIntoViewIfNeeded();
   await hydrated(page);
@@ -34,6 +36,18 @@ test('contacto: valida con mensajes claros y, completo, lleva a gracias', async 
   await page.getByLabel('Mensaje').fill('Necesito ayuda con el IVA del trimestre.');
   await page.getByRole('checkbox').check();
   await page.getByRole('button', { name: 'Enviar mensaje' }).click();
+  // Nada se envía: aviso modal con foco en «Entendido»; Esc lo cierra y el foco vuelve al botón.
+  const notice = page.getByRole('dialog', { name: 'Esta web es una demostración.' });
+  await expect(notice).toBeVisible();
+  await expect(notice).toContainText('El formulario no envía ningún mensaje');
+  await expect(notice.getByRole('button', { name: 'Entendido' })).toBeFocused();
+  await page.keyboard.press('Escape');
+  await expect(notice).toBeHidden();
+  await expect(page.getByRole('button', { name: 'Enviar mensaje' })).toBeFocused();
+  await expect(page).toHaveURL(/\/contacto$/);
+  // Desde el aviso se puede ver cómo seguiría el recorrido.
+  await page.getByRole('button', { name: 'Enviar mensaje' }).click();
+  await notice.getByRole('link', { name: 'Ver la página de confirmación' }).click();
   await expect(page).toHaveURL(/\/gracias$/);
   await expect(page.getByRole('heading', { level: 1 })).toHaveText('Recibido. Nos encargamos.');
 });
@@ -61,7 +75,7 @@ test('contacto: sin JS, el plazo general y el formulario alternativo', async ({ 
   await context.close();
 });
 
-test('consulta gratuita: el calendario de demostración lleva a gracias con la cita', async ({
+test('consulta gratuita: el calendario de demostración avisa y lleva a gracias con la cita', async ({
   page,
 }) => {
   await page.goto('/consulta-gratuita');
@@ -70,6 +84,9 @@ test('consulta gratuita: el calendario de demostración lleva a gracias con la c
   await days.first().click();
   await page.locator('.nb-book__time').first().click();
   await page.getByRole('button', { name: 'Confirmar la consulta' }).click();
+  const notice = page.getByRole('dialog', { name: 'Esta web es una demostración.' });
+  await expect(notice).toContainText('No se reserva ninguna cita');
+  await notice.getByRole('link', { name: 'Ver la página de confirmación' }).click();
   await expect(page).toHaveURL(/\/gracias\?fecha=\d{4}-\d{2}-\d{2}&hora=\d{2}:\d{2}/);
   await expect(page.getByText(/Tu consulta: .+ a las \d{2}:\d{2}\./)).toBeVisible();
 });

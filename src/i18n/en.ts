@@ -421,7 +421,8 @@ export const en: Messages = {
       'Northbridge Advisory is a fiduciary firm founded in Zurich in 2014: one dedicated contact person, reminders before every deadline and a fixed price. Meet the team.',
     title: 'A small firm, with the rigour of a large one.',
     lead: 'Since 2014 we have handled the accounting, VAT and payroll of more than 200 companies in Zurich.',
-    leadIntl: 'Since 2014 we have handled the accounting, VAT and payroll of more than 200 companies.',
+    leadIntl:
+      'Since 2014 we have handled the accounting, VAT and payroll of more than 200 companies.',
     storyLabel: 'Story',
     storyTitle: 'Why Northbridge exists',
     story: [
@@ -547,6 +548,16 @@ export const en: Messages = {
     countryNotice: 'This guide is written for another country.',
     countryOther: 'The version for your country',
   },
+  /** Aviso de web ficticia al enviar el formulario o la reserva de demostración. */
+  demo: {
+    label: 'Portfolio project',
+    title: 'This website is a showcase.',
+    text: 'Northbridge Advisory is a fictional company, created as a web design and development portfolio project.',
+    form: 'The form does not send any message and your details are not stored anywhere.',
+    booking: 'No appointment is booked and your details are not stored anywhere.',
+    close: 'Got it',
+    next: 'See the confirmation page',
+  },
   form: {
     name: 'Name',
     email: 'Email',
@@ -576,7 +587,6 @@ export const en: Messages = {
       company: 'Choose your company type.',
       message: 'Write at least 10 characters so we can help you.',
       privacy: 'We need your consent to reply to you.',
-      send: 'We couldn’t send your message. Try again or email us at {email}.',
     },
     noscript:
       'The form needs JavaScript to send. You can also email us at {email} or call us on {phone}.',

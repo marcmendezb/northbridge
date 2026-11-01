@@ -420,7 +420,8 @@ export const fr: Messages = {
       'Northbridge Advisory est une fiduciaire fondée à Zurich en 2014 : une personne de contact attitrée, un rappel avant chaque échéance et un prix fixe. Découvrez l’équipe.',
     title: 'Un petit cabinet, avec la rigueur d’un grand.',
     lead: 'Depuis 2014, nous tenons la comptabilité, la TVA et les salaires de plus de 200 entreprises à Zurich.',
-    leadIntl: 'Depuis 2014, nous tenons la comptabilité, la TVA et les salaires de plus de 200 entreprises.',
+    leadIntl:
+      'Depuis 2014, nous tenons la comptabilité, la TVA et les salaires de plus de 200 entreprises.',
     storyLabel: 'Histoire',
     storyTitle: 'Pourquoi Northbridge existe',
     story: [
@@ -547,6 +548,16 @@ export const fr: Messages = {
     countryNotice: 'Ce guide est rédigé pour un autre pays.',
     countryOther: 'La version pour votre pays',
   },
+  /** Aviso de web ficticia al enviar el formulario o la reserva de demostración. */
+  demo: {
+    label: 'Projet de portfolio',
+    title: 'Ce site est une démonstration.',
+    text: 'Northbridge Advisory est une entreprise fictive, créée comme projet de portfolio en design et développement web.',
+    form: 'Le formulaire n’envoie aucun message et vos données ne sont enregistrées nulle part.',
+    booking: 'Aucun rendez-vous n’est réservé et vos données ne sont enregistrées nulle part.',
+    close: 'Compris',
+    next: 'Voir la page de confirmation',
+  },
   form: {
     name: 'Nom',
     email: 'E-mail',
@@ -576,7 +587,6 @@ export const fr: Messages = {
       company: 'Choisissez le type d’entreprise.',
       message: 'Écrivez au moins 10 caractères pour que nous puissions vous aider.',
       privacy: 'Nous avons besoin de votre consentement pour vous répondre.',
-      send: 'Nous n’avons pas pu envoyer le message. Réessayez ou écrivez-nous à {email}.',
     },
     noscript:
       'L’envoi du formulaire nécessite JavaScript. Vous pouvez aussi nous écrire à {email} ou nous appeler au {phone}.',

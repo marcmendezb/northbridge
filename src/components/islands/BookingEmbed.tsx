@@ -1,10 +1,12 @@
 import { useEffect, useId, useState } from 'react';
 import type { Messages } from '../../i18n/es';
+import DemoNotice from './DemoNotice';
 
 type Strings = Messages['booking'];
 
 interface Props {
   s: Strings;
+  demo: Messages['demo'];
   /** Etiqueta BCP 47 para las fechas («es», «de-CH»…). */
   intl: string;
   thanksHref: string;
@@ -30,8 +32,10 @@ function nextWorkingDays(n: number): Date[] {
 /** Disponibilidad de demostración, estable por día: algunas horas ya están ocupadas. */
 const freeSlots = (day: Date) => SLOTS.filter((_, i) => (day.getDate() + i * 3) % 4 !== 0);
 
-function DemoScheduler({ s, intl, thanksHref }: Omit<Props, 'calLink'>) {
+function DemoScheduler({ s, demo, intl, thanksHref }: Omit<Props, 'calLink'>) {
   const id = useId();
+  // Web ficticia (portfolio): no se reserva nada; al confirmar se abre el aviso.
+  const [demoOpen, setDemoOpen] = useState(false);
   const [days, setDays] = useState<Date[]>([]);
   const [day, setDay] = useState<string>('');
   const [time, setTime] = useState<string>('');
@@ -50,7 +54,7 @@ function DemoScheduler({ s, intl, thanksHref }: Omit<Props, 'calLink'>) {
       onSubmit={(e) => {
         e.preventDefault();
         if (!day || !time) return;
-        window.location.assign(`${thanksHref}?fecha=${day}&hora=${time}`);
+        setDemoOpen(true);
       }}
     >
       <fieldset className="nb-book__set">
@@ -102,14 +106,22 @@ function DemoScheduler({ s, intl, thanksHref }: Omit<Props, 'calLink'>) {
         {s.confirm}
       </button>
       <p className="nb-book__demo">{s.demoNote}</p>
+
+      <DemoNotice
+        s={demo}
+        kind="booking"
+        open={demoOpen}
+        onClose={() => setDemoOpen(false)}
+        nextHref={`${thanksHref}?fecha=${day}&hora=${time}`}
+      />
     </form>
   );
 }
 
 /** Calendario de reservas: Cal.com solo tras consentimiento; si no hay enlace, demostración. */
-export default function BookingEmbed({ s, intl, thanksHref, calLink }: Props) {
+export default function BookingEmbed({ s, demo, intl, thanksHref, calLink }: Props) {
   const [consent, setConsent] = useState(false);
-  if (!calLink) return <DemoScheduler s={s} intl={intl} thanksHref={thanksHref} />;
+  if (!calLink) return <DemoScheduler s={s} demo={demo} intl={intl} thanksHref={thanksHref} />;
   if (!consent)
     return (
       <div className="nb-book nb-book--consent">

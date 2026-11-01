@@ -547,6 +547,16 @@ export const de: Messages = {
     countryNotice: 'Dieser Ratgeber ist für ein anderes Land geschrieben.',
     countryOther: 'Die Version für dein Land',
   },
+  /** Aviso de web ficticia al enviar el formulario o la reserva de demostración. */
+  demo: {
+    label: 'Portfolio-Projekt',
+    title: 'Diese Website ist eine Demonstration.',
+    text: 'Northbridge Advisory ist ein fiktives Unternehmen, entstanden als Portfolio-Projekt für Webdesign und Webentwicklung.',
+    form: 'Das Formular sendet keine Nachricht, und deine Daten werden nirgends gespeichert.',
+    booking: 'Es wird kein Termin gebucht, und deine Daten werden nirgends gespeichert.',
+    close: 'Verstanden',
+    next: 'Zur Bestätigungsseite',
+  },
   form: {
     name: 'Name',
     email: 'E-Mail',
@@ -576,7 +586,6 @@ export const de: Messages = {
       company: 'Wähle die Unternehmensform.',
       message: 'Schreib mindestens 10 Zeichen, damit wir dir helfen können.',
       privacy: 'Wir brauchen deine Einwilligung, um dir zu antworten.',
-      send: 'Die Nachricht konnte nicht gesendet werden. Versuch es nochmals oder schreib uns an {email}.',
     },
     noscript:
       'Zum Senden des Formulars braucht es JavaScript. Du kannst uns auch an {email} schreiben oder unter {phone} anrufen.',

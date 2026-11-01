@@ -7,15 +7,15 @@ import {
   type ContactData,
   type ContactErrorKey,
 } from '../../lib/contact/schema';
-import { sendContact } from '../../lib/contact/send';
+import DemoNotice from './DemoNotice';
 
 type Strings = Messages['form'];
 
 interface Props {
   s: Strings;
+  demo: Messages['demo'];
   privacyHref: string;
   thanksHref: string;
-  email: string;
 }
 
 /** Resolver de Zod para React Hook Form, sin dependencias extra: cada error trae su clave. */
@@ -30,9 +30,10 @@ const resolver: Resolver<ContactData> = async (values) => {
   return { values: {}, errors: errors as never };
 };
 
-export default function ContactForm({ s, privacyHref, thanksHref, email }: Props) {
+export default function ContactForm({ s, demo, privacyHref, thanksHref }: Props) {
   const id = useId();
-  const [sendError, setSendError] = useState(false);
+  // Web ficticia (portfolio): nada se envía; con los datos válidos se abre el aviso.
+  const [demoOpen, setDemoOpen] = useState(false);
   const {
     register,
     handleSubmit,
@@ -51,15 +52,7 @@ export default function ContactForm({ s, privacyHref, thanksHref, email }: Props
   }, [setValue]);
 
   const onSubmit = handleSubmit(
-    async (data) => {
-      setSendError(false);
-      try {
-        await sendContact(data);
-        window.location.assign(thanksHref);
-      } catch {
-        setSendError(true);
-      }
-    },
+    () => setDemoOpen(true),
     () => {
       // Con errores, el foco va al primer campo marcado (lo hace RHF) y se anuncia el resumen.
     },
@@ -162,12 +155,6 @@ export default function ContactForm({ s, privacyHref, thanksHref, email }: Props
         <ErrorText field="privacy" />
       </div>
 
-      {sendError && (
-        <p className="nb-form__summary" role="alert">
-          {s.errors.send.replace('{email}', email)}
-        </p>
-      )}
-
       <button type="submit" className="nb-form__submit" disabled={isSubmitting}>
         {isSubmitting ? s.sending : s.submit}
         <svg viewBox="0 0 24 24" width="18" height="18" aria-hidden="true">
@@ -179,6 +166,14 @@ export default function ContactForm({ s, privacyHref, thanksHref, email }: Props
           />
         </svg>
       </button>
+
+      <DemoNotice
+        s={demo}
+        kind="form"
+        open={demoOpen}
+        onClose={() => setDemoOpen(false)}
+        nextHref={thanksHref}
+      />
     </form>
   );
 }
