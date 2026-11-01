@@ -87,29 +87,38 @@ export function zurichHolidays(y: number): Set<string> {
   );
 }
 
-export function isWorkingDay(date: CivilDate): boolean {
+/** Días de cierre de una oficina en un año (por defecto, la de Zúrich). */
+export type ClosedDays = (y: number) => Set<string>;
+
+export function isWorkingDay(date: CivilDate, closed: ClosedDays = zurichHolidays): boolean {
   const wd = weekdayOf(date);
-  return wd !== 0 && wd !== 6 && !zurichHolidays(date.y).has(key(date));
+  return wd !== 0 && wd !== 6 && !closed(date.y).has(key(date));
 }
 
 /** Primer día laborable estrictamente posterior a `date`. */
-export function nextWorkingDay(date: CivilDate): CivilDate {
+export function nextWorkingDay(date: CivilDate, closed: ClosedDays = zurichHolidays): CivilDate {
   let next = addDays(date, 1);
-  while (!isWorkingDay(next)) next = addDays(next, 1);
+  while (!isWorkingDay(next, closed)) next = addDays(next, 1);
   return next;
 }
 
-/** Día (en Zúrich) antes de cuyas 12:00 respondemos a un mensaje enviado en `now`. */
-export function replyDay(now: Date): CivilDate {
-  return nextWorkingDay(zurichNow(now));
+/**
+ * Día antes de cuyas 12:00 respondemos a un mensaje enviado en `now`. Las cinco oficinas comparten
+ * la hora de Europa central, así que basta la de Zúrich; los cierres son los de cada oficina.
+ */
+export function replyDay(now: Date, closed: ClosedDays = zurichHolidays): CivilDate {
+  return nextWorkingDay(zurichNow(now), closed);
 }
 
 /** Estado de la oficina: abierta ahora, o el día en que vuelve a abrir. */
-export function officeStatus(now: Date): { open: true } | { open: false; opens: CivilDate } {
+export function officeStatus(
+  now: Date,
+  closed: ClosedDays = zurichHolidays,
+): { open: true } | { open: false; opens: CivilDate } {
   const z = zurichNow(now);
-  if (isWorkingDay(z) && z.minutes >= OPEN_MINUTES && z.minutes < CLOSE_MINUTES)
+  if (isWorkingDay(z, closed) && z.minutes >= OPEN_MINUTES && z.minutes < CLOSE_MINUTES)
     return { open: true };
-  const opens = isWorkingDay(z) && z.minutes < OPEN_MINUTES ? z : nextWorkingDay(z);
+  const opens = isWorkingDay(z, closed) && z.minutes < OPEN_MINUTES ? z : nextWorkingDay(z, closed);
   return { open: false, opens: { y: opens.y, m: opens.m, d: opens.d } };
 }
 

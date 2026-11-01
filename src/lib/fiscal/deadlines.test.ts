@@ -3,6 +3,8 @@ import {
   daysBetween,
   spainNationalHolidays,
   berlinHolidays,
+  franceHolidays,
+  italyHolidays,
   deadlineIn,
   isLegalWorkday,
   yearFraction,
@@ -12,6 +14,8 @@ import { nextDeadline, timeline } from './timeline';
 import { events as CH } from '../../data/fiscal-calendar/ch';
 import { events as ES } from '../../data/fiscal-calendar/es';
 import { events as DE } from '../../data/fiscal-calendar/de';
+import { events as FR } from '../../data/fiscal-calendar/fr';
+import { events as IT } from '../../data/fiscal-calendar/it';
 
 describe('IVA suizo: fin del segundo mes tras el periodo (ESTV, «fällig am 31. Mai»)', () => {
   const end = (m: number): DeadlineRule => ({ type: 'monthEnd', m, shift: false });
@@ -127,5 +131,48 @@ describe('Alemania: § 108 AO con festivos de Berlín, 2026', () => {
     expect(due('de-trade-aug')).toEqual({ y: 2026, m: 8, d: 17 }); // 15-8 sábado
     expect(due('de-returns')).toEqual({ y: 2026, m: 7, d: 31 });
     expect(due('de-wage-certificates')).toEqual({ y: 2026, m: 3, d: 2 }); // 28-2 sábado
+  });
+});
+
+describe('Francia: art. 199-0 anexo IV CGI con festivos franceses', () => {
+  const FR_EVENTS = FR.flatMap((e) => (e.rule && !e.recurring ? [{ id: e.id, rule: e.rule }] : []));
+  const due = (id: string, y = 2026) =>
+    timeline(FR_EVENTS, y, franceHolidays).find((t) => t.id === id)?.due;
+  it('liasse fiscale: 2.º día hábil tras el 1 de mayo y 15 días más por vía telemática', () => {
+    expect(due('fr-return')).toEqual({ y: 2026, m: 5, d: 5 });
+    expect(due('fr-return-online')).toEqual({ y: 2026, m: 5, d: 20 });
+    expect(due('fr-return', 2027)).toEqual({ y: 2027, m: 5, d: 4 }); // impots.gouv: CA12 2026, 4-5-2027
+  });
+  it('acomptes y solde del IS, y CFE', () => {
+    expect(due('fr-is-mar')).toEqual({ y: 2026, m: 3, d: 16 }); // 15-3 domingo
+    expect(due('fr-is-balance')).toEqual({ y: 2026, m: 5, d: 15 });
+    expect(due('fr-is-jun')).toEqual({ y: 2026, m: 6, d: 15 });
+    expect(due('fr-cfe')).toEqual({ y: 2026, m: 12, d: 15 });
+  });
+});
+
+describe('Italia: scadenzario de la Agenzia delle Entrate 2026', () => {
+  const IT_EVENTS = IT.flatMap((e) => (e.rule && !e.recurring ? [{ id: e.id, rule: e.rule }] : []));
+  const due = (id: string) =>
+    timeline(IT_EVENTS, 2026, italyHolidays).find((t) => t.id === id)?.due;
+  it('IVA trimestral y LIPE, con sábados y domingos trasladados', () => {
+    expect(due('it-vat-annual')).toEqual({ y: 2026, m: 3, d: 16 });
+    expect(due('it-vat-q1')).toEqual({ y: 2026, m: 5, d: 18 }); // 16-5 sábado
+    expect(due('it-vat-q2')).toEqual({ y: 2026, m: 8, d: 20 });
+    expect(due('it-vat-q3')).toEqual({ y: 2026, m: 11, d: 16 });
+    expect(due('it-lipe-q4')).toEqual({ y: 2026, m: 3, d: 2 }); // 28-2 sábado
+    expect(due('it-lipe-q1')).toEqual({ y: 2026, m: 6, d: 1 }); // 31-5 domingo
+    expect(due('it-lipe-q2')).toEqual({ y: 2026, m: 9, d: 30 });
+  });
+  it('declaraciones, saldo y acconti, CU y 770', () => {
+    expect(due('it-returns')).toEqual({ y: 2026, m: 11, d: 2 }); // 31-10 sábado
+    expect(due('it-770')).toEqual({ y: 2026, m: 11, d: 2 });
+    expect(due('it-balance')).toEqual({ y: 2026, m: 6, d: 30 });
+    expect(due('it-second-advance')).toEqual({ y: 2026, m: 11, d: 30 });
+    expect(due('it-cu')).toEqual({ y: 2026, m: 3, d: 16 });
+  });
+  it('el 4 de octubre es festivo desde 2026 (Ley 151/2025)', () => {
+    expect(italyHolidays(2025).has('2025-10-4')).toBe(false);
+    expect(italyHolidays(2027).has('2027-10-4')).toBe(true);
   });
 });

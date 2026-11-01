@@ -3,6 +3,8 @@ import type { FiscalEvent } from './types';
 import { events as CH } from './ch';
 import { events as ES } from './es';
 import { events as DE } from './de';
+import { events as FR } from './fr';
+import { events as IT } from './it';
 
 import type { Text } from './types';
 
@@ -12,10 +14,10 @@ export type { FiscalEvent, Text } from './types';
  * Calendario fiscal por país (docs/09: datos estructurados para el futuro calendario interactivo).
  * Cada país vive en su archivo; los que aún no existen se añaden aquí.
  */
-export const FISCAL_CALENDARS: Partial<Record<Country, FiscalEvent[]>> = { CH, ES, DE };
+export const FISCAL_CALENDARS: Partial<Record<Country, FiscalEvent[]>> = { CH, ES, DE, FR, IT };
 
 /** Países con calendario propio; el resto ve el suizo hasta tener el suyo. */
-export type CalendarCountry = 'CH' | 'ES' | 'DE';
+export type CalendarCountry = 'CH' | 'ES' | 'DE' | 'FR' | 'IT';
 
 /** A quién aplica cada calendario y de dónde salen sus fechas. */
 export const CALENDAR_NOTES: Record<CalendarCountry, Text> = {
@@ -39,5 +41,19 @@ export const CALENDAR_NOTES: Record<CalendarCountry, Text> = {
     de: 'Gesellschaft oder Selbständige mit Geschäftsjahr gleich Kalenderjahr. Fristen der spanischen Steuerbehörde: Ist der letzte Tag kein Werktag, gilt der nächste Werktag.',
     fr: 'Société ou indépendant dont l’exercice correspond à l’année civile. Échéances de l’administration fiscale espagnole : si le dernier jour n’est pas ouvrable, le jour ouvrable suivant s’applique.',
     it: 'Società o autonomo con esercizio uguale all’anno civile. Scadenze dell’Agenzia tributaria spagnola: se l’ultimo giorno non è lavorativo, vale il giorno lavorativo successivo.',
+  },
+  FR: {
+    es: 'Sociedad sujeta al impuesto sobre sociedades (SAS, SARL) con ejercicio igual al año natural, en París. Si un pago vence en sábado, domingo o festivo, pasa al siguiente día hábil (art. 199-0 anexo IV CGI). Desde 2027 desaparece el régimen simplificado de IVA: hasta 1 M€ de volumen, el IVA se declara cada trimestre.',
+    en: 'Company subject to corporate income tax (SAS, SARL) with a financial year equal to the calendar year, in Paris. If a payment falls on a Saturday, Sunday or public holiday, the next working day applies (art. 199-0 annex IV CGI). From 2027 the simplified VAT scheme ends: up to €1M turnover, VAT is filed quarterly.',
+    de: 'Körperschaftsteuerpflichtige Gesellschaft (SAS, SARL) mit Geschäftsjahr gleich Kalenderjahr, in Paris. Fällt eine Zahlung auf einen Samstag, Sonntag oder Feiertag, gilt der nächste Werktag (Art. 199-0 Anhang IV CGI). Ab 2027 entfällt das vereinfachte Umsatzsteuerverfahren: Bis 1 Mio. € Umsatz wird vierteljährlich erklärt.',
+    fr: 'Société soumise à l’IS (SAS, SARL) dont l’exercice correspond à l’année civile, à Paris. Si un paiement tombe un samedi, un dimanche ou un jour férié, il est reporté au premier jour ouvrable suivant (art. 199-0 annexe IV CGI). À partir de 2027, le régime simplifié de TVA disparaît : jusqu’à 1 M€ de chiffre d’affaires, la TVA se déclare chaque trimestre.',
+    it: 'Società soggetta all’imposta sulle società (SAS, SARL) con esercizio uguale all’anno civile, a Parigi. Se un pagamento cade di sabato, domenica o in un festivo, slitta al giorno lavorativo successivo (art. 199-0 allegato IV CGI). Dal 2027 il regime IVA semplificato scompare: fino a 1 M€ di fatturato, l’IVA si dichiara ogni trimestre.',
+  },
+  IT: {
+    es: 'SRL o autónomo con ejercicio igual al año natural e IVA trimestral, en Roma. Si el plazo cae en sábado o festivo, pasa al siguiente día hábil (art. 7 DL 70/2011).',
+    en: 'SRL or self-employed with a financial year equal to the calendar year and quarterly VAT, in Rome. If a deadline falls on a Saturday or public holiday, the next working day applies (art. 7 DL 70/2011).',
+    de: 'SRL oder Selbständige mit Geschäftsjahr gleich Kalenderjahr und vierteljährlicher Umsatzsteuer, in Rom. Fällt eine Frist auf einen Samstag oder Feiertag, gilt der nächste Werktag (Art. 7 DL 70/2011).',
+    fr: 'SRL ou indépendant dont l’exercice correspond à l’année civile, avec TVA trimestrielle, à Rome. Si une échéance tombe un samedi ou un jour férié, elle est reportée au jour ouvrable suivant (art. 7 DL 70/2011).',
+    it: 'SRL o autonomo con esercizio uguale all’anno civile e IVA trimestrale, a Roma. Se la scadenza cade di sabato o in un festivo, slitta al primo giorno lavorativo successivo (art. 7 DL 70/2011).',
   },
 };

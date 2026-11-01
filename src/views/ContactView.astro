@@ -377,30 +377,41 @@ const arch = 'M10 37V29A14 14 0 0 1 38 29V37';
 
 <script>
   import { formatDay, officeStatus, replyDay, zurichNow } from '../lib/contact/office';
+  import { OFFICE_CLOSED } from '../lib/contact/closed-days';
+  import type { Country } from '../lib/country';
 
-  // Plazo y estado reales (hora de Zúrich). Sin JS queda el texto general del servidor.
+  // Plazo y estado reales (hora de Europa central). Sin JS queda el texto general del servidor.
   const now = new Date();
+  const root = document.documentElement;
   const promise = document.querySelector<HTMLElement>('[data-promise]');
   if (promise) {
     const { locale = 'es', tpl = '', open = '', closed = '', closedToday = '' } = promise.dataset;
     const target = promise.querySelector('[data-promise-text]');
     const [before, after = ''] = tpl.split('{when}');
-    if (target && before !== undefined) {
-      const em = document.createElement('em');
-      em.textContent = formatDay(replyDay(now), locale);
-      target.replaceChildren(before, em, after);
-    }
-    const status = officeStatus(now);
     const z = zurichNow(now);
     const line = promise.querySelector<HTMLElement>('[data-status]');
     const text = promise.querySelector('[data-status-text]');
-    if (line && text) {
-      if (status.open) text.textContent = open;
-      else if (status.opens.d === z.d && status.opens.m === z.m) text.textContent = closedToday;
-      else text.textContent = closed.replace('{when}', formatDay(status.opens, locale, false));
-      line.dataset.open = String(status.open);
-      line.hidden = false;
-    }
+
+    // Con los cierres de la oficina del país elegido; se rehace si cambia el país en el header.
+    const render = () => {
+      const country = (root.dataset.country ?? 'CH') as Country;
+      const closedDays = OFFICE_CLOSED[country] ?? OFFICE_CLOSED.CH;
+      if (target && before !== undefined) {
+        const em = document.createElement('em');
+        em.textContent = formatDay(replyDay(now, closedDays), locale);
+        target.replaceChildren(before, em, after);
+      }
+      const status = officeStatus(now, closedDays);
+      if (line && text) {
+        if (status.open) text.textContent = open;
+        else if (status.opens.d === z.d && status.opens.m === z.m) text.textContent = closedToday;
+        else text.textContent = closed.replace('{when}', formatDay(status.opens, locale, false));
+        line.dataset.open = String(status.open);
+        line.hidden = false;
+      }
+    };
+    render();
+    new MutationObserver(render).observe(root, { attributeFilter: ['data-country'] });
 
     // Fecha de la carta y día de hoy en el horario.
     const date = document.querySelector<HTMLElement>('[data-letter-date]');

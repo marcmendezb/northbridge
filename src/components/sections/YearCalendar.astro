@@ -74,10 +74,10 @@ const items = timeline(ruled, buildYear, HOLIDAYS[calendar]).map((it) => {
   };
 });
 /** En el gráfico no va la ventana sin fecha legal (certificados): solo en la lista. */
-const lanes = (['vat', 'tax', 'pay', 'payroll'] as const).map((cat) => ({
-  cat,
-  items: items.filter((it) => it.cat === cat && !it.window),
-}));
+/** Carriles con algún plazo con fecha (en Francia el IVA y la DSN no la tienen: solo en la lista). */
+const lanes = (['vat', 'tax', 'pay', 'payroll'] as const)
+  .map((cat) => ({ cat, items: items.filter((it) => it.cat === cat && !it.window) }))
+  .filter((l) => l.items.length);
 /** Leyenda de las marcas menores: en Suiza, las cuotas AVS; en otros países, lo que sean allí. */
 const minorShorts = [...new Set(items.filter((it) => it.minor).map((it) => it.short))];
 const minorLabel = calendar === 'CH' ? y.minor : minorShorts.join(', ');
@@ -142,7 +142,12 @@ const pct = (f: number) => `${(f * 100).toFixed(3)}%`;
     >
       <div class="nb-chart__scroll" data-lenis-prevent-horizontal>
         <div class="nb-chart__frame">
-          <ul class="nb-chart__names" role="list" aria-hidden="true">
+          <ul
+            class="nb-chart__names"
+            role="list"
+            aria-hidden="true"
+            style={`--lanes:${lanes.length}`}
+          >
             <li class="nb-chart__year" data-yr-year>
               {buildYear}
             </li>
@@ -154,7 +159,7 @@ const pct = (f: number) => `${(f * 100).toFixed(3)}%`;
             ))}
           </ul>
 
-          <div class="nb-chart__plot">
+          <div class="nb-chart__plot" style={`--lanes:${lanes.length}`}>
             <ol class="nb-chart__months" role="list" aria-hidden="true">
               {marks.map((mk) => (
                 <li
@@ -168,7 +173,10 @@ const pct = (f: number) => `${(f * 100).toFixed(3)}%`;
             </ol>
 
             {lanes.map((l) => (
-              <div class:list={['nb-chart__lane', `nb-chart__lane--${l.cat}`]}>
+              <div
+                class:list={['nb-chart__lane', `nb-chart__lane--${l.cat}`]}
+                style={`grid-row:${lanes.indexOf(l) + 2}`}
+              >
                 {l.items.map((it) => (
                   <>
                     {it.extends && (
@@ -559,7 +567,7 @@ const pct = (f: number) => `${(f * 100).toFixed(3)}%`;
   }
   .nb-chart__names {
     display: grid;
-    grid-template-rows: var(--head) repeat(4, var(--lane));
+    grid-template-rows: var(--head) repeat(var(--lanes, 4), var(--lane));
     margin: 0;
     padding: 0;
     list-style: none;
@@ -604,7 +612,7 @@ const pct = (f: number) => `${(f * 100).toFixed(3)}%`;
   .nb-chart__plot {
     position: relative;
     display: grid;
-    grid-template-rows: var(--head) repeat(4, var(--lane));
+    grid-template-rows: var(--head) repeat(var(--lanes, 4), var(--lane));
   }
   /* Meses: bandas alternas a toda altura, el actual marcado. */
   .nb-chart__months {
@@ -639,18 +647,6 @@ const pct = (f: number) => `${(f * 100).toFixed(3)}%`;
   .nb-chart__lane {
     position: relative;
     border-top: 1px solid var(--piedra-200);
-  }
-  .nb-chart__lane--vat {
-    grid-row: 2;
-  }
-  .nb-chart__lane--tax {
-    grid-row: 3;
-  }
-  .nb-chart__lane--pay {
-    grid-row: 4;
-  }
-  .nb-chart__lane--payroll {
-    grid-row: 5;
   }
   /* Carril: la línea base del año a 26 px del fondo. */
   .nb-chart__lane::after {

@@ -12,6 +12,8 @@ import { addDays, type CivilDate, weekdayOf, easterSunday } from '../contact/off
  * - `afterPeriod`: N días tras el fin de un periodo (IVA: 60 días tras el trimestre). Si el periodo
  *   termina el 31 de diciembre, es el del año anterior.
  * - `range`: una ventana de práctica, sin fecha legal (certificados de salario en enero o febrero).
+ * - `nthWorkdayAfter`: el n-ésimo día hábil posterior a una fecha, más `plusDays` naturales (Francia:
+ *   la liasse fiscale vence el 2.º día hábil tras el 1 de mayo, con 15 días más por vía telemática).
  * `shift`: si el último día es sábado, domingo o festivo, el plazo pasa al siguiente día hábil del
  * país (Suiza: art. 38.3 ATSG para la AVS; España: art. 30 Ley 39/2015 y LGT). Los festivos de cada
  * país están en `HOLIDAYS`.
@@ -20,7 +22,15 @@ export type DeadlineRule =
   | { type: 'fixed'; m: number; d: number; shift: boolean }
   | { type: 'monthEnd'; m: number; shift: boolean }
   | { type: 'afterPeriod'; endM: number; endD: number; days: number; shift: boolean }
-  | { type: 'range'; from: { m: number; d: number }; to: { m: number; d: number } | 'endFeb' };
+  | { type: 'range'; from: { m: number; d: number }; to: { m: number; d: number } | 'endFeb' }
+  | {
+      type: 'nthWorkdayAfter';
+      m: number;
+      d: number;
+      n: number;
+      plusDays?: number;
+      shift: boolean;
+    };
 
 export interface Deadline {
   /** Inicio de la ventana (igual a `due` salvo en `range`). */
@@ -89,11 +99,57 @@ export function berlinHolidays(y: number): Set<string> {
   );
 }
 
+/** Festivos legales de Francia (art. L3133-1 del Code du travail); la oficina está en París. */
+export function franceHolidays(y: number): Set<string> {
+  const easter = easterSunday(y);
+  return new Set(
+    [
+      { y, m: 1, d: 1 },
+      addDays(easter, 1), // Lundi de Pâques
+      { y, m: 5, d: 1 },
+      { y, m: 5, d: 8 },
+      addDays(easter, 39), // Ascension
+      addDays(easter, 50), // Lundi de Pentecôte
+      { y, m: 7, d: 14 },
+      { y, m: 8, d: 15 },
+      { y, m: 11, d: 1 },
+      { y, m: 11, d: 11 },
+      { y, m: 12, d: 25 },
+    ].map(key),
+  );
+}
+
+/**
+ * Festivos nacionales de Italia (Ley 260/1949 y DPR 792/1985); el 4 de octubre, San Francisco,
+ * desde 2026 (Ley 151/2025). Los plazos fiscales usan los nacionales, no el patrón local.
+ */
+export function italyHolidays(y: number): Set<string> {
+  const easter = easterSunday(y);
+  return new Set(
+    [
+      { y, m: 1, d: 1 },
+      { y, m: 1, d: 6 },
+      addDays(easter, 1), // Lunedì dell'Angelo
+      { y, m: 4, d: 25 },
+      { y, m: 5, d: 1 },
+      { y, m: 6, d: 2 },
+      { y, m: 8, d: 15 },
+      ...(y >= 2026 ? [{ y, m: 10, d: 4 }] : []),
+      { y, m: 11, d: 1 },
+      { y, m: 12, d: 8 },
+      { y, m: 12, d: 25 },
+      { y, m: 12, d: 26 },
+    ].map(key),
+  );
+}
+
 export type HolidayCalendar = (y: number) => Set<string>;
-export const HOLIDAYS: Record<'CH' | 'ES' | 'DE', HolidayCalendar> = {
+export const HOLIDAYS: Record<'CH' | 'ES' | 'DE' | 'FR' | 'IT', HolidayCalendar> = {
   CH: zurichLegalHolidays,
   ES: spainNationalHolidays,
   DE: berlinHolidays,
+  FR: franceHolidays,
+  IT: italyHolidays,
 };
 
 export function isLegalWorkday(date: CivilDate, holidays: HolidayCalendar = zurichLegalHolidays) {
@@ -123,6 +179,13 @@ export function deadlineIn(
     const to = rule.to === 'endFeb' ? { m: 2, d: isLeap(year) ? 29 : 28 } : rule.to;
     const start = { y: year, ...rule.from };
     return { start, due: { y: year, ...to }, shifted: false };
+  }
+  if (rule.type === 'nthWorkdayAfter') {
+    let day = { y: year, m: rule.m, d: rule.d };
+    for (let i = 0; i < rule.n; i++) day = onOrNextWorkday(addDays(day, 1), holidays);
+    const legal = addDays(day, rule.plusDays ?? 0);
+    const due = rule.shift ? onOrNextWorkday(legal, holidays) : legal;
+    return { start: due, due, shifted: key(due) !== key(legal) };
   }
   const legal =
     rule.type === 'fixed'

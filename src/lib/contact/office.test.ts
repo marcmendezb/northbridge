@@ -1,5 +1,6 @@
 import { describe, expect, it } from 'vitest';
 import { easterSunday, formatDay, isWorkingDay, officeStatus, replyDay, zurichNow } from './office';
+import { OFFICE_CLOSED } from './closed-days';
 
 /** Instante a partir de la hora de Zúrich (CET +01:00 / CEST +02:00). */
 const at = (iso: string) => new Date(iso);
@@ -73,5 +74,20 @@ describe('formatDay', () => {
   });
   it('can give only the weekday', () => {
     expect(formatDay(day, 'es', false)).toBe('jueves');
+  });
+});
+
+describe('cierres por país (OFFICE_CLOSED)', () => {
+  it('Roma cierra el 29 de junio y Madrid el 12 de octubre; Zúrich no', () => {
+    const friday = at('2026-06-26T16:00:00+02:00');
+    expect(replyDay(friday, OFFICE_CLOSED.IT)).toEqual({ y: 2026, m: 6, d: 30 });
+    expect(replyDay(friday, OFFICE_CLOSED.CH)).toEqual({ y: 2026, m: 6, d: 29 });
+    const octFriday = at('2026-10-09T16:00:00+02:00');
+    expect(replyDay(octFriday, OFFICE_CLOSED.ES)).toEqual({ y: 2026, m: 10, d: 13 });
+    expect(officeStatus(at('2026-10-12T10:00:00+02:00'), OFFICE_CLOSED.ES)).toEqual({
+      open: false,
+      opens: { y: 2026, m: 10, d: 13 },
+    });
+    expect(officeStatus(at('2026-10-12T10:00:00+02:00'), OFFICE_CLOSED.DE)).toEqual({ open: true });
   });
 });

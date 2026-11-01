@@ -82,7 +82,7 @@ const showYear = key === 'iva-y-fiscalidad';
 const calendarOf = (c: Country): CalendarCountry =>
   c in FISCAL_CALENDARS ? (c as CalendarCountry) : 'CH';
 const articles = showYear ? await getArticles(locale) : [];
-const yearGroups = (['CH', 'ES', 'DE'] as const)
+const yearGroups = (['CH', 'ES', 'DE', 'FR', 'IT'] as const)
   .map((calendar) => ({
     calendar,
     countries: COUNTRIES.filter((c) => calendarOf(c) === calendar),
