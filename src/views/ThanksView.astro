@@ -1,153 +1,367 @@
 ---
+/**
+ * Confirmación: el puente de lo que viene. Tres arcos colgados de un tablero, como el símbolo:
+ * hoy (recibido o reservado), el día exacto de la respuesta o de la consulta, y después.
+ * Sin JS se ve completo con textos generales; con JS, las fechas concretas del país elegido.
+ */
+import { Picture } from 'astro:assets';
 import BaseLayout from '../layouts/BaseLayout.astro';
-import BridgeMark from '../components/brand/BridgeMark.astro';
 import Arrow from '../components/brand/Arrow.astro';
-import { localeMeta, useI18n } from '../i18n';
-import { entryKey, getArticles, guideCountries } from '../lib/content';
+import lea from '../assets/img/about/team/lea-brunner.jpeg';
+import { localeMeta, useI18n, type Messages } from '../i18n';
+import { entryKey, getArticles, getTeam, guideCountries } from '../lib/content';
 
-const { t, tRaw, lp, locale } = useI18n(Astro.currentLocale);
-const next = tRaw<string[]>('thanks.next');
-const nextDay = t('thanks.nextDay');
+const { tRaw, lp, locale } = useI18n(Astro.currentLocale);
+const s = tRaw<Messages['thanks']>('thanks');
+const reader = (await getTeam(locale))[0];
+const readerName = reader?.data.name ?? 'Lea Brunner';
+const [readerBefore = '', readerAfter = ''] = s.reader.split('{name}');
+const [bookedBefore = '', bookedAfter = ''] = s.readerBooked.split('{name}');
 /** El calendario fiscal del país activo (o el suizo si aún no tiene). */
 const guides = await getArticles(locale);
 const shownIn = guideCountries(guides);
 const calendars = guides.filter((g) => g.data.topic === 'calendario');
 ---
 
-<BaseLayout title={t('thanks.seoTitle')} noindex overlayHeader>
-  <section class="nb-thanks" data-surface="dark">
-    <div class="nb-container nb-thanks__inner">
-      <BridgeMark animate class="nb-thanks__mark" strokeWidth={2.5} />
-      <h1 class="nb-thanks__title">{t('thanks.title')}</h1>
-      <p class="nb-thanks__lead">{t('thanks.lead')}</p>
-      <p
-        class="nb-thanks__booked"
-        data-booked
-        data-template={t('thanks.booked')}
-        data-intl={localeMeta[locale].intl}
-        hidden
-      ></p>
+<BaseLayout title={s.seoTitle} noindex overlayHeader>
+  <section
+    class="nb-ty"
+    data-surface="dark"
+    data-thanks
+    data-locale={locale}
+    data-intl={localeMeta[locale].intl}
+  >
+    <div class="nb-container nb-ty__head">
+      <h1 class="nb-ty__title" data-booked-text={s.titleBooked}>
+        {s.title}
+      </h1>
 
-      <div class="nb-thanks__next">
-        <h2 class="nb-thanks__h">{t('thanks.nextTitle')}</h2>
-        <ol>
-          {next.map((step) => (
-            <li>
-              <svg class="nb-thanks__n" viewBox="4 11 40 26" aria-hidden="true">
+      <div class="nb-ty__reader">
+        <div class="nb-ty__portrait">
+          <Picture
+            src={lea}
+            formats={['avif', 'webp']}
+            widths={[160, 320]}
+            sizes="128px"
+            alt=""
+            quality={74}
+            class="nb-ty__img"
+          />
+        </div>
+        <p class="nb-ty__who">
+          <span data-reader>
+            {readerBefore}
+            <strong>{readerName}</strong>
+            {readerAfter}
+          </span>
+          <span
+            data-reader-booked
+            data-before={bookedBefore}
+            data-after={bookedAfter}
+            data-name={readerName}
+            hidden
+          ></span>
+          <span class="nb-ty__role">{reader?.data.role}</span>
+        </p>
+      </div>
+    </div>
+
+    <div class="nb-container nb-ty__bridge">
+      <h2 class="nb-ty__h">{s.bridgeTitle}</h2>
+      <div class="nb-span">
+        <span class="nb-span__deck" aria-hidden="true"></span>
+        <ol class="nb-span__arches" role="list">
+          <li class="nb-span__arch is-done">
+            <span class="nb-span__mark" aria-hidden="true">
+              <svg viewBox="4 11 40 26" fill="none" stroke="currentColor" stroke-width="4">
                 <path d="M4 13H44"></path>
                 <path d="M10 37V29A14 14 0 0 1 38 29V37"></path>
               </svg>
-              <span
-                data-next-day={step.includes('{date}') ? '' : undefined}
-                data-template={step}
-                data-intl={localeMeta[locale].intl}
-              >
-                {step.replace('{date}', nextDay)}
-              </span>
-            </li>
-          ))}
+            </span>
+            <p class="nb-span__when" data-now data-template={s.now}>
+              {s.today}
+            </p>
+            <p class="nb-span__what" data-booked-text={s.bookedNow}>
+              {s.received}
+            </p>
+          </li>
+          <li class="nb-span__arch is-next">
+            <span class="nb-span__pin" aria-hidden="true"></span>
+            <p
+              class="nb-span__when"
+              data-reply
+              data-template={s.replyWhen}
+              data-booked-template={s.callWhen}
+            >
+              {s.replyFallback}
+            </p>
+            <p class="nb-span__what" data-booked-text={s.call}>
+              {s.reply}
+            </p>
+          </li>
+          <li class="nb-span__arch">
+            <p class="nb-span__when">{s.after}</p>
+            <p class="nb-span__what">{s.proposal}</p>
+          </li>
         </ol>
       </div>
+    </div>
 
-      <div class="nb-thanks__more">
-        <p class="nb-thanks__h">{t('thanks.meanwhile')}</p>
+    <div class="nb-container nb-ty__foot">
+      <div class="nb-ty__more">
+        <p class="nb-ty__meanwhile">{s.meanwhile}</p>
         {calendars.map((g) => (
           <a href={lp(`/recursos/${entryKey(g)}`)} data-cc={(shownIn.get(g.id) ?? []).join(' ')}>
-            {t('thanks.readGuide')} <Arrow />
+            {s.readGuide} <Arrow />
           </a>
         ))}
         <a href={lp('/calculadora')}>
-          {t('thanks.tryCalculator')} <Arrow />
+          {s.tryCalculator} <Arrow />
         </a>
       </div>
+      <p class="nb-ty__demo">{s.demo}</p>
     </div>
   </section>
 </BaseLayout>
 
 <style is:global>
-  .nb-thanks {
+  .nb-ty {
+    position: relative;
+    overflow: clip;
     min-height: 100svh;
     padding-top: var(--header-h);
     background: var(--navy-800);
     color: var(--navy-100);
   }
-  .nb-thanks__inner {
+
+  /* ── Cabecera: el titular y quién lee tu mensaje ── */
+  .nb-ty__head {
     display: grid;
-    justify-items: start;
-    gap: 24px;
-    padding-block: clamp(48px, 8vw, 120px);
+    gap: 32px;
+    align-items: end;
+    padding-block: clamp(48px, 7vw, 104px) clamp(40px, 5vw, 72px);
   }
-  .nb-thanks__mark {
-    width: clamp(88px, 9vw, 120px);
-    height: auto;
-    color: var(--white);
+  @media (min-width: 900px) {
+    .nb-ty__head {
+      grid-template-columns: minmax(0, 1fr) auto;
+      gap: 64px;
+    }
   }
-  .nb-thanks__title {
+  .nb-ty__title {
     margin: 0;
-    max-width: 14ch;
-    font-size: clamp(2.5rem, 1rem + 5vw, 5.5rem);
+    max-width: 11ch;
+    font-family: var(--font-display);
+    font-optical-sizing: auto;
+    font-size: clamp(3rem, 1.2rem + 6.4vw, 6.75rem);
     font-weight: 300;
-    line-height: 1;
-    letter-spacing: -0.025em;
+    line-height: 0.98;
+    letter-spacing: -0.03em;
     color: var(--white);
+    text-wrap: balance;
   }
-  .nb-thanks__lead,
-  .nb-thanks__booked {
-    margin: 0;
-    max-width: 36rem;
-    font-size: 1.1875rem;
-    line-height: 1.55;
+  .nb-ty__reader {
+    display: flex;
+    align-items: flex-end;
+    gap: 20px;
   }
-  .nb-thanks__booked {
-    padding: 12px 16px;
-    border: 1px solid var(--navy-600);
-    border-radius: var(--radius-button, 4px);
-    color: var(--white);
+  .nb-ty__portrait {
+    flex: none;
+    width: clamp(96px, 9vw, 128px);
+    aspect-ratio: 3 / 4;
+    overflow: hidden;
+    border-radius: 9999px 9999px 0 0;
+    background: var(--navy-700);
   }
-  .nb-thanks__next {
+  .nb-ty__portrait picture {
+    display: contents;
+  }
+  .nb-ty__img {
+    display: block;
     width: 100%;
-    max-width: 44rem;
-    margin-top: 24px;
+    height: 100%;
+    object-fit: cover;
   }
-  .nb-thanks__h {
-    margin: 0 0 12px;
-    font-family: var(--font-sans);
-    font-size: 0.75rem;
-    font-weight: 600;
-    letter-spacing: 0.16em;
-    text-transform: uppercase;
+  .nb-ty__who {
+    display: grid;
+    gap: 6px;
+    margin: 0;
+    padding-bottom: 4px;
+    font-family: var(--font-display);
+    font-optical-sizing: auto;
+    font-size: 1.5rem;
+    font-weight: 300;
+    line-height: 1.15;
+    color: var(--white);
+  }
+  .nb-ty__who strong {
+    font-weight: 400;
+  }
+  .nb-ty__role {
+    font-family: var(--font-text);
+    font-size: 0.875rem;
+    line-height: 1.4;
     color: var(--navy-200);
   }
-  .nb-thanks__next ol {
+
+  /* ── El puente: tablero continuo y tres arcos tangentes ── */
+  /* Las patas de los arcos se apoyan en el filete del pie. */
+  .nb-ty__bridge {
+    padding-bottom: 0;
+  }
+  .nb-ty__h {
+    margin: 0 0 20px;
+    font-family: var(--font-display);
+    font-size: 1.375rem;
+    font-weight: 400;
+    color: var(--navy-200);
+  }
+  .nb-span {
+    position: relative;
+  }
+  /* El suelo: mismo ancho que el tablero; en él se apoyan las patas de los arcos. */
+  .nb-span::after {
+    content: '';
+    position: absolute;
+    inset: auto 0 0;
+    height: 1px;
+    background: var(--navy-600);
+  }
+  .nb-span__deck {
+    position: absolute;
+    inset: 0 0 auto;
+    z-index: 1;
+    height: 1.5px;
+    background: var(--navy-200);
+    transform-origin: left center;
+    pointer-events: none;
+  }
+  .nb-span__arches {
+    display: grid;
+    gap: 16px;
     margin: 0;
     padding: 0;
     list-style: none;
-    border-top: 1px solid var(--navy-600);
   }
-  .nb-thanks__next li {
-    display: flex;
-    gap: 16px;
-    padding-block: 16px;
-    border-bottom: 1px solid var(--navy-600);
-    font-size: 1.0625rem;
-    color: var(--white);
-  }
-  /* Sin numeración: el símbolo, pequeño, marca cada paso. */
-  .nb-thanks__n {
-    flex: none;
-    width: 22px;
-    height: 14px;
-    margin-top: 0.45em;
-    fill: none;
-    stroke: var(--salvia-300);
-    stroke-width: 4;
-  }
-  .nb-thanks__more {
+  .nb-span__arch {
+    position: relative;
     display: grid;
-    gap: 8px;
-    margin-top: 16px;
+    align-content: end;
+    gap: 10px;
+    min-height: 220px;
+    padding: 72px 28px 32px;
+    border: 1.5px solid var(--navy-600);
+    border-bottom: 0;
+    border-radius: 9999px 9999px 0 0;
+    text-align: center;
   }
-  .nb-thanks__more a {
+  /* El tramo hecho, con algo de cuerpo; el siguiente, marcado en salvia. */
+  .nb-span__arch.is-done {
+    border-color: var(--navy-200);
+    background: color-mix(in oklab, var(--navy-600) 28%, transparent);
+  }
+  .nb-span__arch.is-next {
+    border-color: var(--salvia-300);
+  }
+  .nb-span__mark {
+    justify-self: center;
+    width: 34px;
+    color: var(--salvia-300);
+  }
+  .nb-span__mark svg {
+    display: block;
+    width: 100%;
+    height: auto;
+  }
+  /* Punto de tangencia del arco siguiente con el tablero. */
+  .nb-span__pin {
+    position: absolute;
+    top: -6px;
+    left: 50%;
+    width: 11px;
+    height: 11px;
+    border: 1.5px solid var(--salvia-300);
+    border-radius: 9999px;
+    background: var(--navy-800);
+    transform: translateX(-50%);
+  }
+  .nb-span__when {
+    margin: 0;
+    font-family: var(--font-display);
+    font-optical-sizing: auto;
+    font-size: clamp(1.5rem, 1.1rem + 1vw, 2rem);
+    font-weight: 300;
+    line-height: 1.12;
+    color: var(--white);
+    text-wrap: balance;
+  }
+  .nb-span__what {
+    margin: 0 auto;
+    max-width: 26ch;
+    font-size: 1rem;
+    line-height: 1.55;
+    color: var(--navy-100);
+    text-wrap: pretty;
+  }
+  .nb-span__arch:not(.is-done, .is-next) :is(.nb-span__when, .nb-span__what) {
+    color: var(--navy-200);
+  }
+
+  /* En móvil, cada arco cuelga de su propio tramo de tablero. */
+  @media (max-width: 759px) {
+    .nb-span__deck {
+      display: none;
+    }
+    .nb-span__arch {
+      margin-top: 12px;
+    }
+    .nb-span__arch::before {
+      content: '';
+      position: absolute;
+      inset: -1.5px -12px auto;
+      height: 1.5px;
+      background: var(--navy-200);
+    }
+  }
+  @media (min-width: 760px) {
+    .nb-span {
+      padding-top: 0;
+    }
+    .nb-span__arches {
+      grid-template-columns: repeat(3, minmax(0, 1fr));
+      gap: clamp(12px, 2vw, 28px);
+    }
+    .nb-span__arch {
+      aspect-ratio: 1.24 / 1;
+      min-height: 0;
+      padding: 0 clamp(20px, 3vw, 44px) clamp(28px, 3vw, 40px);
+    }
+  }
+
+  /* ── Pie: mientras tanto y la nota de demostración ── */
+  .nb-ty__foot {
+    display: grid;
+    gap: 28px;
+    padding-block: 28px clamp(48px, 6vw, 80px);
+  }
+  @media (min-width: 900px) {
+    .nb-ty__foot {
+      grid-template-columns: minmax(0, 1fr) minmax(0, 22rem);
+      align-items: end;
+    }
+  }
+  .nb-ty__more {
+    display: flex;
+    flex-wrap: wrap;
+    align-items: center;
+    gap: 8px 32px;
+  }
+  .nb-ty__meanwhile {
+    margin: 0;
+    width: 100%;
+    font-size: 0.9375rem;
+    color: var(--navy-200);
+  }
+  .nb-ty__more a {
     display: inline-flex;
     align-items: center;
     gap: 8px;
@@ -155,44 +369,133 @@ const calendars = guides.filter((g) => g.data.topic === 'calendario');
     font-weight: 600;
     color: var(--white);
     text-decoration: none;
+    transition: color var(--dur-fast) var(--ease-out);
   }
-  .nb-thanks__more a:hover {
+  .nb-ty__more a:hover {
     color: var(--salvia-300);
+  }
+  .nb-ty__more a:focus-visible {
+    outline: 2px solid var(--salvia-300);
+    outline-offset: 3px;
+  }
+  .nb-ty__demo {
+    margin: 0;
+    font-size: 0.8125rem;
+    line-height: 1.5;
+    color: var(--navy-200);
+  }
+
+  /* ── Movimiento: el tablero se tiende y los arcos se levantan, uno tras otro ── */
+  @media (prefers-reduced-motion: no-preference) {
+    .js.motion .nb-ty__title,
+    .js.motion .nb-ty__reader {
+      animation: nb-ty-rise var(--dur-slow) var(--ease-out) both;
+    }
+    .js.motion .nb-ty__reader {
+      animation-delay: 0.25s;
+    }
+    .js.motion .nb-ty__img {
+      animation: nb-ty-arch 1.4s var(--ease-out) 0.3s both;
+    }
+    .js.motion .nb-span__deck {
+      animation: nb-ty-deck 1.4s var(--ease-out) 0.5s both;
+    }
+    .js.motion .nb-span__arch {
+      animation: nb-ty-rise 1.1s var(--ease-out) both;
+    }
+    .js.motion .nb-span__arch:nth-child(1) {
+      animation-delay: 0.9s;
+    }
+    .js.motion .nb-span__arch:nth-child(2) {
+      animation-delay: 1.15s;
+    }
+    .js.motion .nb-span__arch:nth-child(3) {
+      animation-delay: 1.4s;
+    }
+    .js.motion .nb-ty__foot {
+      animation: nb-ty-fade var(--dur-slow) var(--ease-out) 1.7s both;
+    }
+  }
+  @keyframes nb-ty-rise {
+    from {
+      opacity: 0;
+      transform: translateY(24px);
+    }
+  }
+  @keyframes nb-ty-arch {
+    from {
+      transform: translateY(101%);
+    }
+  }
+  @keyframes nb-ty-deck {
+    from {
+      transform: scaleX(0);
+    }
+  }
+  @keyframes nb-ty-fade {
+    from {
+      opacity: 0;
+    }
   }
 </style>
 
 <script>
-  // Fechas concretas (docs/02: «El 30 de noviembre», no «próximamente»), calculadas en el navegador.
-  const nextWorkingDay = () => {
-    const d = new Date();
-    do d.setDate(d.getDate() + 1);
-    while (d.getDay() === 0 || d.getDay() === 6);
-    return d;
-  };
-  document.querySelectorAll<HTMLElement>('[data-next-day]').forEach((el) => {
-    const fmt = new Intl.DateTimeFormat(el.dataset.intl, {
-      weekday: 'long',
-      day: 'numeric',
-      month: 'long',
-    });
-    el.textContent = (el.dataset.template ?? '').replace('{date}', fmt.format(nextWorkingDay()));
-  });
+  import { formatDay, replyDay } from '../lib/contact/office';
+  import { OFFICE_CLOSED } from '../lib/contact/closed-days';
+  import type { Country } from '../lib/country';
 
-  // Si viene de la reserva: «Tu consulta: martes, 28 de octubre a las 10:30».
-  const booked = document.querySelector<HTMLElement>('[data-booked]');
-  const q = new URLSearchParams(location.search);
-  const fecha = q.get('fecha');
-  const hora = q.get('hora');
-  if (booked && fecha && hora && /^\d{4}-\d{2}-\d{2}$/.test(fecha) && /^\d{2}:\d{2}$/.test(hora)) {
-    const [y, m, d] = fecha.split('-').map(Number);
-    const fmt = new Intl.DateTimeFormat(booked.dataset.intl, {
-      weekday: 'long',
-      day: 'numeric',
-      month: 'long',
-    });
-    booked.textContent = (booked.dataset.template ?? '')
-      .replace('{date}', fmt.format(new Date(y, m - 1, d)))
-      .replace('{time}', hora);
-    booked.hidden = false;
+  // Fechas concretas (docs/02: «El 30 de noviembre», no «próximamente»), en el navegador.
+  const root = document.documentElement;
+  const section = document.querySelector<HTMLElement>('[data-thanks]');
+  if (section) {
+    const locale = section.dataset.locale ?? 'es';
+    const intl = section.dataset.intl ?? locale;
+    const now = new Date();
+    const cap = (text: string) => text.charAt(0).toLocaleUpperCase(intl) + text.slice(1);
+
+    // Hoy, con la hora a la que llega el mensaje.
+    const nowEl = section.querySelector<HTMLElement>('[data-now]');
+    const time = new Intl.DateTimeFormat(intl, { hour: '2-digit', minute: '2-digit' }).format(now);
+    if (nowEl) nowEl.textContent = (nowEl.dataset.template ?? '').replace('{time}', time);
+
+    // Si viene de la reserva: título, persona y el segundo tramo pasan a la consulta.
+    const q = new URLSearchParams(location.search);
+    const fecha = q.get('fecha') ?? '';
+    const hora = q.get('hora') ?? '';
+    const booked = /^\d{4}-\d{2}-\d{2}$/.test(fecha) && /^\d{2}:\d{2}$/.test(hora);
+    const reply = section.querySelector<HTMLElement>('[data-reply]');
+
+    if (booked) {
+      section.querySelectorAll<HTMLElement>('[data-booked-text]').forEach((el) => {
+        el.textContent = el.dataset.bookedText ?? el.textContent;
+      });
+      const plain = section.querySelector<HTMLElement>('[data-reader]');
+      const alt = section.querySelector<HTMLElement>('[data-reader-booked]');
+      if (plain && alt) {
+        const strong = document.createElement('strong');
+        strong.textContent = alt.dataset.name ?? '';
+        alt.replaceChildren(alt.dataset.before ?? '', strong, alt.dataset.after ?? '');
+        plain.hidden = true;
+        alt.hidden = false;
+      }
+      const [y, m, d] = fecha.split('-').map(Number);
+      if (reply)
+        reply.textContent = cap(
+          (reply.dataset.bookedTemplate ?? '')
+            .replace('{date}', formatDay({ y, m, d }, locale))
+            .replace('{time}', hora),
+        );
+    } else if (reply) {
+      // El día de la respuesta, con los cierres de la oficina del país elegido.
+      const render = () => {
+        const country = (root.dataset.country ?? 'CH') as Country;
+        const day = replyDay(now, OFFICE_CLOSED[country] ?? OFFICE_CLOSED.CH);
+        reply.textContent = cap(
+          (reply.dataset.template ?? '').replace('{date}', formatDay(day, locale)),
+        );
+      };
+      render();
+      new MutationObserver(render).observe(root, { attributeFilter: ['data-country'] });
+    }
   }
 </script>

@@ -88,7 +88,8 @@ test('consulta gratuita: el calendario de demostración avisa y lleva a gracias 
   await expect(notice).toContainText('No se reserva ninguna cita');
   await notice.getByRole('link', { name: 'Ver la página de confirmación' }).click();
   await expect(page).toHaveURL(/\/gracias\?fecha=\d{4}-\d{2}-\d{2}&hora=\d{2}:\d{2}/);
-  await expect(page.getByText(/Tu consulta: .+ a las \d{2}:\d{2}\./)).toBeVisible();
+  await expect(page.getByRole('heading', { level: 1 })).toHaveText('Reservado. Te esperamos.');
+  await expect(page.locator('[data-reply]')).toHaveText(/, a las \d{2}:\d{2}$/);
 });
 
 test('recursos: el filtro por tema muestra solo esas guías', async ({ page }) => {
