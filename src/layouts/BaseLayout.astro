@@ -108,8 +108,9 @@ const alternateLinks = alternates(parsePath(Astro.url.pathname).canonical).map((
     ))}
     <link rel="alternate" hreflang="x-default" href={alternateLinks[0].href} />
     <script is:inline>
-      // Idioma del navegador: solo al entrar desde fuera, si no se eligió antes uno en el selector
-      // y nunca para robots ni navegadores automatizados (SEO y tests). DECISIONES.md.
+      // Idioma al entrar desde fuera: el del lugar (zona horaria), y si no es uno de los cinco países,
+      // el del navegador. Nunca si ya se eligió uno en el selector, ni para robots o navegadores
+      // automatizados (SEO y tests). DECISIONES.md.
       (() => {
         try {
           if (localStorage.getItem('nb-lang')) return;
@@ -117,9 +118,23 @@ const alternateLinks = alternates(parsePath(Astro.url.pathname).canonical).map((
             return;
           if (document.referrer && new URL(document.referrer).origin === location.origin) return;
           const supported = ['es', 'en', 'de', 'fr', 'it'];
-          const wanted = (navigator.languages || [navigator.language])
-            .map((l) => l.split('-')[0].toLowerCase())
-            .find((l) => supported.includes(l));
+          const prefs = (navigator.languages || [navigator.language]).map((l) =>
+            l.split('-')[0].toLowerCase(),
+          );
+          // Suiza tiene tres idiomas: el primero de ellos que prefiera el navegador, si no, alemán.
+          const local = {
+            'Europe/Zurich': ['de', 'fr', 'it'],
+            'Europe/Madrid': ['es'],
+            'Atlantic/Canary': ['es'],
+            'Africa/Ceuta': ['es'],
+            'Europe/Berlin': ['de'],
+            'Europe/Busingen': ['de'],
+            'Europe/Paris': ['fr'],
+            'Europe/Rome': ['it'],
+          }[Intl.DateTimeFormat().resolvedOptions().timeZone || ''];
+          const wanted = local
+            ? prefs.find((l) => local.includes(l)) || local[0]
+            : prefs.find((l) => supported.includes(l));
           const current = document.documentElement.lang.split('-')[0];
           if (!wanted || wanted === current) return;
           const link = [...document.querySelectorAll('link[rel="alternate"][hreflang]')].find(

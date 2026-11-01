@@ -96,9 +96,9 @@ test('país: cambia moneda y formas jurídicas, independiente del idioma, y se r
   await expect(page.locator('.nb-pk .t-price').nth(1)).toHaveText('490', { useInnerText: true });
 });
 
-test.describe('país e idioma del navegador', () => {
+test.describe('país e idioma del lugar', () => {
   test.use({ locale: 'de-CH', timezoneId: 'Europe/Zurich' });
-  test('al entrar, lleva al idioma del navegador y aplica el país de la zona horaria', async ({
+  test('al entrar desde Zúrich, Suiza y alemán; una elección a mano se respeta', async ({
     page,
   }) => {
     // Playwright marca navigator.webdriver; aquí se simula una visita normal.
@@ -123,3 +123,29 @@ test.describe('país por zona horaria', () => {
     await expect(page.locator('.nb-pk .t-price').nth(1)).toHaveText('490', { useInnerText: true });
   });
 });
+
+/** Visita normal (sin webdriver) desde una zona horaria y con un idioma de navegador concretos. */
+const visit = (locale: string, timezoneId: string, expected: RegExp, country: string) =>
+  test.describe(`${timezoneId} con navegador ${locale}`, () => {
+    test.use({ locale, timezoneId });
+    test(`abre en ${expected} con país ${country || 'por defecto'}`, async ({ page }) => {
+      await page.addInitScript(() =>
+        Object.defineProperty(Navigator.prototype, 'webdriver', { get: () => false }),
+      );
+      await page.goto('/precios');
+      await expect(page).toHaveURL(expected);
+      // Sin país detectado no hay atributo: la web usa Suiza por defecto.
+      if (country) await expect(page.locator('html')).toHaveAttribute('data-country', country);
+      else await expect(page.locator('html')).not.toHaveAttribute('data-country', /.+/);
+    });
+  });
+
+// El idioma sigue al lugar, aunque el navegador esté en otro idioma.
+visit('es-ES', 'Europe/Zurich', /\/de\/preise$/, 'CH');
+visit('en-US', 'Europe/Paris', /\/fr\/tarifs$/, 'FR');
+visit('en-GB', 'Europe/Rome', /\/it\/prezzi$/, 'IT');
+visit('de-DE', 'Europe/Madrid', /\/precios$/, 'ES');
+// En Suiza, si el navegador prefiere francés o italiano, ese idioma.
+visit('fr-CH', 'Europe/Zurich', /\/fr\/tarifs$/, 'CH');
+// Fuera de los cinco países, el idioma del navegador.
+visit('en-US', 'America/New_York', /\/en\/pricing$/, '');

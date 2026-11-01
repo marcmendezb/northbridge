@@ -109,6 +109,44 @@ const segments: Record<string, Partial<Record<Locale, string>>> = {
     fr: '5-erreurs-comptables-des-startups-en-allemagne',
     it: '5-errori-contabili-delle-startup-in-germania',
   },
+  // Guías de Francia
+  'como-constituir-una-sas-en-francia': {
+    en: 'how-to-set-up-an-sas-in-france',
+    de: 'sas-in-frankreich-gruenden',
+    fr: 'creer-une-sas-en-france',
+    it: 'come-costituire-una-sas-in-francia',
+  },
+  'calendario-fiscal-para-pymes-en-francia': {
+    en: 'tax-calendar-for-smes-in-france',
+    de: 'steuerkalender-fuer-kmu-in-frankreich',
+    fr: 'calendrier-fiscal-pour-pme-en-france',
+    it: 'calendario-fiscale-per-pmi-in-francia',
+  },
+  '5-errores-contables-de-las-startups-en-francia': {
+    en: '5-accounting-mistakes-startups-make-in-france',
+    de: '5-buchhaltungsfehler-von-startups-in-frankreich',
+    fr: '5-erreurs-comptables-des-start-up-en-france',
+    it: '5-errori-contabili-delle-startup-in-francia',
+  },
+  // Guías de Italia
+  'como-constituir-una-srl-en-italia': {
+    en: 'how-to-set-up-an-srl-in-italy',
+    de: 'srl-in-italien-gruenden',
+    fr: 'creer-une-srl-en-italie',
+    it: 'come-costituire-una-srl-in-italia',
+  },
+  'calendario-fiscal-para-pymes-en-italia': {
+    en: 'tax-calendar-for-smes-in-italy',
+    de: 'steuerkalender-fuer-kmu-in-italien',
+    fr: 'calendrier-fiscal-pour-pme-en-italie',
+    it: 'calendario-fiscale-per-pmi-in-italia',
+  },
+  '5-errores-contables-de-las-startups-en-italia': {
+    en: '5-accounting-mistakes-startups-make-in-italy',
+    de: '5-buchhaltungsfehler-von-startups-in-italien',
+    fr: '5-erreurs-comptables-des-start-up-en-italie',
+    it: '5-errori-contabili-delle-startup-in-italia',
+  },
 };
 
 const forward = (segment: string, locale: Locale) =>
