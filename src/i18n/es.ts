@@ -589,6 +589,7 @@ export const es = {
       'Para enviar el formulario hace falta JavaScript. También puedes escribirnos a {email} o llamarnos al {phone}.',
   },
   contact: {
+    phoneCentral: 'central en Zúrich',
     seoTitle: 'Contacto',
     seoDescription:
       'Escríbenos o llámanos: Northbridge Advisory, Seefeldstrasse 45, 8008 Zúrich. Te respondemos antes de las 12:00 del siguiente día laborable.',

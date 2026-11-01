@@ -1,0 +1,21 @@
+---
+/**
+ * Teléfono de la firma. Es el de la central de Zúrich en todos los países (no se inventan números
+ * locales): fuera de Suiza se indica junto al número.
+ */
+import { useI18n } from '../../i18n';
+import { byCountry } from '../../lib/country';
+import { site } from '../../lib/site';
+
+interface Props {
+  class?: string;
+}
+const { class: className } = Astro.props;
+const { t } = useI18n(Astro.currentLocale);
+const note = byCountry((c) => (c === 'CH' ? '' : ` (${t('contact.phoneCentral')})`));
+---
+
+<a class={className} href={`tel:${site.phone.replace(/\s/g, '')}`}>
+  {site.phone}
+  <Fragment set:html={note} />
+</a>

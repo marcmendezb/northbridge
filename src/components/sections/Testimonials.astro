@@ -7,9 +7,15 @@
 import Section from '../ui/Section.astro';
 import { localeMeta, useI18n } from '../../i18n';
 import { getTestimonials } from '../../lib/content';
+import { COUNTRIES } from '../../lib/country';
 const { t, locale } = useI18n(Astro.currentLocale);
 
-const items = await getTestimonials(locale);
+/** Un carrusel por país (clientes de cada oficina); se muestra el del país elegido. */
+const all = await getTestimonials(locale);
+const groups = COUNTRIES.map((cc) => ({
+  cc,
+  items: all.filter((it) => (it.data.country ?? 'CH') === cc),
+})).filter((g) => g.items.length);
 const [open] = localeMeta[locale].quotes;
 const initials = (name: string) =>
   name
@@ -21,82 +27,90 @@ const chevron = (dir: 'prev' | 'next') => (dir === 'prev' ? 'M15 5l-7 7 7 7' : '
 ---
 
 <Section tone="piedra" title={t('home.testimonials.title')}>
-  <div class="nb-tst" data-tst role="region" aria-label={t('home.testimonials.region')}>
-    <span class="nb-tst__mark" aria-hidden="true">
-      {open.trim()}
-    </span>
+  {groups.map(({ cc, items }) => (
+    <div
+      class="nb-tst"
+      data-tst
+      data-cc={cc}
+      role="region"
+      aria-label={t('home.testimonials.region')}
+    >
+      <span class="nb-tst__mark" aria-hidden="true">
+        {open.trim()}
+      </span>
 
-    <div class="nb-tst__main">
-      <ul class="nb-tst__slides" data-tst-slides>
-        {items.map((it, i) => (
-          <li class="nb-slide" data-active={i === 0 ? '' : undefined}>
-            <figure class="nb-tst__figure">
-              <blockquote class="nb-tst__quote">
-                <p>{it.data.quote}</p>
-              </blockquote>
-              <figcaption class="nb-tst__author">
-                <span class="nb-tst__avatar" aria-hidden="true">
-                  {initials(it.data.author)}
-                </span>
-                <span class="nb-tst__who">
-                  <span class="nb-tst__name">{it.data.author}</span>
-                  <span class="nb-tst__role">
-                    {it.data.role}
-                    <span class="nb-tst__sep" aria-hidden="true">
-                      /
-                    </span>
-                    <span class="nb-tst__company">{it.data.company}</span>
-                  </span>
-                </span>
-              </figcaption>
-            </figure>
-          </li>
-        ))}
-      </ul>
-
-      <div class="nb-tst__nav">
-        <ul class="nb-tst__lines">
+      <div class="nb-tst__main">
+        <ul class="nb-tst__slides" data-tst-slides>
           {items.map((it, i) => (
-            <li>
-              <button
-                type="button"
-                class="nb-tst__line"
-                data-index={i}
-                aria-label={`${t('home.testimonials.goTo')}: ${it.data.author}`}
-                aria-current={i === 0 ? 'true' : undefined}
-              >
-                <span aria-hidden="true" />
-              </button>
+            <li class="nb-slide" data-active={i === 0 ? '' : undefined}>
+              <figure class="nb-tst__figure">
+                <blockquote class="nb-tst__quote">
+                  <p>{it.data.quote}</p>
+                </blockquote>
+                <figcaption class="nb-tst__author">
+                  <span class="nb-tst__avatar" aria-hidden="true">
+                    {initials(it.data.author)}
+                  </span>
+                  <span class="nb-tst__who">
+                    <span class="nb-tst__name">{it.data.author}</span>
+                    <span class="nb-tst__role">
+                      {it.data.role}
+                      <span class="nb-tst__sep" aria-hidden="true">
+                        /
+                      </span>
+                      <span class="nb-tst__company">{it.data.company}</span>
+                    </span>
+                  </span>
+                </figcaption>
+              </figure>
             </li>
           ))}
         </ul>
-        <div class="nb-tst__arrows">
-          {(['prev', 'next'] as const).map((dir) => (
-            <button
-              type="button"
-              class="nb-tst__arrow"
-              data-dir={dir}
-              aria-label={t(dir === 'prev' ? 'home.testimonials.prev' : 'home.testimonials.next')}
-            >
-              <svg
-                viewBox="0 0 24 24"
-                width="20"
-                height="20"
-                fill="none"
-                stroke="currentColor"
-                stroke-width="1.5"
-                stroke-linecap="butt"
-                stroke-linejoin="miter"
-                aria-hidden="true"
+
+        <div class="nb-tst__nav">
+          <ul class="nb-tst__lines">
+            {items.map((it, i) => (
+              <li>
+                <button
+                  type="button"
+                  class="nb-tst__line"
+                  data-index={i}
+                  aria-label={`${t('home.testimonials.goTo')}: ${it.data.author}`}
+                  aria-current={i === 0 ? 'true' : undefined}
+                >
+                  <span aria-hidden="true" />
+                </button>
+              </li>
+            ))}
+          </ul>
+          <div class="nb-tst__arrows">
+            {(['prev', 'next'] as const).map((dir) => (
+              <button
+                type="button"
+                class="nb-tst__arrow"
+                data-dir={dir}
+                aria-label={t(dir === 'prev' ? 'home.testimonials.prev' : 'home.testimonials.next')}
               >
-                <path d={chevron(dir)} />
-              </svg>
-            </button>
-          ))}
+                <svg
+                  viewBox="0 0 24 24"
+                  width="20"
+                  height="20"
+                  fill="none"
+                  stroke="currentColor"
+                  stroke-width="1.5"
+                  stroke-linecap="butt"
+                  stroke-linejoin="miter"
+                  aria-hidden="true"
+                >
+                  <path d={chevron(dir)} />
+                </svg>
+              </button>
+            ))}
+          </div>
         </div>
       </div>
     </div>
-  </div>
+  ))}
 </Section>
 
 <style is:global>

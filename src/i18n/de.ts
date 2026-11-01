@@ -591,6 +591,7 @@ export const de: Messages = {
       'Zum Senden des Formulars braucht es JavaScript. Du kannst uns auch an {email} schreiben oder unter {phone} anrufen.',
   },
   contact: {
+    phoneCentral: 'Zentrale in Zürich',
     seoTitle: 'Kontakt',
     seoDescription:
       'Schreib uns oder ruf an: Northbridge Advisory, Seefeldstrasse 45, 8008 Zürich. Wir antworten bis 12:00 Uhr am nächsten Arbeitstag.',

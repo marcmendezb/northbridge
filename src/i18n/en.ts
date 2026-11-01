@@ -592,6 +592,7 @@ export const en: Messages = {
       'The form needs JavaScript to send. You can also email us at {email} or call us on {phone}.',
   },
   contact: {
+    phoneCentral: 'head office in Zurich',
     seoTitle: 'Contact',
     seoDescription:
       'Write to us or call us: Northbridge Advisory, Seefeldstrasse 45, 8008 Zurich. We reply before 12:00 on the next working day.',

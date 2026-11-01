@@ -15,7 +15,7 @@ test('home: hero animado termina en estado final y todo el contenido es visible'
     .evaluate((el) => getComputedStyle(el).opacity);
   expect(opacity).toBe('1');
   await page.getByText('Lo que dicen quienes trabajan con nosotros').scrollIntoViewIfNeeded();
-  await expect(page.locator('.nb-slide[data-active]')).toBeVisible();
+  await expect(page.locator('[data-tst]:visible .nb-slide[data-active]')).toBeVisible();
 });
 
 test('home: las cifras llegan a su valor final y son accesibles', async ({ page }) => {
@@ -31,14 +31,20 @@ test('home: testimonios sin rotación automática; líneas, flechas y teclado ca
   await page.goto('/');
   const region = page.getByRole('region', { name: 'Testimonios de clientes' });
   await region.scrollIntoViewIfNeeded();
-  const first = await page.locator('.nb-slide[data-active]').innerText();
+  const first = await page.locator('[data-tst]:visible .nb-slide[data-active]').innerText();
   await page.waitForTimeout(7000);
-  expect(await page.locator('.nb-slide[data-active]').innerText()).toBe(first);
+  expect(await page.locator('[data-tst]:visible .nb-slide[data-active]').innerText()).toBe(first);
   await page.getByRole('button', { name: 'Testimonio siguiente' }).click();
-  await expect(page.locator('.nb-slide[data-active]')).not.toHaveText(first);
-  await expect(page.locator('.nb-tst__line[aria-current]')).toHaveAttribute('data-index', '1');
+  await expect(page.locator('[data-tst]:visible .nb-slide[data-active]')).not.toHaveText(first);
+  await expect(page.locator('[data-tst]:visible .nb-tst__line[aria-current]')).toHaveAttribute(
+    'data-index',
+    '1',
+  );
   await page.keyboard.press('ArrowLeft');
-  await expect(page.locator('.nb-tst__line[aria-current]')).toHaveAttribute('data-index', '0');
+  await expect(page.locator('[data-tst]:visible .nb-tst__line[aria-current]')).toHaveAttribute(
+    'data-index',
+    '0',
+  );
   await expect(page.locator('.nb-slide:visible')).toHaveCount(1);
 });
 
@@ -76,9 +82,9 @@ test.describe('reduced motion', () => {
         .first()
         .evaluate((el) => getComputedStyle(el).transform),
     ).toBe('none');
-    const first = await page.locator('.nb-slide[data-active]').innerText();
+    const first = await page.locator('[data-tst]:visible .nb-slide[data-active]').innerText();
     await page.waitForTimeout(8600);
-    expect(await page.locator('.nb-slide[data-active]').innerText()).toBe(first);
+    expect(await page.locator('[data-tst]:visible .nb-slide[data-active]').innerText()).toBe(first);
   });
 });
 

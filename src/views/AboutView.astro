@@ -1,4 +1,5 @@
 ---
+import PhoneLink from '../components/ui/PhoneLink.astro';
 import { Image, Picture } from 'astro:assets';
 import logoMark from '../assets/brand/logo-header.png';
 import type { ImageMetadata } from 'astro';
@@ -36,7 +37,6 @@ const principles = tRaw<{ title: string; text: string }[]>('about.principles');
 const facts = tRaw<{ value: string; label: string }[]>('about.facts');
 const bookingCta = getBookingCta(locale);
 const guarantees = tRaw<string[]>('booking.guarantees');
-const tel = `tel:${site.phone.replace(/\s/g, '')}`;
 const yearDigits = String(site.founded).split('');
 /** «200+» → cifra animable y sufijo. */
 const splitFact = (v: string) => {
@@ -293,7 +293,7 @@ const splitFact = (v: string) => {
           </Button>
           <p class="nb-meet__call">
             {t('about.ctaCall').split('{phone}')[0]}
-            <a href={tel}>{site.phone}</a>
+            <PhoneLink />
             {t('about.ctaCall').split('{phone}')[1]}
           </p>
         </div>

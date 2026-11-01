@@ -1,4 +1,5 @@
 ---
+import PhoneLink from '../ui/PhoneLink.astro';
 /**
  * Cierre de la Home: el reverso del hero. El vídeo asoma dentro del arco y, con el scroll,
  * el arco se abre hasta volver a pantalla completa (escritorio con movimiento: finalScene.ts).
@@ -55,7 +56,7 @@ const posterFile = await getImage({ src: poster, format: 'webp', width: 1920, qu
           {bookingCta.label}
         </Button>
         <p class="nb-final__direct">
-          <a href={`tel:${site.phone.replace(/\s/g, '')}`}>{site.phone}</a>
+          <PhoneLink />
           <span aria-hidden="true">/</span>
           <a href={`mailto:${site.email}`}>{site.email}</a>
         </p>

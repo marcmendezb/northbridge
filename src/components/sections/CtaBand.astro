@@ -1,4 +1,5 @@
 ---
+import PhoneLink from '../ui/PhoneLink.astro';
 /**
  * Cierre «20 minutos para ordenar tus números» (servicios, artículos, calculadora).
  * Los 20 minutos dibujados: una regla de la llamada, de 0 a 20, con lo que pasa en cada mitad y,
@@ -6,7 +7,7 @@
  * reloj corre (clockScene.ts). Sin JS o con movimiento reducido: la regla completa y «20:00».
  */
 import Button from '../ui/Button.astro';
-import { getBookingCta, site } from '../../lib/site';
+import { getBookingCta } from '../../lib/site';
 import { useI18n, type Messages } from '../../i18n';
 const { t, tRaw, locale } = useI18n(Astro.currentLocale);
 const bookingCta = getBookingCta(locale);
@@ -18,7 +19,6 @@ interface Props {
 const { title = t('home.cta.title'), text = t('home.cta.text') } = Astro.props;
 const expect = tRaw<Messages['booking']['expect']>('booking.expect');
 const guarantees = tRaw<string[]>('booking.guarantees');
-const tel = `tel:${site.phone.replace(/\s/g, '')}`;
 const min = t('home.cta.min');
 const [callBefore, callAfter] = t('home.cta.orCall').split('{phone}');
 const ticks = Array.from({ length: 21 }, (_, i) => i);
@@ -40,7 +40,7 @@ const ticks = Array.from({ length: 21 }, (_, i) => i);
         </Button>
         <p class="nb-clock__call-us">
           {callBefore}
-          <a href={tel}>{site.phone}</a>
+          <PhoneLink />
           {callAfter}
         </p>
       </div>

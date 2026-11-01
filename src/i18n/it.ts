@@ -592,6 +592,7 @@ export const it: Messages = {
       'Per inviare il modulo serve JavaScript. Puoi anche scriverci a {email} o chiamarci al {phone}.',
   },
   contact: {
+    phoneCentral: 'centralino a Zurigo',
     seoTitle: 'Contatti',
     seoDescription:
       'Scrivici o chiamaci: Northbridge Advisory, Seefeldstrasse 45, 8008 Zurigo. Ti rispondiamo entro le 12:00 del giorno lavorativo successivo.',

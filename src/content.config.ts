@@ -67,6 +67,8 @@ const testimonios = defineCollection({
     service: z.string().optional(),
     order: z.number(),
     fictional: z.literal(true),
+    /** País cuyo carrusel lo muestra (clientes de cada oficina); por defecto, Suiza. */
+    country: z.enum(['CH', 'ES', 'DE', 'FR', 'IT']).default('CH'),
   }),
 });
 

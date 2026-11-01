@@ -1,4 +1,5 @@
 ---
+import PhoneLink from '../components/ui/PhoneLink.astro';
 import BaseLayout from '../layouts/BaseLayout.astro';
 import { Picture } from 'astro:assets';
 import Breadcrumbs from '../components/layout/Breadcrumbs.astro';
@@ -83,7 +84,7 @@ const arch = 'M10 37V29A14 14 0 0 1 38 29V37';
           </p>
         </div>
         <p class="nb-cx__direct" data-reveal>
-          <a href={tel}>{site.phone}</a>
+          <PhoneLink />
           <span aria-hidden="true">/</span>
           <a href={`mailto:${site.email}`}>{site.email}</a>
         </p>
@@ -253,7 +254,7 @@ const arch = 'M10 37V29A14 14 0 0 1 38 29V37';
           <div>
             <dt>{c.phone}</dt>
             <dd>
-              <a href={tel}>{site.phone}</a>
+              <PhoneLink />
             </dd>
           </div>
           <div>

@@ -1,4 +1,5 @@
 ---
+import PhoneLink from '../ui/PhoneLink.astro';
 import Logo from '../brand/Logo.astro';
 import Button from '../ui/Button.astro';
 import { useI18n } from '../../i18n';
@@ -85,9 +86,7 @@ import { byCountry } from '../../lib/country';
                 {`${OFFICES[cc].postalCode} ${OFFICES[cc].city}`}
               </span>
             ))}
-            <a class="nb-footer__link mt-3" href={`tel:${site.phone.replace(/\s/g, '')}`}>
-              {site.phone}
-            </a>
+            <PhoneLink class="nb-footer__link mt-3" />
             <a class="nb-footer__link" href={`mailto:${site.email}`}>
               {site.email}
             </a>
