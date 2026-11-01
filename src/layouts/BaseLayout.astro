@@ -10,6 +10,7 @@ import Footer from '../components/layout/Footer.astro';
 import { alternates, localeMeta, parsePath, useI18n } from '../i18n';
 import { site } from '../lib/site';
 import { readTokens } from '../lib/contrast';
+import { ogImage } from '../lib/seo';
 const { t, locale } = useI18n(Astro.currentLocale);
 
 const themeColor = readTokens()['navy-800'];
@@ -23,6 +24,8 @@ interface Props {
   minimalHeader?: boolean;
   /** Pantallas sin pie (p. ej. herramientas internas). */
   hideFooter?: boolean;
+  /** Datos estructurados propios de la página (p. ej. la empresa en Home y Contacto). */
+  jsonLd?: object;
 }
 const {
   title,
@@ -31,10 +34,12 @@ const {
   overlayHeader = false,
   minimalHeader = false,
   hideFooter = false,
+  jsonLd,
 } = Astro.props;
 
 const fullTitle = title ? `${title} / ${site.name}` : `${site.name} / ${t('brand.claim')}`;
 const canonical = new URL(Astro.url.pathname, Astro.site ?? site.url);
+const shareImage = ogImage(locale, Astro.site ?? site.url);
 const alternateLinks = alternates(parsePath(Astro.url.pathname).canonical).map((a) => ({
   locale: a.locale,
   href: new URL(a.path, Astro.site ?? site.url).toString(),
@@ -89,6 +94,15 @@ const alternateLinks = alternates(parsePath(Astro.url.pathname).canonical).map((
     <meta property="og:type" content="website" />
     <meta property="og:site_name" content={site.name} />
     <meta property="og:locale" content={localeMeta[locale].og} />
+    <meta property="og:title" content={fullTitle} />
+    <meta property="og:description" content={description} />
+    <meta property="og:url" content={canonical} />
+    <meta property="og:image" content={shareImage} />
+    <meta property="og:image:width" content="1200" />
+    <meta property="og:image:height" content="630" />
+    <meta property="og:image:alt" content={`${site.name}. ${t('brand.claim')}`} />
+    <meta name="twitter:card" content="summary_large_image" />
+    {jsonLd && <script type="application/ld+json" set:html={JSON.stringify(jsonLd)} />}
     {alternateLinks.map((a) => (
       <link rel="alternate" hreflang={localeMeta[a.locale].htmlLang} href={a.href} />
     ))}

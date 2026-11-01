@@ -8,10 +8,16 @@ import CalculatorTeaser from '../components/sections/CalculatorTeaser.astro';
 import Testimonials from '../components/sections/Testimonials.astro';
 import FinalCta from '../components/sections/FinalCta.astro';
 import { useI18n } from '../i18n';
-const { t } = useI18n(Astro.currentLocale);
+import { organizationJsonLd } from '../lib/seo';
+import { site } from '../lib/site';
+const { t, locale } = useI18n(Astro.currentLocale);
 ---
 
-<BaseLayout description={t('home.seoDescription')} overlayHeader>
+<BaseLayout
+  description={t('home.seoDescription')}
+  overlayHeader
+  jsonLd={organizationJsonLd(locale, Astro.site ?? site.url)}
+>
   <Hero />
   <ServicesTeaser />
   <Stats />

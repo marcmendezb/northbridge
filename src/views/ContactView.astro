@@ -12,6 +12,7 @@ import { getBookingCta, site } from '../lib/site';
 import { byCountry, COUNTRIES } from '../lib/country';
 import { OFFICES } from '../data/offices';
 import { vatFor } from '../lib/vat';
+import { organizationJsonLd } from '../lib/seo';
 
 const { t, tRaw, lp, locale } = useI18n(Astro.currentLocale);
 const bookingCta = getBookingCta(locale);
@@ -48,7 +49,12 @@ const deck = 'M4 13H44';
 const arch = 'M10 37V29A14 14 0 0 1 38 29V37';
 ---
 
-<BaseLayout title={t('contact.seoTitle')} description={t('contact.seoDescription')} overlayHeader>
+<BaseLayout
+  title={t('contact.seoTitle')}
+  description={t('contact.seoDescription')}
+  overlayHeader
+  jsonLd={organizationJsonLd(locale, Astro.site ?? site.url)}
+>
   <!-- 1 · Cabecera: la puerta de la oficina, en arco, y el plazo real de respuesta -->
   <header class="nb-cx" data-surface="dark" data-contact-hero>
     <div class="nb-container nb-cx__grid">
