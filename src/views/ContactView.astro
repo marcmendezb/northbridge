@@ -118,12 +118,16 @@ const arch = 'M10 37V29A14 14 0 0 1 38 29V37';
         </h2>
       </div>
       <ol class="nb-ways__list" role="list" data-ways>
-        {ways.map((w, i) => (
+        {ways.map((w) => (
           <li class="nb-way" data-way>
             <span class="nb-way__rule" data-way-rule aria-hidden="true" />
             <a class="nb-way__link" href={w.href}>
+              {/* Sin numeración: el símbolo, pequeño, marca cada camino. */}
               <span class="nb-way__n" aria-hidden="true">
-                {String(i + 1).padStart(2, '0')}
+                <svg viewBox="4 11 40 26" fill="none" stroke="currentColor" stroke-width="4">
+                  <path d="M4 13H44" />
+                  <path d="M10 37V29A14 14 0 0 1 38 29V37" />
+                </svg>
               </span>
               <span class="nb-way__main">
                 <span class="nb-way__title">{w.title}</span>
@@ -670,13 +674,15 @@ const arch = 'M10 37V29A14 14 0 0 1 38 29V37';
     outline: 2px solid var(--navy-600);
     outline-offset: 2px;
   }
+  .nb-way__n svg {
+    display: block;
+    width: 100%;
+    height: auto;
+  }
   .nb-way__n {
     align-self: start;
-    padding-top: 0.6em;
-    font-size: 0.8125rem;
-    font-weight: 600;
-    letter-spacing: 0.14em;
-    font-variant-numeric: tabular-nums;
+    width: 24px;
+    padding-top: 0.7em;
     color: var(--piedra-600);
     transition: color var(--dur-base) var(--ease-out);
   }

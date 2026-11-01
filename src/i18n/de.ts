@@ -714,7 +714,6 @@ export const de: Messages = {
     hours: 'Stunden',
     minutes: 'Minuten',
     seconds: 'Sekunden',
-    countdownSr: '{label} {h} Stunden und {m} Minuten.',
     seoTitle: 'Danke',
     title: 'Erhalten. Wir kümmern uns darum.',
     titleBooked: 'Gebucht. Wir freuen uns auf dich.',

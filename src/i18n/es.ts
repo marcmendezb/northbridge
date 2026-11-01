@@ -712,7 +712,6 @@ export const es = {
     hours: 'horas',
     minutes: 'minutos',
     seconds: 'segundos',
-    countdownSr: '{label} {h} horas y {m} minutos.',
     seoTitle: 'Gracias',
     title: 'Recibido. Nos encargamos.',
     titleBooked: 'Reservado. Te esperamos.',

@@ -81,7 +81,7 @@ const ROUTE = `M${LEG} ${H} V${8 + R} A${R} ${R} 0 0 1 ${W - LEG} ${8 + R} V${H}
                 <small>{s.seconds}</small>
               </span>
             </p>
-            <p class="sr-only" data-clock-sr data-template={s.countdownSr}></p>
+            <p class="sr-only" data-clock-sr></p>
           </div>
         </div>
 
@@ -575,11 +575,16 @@ const ROUTE = `M${LEG} ${H} V${8 + R} A${R} ${R} 0 0 1 ${W - LEG} ${8 + R} V${H}
         return left;
       };
       const left = tick();
-      if (sr)
-        sr.textContent = (sr.dataset.template ?? '')
-          .replace('{label}', label)
-          .replace('{h}', String(Math.floor(left / 3600)))
-          .replace('{m}', String(Math.floor((left % 3600) / 60)));
+      // «14 horas y 30 minutos» / «1 hour and 1 minute»: plural y conjunción de cada idioma.
+      if (sr) {
+        const unit = (n: number, u: 'hour' | 'minute') =>
+          new Intl.NumberFormat(intl, { style: 'unit', unit: u, unitDisplay: 'long' }).format(n);
+        const span = new Intl.ListFormat(intl, { type: 'conjunction' }).format([
+          unit(Math.floor(left / 3600), 'hour'),
+          unit(Math.floor((left % 3600) / 60), 'minute'),
+        ]);
+        sr.textContent = `${label} ${span}.`;
+      }
       clock.hidden = false;
       const timer = window.setInterval(() => {
         if (tick() === 0) window.clearInterval(timer);
