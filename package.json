@@ -46,5 +46,13 @@
     "typescript": "^6.0.3",
     "typescript-eslint": "^8.72.1",
     "vitest": "^4.1.12"
-  }
+  },
+  "description": "Multilingual website for a fictional Zurich fiduciary: Astro, React islands, TypeScript, per-country tax calendars.",
+  "homepage": "https://northbridge-124.pages.dev",
+  "repository": {
+    "type": "git",
+    "url": "https://github.com/marcmendezb/northbridge.git"
+  },
+  "author": "Marc Mendez",
+  "license": "UNLICENSED"
 }
