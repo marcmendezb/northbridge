@@ -1,10 +1,10 @@
 ---
 import { uid } from '../../lib/uid';
 
-/** Patrón viaducto (tile 48 × 40, trazo 1,5). `dark` pinta su propio fondo Navy 800; `light` se superpone a Piedra 50. */
+/** Viaduct pattern (48 × 40 tile, 1.5 stroke). `dark` paints its own Navy 800 background; `light` sits on top of Stone 50. */
 interface Props {
   tone?: 'dark' | 'light';
-  /** Desvanece el patrón hacia transparente para que no compita con el texto. */
+  /** Fades the pattern to transparent so it doesn't compete with the text. */
   mask?: 'none' | 'top' | 'bottom' | 'left' | 'right';
   class?: string;
 }

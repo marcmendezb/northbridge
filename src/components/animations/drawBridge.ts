@@ -1,6 +1,6 @@
 import type { Gsap } from './types';
 
-/** Dibuja el tablero y después el arco de un `BridgeMark` (pathLength = 1). Devuelve la línea de tiempo. */
+/** Draws the deck and then the arch of a `BridgeMark` (pathLength = 1). Returns the timeline. */
 export function drawBridge(
   gsap: Gsap,
   svg: Element,

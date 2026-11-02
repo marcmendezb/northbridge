@@ -39,7 +39,7 @@ const portraits: Record<string, ImageMetadata> = {
 };
 const minutes = readingMinutes(entry.body);
 const cover = topicCovers[d.topic];
-/** Si el país elegido no es el de esta guía y existe su versión, se avisa y se enlaza. */
+/** If the selected country isn't this guide's and a version for it exists, show a notice with a link. */
 const allGuides = await getArticles(locale);
 const otherVersions = COUNTRIES.filter((c) => c !== d.country)
   .map((c) => ({ c, guide: guideFor(allGuides, d.topic, c) }))
@@ -223,7 +223,7 @@ const jsonLd = {
     gap: 20px;
     padding-block: clamp(40px, 6vw, 80px) clamp(72px, 9vw, 136px);
   }
-  /* Aviso de país: la guía es de otro país y existe la versión del tuyo. */
+  /* Country notice: this guide is for another country and there is a version for yours. */
   .nb-art-country {
     margin-top: -24px;
     margin-bottom: 40px;
@@ -260,7 +260,7 @@ const jsonLd = {
   .nb-art-country__link:hover {
     color: var(--salvia-600);
   }
-  /* Portada: a todo el ancho del contenedor, montada sobre el borde de la cabecera. */
+  /* Cover: full container width, sitting on the edge of the header. */
   .nb-art-cover {
     margin-top: clamp(-56px, -4vw, -32px);
   }
@@ -447,7 +447,7 @@ const jsonLd = {
 </style>
 
 <script>
-  // Índice: marca la sección que se está leyendo.
+  // Table of contents: highlights the section being read.
   const links = [...document.querySelectorAll<HTMLAnchorElement>('[data-toc-link]')];
   if (links.length) {
     const byId = new Map(links.map((a) => [a.dataset.tocLink, a]));

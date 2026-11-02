@@ -2,8 +2,8 @@ import type { Locale } from '../i18n/locales';
 import type { Country } from './country';
 
 /**
- * Nombre del IVA según el país: los textos base llevan la sigla suiza («IVA (MWST)»). Fuera de Suiza
- * se quita el paréntesis y, en alemán, la sigla suiza «MWST» pasa a la alemana «MwSt.».
+ * VAT name per country: base texts use the Swiss abbreviation ("IVA (MWST)"). Outside Switzerland
+ * the brackets are dropped and, in German, the Swiss "MWST" becomes the German "MwSt.".
  */
 export function vatFor(text: string, country: Country, locale: Locale): string {
   if (country === 'CH') return text;

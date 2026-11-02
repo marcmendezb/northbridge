@@ -2,11 +2,11 @@ import AxeBuilder from '@axe-core/playwright';
 import { expect, test } from '@playwright/test';
 
 for (const path of ['/', '/_brand']) {
-  test(`axe: sin errores en ${path}`, async ({ page }) => {
+  test(`axe: no violations on ${path}`, async ({ page }) => {
     await page.goto(path, { waitUntil: 'networkidle' });
-    // Axe mide el estado final: la entrada del hero (fundidos de opacidad) dura unos 2 s.
+    // Axe checks the final state: the hero entrance (opacity fades) takes about 2 s.
     await page.waitForTimeout(2600);
-    // Las muestras de contraste de /_brand incluyen a propósito parejas límite o prohibidas.
+    // The contrast samples on /_brand deliberately include borderline or forbidden pairs.
     const results = await new AxeBuilder({ page })
       .exclude('[data-contrast-demo]')
       .withTags(['wcag2a', 'wcag2aa', 'wcag21aa', 'wcag22aa'])
@@ -17,7 +17,7 @@ for (const path of ['/', '/_brand']) {
   });
 }
 
-test('menú móvil: abre, atrapa foco, cierra con Esc y devuelve el foco', async ({ page }) => {
+test('mobile menu: opens, traps focus, closes with Esc and returns focus', async ({ page }) => {
   await page.setViewportSize({ width: 375, height: 800 });
   await page.goto('/');
   const btn = page.getByRole('button', { name: 'Abrir menú' });
@@ -35,7 +35,7 @@ test('menú móvil: abre, atrapa foco, cierra con Esc y devuelve el foco', async
   await expect(page.locator('#mobile-menu')).toBeHidden();
 });
 
-test('saltar al contenido es el primer elemento enfocable', async ({ page }) => {
+test('skip link is the first focusable element', async ({ page }) => {
   await page.goto('/');
   await page.keyboard.press('Tab');
   const skip = page.getByRole('link', { name: 'Saltar al contenido' });
@@ -43,15 +43,15 @@ test('saltar al contenido es el primer elemento enfocable', async ({ page }) => 
   await expect(skip).toBeVisible();
 });
 
-test('sin horizontal scroll en 360 px', async ({ page }) => {
+test('no horizontal scroll at 360 px', async ({ page }) => {
   await page.setViewportSize({ width: 360, height: 800 });
   await page.goto('/_brand');
   expect(await page.evaluate(() => document.documentElement.scrollWidth <= innerWidth)).toBe(true);
 });
 
-test.describe('sin JS', () => {
+test.describe('without JS', () => {
   test.use({ javaScriptEnabled: false });
-  test('todo el contenido del acordeón y la navegación son visibles', async ({ page }) => {
+  test('all accordion content and the navigation are visible', async ({ page }) => {
     await page.goto('/_brand');
     await expect(page.getByText('Si cierras el 31 de diciembre')).toBeVisible();
     await expect(page.locator('#mobile-menu a').first()).toBeAttached();
@@ -60,7 +60,7 @@ test.describe('sin JS', () => {
 
 test.describe('reduced motion', () => {
   test.use({ reducedMotion: 'reduce' });
-  test('el puente se muestra completo (sin estado oculto)', async ({ page }) => {
+  test('the bridge is fully drawn (no hidden state)', async ({ page }) => {
     await page.goto('/_brand');
     const offset = await page
       .locator('.nb-bridge[data-animate] path')
@@ -70,7 +70,7 @@ test.describe('reduced motion', () => {
   });
 });
 
-test('axe con el desplegable de Servicios abierto', async ({ page }) => {
+test('axe with the Services dropdown open', async ({ page }) => {
   await page.setViewportSize({ width: 1440, height: 900 });
   await page.goto('/servicios', { waitUntil: 'networkidle' });
   await page.locator('.nb-nav__trigger').hover();

@@ -21,12 +21,12 @@ type Strings = Messages['calculator'];
 interface Props {
   locale: Locale;
   s: Strings;
-  /** «Precios sin IVA» y la unidad «{currency}/mes» del diccionario. */
+  /** "Prices excl. VAT" and the "{currency}/month" unit from the dictionary. */
   vatNote: string;
   perMonth: string;
   note: string;
   bookLabel: string;
-  /** Etiqueta corta del paquete recomendado («Recomendado»). */
+  /** Short label for the recommended package ("Recommended"). */
   recommendedTag: string;
   bookHref: string;
   pricingHref: string;
@@ -44,7 +44,7 @@ const fill = (text: string, vars: Record<string, string | number>) =>
   text.replace(/\{(\w+)\}/g, (_, k) => String(vars[k] ?? `{${k}}`));
 const clamp = (n: number, max: number) => Math.min(max, Math.max(0, Math.round(n) || 0));
 
-/** Estado desde la URL (`?tipo=gmbh&facturas=60&empleados=5`); `facturas=mas` = más de 200. */
+/** State from the URL (`?tipo=gmbh&facturas=60&empleados=5`); `facturas=mas` means more than 200. */
 function readUrl(): { input: CalculatorInput; more: boolean } | null {
   const q = new URLSearchParams(window.location.search);
   if (!q.has('tipo') && !q.has('facturas') && !q.has('empleados')) return null;
@@ -62,7 +62,7 @@ function readUrl(): { input: CalculatorInput; more: boolean } | null {
 const toQuery = (input: CalculatorInput, more: boolean) =>
   `?tipo=${input.type}&facturas=${more ? 'mas' : input.invoices}&empleados=${input.employees}`;
 
-/** Cifra que «rueda» hasta su nuevo valor (0,6 s, sin rebote); inmediata con movimiento reducido. */
+/** A figure that "rolls" to its new value (0.6 s, no bounce); instant with reduced motion. */
 function Rolling({ value, locale }: { value: number; locale: Locale }) {
   const ref = useRef<HTMLSpanElement>(null);
   const shown = useRef(value);
@@ -88,7 +88,7 @@ function Rolling({ value, locale }: { value: number; locale: Locale }) {
   return <span ref={ref}>{formatNumber(value, locale)}</span>;
 }
 
-/** Importe de una línea del desglose: la conversión exacta, redondeada a la unidad. */
+/** Amount for one breakdown line: the exact conversion, rounded to the unit. */
 const lineAmount = (eur: number, currency: Currency) =>
   currency === 'EUR' ? eur : Math.round(eur * EXCHANGE_RATES[currency]);
 
@@ -107,10 +107,10 @@ export default function Calculator({
   const [more, setMore] = useState(false);
   const [announce, setAnnounce] = useState('');
   const id = useId();
-  /** Solo se escribe en la URL y se anuncia el resultado cuando la persona cambia algo. */
+  /** The URL is only updated and the result only announced once the person changes something. */
   const touched = useRef(false);
 
-  // Al hidratar: respuestas de la URL (si las hay).
+  // On hydration: answers from the URL (if any).
   useEffect(() => {
     const fromUrl = readUrl();
     if (fromUrl) {
@@ -124,7 +124,7 @@ export default function Calculator({
     [input, more],
   );
 
-  // URL compartible y anuncio para lectores de pantalla (con 400 ms de espera, sin saturar).
+  // Shareable URL and a screen reader announcement (debounced by 400 ms so it doesn't flood).
   useEffect(() => {
     if (!touched.current) return;
     window.history.replaceState(null, '', toQuery(input, more));

@@ -1,8 +1,8 @@
 import type { FiscalEvent } from './types';
 
 /**
- * Suiza (cantón de Zúrich). Datos comprobados el 26-10-2026 en fuentes oficiales: ver el artículo
- * «calendario-fiscal-para-pymes» y DECISIONES.md.
+ * Switzerland (canton of Zurich). Data checked on 26-10-2026 against official sources: see the
+ * "calendario-fiscal-para-pymes" guide and its source list.
  */
 export const events: FiscalEvent[] = [
   {

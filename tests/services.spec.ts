@@ -11,7 +11,7 @@ const slugs = [
 const pages = ['/servicios', '/precios', ...slugs.map((s) => `/servicios/${s}`)];
 
 for (const path of pages) {
-  test(`axe, h1 único y sin scroll horizontal: ${path}`, async ({ page }) => {
+  test(`axe, a single h1 and no horizontal scroll: ${path}`, async ({ page }) => {
     for (const width of [360, 1440]) {
       await page.setViewportSize({ width, height: 800 });
       await page.goto(path, { waitUntil: 'networkidle' });
@@ -21,7 +21,7 @@ for (const path of pages) {
       ).toBe(true);
     }
     await expect(page.locator('main h1')).toHaveCount(1);
-    // Deja que terminen los reveals antes de medir contraste.
+    // Let the reveals finish before measuring contrast.
     await page.evaluate(async () => {
       for (let y = 0; y < document.body.scrollHeight; y += 400) {
         scrollTo({ top: y, behavior: 'instant' });
@@ -39,7 +39,7 @@ for (const path of pages) {
   });
 }
 
-test('las 5 subpáginas salen de una plantilla y llevan FAQPage JSON-LD con 4 preguntas', async ({
+test('the 5 service pages share a template and include FAQPage JSON-LD with 4 questions', async ({
   page,
 }) => {
   for (const slug of slugs) {
@@ -54,10 +54,10 @@ test('las 5 subpáginas salen de una plantilla y llevan FAQPage JSON-LD con 4 pr
   }
 });
 
-test('precios: importes desde config, Growth único destacado, tabla accesible', async ({
+test('pricing: amounts from config, Growth is the only highlight, accessible table', async ({
   page,
 }) => {
-  // En un país con euro se ven los importes de config.ts tal cual (Suiza los convierte a CHF).
+  // In a euro country the config.ts amounts show as they are (Switzerland converts them to CHF).
   await page.addInitScript(() => localStorage.setItem('nb-country', 'ES'));
   await page.goto('/precios');
   await expect(page.locator('.nb-pk').getByText('Recomendado')).toHaveCount(1);
@@ -65,15 +65,15 @@ test('precios: importes desde config, Growth único destacado, tabla accesible',
   const table = page.getByRole('table', { name: /Comparativa de los paquetes/ });
   await expect(table.locator('thead th')).toHaveCount(4);
   await expect(page.getByText('SL desde 1 490 €', { exact: false }).first()).toBeVisible();
-  // Tarjeta del paquete y cabecera de la tabla: el mismo importe de config.ts.
+  // Package card and table header: the same amount from config.ts.
   for (const n of ['190', '490', '990'])
     await expect(page.locator('.t-price:visible', { hasText: n })).toHaveCount(2);
-  // «¿Qué te describe mejor?»: el foco pasa al paquete que encaja.
+  // "What describes you best?": focus moves to the matching package.
   await page.getByRole('button', { name: 'Trabajo por mi cuenta' }).click();
   await expect(page.locator('[data-pkg="essential"]')).toHaveAttribute('data-fit', '');
 });
 
-test('acordeón de FAQ: abre con teclado y actualiza aria-expanded', async ({ page }) => {
+test('FAQ accordion: opens with the keyboard and updates aria-expanded', async ({ page }) => {
   await page.goto('/servicios/iva-y-fiscalidad');
   const q = page.getByRole('button', { name: '¿Cada cuánto se declara el IVA?' });
   await expect(q).toHaveAttribute('aria-expanded', 'false');
@@ -83,11 +83,11 @@ test('acordeón de FAQ: abre con teclado y actualiza aria-expanded', async ({ pa
   await expect(page.getByText('Trimestralmente con el método efectivo')).toBeVisible();
 });
 
-test.describe('sin JS', () => {
+test.describe('without JS', () => {
   test.use({ javaScriptEnabled: false });
-  test('FAQ y tabla de precios completas', async ({ page }) => {
+  test('full FAQ and pricing table', async ({ page }) => {
     await page.goto('/servicios/iva-y-fiscalidad');
-    // Una versión por país: sin JS se ve la suiza (la del país por defecto).
+    // One version per country: without JS the Swiss one shows (the default country).
     await expect(page.getByText('No la contestes todavía').filter({ visible: true })).toBeVisible();
     await page.goto('/precios');
     await expect(page.getByText('Hay intereses', { exact: false })).toHaveCount(0);

@@ -11,7 +11,7 @@ import { localeMeta, useI18n, type Messages } from '../i18n';
 
 const { t, tRaw, lp, locale } = useI18n(Astro.currentLocale);
 const s = tRaw<Messages['booking']>('booking');
-/** Cal.com solo si hay un enlace real configurado (PUBLIC_CAL_LINK); si no, demostración. */
+/** Cal.com only if a real link is configured (PUBLIC_CAL_LINK); otherwise a demo. */
 const calLink = import.meta.env.PUBLIC_CAL_LINK as string | undefined;
 import { byCountry } from '../lib/country';
 import { OFFICES } from '../data/offices';
@@ -285,7 +285,7 @@ import { OFFICES } from '../data/offices';
     color: var(--salvia-300);
   }
 
-  /* Calendario (isla BookingEmbed). */
+  /* Calendar (BookingEmbed island). */
   .nb-book {
     display: grid;
     gap: 20px;

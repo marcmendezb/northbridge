@@ -33,13 +33,13 @@ const { t, lp, locale } = useI18n(Astro.currentLocale);
 const bookingCta = getBookingCta(locale);
 const d = entry.data;
 const key = entryKey(entry);
-/** Textos por país (servicios-pais); los países sin versión propia ven la suiza. */
+/** Country-specific texts (servicios-pais); countries without their own version see the Swiss one. */
 const variants = await getServiceVariants(entry, locale);
 const textOf = (c: Country) => variants.find((v) => v.countries.includes(c))!.text;
 const ccOf = (countries: Country[]) => (variants.length > 1 ? countries.join(' ') : undefined);
 const titleHtml = byCountry((c) => textOf(c).title);
 const titleVaries = new Set(variants.map((v) => v.text.title)).size > 1;
-/** Migas: el nombre neutro del servicio (el título puede llevar formas jurídicas de un país). */
+/** Breadcrumbs: the service's neutral name (the title may include a country's legal forms). */
 const crumbLabel = getServiceLinks(locale).find((l) => l.key === key)?.label ?? d.title;
 const relatedHtml = await Promise.all(
   related.map(async (r) => {
@@ -62,7 +62,7 @@ const photos: Record<string, ImageMetadata> = {
 };
 const photo = photos[key] ?? contabilidad;
 
-/** El detalle puede citar un importe: una variante por país (moneda). */
+/** The details may mention an amount: one variant per country (currency). */
 const prices = d.pricing.map((p) => {
   const base = describePricing(p, locale);
   const detail = base.detail
@@ -76,9 +76,9 @@ const prices = d.pricing.map((p) => {
 });
 const mentionsVat = JSON.stringify(d).includes('MWST');
 
-/* ── Firma del servicio de IVA: el año fiscal de cada país (YearCalendar) ── */
+/* ── VAT service signature: each country's tax year (YearCalendar) ── */
 const showYear = key === 'iva-y-fiscalidad';
-/** Calendario de cada país; los que aún no tienen el suyo ven el suizo. */
+/** Each country's calendar; those without their own see the Swiss one. */
 const calendarOf = (c: Country): CalendarCountry =>
   c in FISCAL_CALENDARS ? (c as CalendarCountry) : 'CH';
 const articles = showYear ? await getArticles(locale) : [];
@@ -102,7 +102,7 @@ const faqJsonLd = {
 ---
 
 <BaseLayout title={d.seo.title} description={d.seo.description} overlayHeader>
-  <!-- 1 · Cabecera: el servicio en grande y su foto, que se abre al bajar -->
+  <!-- Header: the service in large type and its photo, which opens up on scroll -->
   <header class="nb-sx" data-surface="dark" data-service-hero>
     <div class="nb-container nb-sx__inner">
       <Breadcrumbs
@@ -167,14 +167,14 @@ const faqJsonLd = {
       ),
     )}
   {showYear && <script is:inline>
-    // Calendarios de otros países en <template> (inertes: sin estilo, maquetación ni animación).
-    // Se monta solo el del país elegido, antes de los demás scripts; si se cambia de país más
-    // tarde, el nuevo entra ya en su estado final (sin la animación de entrada).
+    // Other countries' calendars sit in <template> (inert: no styles, layout or animation).
+    // Only the selected country's one is mounted, before the other scripts run; if the country changes
+    // later, the new one comes in already in its final state (without the entrance animation).
     (() => {
       const root = document.documentElement;
       let late = false;
-      // El suizo se pinta en el HTML (sin JS se ve ese); si el país es otro, también pasa a
-      // <template> para que no pese oculto.
+      // The Swiss calendar is rendered in the HTML (that is what shows without JS); for another country it also
+      // moves into a <template> so it doesn't weigh on the page while hidden.
       const ch = document.querySelector('section[data-year][data-calendar="CH"]');
       if (ch && (root.dataset.country || 'CH') !== 'CH') {
         const tpl = document.createElement('template');
@@ -208,7 +208,7 @@ const faqJsonLd = {
     })();
   </script>}
 
-  <!-- 2 · Qué incluye: un libro mayor, una línea por cosa que hacemos -->
+  <!-- What's included: a ledger, one line per thing we do -->
   <section class="nb-scope" aria-labelledby="includes-title">
     <div class="nb-container nb-scope__grid">
       <div class="nb-scope__aside">
@@ -232,7 +232,7 @@ const faqJsonLd = {
     </div>
   </section>
 
-  <!-- 3 · Para quién: tres frases en las que reconocerse -->
+  <!-- Who it's for: three statements to recognise yourself in -->
   <section class="nb-who" aria-labelledby="who-title">
     <div class="nb-container">
       <div class="nb-who__head">
@@ -259,7 +259,7 @@ const faqJsonLd = {
     </div>
   </section>
 
-  <!-- 4 · Proceso: cruzar el puente, un arco por paso -->
+  <!-- Process: crossing the bridge, one arch per step -->
   {variants.map((v, i) => (
     <ServiceProcess
       steps={v.text.process}
@@ -270,7 +270,7 @@ const faqJsonLd = {
     />
   ))}
 
-  <!-- 5 · Precio: un recibo, con lo que cuesta y lo que se cierra después -->
+  <!-- Price: a receipt, with what it costs and what gets agreed afterwards -->
   <section class="nb-receipt-wrap" aria-labelledby="price-title">
     <div class="nb-container nb-receipt-wrap__grid">
       <div class="nb-receipt-wrap__text">
@@ -319,7 +319,7 @@ const faqJsonLd = {
     </div>
   </section>
 
-  <!-- 6 · Preguntas -->
+  <!-- FAQ -->
   <section class="nb-sfaq" aria-labelledby="faq-title">
     <div class="nb-container nb-sfaq__grid">
       <div class="nb-sfaq__aside">
@@ -339,7 +339,7 @@ const faqJsonLd = {
     <script type="application/ld+json" set:html={JSON.stringify(faqJsonLd)} />
   </section>
 
-  <!-- 7 · Relacionados: con su foto -->
+  <!-- Related services, with their photos -->
   <section class="nb-rel" aria-labelledby="related-title">
     <div class="nb-container">
       <div class="nb-rel__head">
@@ -384,13 +384,13 @@ const faqJsonLd = {
 </BaseLayout>
 
 <style is:global>
-  /* ── 1 · Cabecera ── */
+  /* ── Header ── */
   .nb-sx {
     position: relative;
     background: var(--navy-800);
     color: var(--navy-100);
   }
-  /* El navy baja hasta la mitad de la foto; la otra mitad ya es la página. */
+  /* The navy goes halfway down the photo; the other half is already the page. */
   .nb-sx::after {
     content: '';
     position: absolute;
@@ -470,7 +470,7 @@ const faqJsonLd = {
     object-fit: cover;
   }
 
-  /* ── 2 · Qué incluye ── */
+  /* ── What's included ── */
   .nb-scope {
     padding-block: var(--section-y);
     background: var(--piedra-50);
@@ -533,7 +533,7 @@ const faqJsonLd = {
     color: var(--navy-800);
   }
 
-  /* ── 3 · Para quién ── */
+  /* ── Who it's for ── */
   .nb-who {
     padding-block: var(--section-y);
     background: var(--navy-800);
@@ -605,7 +605,7 @@ const faqJsonLd = {
     color: var(--white);
   }
 
-  /* ── 5 · Precio ── */
+  /* ── Price ── */
   .nb-receipt-wrap {
     padding-block: var(--section-y);
     background: var(--piedra-100);
@@ -667,7 +667,7 @@ const faqJsonLd = {
     padding: 0;
     list-style: none;
   }
-  /* Concepto arriba, importe debajo: cabe cualquier texto, también «Incluido desde Essential». */
+  /* Label on top, amount below: any text fits, including "Included from Essential". */
   .nb-receipt__line {
     display: grid;
     gap: 6px;
@@ -703,7 +703,7 @@ const faqJsonLd = {
     color: var(--piedra-700);
   }
 
-  /* ── 6 · Preguntas ── */
+  /* ── FAQ ── */
   .nb-sfaq {
     padding-block: var(--section-y);
     background: var(--white);
@@ -728,7 +728,7 @@ const faqJsonLd = {
     gap: 16px;
   }
 
-  /* ── 7 · Relacionados ── */
+  /* ── Related ── */
   .nb-rel {
     padding-block: var(--section-y);
     background: var(--piedra-50);

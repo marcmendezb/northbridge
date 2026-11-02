@@ -1,13 +1,13 @@
 import type { FiscalEvent } from './types';
 
 /**
- * Alemania: GmbH o autónomo con ejercicio igual al año natural, en Berlín. Plazos comprobados el
- * 29-10-2026: § 18 UStG (Voranmeldung el día 10; trimestral entre 2000 y 9000 € de cuota del año
- * anterior, mensual por encima), § 149 AO (declaraciones anuales: 31 de julio sin asesor fiscal),
- * § 37 EStG y § 31 KStG (pagos a cuenta el 10 de marzo, junio, septiembre y diciembre), § 19 GewStG
- * (15 de febrero, mayo, agosto y noviembre), § 41a y § 41b EStG (Lohnsteuer), § 23 SGB IV
- * (cotizaciones) y § 325 HGB (publicación de cuentas). Si el último día es sábado, domingo o festivo,
- * vence el siguiente día hábil (§ 108 Abs. 3 AO). Ver DECISIONES.md.
+ * Germany: GmbH or self-employed with a calendar financial year, in Berlin. Deadlines checked on
+ * 29-10-2026: § 18 UStG (advance VAT return on the 10th; quarterly between €2,000 and €9,000 of the
+ * previous year's VAT, monthly above that), § 149 AO (annual returns: 31 July without a tax adviser),
+ * § 37 EStG and § 31 KStG (prepayments on 10 March, June, September and December), § 19 GewStG
+ * (15 February, May, August and November), § 41a and § 41b EStG (wage tax), § 23 SGB IV
+ * (contributions) and § 325 HGB (publication of accounts). If the last day is a Saturday, Sunday or holiday,
+ * it moves to the next working day (§ 108 Abs. 3 AO).
  */
 type T5 = { es: string; en: string; de: string; fr: string; it: string };
 const T = (es: string, en: string, de: string, fr: string, it: string): T5 => ({
@@ -122,8 +122,8 @@ const trade = (id: string, m: number): FiscalEvent => ({
 });
 
 export const events: FiscalEvent[] = [
-  // IVA: Umsatzsteuer-Voranmeldung trimestral, el día 10 tras el trimestre (mensual si la cuota
-  // del año anterior supera 9000 €).
+  // VAT: quarterly Umsatzsteuer-Voranmeldung, on the 10th after the quarter (monthly if the previous
+  // year's VAT exceeded €9,000).
   vat(
     'de-vat-q4',
     1,
@@ -167,7 +167,7 @@ export const events: FiscalEvent[] = [
     ),
   ),
 
-  // Impuestos: declaraciones anuales y publicación de cuentas.
+  // Taxes: annual returns and publication of accounts.
   {
     id: 'de-returns',
     cat: 'tax',
@@ -237,7 +237,7 @@ export const events: FiscalEvent[] = [
     ),
   },
 
-  // Pagos: a cuenta de renta o sociedades (Hacienda) y del impuesto industrial (municipio).
+  // Payments: income or corporate tax prepayments (tax office) and trade tax (municipality).
   trade('de-trade-feb', 2),
   prepay('de-prepay-mar', 3),
   trade('de-trade-may', 5),
@@ -247,7 +247,7 @@ export const events: FiscalEvent[] = [
   trade('de-trade-nov', 11),
   prepay('de-prepay-dec', 12),
 
-  // Nóminas: certificados anuales, retención mensual y cotizaciones.
+  // Payroll: annual certificates, monthly withholding and contributions.
   {
     id: 'de-wage-certificates',
     cat: 'payroll',

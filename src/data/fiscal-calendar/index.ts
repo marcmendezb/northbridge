@@ -11,15 +11,15 @@ import type { Text } from './types';
 export type { FiscalEvent, Text } from './types';
 
 /**
- * Calendario fiscal por país (docs/09: datos estructurados para el futuro calendario interactivo).
- * Cada país vive en su archivo; los que aún no existen se añaden aquí.
+ * Tax calendar per country.
+ * Each country lives in its own file; new ones are added here.
  */
 export const FISCAL_CALENDARS: Partial<Record<Country, FiscalEvent[]>> = { CH, ES, DE, FR, IT };
 
-/** Países con calendario propio; el resto ve el suizo hasta tener el suyo. */
+/** Countries with their own calendar; the rest see the Swiss one until they have theirs. */
 export type CalendarCountry = 'CH' | 'ES' | 'DE' | 'FR' | 'IT';
 
-/** A quién aplica cada calendario y de dónde salen sus fechas. */
+/** Who each calendar applies to and where its dates come from. */
 export const CALENDAR_NOTES: Record<CalendarCountry, Text> = {
   CH: {
     es: 'Pyme con ejercicio igual al año natural, en el cantón de Zúrich.',

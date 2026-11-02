@@ -16,8 +16,8 @@ import { splitReveal } from './splitReveal';
 import { getSmoothScroll } from './smoothScroll';
 
 /**
- * Registra las escenas de la página según los atributos `data-*` presentes.
- * GSAP se importa de forma dinámica y solo con `prefers-reduced-motion: no-preference`.
+ * Registers the page's scenes based on the `data-*` attributes present.
+ * GSAP is imported dynamically and only with `prefers-reduced-motion: no-preference`.
  */
 export async function initPage() {
   const [{ gsap }, { ScrollTrigger }] = await Promise.all([
@@ -26,7 +26,7 @@ export async function initPage() {
   ]);
   gsap.registerPlugin(ScrollTrigger);
   const kit = { gsap, ScrollTrigger };
-  // ScrollTrigger sigue la posición que calcula Lenis.
+  // ScrollTrigger follows the scroll position computed by Lenis.
   getSmoothScroll()?.on('scroll', ScrollTrigger.update);
 
   const mm = gsap.matchMedia();
@@ -48,6 +48,6 @@ export async function initPage() {
     void splitReveal(kit);
   });
 
-  // Limpieza antes de cambiar de página (View Transitions, fase 7).
+  // Clean up before leaving the page.
   document.addEventListener('astro:before-swap', () => mm.revert(), { once: true });
 }

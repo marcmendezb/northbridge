@@ -1,8 +1,8 @@
 import type { AnimationKit } from './types';
 
 /**
- * `[data-split]`: el titular sube línea a línea desde una máscara (SplitText, solo transform/opacity).
- * Se divide cuando las fuentes ya han cargado para que los cortes de línea sean los definitivos.
+ * `[data-split]`: the headline rises line by line from a mask (SplitText, transform/opacity only).
+ * It is split once fonts have loaded so the line breaks are final.
  */
 export async function splitReveal(
   { gsap, ScrollTrigger }: AnimationKit,

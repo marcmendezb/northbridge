@@ -1,4 +1,4 @@
-/** Textos de interfaz en español (tuteo, frases cortas, sin exclamaciones). Es la plantilla de forma de todos los idiomas. */
+/** UI strings in Spanish (informal "tú", short sentences, no exclamation marks). Defines the shape for every language. */
 export const es = {
   brand: {
     name: 'Northbridge Advisory',
@@ -545,7 +545,7 @@ export const es = {
     countryNotice: 'Esta guía está pensada para otro país.',
     countryOther: 'La versión para tu país',
   },
-  /** Aviso de web ficticia al enviar el formulario o la reserva de demostración. */
+  /** Fictional site notice shown when submitting the form or the demo booking. */
   demo: {
     label: 'Proyecto de portfolio',
     title: 'Esta web es una demostración.',
@@ -757,7 +757,7 @@ type Leaves<T, P extends string = ''> = {
 
 export type MessageKey = Leaves<typeof es>;
 
-/** Forma del diccionario: misma estructura que `es`, con textos libres. Todos los idiomas la cumplen. */
+/** Dictionary shape: same structure as `es`, with free text. Every language follows it. */
 type Widen<T> = T extends string
   ? string
   : T extends readonly (infer U)[]

@@ -12,7 +12,7 @@ export type CompanyType = keyof typeof BASE;
 
 export interface CalculatorInput {
   type: CompanyType;
-  /** Facturas al mes (emitidas + recibidas). */
+  /** Invoices per month (issued + received). */
   invoices: number;
   employees: number;
 }
@@ -23,13 +23,13 @@ export type CalculatorResult =
 
 const roundTo = (value: number) => Math.round(value / ROUND_TO) * ROUND_TO;
 
-/** Recargo mensual por volumen de facturas (0 a 200). */
+/** Monthly surcharge by invoice volume (0 to 200). */
 export function invoiceFee(invoices: number): number {
   const tier = INVOICE_TIERS.find((t) => invoices <= t.upTo);
   return tier ? tier.fee : INVOICE_TIERS[INVOICE_TIERS.length - 1].fee;
 }
 
-/** Nóminas: las 10 primeras a una tarifa y el resto a otra (docs/07). */
+/** Payroll: the first 10 payslips at one rate and the rest at another. */
 export function payrollFee(employees: number): number {
   const [first, rest] = PAYROLL;
   const n = Math.max(0, employees);
@@ -44,7 +44,7 @@ export function recommendedPackage({ type, invoices, employees }: CalculatorInpu
   return 'essential';
 }
 
-/** Precio mensual estimado (EUR, sin IVA; convert() para otras monedas): función pura, todos los importes salen de config.ts. */
+/** Estimated monthly price (EUR, excl. VAT; convert() for other currencies): a pure function, all amounts come from config.ts. */
 export function calculate(input: CalculatorInput): CalculatorResult {
   if (input.invoices > INVOICE_TIERS[INVOICE_TIERS.length - 1].upTo) return { custom: true };
   const raw = BASE[input.type] + invoiceFee(input.invoices) + payrollFee(input.employees);

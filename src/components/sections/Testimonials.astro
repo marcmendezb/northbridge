@@ -1,8 +1,8 @@
 ---
 /**
- * Testimonios editoriales: una cita grande a la vez, sin rotación automática.
- * Navegación con líneas (la activa se alarga), anterior/siguiente y flechas del teclado.
- * Sin JS, las tres citas se ven seguidas. Comillas grandes en lugar de numeración.
+ * Editorial testimonials: one large quote at a time, no autoplay.
+ * Navigation with lines (the active one gets longer), previous/next and arrow keys.
+ * Without JS, all quotes are shown one after another. Large quotation marks instead of numbering.
  */
 import Section from '../ui/Section.astro';
 import { localeMeta, useI18n } from '../../i18n';
@@ -10,7 +10,7 @@ import { getTestimonials } from '../../lib/content';
 import { COUNTRIES } from '../../lib/country';
 const { t, locale } = useI18n(Astro.currentLocale);
 
-/** Un carrusel por país (clientes de cada oficina); se muestra el del país elegido. */
+/** One carousel per country (clients of each office); the selected country's one is shown. */
 const all = await getTestimonials(locale);
 const groups = COUNTRIES.map((cc) => ({
   cc,
@@ -124,7 +124,7 @@ const chevron = (dir: 'prev' | 'next') => (dir === 'prev' ? 'M15 5l-7 7 7 7' : '
       grid-template-columns: auto minmax(0, 1fr);
     }
   }
-  /* Comillas grandes en Piedra: el ancla visual que en la referencia ocupaba el número. */
+  /* Large quotation marks in stone: the visual anchor where the reference design had a number. */
   .nb-tst__mark {
     font-family: var(--font-display);
     font-optical-sizing: auto;
@@ -149,7 +149,7 @@ const chevron = (dir: 'prev' | 'next') => (dir === 'prev' ? 'M15 5l-7 7 7 7' : '
     font-family: var(--font-display);
     font-optical-sizing: auto;
     font-size: clamp(1.625rem, 1rem + 2.2vw, 2.75rem);
-    /* Redonda: la cursiva (144 KB) se descargaría en la Home solo por esta cita y retrasa el LCP. */
+    /* Upright: the italic font (144 KB) would be downloaded on the home page just for this quote and delays the LCP. */
     font-weight: 300;
     line-height: 1.22;
     letter-spacing: -0.012em;
@@ -165,7 +165,7 @@ const chevron = (dir: 'prev' | 'next') => (dir === 'prev' ? 'M15 5l-7 7 7 7' : '
     gap: 16px;
     margin-top: 40px;
   }
-  /* Monograma con forma de arco (el arco solo enmarca retratos). */
+  /* Arch-shaped monogram (the arch only frames portraits). */
   .nb-tst__avatar {
     display: inline-flex;
     align-items: flex-end;
@@ -269,7 +269,7 @@ const chevron = (dir: 'prev' | 'next') => (dir === 'prev' ? 'M15 5l-7 7 7 7' : '
     color: var(--navy-800);
   }
 
-  /* Con JS: una cita a la vez, con salida lateral corta y entrada suave. */
+  /* With JS: one quote at a time, with a short sideways exit and a soft entrance. */
   .js .nb-tst__nav {
     display: flex;
   }

@@ -12,8 +12,8 @@ export interface PricingRef {
 const isPackage = (ref: string): ref is PackageId => ref in PACKAGES;
 
 /**
- * Texto de precio orientativo de un servicio, siempre derivado de config.ts. `amount` queda en EUR
- * (lo convierte PriceTag); los textos ya salen en la moneda pedida.
+ * Indicative price text for a service, always derived from config.ts. `amount` stays in EUR
+ * (PriceTag converts it); the texts already come in the requested currency.
  */
 export function describePricing(
   { ref, mode }: PricingRef,
@@ -50,7 +50,7 @@ export function describePricing(
   };
 }
 
-/** Unidad tras el importe: «€/mes», «CHF/mes» o solo la moneda en los precios cerrados. */
+/** Unit after the amount: "€/month", "CHF/month" or just the currency for fixed prices. */
 export function priceUnit(currency: Currency, locale: Locale = 'es', once = false): string {
   return t(once ? 'price.unitOnce' : 'price.perMonth', locale, {
     currency: CURRENCY_SYMBOL[currency],

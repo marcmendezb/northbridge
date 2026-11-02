@@ -1,8 +1,8 @@
 import type { AnimationKit } from './types';
 
 /**
- * `[data-journey]`: en escritorio la sección se ancla y los pasos cruzan la pantalla (scrub) sobre un
- * tablero que se traza; cada paso dibuja su escena al entrar. En móvil, cada escena se dibuja al llegar.
+ * `[data-journey]`: on desktop the section pins and the steps cross the screen (scrub) over a
+ * deck that draws itself; each step draws its scene as it enters. On mobile, each scene draws on arrival.
  */
 export function journeyScene({ gsap, ScrollTrigger }: AnimationKit) {
   const el = document.querySelector<HTMLElement>('[data-journey]');
@@ -14,7 +14,7 @@ export function journeyScene({ gsap, ScrollTrigger }: AnimationKit) {
   const panels = Array.from(el.querySelectorAll<HTMLElement>('[data-journey-panel]'));
   if (!pin || !track || !panels.length) return;
 
-  /** Escena de cada paso (pausada): del estado vacío al dibujado. */
+  /** Scene for each step (paused): from empty to fully drawn. */
   const scene = (panel: HTMLElement) => {
     const q = (s: string) => panel.querySelectorAll(s);
     const tl = gsap.timeline({ defaults: { ease: 'power2.inOut' } });
@@ -31,11 +31,11 @@ export function journeyScene({ gsap, ScrollTrigger }: AnimationKit) {
           .fromTo(
             q('.v-arc'),
             { strokeDashoffset: 1 },
-            // Sin redondeo: el arco de 20 minutos es un tercio exacto del círculo (pathLength = 1).
+            // No rounding: the 20-minute arc is exactly a third of the circle (pathLength = 1).
             { strokeDashoffset: 0.6667, duration: 0.8, autoRound: false },
             0.1,
           )
-          // La aguja gira 120° (20 minutos) sobre el centro: se anima su atributo transform de SVG.
+          // The hand turns 120° (20 minutes) around the centre: its SVG transform attribute is animated.
           .fromTo(
             hand,
             { angle: 0 },

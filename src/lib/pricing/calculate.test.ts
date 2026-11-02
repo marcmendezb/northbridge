@@ -7,7 +7,7 @@ const priced = (input: CalculatorInput) => {
   return r;
 };
 
-describe('calculate: casos obligatorios de docs/07', () => {
+describe('calculate: reference cases', () => {
   it.each([
     ['autonomo', 10, 0, 'essential', 190, [190, 210]],
     ['autonomo', 40, 0, 'essential', 280, [280, 310]],
@@ -25,18 +25,18 @@ describe('calculate: casos obligatorios de docs/07', () => {
     },
   );
 
-  it('suelo del paquete: startup 15/2 tiene raw 350; gmbh 30/12 tiene raw 782', () => {
+  it('package floor: startup 15/2 has raw 350; gmbh 30/12 has raw 782', () => {
     expect(priced({ type: 'startup', invoices: 15, employees: 2 }).raw).toBe(350);
     expect(priced({ type: 'gmbh', invoices: 30, employees: 12 }).raw).toBe(782);
   });
 
-  it('más de 200 facturas: propuesta a medida', () => {
+  it('more than 200 invoices: custom proposal', () => {
     for (const type of ['autonomo', 'startup', 'gmbh', 'ag'] as const)
       expect(calculate({ type, invoices: 201, employees: 3 })).toEqual({ custom: true });
   });
 });
 
-describe('calculate: bordes', () => {
+describe('calculate: edge cases', () => {
   const base = { type: 'gmbh' as CompanyType, employees: 0 };
   it.each([
     [20, 21],
@@ -47,14 +47,14 @@ describe('calculate: bordes', () => {
       priced({ ...base, invoices: a }).raw,
     );
   });
-  it('200 facturas tiene precio; 201 es a medida', () => {
+  it('200 invoices has a price; 201 is custom', () => {
     expect(calculate({ ...base, invoices: 200 }).custom).toBe(false);
     expect(calculate({ ...base, invoices: 201 }).custom).toBe(true);
   });
-  it('101 facturas recomienda Full Service', () => {
+  it('101 invoices recommends Full Service', () => {
     expect(priced({ ...base, invoices: 101 }).package).toBe('full');
   });
-  it('10 → 11 empleados: cambia la tarifa por empleado y pasa a Full Service', () => {
+  it('10 → 11 employees: the per-employee rate changes and Full Service is recommended', () => {
     const ten = priced({ ...base, invoices: 10, employees: 10 });
     const eleven = priced({ ...base, invoices: 10, employees: 11 });
     expect(eleven.raw - ten.raw).toBe(26);
@@ -63,9 +63,9 @@ describe('calculate: bordes', () => {
   });
 });
 
-describe('calculate: monotonía (subir una entrada nunca baja el precio)', () => {
+describe('calculate: monotonic (raising an input never lowers the price)', () => {
   const types: CompanyType[] = ['autonomo', 'startup', 'gmbh', 'ag'];
-  it('facturas y empleados', () => {
+  it('invoices and employees', () => {
     for (const type of types) {
       for (let invoices = 0; invoices < 200; invoices += 7) {
         for (let employees = 0; employees < 50; employees += 3) {

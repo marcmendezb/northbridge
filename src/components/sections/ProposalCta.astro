@@ -1,8 +1,8 @@
 ---
 /**
- * Cierre de Precios: lo que recibes después de los 20 minutos. A la izquierda, la invitación;
- * a la derecha, una propuesta de precio cerrado de ejemplo (importe calculado con calculate.ts,
- * en la moneda del país elegido) que se escribe línea a línea y se firma (pricingScene.ts).
+ * Pricing page closing section: what you get after the 20 minutes. On the left, the invitation;
+ * on the right, a sample fixed-price proposal (amount computed with calculate.ts,
+ * in the selected country's currency) that writes itself line by line and gets signed (pricingScene.ts).
  */
 import Button from '../ui/Button.astro';
 import { useI18n } from '../../i18n';
@@ -17,7 +17,7 @@ import { formatNumber } from '../../lib/format';
 
 const { t, lp, locale } = useI18n(Astro.currentLocale);
 const bookingCta = getBookingCta(locale);
-// El mismo ejemplo de docs/07 que el teaser de la calculadora: pyme, 60 facturas, 5 empleados.
+// The same example as the calculator teaser: SME, 60 invoices, 5 employees.
 const example = calculate({ type: 'gmbh', invoices: 60, employees: 5 });
 const price = example.custom ? 0 : example.price;
 const pkg = example.custom ? '' : PACKAGES[example.package].name;
@@ -159,7 +159,7 @@ const rows = [
     margin-top: 8px;
   }
 
-  /* La propuesta: una hoja sobre la mesa, ligeramente girada (2D, sin perspectiva). */
+  /* The proposal: a sheet of paper on the desk, slightly rotated (2D, no perspective). */
   .nb-prop__stage {
     display: grid;
     justify-items: center;

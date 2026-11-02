@@ -8,15 +8,15 @@ import { useI18n } from '../../i18n';
 const { t, locale } = useI18n(Astro.currentLocale);
 
 /**
- * «desde» y la unidad en Instrument Sans; el importe en Newsreader. Siempre con «Precios sin IVA».
- * `amount` va en EUR (config.ts): se muestra convertido a la moneda del país elegido.
+ * "from" and the unit in Instrument Sans; the amount in Newsreader. Always with "Prices excl. VAT".
+ * `amount` is in EUR (config.ts): it is shown converted to the selected country's currency.
  */
 interface Props {
   amount: number;
-  /** Precio cerrado (pago único): la unidad es solo la moneda. */
+  /** Fixed price (one-off payment): the unit is just the currency. */
   once?: boolean;
   size?: 'md' | 'lg';
-  /** Primera mención de IVA en la página: «IVA (MWST)». */
+  /** First mention of VAT on the page: "VAT (MWST)". */
   firstVat?: boolean;
   hideVatNote?: boolean;
   class?: string;

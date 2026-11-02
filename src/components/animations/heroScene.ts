@@ -2,18 +2,18 @@ import { drawBridge } from './drawBridge';
 import type { AnimationKit } from './types';
 
 /**
- * Escena del hero.
- * 1) Entrada: el puente se dibuja, el título sube por líneas, aparecen subtítulo, botones y prueba.
- * 2) Arco-portal (escritorio): al empezar a bajar, la foto a sangre se encoge hasta quedar recortada
- *    en el arco de la marca, el texto de entrada sale y aparece la promesa. La transición se completa
- *    sola (no va ligada al scroll) para que nunca quede a medias.
+ * Hero scene.
+ * 1) Intro: the bridge draws, the headline rises line by line, then the subtitle, buttons and proof.
+ * 2) Arch portal (desktop): as you start scrolling, the full-bleed photo shrinks until it is cropped
+ *    into the brand's arch, the intro text leaves and the promise appears. The transition completes
+ *    on its own (it is not tied to the scroll position) so it never gets stuck halfway.
  */
 export function heroScene({ gsap, ScrollTrigger }: AnimationKit) {
   const hero = document.querySelector<HTMLElement>('[data-hero]');
   if (!hero) return;
   const q = <T extends Element>(sel: string) => Array.from(hero.querySelectorAll<T>(sel));
 
-  // ── Entrada ──
+  // ── Intro ──
   const intro = gsap.timeline({ defaults: { ease: 'expo.out' } });
   const mark = hero.querySelector('[data-hero-mark]');
   if (mark) intro.add(drawBridge(gsap, mark, { speed: 1.6 }), 0);
@@ -22,7 +22,7 @@ export function heroScene({ gsap, ScrollTrigger }: AnimationKit) {
   if (lines.length) {
     intro.fromTo(
       lines,
-      // y: 0 anula la traslación inicial del CSS (GSAP la leería como píxeles).
+      // y: 0 cancels the initial CSS translation (GSAP would read it as pixels).
       { yPercent: 135, y: 0, opacity: 0 },
       { yPercent: 0, y: 0, opacity: 1, duration: 1.2, stagger: 0.09 },
       0.12,
@@ -33,11 +33,11 @@ export function heroScene({ gsap, ScrollTrigger }: AnimationKit) {
     intro.fromTo(el, { opacity: 0, y: 16 }, { opacity: 1, y: 0, duration: 1 }, at);
   });
 
-  // La foto «respira» al cargar: de 1,06 a 1 (solo transform).
+  // The photo "breathes" on load: from 1.06 to 1 (transform only).
   const img = hero.querySelector('[data-hero-media]');
   if (img) gsap.fromTo(img, { scale: 1.08 }, { scale: 1, duration: 2.4, ease: 'expo.out' });
 
-  // ── Arco-portal ──
+  // ── Arch portal ──
   const photo = hero.querySelector<HTMLElement>('[data-hero-photo]');
   const introLayer = hero.querySelector<HTMLElement>('.hero__intro');
   const introText = hero.querySelector<HTMLElement>('.hero__intro-inner');
@@ -48,29 +48,29 @@ export function heroScene({ gsap, ScrollTrigger }: AnimationKit) {
   mm.add('(min-width: 768px)', () => {
     const promiseParts = q('.hero__promise-inner > *');
 
-    /** Geometría del arco final, calculada con el viewport actual. */
+    /** Geometry of the final arch, computed from the current viewport. */
     const geometry = () => {
       const w = window.innerWidth;
       const h = window.innerHeight;
-      // Borde derecho del arco = borde derecho de la barra del header (rejilla compartida).
+      // Right edge of the arch = right edge of the header bar (shared grid).
       const barEnd = document.querySelector('.nb-bar')?.getBoundingClientRect().right;
       const edge = barEnd ? w - barEnd : Math.max(0, (w - 1280) / 2) + 40;
       const archW = Math.min(w * 0.4, 520);
       const headerH =
         parseFloat(getComputedStyle(document.documentElement).getPropertyValue('--header-h')) || 96;
-      const top = headerH + 28; // bajo el header flotante
+      const top = headerH + 28; // below the floating header
       const bottom = Math.max(48, h * 0.07);
       const left = w - edge - archW;
-      // Dónde cae la ventana de luz de la foto (object-fit: cover, object-position 18 % 50 %).
+      // Where the window of light falls in the photo (object-fit: cover, object-position 18% 50%).
       const s = Math.max(w / 1280, h / 720);
       const iw = 1280 * s;
       const ih = 720 * s;
-      // En pantallas verticales la ventana puede caer fuera: el punto de zoom se mantiene dentro.
+      // On portrait screens the window can fall outside: the zoom point is kept inside.
       const winX = Math.min(Math.max((w - iw) * 0.18 + 0.655 * iw, w * 0.15), w * 0.85);
       const winY = Math.min(Math.max((h - ih) * 0.5 + 0.4 * ih, h * 0.15), h * 0.85);
       const archH = h - top - bottom;
-      // Escala de encuadre (la ventana llena el arco) y mínima para que la foto, centrada en la
-      // ventana, cubra el arco por los cuatro lados en cualquier proporción de pantalla.
+      // Framing scale (the window fills the arch) and a minimum so that the photo, centred on the
+      // window, covers the arch on all four sides at any aspect ratio.
       const frame = Math.min(archW / (0.3 * iw), archH / (0.62 * ih));
       const cover = Math.max(
         archW / 2 / Math.max(1, winX),
@@ -94,8 +94,8 @@ export function heroScene({ gsap, ScrollTrigger }: AnimationKit) {
     gsap.set(photo, { clipPath: 'inset(0px 0px 0px 0px round 0px 0px 0px 0px)' });
     const tl = gsap.timeline({
       defaults: { ease: 'none' },
-      // Al empezar a bajar, la transición se completa sola (y se deshace al volver arriba):
-      // con scrub, parar a medias dejaba el arco en una forma intermedia (techo plano).
+      // Once scrolling starts, the transition completes on its own (and reverses when scrolling back up):
+      // with scrub, stopping halfway left the arch in an in-between shape (flat top).
       scrollTrigger: {
         trigger: hero,
         start: 'top+=24 top',
@@ -135,10 +135,10 @@ export function heroScene({ gsap, ScrollTrigger }: AnimationKit) {
         0.46,
       )
       .to({}, { duration: 0.001 }, 1);
-    // Antes de que la promesa aparezca, la regla está sin trazar.
+    // Before the promise appears, the rule is not drawn yet.
     gsap.set('[data-hero-rule] path', { strokeDasharray: 1, strokeDashoffset: 1 });
-    // Pie de la imagen: sube con el recorte hasta la base del arco, las credenciales entran en él,
-    // «Desliza» desaparece y la banda pasa a blanco con texto navy.
+    // Image footer: rises with the crop to the base of the arch, the credentials move into it,
+    // "Scroll" disappears and the band turns white with navy text.
     if (band) {
       const facts = band.querySelector<HTMLElement>('.hero__facts');
       const cue = band.querySelector<HTMLElement>('.hero__scroll');
@@ -146,7 +146,7 @@ export function heroScene({ gsap, ScrollTrigger }: AnimationKit) {
         getComputedStyle(document.documentElement).getPropertyValue(name).trim();
       const restLeft = () =>
         facts ? facts.getBoundingClientRect().left - Number(gsap.getProperty(facts, 'x')) : 0;
-      // La barra flota a --band-gap del borde: sube lo justo para apoyarse en la base del arco.
+      // The bar floats --band-gap from the edge: it rises just enough to sit on the base of the arch.
       const gap = () => parseFloat(getComputedStyle(band).bottom) || 0;
       tl.to(
         band,

@@ -1,14 +1,14 @@
 import type { FiscalEvent } from './types';
 
 /**
- * Italia: SRL o autónomo con ejercicio igual al año natural, en Roma. Plazos comprobados el
- * 01-11-2026 en la Agenzia delle Entrate (scadenzario y fichas): IVA trimestral por opción (volumen
- * de hasta 500 000 € en servicios y 800 000 € en otras actividades) el 16 de mayo, 20 de agosto y 16 de
- * noviembre con el 1 % de interés, y el 4.º trimestre con el saldo anual el 16 de marzo; LIPE el
- * último día del segundo mes tras el trimestre (Q2: 30 de septiembre); declaración de IVA del 1 de
- * febrero al 30 de abril; saldo y primer acconto de IRES/IRAP el último día del sexto mes (30 de
- * junio), segundo acconto el del undécimo (30 de noviembre); Redditi, IRAP y 770 el 31 de octubre; CU
- * el 16 de marzo. Si el plazo cae en sábado o festivo, pasa al siguiente día hábil (art. 7 DL 70/2011).
+ * Italy: SRL or self-employed with a calendar financial year, in Rome. Deadlines checked on
+ * 01-11-2026 with the Agenzia delle Entrate (deadline calendar and guidance): quarterly VAT by option (turnover
+ * up to €500,000 for services and €800,000 for other activities) on 16 May, 20 August and 16
+ * November with 1% interest, and Q4 with the annual balance on 16 March; LIPE on the
+ * last day of the second month after the quarter (Q2: 30 September); annual VAT return from 1
+ * February to 30 April; balance and first IRES/IRAP advance on the last day of the sixth month (30
+ * June), second advance on the last day of the eleventh (30 November); Redditi, IRAP and 770 on 31 October; CU
+ * on 16 March. If a deadline falls on a Saturday or holiday, it moves to the next working day (art. 7 DL 70/2011).
  */
 type T5 = { es: string; en: string; de: string; fr: string; it: string };
 const T = (es: string, en: string, de: string, fr: string, it: string): T5 => ({
@@ -83,7 +83,7 @@ const lipe = (id: string, m: number, q: T5, rule: FiscalEvent['rule'], when: T5)
 });
 
 export const events: FiscalEvent[] = [
-  // IVA: trimestral por opción, saldo anual en marzo y declaración anual hasta el 30 de abril.
+  // VAT: quarterly by option, annual balance in March and annual return by 30 April.
   {
     id: 'it-vat-annual',
     cat: 'vat',
@@ -108,7 +108,7 @@ export const events: FiscalEvent[] = [
   },
   {
     id: 'it-vat-return',
-    // Declaración anual: en el carril de impuestos, junto a las demás (y lejos del IVA de mayo).
+    // Annual return: in the taxes lane, with the other returns (and away from the May VAT).
     cat: 'tax',
     month: 4,
     rule: { type: 'fixed', m: 4, d: 30, shift: true },
@@ -206,7 +206,7 @@ export const events: FiscalEvent[] = [
     T('30 de noviembre', '30 November', '30. November', '30 novembre', '30 novembre'),
   ),
 
-  // Impuestos: declaraciones anuales.
+  // Taxes: annual returns.
   {
     id: 'it-returns',
     cat: 'tax',
@@ -242,7 +242,7 @@ export const events: FiscalEvent[] = [
     ),
   },
 
-  // Pagos: saldo y acconti de IRES (o IRPEF) e IRAP.
+  // Payments: IRES (or IRPEF) and IRAP balance and advances.
   {
     id: 'it-balance',
     cat: 'pay',
@@ -306,7 +306,7 @@ export const events: FiscalEvent[] = [
     ),
   },
 
-  // Nóminas: CU, 770 y el F24 de cada mes.
+  // Payroll: CU, 770 and the monthly F24.
   {
     id: 'it-cu',
     cat: 'payroll',

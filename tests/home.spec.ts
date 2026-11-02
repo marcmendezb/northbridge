@@ -1,6 +1,6 @@
 import { expect, test } from '@playwright/test';
 
-test('home: hero animado termina en estado final y todo el contenido es visible', async ({
+test('home: the animated hero ends in its final state and all content is visible', async ({
   page,
 }) => {
   await page.goto('/');
@@ -18,14 +18,14 @@ test('home: hero animado termina en estado final y todo el contenido es visible'
   await expect(page.locator('[data-tst]:visible .nb-slide[data-active]')).toBeVisible();
 });
 
-test('home: las cifras llegan a su valor final y son accesibles', async ({ page }) => {
+test('home: the figures reach their final value and are accessible', async ({ page }) => {
   await page.goto('/');
   await page.locator('[data-count="200"]').scrollIntoViewIfNeeded();
   await expect(page.locator('[data-count="200"]')).toHaveText('200', { timeout: 4000 });
   await expect(page.getByText('200+ Clientes activos')).toHaveCount(1);
 });
 
-test('home: testimonios sin rotación automática; líneas, flechas y teclado cambian la cita', async ({
+test('home: testimonials never autoplay; lines, arrows and keyboard change the quote', async ({
   page,
 }) => {
   await page.goto('/');
@@ -48,9 +48,9 @@ test('home: testimonios sin rotación automática; líneas, flechas y teclado ca
   await expect(page.locator('.nb-slide:visible')).toHaveCount(1);
 });
 
-test.describe('sin JS', () => {
+test.describe('without JS', () => {
   test.use({ javaScriptEnabled: false });
-  test('hero, cifras y los tres testimonios son visibles', async ({ page }) => {
+  test('hero, figures and the three testimonials are visible', async ({ page }) => {
     await page.goto('/');
     await expect(page.getByRole('heading', { level: 1 })).toBeVisible();
     await expect(
@@ -66,7 +66,7 @@ test.describe('sin JS', () => {
 
 test.describe('reduced motion', () => {
   test.use({ reducedMotion: 'reduce' });
-  test('todo visible de inmediato y la cita no cambia sola', async ({ page }) => {
+  test('everything visible at once and the quote never changes on its own', async ({ page }) => {
     await page.goto('/');
     for (const sel of ['[data-hero-fade]', '[data-reveal]', '.hero__promise-inner > *']) {
       expect(
@@ -88,7 +88,7 @@ test.describe('reduced motion', () => {
   });
 });
 
-test('home: sin scroll horizontal en 360, 768, 1024 y 1440', async ({ page }) => {
+test('home: no horizontal scroll at 360, 768, 1024 and 1440', async ({ page }) => {
   for (const width of [360, 768, 1024, 1440]) {
     await page.setViewportSize({ width, height: 800 });
     await page.goto('/');
@@ -99,7 +99,7 @@ test('home: sin scroll horizontal en 360, 768, 1024 y 1440', async ({ page }) =>
   }
 });
 
-test('header: fijo, flotante y con sombra al hacer scroll', async ({ page }) => {
+test('header: fixed, floating and shadowed on scroll', async ({ page }) => {
   await page.goto('/');
   const header = page.locator('.nb-header');
   expect(await header.evaluate((el) => getComputedStyle(el).position)).toBe('fixed');
@@ -113,12 +113,14 @@ test('header: fijo, flotante y con sombra al hacer scroll', async ({ page }) => 
   expect(await bar.evaluate((el) => getComputedStyle(el).boxShadow)).not.toBe('none');
 });
 
-test('scroll suave (Lenis) activo con movimiento permitido', async ({ page }) => {
+test('smooth scroll (Lenis) is on when motion is allowed', async ({ page }) => {
   await page.goto('/', { waitUntil: 'networkidle' });
   await expect(page.locator('html')).toHaveClass(/lenis/);
 });
 
-test('hero: la foto se recorta en arco al hacer scroll y la promesa aparece', async ({ page }) => {
+test('hero: the photo is cropped into an arch on scroll and the promise appears', async ({
+  page,
+}) => {
   await page.setViewportSize({ width: 1440, height: 900 });
   await page.goto('/', { waitUntil: 'networkidle' });
   const clip = () =>
@@ -139,7 +141,7 @@ test('hero: la foto se recorta en arco al hacer scroll y la promesa aparece', as
   ).toBe('1');
 });
 
-test('hero en móvil: foto arriba y texto sobre navy, sin escena anclada', async ({ page }) => {
+test('hero on mobile: photo on top and text on navy, no pinned scene', async ({ page }) => {
   await page.setViewportSize({ width: 390, height: 844 });
   await page.goto('/', { waitUntil: 'networkidle' });
   expect(
@@ -151,9 +153,7 @@ test('hero en móvil: foto arriba y texto sobre navy, sin escena anclada', async
   await expect(page.getByRole('heading', { level: 1 })).toBeVisible();
 });
 
-test('hero: el vídeo está en bucle, sin sonido, siempre en reproducción y sin control de pausa', async ({
-  page,
-}) => {
+test('hero: the video loops, is muted, always plays and has no pause control', async ({ page }) => {
   await page.goto('/', { waitUntil: 'networkidle' });
   const video = page.locator('[data-hero-video]');
   expect(await video.evaluate((v: HTMLVideoElement) => [v.muted, v.loop, v.playsInline])).toEqual([
@@ -170,16 +170,16 @@ test('hero: el vídeo está en bucle, sin sonido, siempre en reproducción y sin
   expect(await video.evaluate((v: HTMLVideoElement) => v.currentSrc)).toMatch(
     /hero-home\.(webm|mp4)$/,
   );
-  // Los ficheros servidos no llevan pista de audio.
+  // The served files have no audio track.
   for (const ext of ['webm', 'mp4']) {
     const res = await page.request.get(`/video/hero-home.${ext}`);
     expect(res.ok()).toBe(true);
   }
 });
 
-test.describe('reduced motion: vídeo', () => {
+test.describe('reduced motion: video', () => {
   test.use({ reducedMotion: 'reduce' });
-  test('no se reproduce y queda el fotograma inicial', async ({ page }) => {
+  test('does not play and keeps the first frame', async ({ page }) => {
     await page.goto('/', { waitUntil: 'networkidle' });
     await page.waitForTimeout(1200);
     expect(
@@ -189,9 +189,7 @@ test.describe('reduced motion: vídeo', () => {
   });
 });
 
-test('desplegable de Servicios: abre al pasar el ratón, enlaza y se cierra con Esc', async ({
-  page,
-}) => {
+test('Services dropdown: opens on hover, links correctly and closes with Esc', async ({ page }) => {
   await page.setViewportSize({ width: 1440, height: 900 });
   await page.goto('/', { waitUntil: 'networkidle' });
   const trigger = page.locator('.nb-nav__trigger');
@@ -210,14 +208,16 @@ test('desplegable de Servicios: abre al pasar el ratón, enlaza y se cierra con 
   );
   await page.keyboard.press('Escape');
   await expect(trigger).toHaveAttribute('aria-expanded', 'false');
-  // Teclado: Enter abre y el foco pasa al primer enlace.
+  // Keyboard: Enter opens it and focus moves to the first link.
   await trigger.focus();
   await page.keyboard.press('Enter');
   await expect(trigger).toHaveAttribute('aria-expanded', 'true');
   await expect(mega.getByRole('link').first()).toBeFocused();
 });
 
-test('Servicios en el header: el nombre lleva a /servicios, con y sin JS', async ({ browser }) => {
+test('Services in the header: the label links to /servicios, with and without JS', async ({
+  browser,
+}) => {
   for (const javaScriptEnabled of [true, false]) {
     const ctx = await browser.newContext({
       javaScriptEnabled,
@@ -236,7 +236,7 @@ test('Servicios en el header: el nombre lleva a /servicios, con y sin JS', async
   }
 });
 
-test('scroll con rueda de ratón: la página avanza con Lenis activo', async ({ page }) => {
+test('mouse wheel scroll: the page moves with Lenis on', async ({ page }) => {
   await page.goto('/');
   await expect(page.locator('html')).toHaveClass(/lenis/);
   await page.mouse.move(700, 500);

@@ -1,9 +1,9 @@
 ---
 /**
- * El año fiscal de un país como gráfico de cuatro carriles (IVA, impuestos, pagos, nóminas) y lista
- * con la fecha exacta de cada plazo. Las fechas salen de la regla legal de cada plazo
- * (src/lib/fiscal) con los festivos del país: el servidor pinta el año de compilación y el navegador
- * recalcula el año en curso. Se pinta una vez por calendario; `countries` decide qué países lo ven.
+ * A country's tax year as a four-lane chart (VAT, taxes, payments, payroll) plus a list
+ * with the exact date of each deadline. Dates come from each deadline's legal rule
+ * (src/lib/fiscal) with the country's holidays: the server renders the build year and the browser
+ * recalculates the current year. Rendered once per calendar; `countries` decides which countries see it.
  */
 import Arrow from '../brand/Arrow.astro';
 import { useI18n, type Messages } from '../../i18n';
@@ -28,14 +28,14 @@ const { calendar, countries, guideHref } = Astro.props;
 const cal = calendar.toLowerCase();
 const { t, tRaw, locale } = useI18n(Astro.currentLocale);
 const y = tRaw<Messages['services']['detail']['year']>('services.detail.year');
-/** Nombres de los carriles con el nombre del IVA del país («MwSt.» fuera de Suiza, en alemán). */
+/** Lane names using the country's VAT name ("MwSt." outside Switzerland, in German). */
 const cats = Object.fromEntries(
   Object.entries(y.cats).map(([k, v]) => [k, vatFor(v, calendar, locale)]),
 ) as typeof y.cats;
 const note = CALENDAR_NOTES[calendar][locale];
 
 type Cat = 'vat' | 'tax' | 'pay' | 'payroll';
-/** Carril: el que dice el dato o, en el calendario suizo, el que se deduce del id. */
+/** Lane: the one set in the data or, in the Swiss calendar, inferred from the id. */
 const catOf = (e: FiscalEvent): Cat =>
   e.cat ??
   (e.id.startsWith('vat')
@@ -46,9 +46,9 @@ const catOf = (e: FiscalEvent): Cat =>
         ? 'pay'
         : 'tax');
 const events: FiscalEvent[] = FISCAL_CALENDARS[calendar] ?? [];
-/** Reglas legales de cada plazo: el navegador recalcula con ellas el año en curso. */
+/** Legal rule for each deadline: the browser uses them to recalculate the current year. */
 const ruled = events.flatMap((e) => (e.rule && !e.recurring ? [{ id: e.id, rule: e.rule }] : []));
-/** Plazos de cada mes (cotizaciones): solo en la lista, al final y sin fecha. */
+/** Monthly deadlines (contributions): list only, at the end and without a date. */
 const recurring = events
   .filter((e) => e.recurring)
   .map((e) => ({
@@ -58,7 +58,7 @@ const recurring = events
     what: e.what[locale],
     need: e.need[locale],
   }));
-/** Sin JS se ve el año de compilación; con JS, el año en curso. */
+/** Without JS the build year is shown; with JS, the current year. */
 const buildYear = zurichNow(new Date()).y;
 const items = timeline(ruled, buildYear, HOLIDAYS[calendar]).map((it) => {
   const e = events.find((c) => c.id === it.id)!;
@@ -73,15 +73,15 @@ const items = timeline(ruled, buildYear, HOLIDAYS[calendar]).map((it) => {
     need: e.need[locale],
   };
 });
-/** En el gráfico no va la ventana sin fecha legal (certificados): solo en la lista. */
-/** Carriles con algún plazo con fecha (en Francia el IVA y la DSN no la tienen: solo en la lista). */
+/** Windows without a legal date (certificates) stay out of the chart: list only. */
+/** Lanes with at least one dated deadline (in France, VAT and DSN have none: list only). */
 const lanes = (['vat', 'tax', 'pay', 'payroll'] as const)
   .map((cat) => ({ cat, items: items.filter((it) => it.cat === cat && !it.window) }))
   .filter((l) => l.items.length);
-/** Leyenda de las marcas menores: en Suiza, las cuotas AVS; en otros países, lo que sean allí. */
+/** Legend for minor marks: in Switzerland, AHV contributions; elsewhere, whatever they are there. */
 const minorShorts = [...new Set(items.filter((it) => it.minor).map((it) => it.short))];
 const minorLabel = calendar === 'CH' ? y.minor : minorShorts.join(', ');
-/** Cerca del final del año, la etiqueta va a la izquierda de su bandera. */
+/** Near the end of the year, the label goes to the left of its flag. */
 const FLIP_AT = 0.8;
 const marks = monthMarks(buildYear);
 const dateTag = locale === 'en' ? 'en-GB' : locale;
@@ -323,9 +323,9 @@ const pct = (f: number) => `${(f * 100).toFixed(3)}%`;
   import { daysBetween, HOLIDAYS, yearFraction } from '../../lib/fiscal/deadlines';
   import { monthMarks, nextDeadline, timeline, type RuledEvent } from '../../lib/fiscal/timeline';
 
-  // El año fiscal en curso (hora de Zúrich): fechas exactas, hoy y el próximo plazo.
-  // Sin JS queda el año de compilación, también con fechas exactas.
-  // Cada calendario montado (los de otros países llegan desde <template> al cambiar de país).
+  // The current tax year (Zurich time): exact dates, today and the next deadline.
+  // Without JS, the build year stays, also with exact dates.
+  // Each mounted calendar (other countries' ones arrive from <template> when the country changes).
   const setup = (section: HTMLElement) => {
     const ruler = section.querySelector<HTMLElement>('[data-yr-ruler]');
     if (!ruler || section.dataset.yearReady) return;
@@ -345,7 +345,7 @@ const pct = (f: number) => `${(f * 100).toFixed(3)}%`;
     const items = timeline(events, today.y, holidays);
     const q = <T extends Element = HTMLElement>(sel: string) => ruler.querySelector<T>(sel);
 
-    // Regla del año en curso.
+    // Ruler for the current year.
     const year = q('[data-yr-year]');
     if (year) year.textContent = String(today.y);
     monthMarks(today.y).forEach((mk) => {
@@ -370,7 +370,7 @@ const pct = (f: number) => `${(f * 100).toFixed(3)}%`;
         ext.style.setProperty('--from', pct(base.at));
         ext.style.setProperty('--at', pct(it.at));
       }
-      // Bandera: posición, fecha corta, lado de la etiqueta y si ya ha vencido.
+      // Flag: position, short date, label side and whether it is already past.
       const flag = q(`[data-yr-dot][data-id="${it.id}"]`);
       if (flag) {
         flag.style.setProperty('--at', pct(it.window ? it.startAt : it.at));
@@ -379,7 +379,7 @@ const pct = (f: number) => `${(f * 100).toFixed(3)}%`;
         const short = flag.querySelector('[data-yr-flag-date]');
         if (short && !it.window) short.textContent = dayShort(it.due);
       }
-      // Lista: fecha, día de la semana, aviso y nota de fin de semana; en orden de vencimiento.
+      // List: date, weekday, reminder and weekend note; in due-date order.
       const row = list?.querySelector<HTMLElement>(`[data-yr-event="${it.id}"]`);
       if (!row) return;
       if (!('window' in row.dataset)) {
@@ -394,17 +394,17 @@ const pct = (f: number) => `${(f * 100).toFixed(3)}%`;
       if (remind) remind.textContent = (ds.remind ?? '').replace('{date}', dayMonth(it.remind));
       list?.append(row);
     });
-    // Los plazos de cada mes, al final.
+    // Monthly deadlines last.
     list?.querySelectorAll('.nb-yr__event--recurring').forEach((r) => list.append(r));
 
-    // Hoy.
+    // Today.
     const mark = q('[data-yr-today]');
     if (mark) {
       mark.style.setProperty('--at', pct(yearFraction(today)));
       mark.hidden = false;
     }
 
-    // Próximo plazo (puede ser del año siguiente) y los días que quedan.
+    // Next deadline (may be next year) and the days left.
     const next = nextDeadline(events, today, holidays);
     const panel = section.querySelector<HTMLElement>('[data-yr-next]');
     const source = next && list?.querySelector<HTMLElement>(`[data-yr-event="${next.id}"]`);
@@ -433,7 +433,7 @@ const pct = (f: number) => `${(f * 100).toFixed(3)}%`;
       panel.hidden = false;
       source.classList.add('is-next');
       if (next.year === today.y) q(`[data-yr-dot][data-id="${next.id}"]`)?.classList.add('is-next');
-      // La ficha cambia la altura de la página: las escenas de scroll vuelven a medir.
+      // The panel changes the page height: scroll scenes measure again.
       window.dispatchEvent(new Event('resize'));
     }
   };
@@ -445,7 +445,7 @@ const pct = (f: number) => `${(f * 100).toFixed(3)}%`;
 </script>
 
 <style is:global>
-  /* ── IVA · El año fiscal ── */
+  /* ── VAT · The tax year ── */
   .nb-yr {
     padding-block: var(--section-y);
     background: var(--white);
@@ -491,7 +491,7 @@ const pct = (f: number) => `${(f * 100).toFixed(3)}%`;
     line-height: 1.6;
     color: var(--piedra-800);
   }
-  /* Próximo plazo: ficha navy, la única pieza oscura de la sección. */
+  /* Next deadline: navy panel, the only dark element in the section. */
   .nb-yr__next {
     display: grid;
     gap: 8px;
@@ -517,7 +517,7 @@ const pct = (f: number) => `${(f * 100).toFixed(3)}%`;
     font-family: var(--font-display);
     font-size: clamp(2.25rem, 1.4rem + 1.8vw, 3.25rem);
     font-weight: 300;
-    /* Redonda: la cursiva (144 KB) se descargaría solo por esta fecha y retrasa el LCP. */
+    /* Upright: the italic font (144 KB) would be downloaded just for this date and delays the LCP. */
     line-height: 1.05;
     color: var(--white);
   }
@@ -552,14 +552,14 @@ const pct = (f: number) => `${(f * 100).toFixed(3)}%`;
     color: var(--navy-200);
   }
 
-  /* ── El gráfico del año: tres carriles (IVA, impuestos, nóminas) sobre los doce meses ── */
+  /* ── The yearly chart: lanes (VAT, taxes, payments, payroll) across the twelve months ── */
   .nb-chart {
     --lane: 84px;
     --names: 132px;
     --head: 44px;
     margin-top: clamp(48px, 7vw, 88px);
   }
-  /* En pantallas estrechas el año se desliza dentro de su marco (la página no). */
+  /* On narrow screens the year scrolls inside its frame (the page doesn't). */
   .nb-chart__scroll {
     overflow-x: auto;
     overscroll-behavior-x: contain;
@@ -621,7 +621,7 @@ const pct = (f: number) => `${(f * 100).toFixed(3)}%`;
     display: grid;
     grid-template-rows: var(--head) repeat(var(--lanes, 4), var(--lane));
   }
-  /* Meses: bandas alternas a toda altura, el actual marcado. */
+  /* Months: full-height alternating bands, with the current one highlighted. */
   .nb-chart__months {
     position: absolute;
     inset: 0;
@@ -655,7 +655,7 @@ const pct = (f: number) => `${(f * 100).toFixed(3)}%`;
     position: relative;
     border-top: 1px solid var(--piedra-200);
   }
-  /* Carril: la línea base del año a 26 px del fondo. */
+  /* Lane: the year's baseline 26 px from the bottom. */
   .nb-chart__lane::after {
     content: '';
     position: absolute;
@@ -664,7 +664,7 @@ const pct = (f: number) => `${(f * 100).toFixed(3)}%`;
     background: var(--piedra-300);
   }
 
-  /* Pista de aviso: los 10 días antes del plazo, en salvia sobre la línea base. */
+  /* Reminder track: the 10 days before the deadline, in sage on the baseline. */
   .nb-chart__runway {
     position: absolute;
     z-index: 1;
@@ -675,7 +675,7 @@ const pct = (f: number) => `${(f * 100).toFixed(3)}%`;
     background: var(--salvia-400);
     transform-origin: right center;
   }
-  /* Ventana sin fecha legal (certificados): una banda de enero a febrero. */
+  /* Window without a legal date (certificates): a band from January to February. */
   .nb-chart__window {
     position: absolute;
     z-index: 1;
@@ -688,7 +688,7 @@ const pct = (f: number) => `${(f * 100).toFixed(3)}%`;
     background: var(--piedra-100);
   }
 
-  /* Bandera: mástil, punto en su fecha y etiqueta con la fecha corta y el nombre. */
+  /* Flag: pole, dot on its date and a label with the short date and the name. */
   .nb-chart__flag {
     position: absolute;
     z-index: 2;
@@ -773,7 +773,7 @@ const pct = (f: number) => `${(f * 100).toFixed(3)}%`;
   .nb-chart__flag.is-flip .nb-chart__next {
     justify-self: end;
   }
-  /* Ya vencido: en piedra (legible, pero en segundo plano). */
+  /* Already past: in stone (readable, but in the background). */
   .nb-chart__flag.is-past .nb-chart__stem {
     background: var(--piedra-300);
   }
@@ -785,7 +785,7 @@ const pct = (f: number) => `${(f * 100).toFixed(3)}%`;
   .nb-chart__flag.is-past .nb-chart__tag > span:last-child {
     color: var(--piedra-600);
   }
-  /* Próximo: anillo salvia y etiqueta «Próximo plazo». */
+  /* Next: sage ring and a "Next deadline" label. */
   .nb-chart__flag.is-next .nb-chart__pin {
     box-shadow:
       0 0 0 3px var(--white),
@@ -794,11 +794,11 @@ const pct = (f: number) => `${(f * 100).toFixed(3)}%`;
   .nb-chart__flag.is-next .nb-chart__next {
     display: block;
   }
-  /* Pagos: punto cuadrado, para distinguirlos de las declaraciones. */
+  /* Payments: square dot, to tell them apart from filings. */
   .nb-chart__lane--pay .nb-chart__pin {
     border-radius: 2px;
   }
-  /* Cuota recurrente: marca pequeña en la línea, sin mástil ni etiqueta (ficha al pasar). */
+  /* Recurring instalment: small mark on the line, no pole or label (details on hover). */
   .nb-chart__flag.is-minor {
     height: 0;
   }
@@ -828,7 +828,7 @@ const pct = (f: number) => `${(f * 100).toFixed(3)}%`;
     background: var(--piedra-500);
     transform: rotate(45deg);
   }
-  /* Prórroga: continuación discontinua del plazo base; su nombre va debajo, a la izquierda. */
+  /* Extension: dashed continuation of the original deadline; its name goes below, on the left. */
   .nb-chart__extension {
     position: absolute;
     z-index: 1;
@@ -863,7 +863,7 @@ const pct = (f: number) => `${(f * 100).toFixed(3)}%`;
   .nb-chart__flag.is-extension .nb-chart__tip {
     bottom: calc(100% + 24px);
   }
-  /* Ventana: sin mástil ni punto; su nombre va debajo de la banda, desde enero. */
+  /* Window: no pole or dot; its name goes below the band, from January. */
   .nb-chart__flag.is-window {
     height: 0;
   }
@@ -887,7 +887,7 @@ const pct = (f: number) => `${(f * 100).toFixed(3)}%`;
     bottom: calc(100% + 24px);
     left: 0;
   }
-  /* Ficha al pasar o con el teclado: qué es y qué necesitamos. */
+  /* Details on hover or keyboard focus: what it is and what we need. */
   .nb-chart__tip {
     position: absolute;
     bottom: calc(100% + 12px);
@@ -939,7 +939,7 @@ const pct = (f: number) => `${(f * 100).toFixed(3)}%`;
     outline-offset: 3px;
   }
 
-  /* Hoy: una línea que cruza los tres carriles. */
+  /* Today: a line across all lanes. */
   .nb-chart__today {
     position: absolute;
     z-index: 1;
@@ -1004,7 +1004,7 @@ const pct = (f: number) => `${(f * 100).toFixed(3)}%`;
       0 0 0 4px var(--salvia-500);
   }
 
-  /* Lista por fecha: el contenido accesible de la regla, en orden de vencimiento. */
+  /* List by date: the accessible content of the chart, in due-date order. */
   .nb-yr__list {
     display: grid;
     gap: 0 clamp(24px, 4vw, 64px);

@@ -1,12 +1,12 @@
 ---
 import Arrow from '../brand/Arrow.astro';
-/** Botón primario, secundario o ghost. Radio 4 px, nunca en arco. Salvia nunca lleva texto blanco. */
+/** Primary, secondary or ghost button. 4 px radius, never arch-shaped. Sage never carries white text. */
 interface Props {
   variant?: 'primary' | 'secondary' | 'ghost';
   size?: 'md' | 'sm';
   href?: string;
   type?: 'button' | 'submit' | 'reset';
-  /** Superficie oscura: el primario se invierte (blanco con texto Navy 800). */
+  /** Dark surface: the primary button inverts (white with Navy 800 text). */
   on?: 'light' | 'dark';
   arrow?: boolean;
   disabled?: boolean;

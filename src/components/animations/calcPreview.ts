@@ -1,8 +1,8 @@
 import type { AnimationKit } from './types';
 
 /**
- * `[data-calc-preview]`: al entrar en pantalla la vista previa se rellena sola: se elige el tipo de
- * empresa, los deslizadores van a su valor, las cifras cuentan y aparece la estimación. Una sola vez.
+ * `[data-calc-preview]`: when it enters the viewport the preview fills itself in: the company type
+ * is picked, the sliders move to their value, the figures count up and the estimate appears. Once.
  */
 export function calcPreview({ gsap }: AnimationKit) {
   document.querySelectorAll<HTMLElement>('[data-calc-preview]').forEach((el) => {

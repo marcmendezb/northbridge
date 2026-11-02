@@ -5,7 +5,7 @@ import mdx from '@astrojs/mdx';
 import sitemap from '@astrojs/sitemap';
 import tailwindcss from '@tailwindcss/vite';
 
-/** Ruta interna /_brand (guía viva): solo en desarrollo; Astro ignora los archivos con prefijo _ en pages/. */
+/** Internal /_brand route (living style guide): dev only; Astro ignores files prefixed with _ in pages/. */
 /** @type {import('astro').AstroIntegration} */
 const brandGuide = {
   name: 'brand-guide',
@@ -25,7 +25,7 @@ export default defineConfig({
     mdx(),
     brandGuide,
     sitemap({
-      // Gracias es noindex: fuera del sitemap en todos los idiomas.
+      // The thank-you page is noindex: left out of the sitemap in every language.
       filter: (page) =>
         !page.includes('/_brand') && !/\/(gracias|thank-you|danke|merci|grazie)\/?$/.test(page),
       i18n: {

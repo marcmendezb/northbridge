@@ -3,8 +3,8 @@ import BaseLayout from '../layouts/BaseLayout.astro';
 import { dictionaries, locales, localizedPath, localeMeta, t } from '../i18n';
 
 /**
- * 404 única para todos los idiomas (Astro genera un solo 404.html). Trae los cinco textos y un
- * script elige el del idioma de la URL; sin JS, español. El arco llega desplazado y se coloca.
+ * A single 404 for every language (Astro generates one 404.html). It carries all five texts and a
+ * script picks the one for the URL's language; without JS, Spanish. The arch arrives off-centre and settles.
  */
 const blocks = locales.map((locale) => ({
   locale,
@@ -67,7 +67,7 @@ const blocks = locales.map((locale) => ({
     stroke: var(--white);
     stroke-width: 2.5;
   }
-  /* El arco no encaja (desplazado y girado) y después se coloca, tangente al tablero. */
+  /* The arch doesn't fit at first (offset and rotated), then settles tangent to the deck. */
   .nb-404__arch {
     transform-box: fill-box;
     transform-origin: 50% 100%;
@@ -144,7 +144,7 @@ const blocks = locales.map((locale) => ({
 </style>
 
 <script>
-  // Idioma según la URL pedida (/en/…, /de/…); el resto, español.
+  // Language from the requested URL (/en/…, /de/…); anything else, Spanish.
   const code = location.pathname.split('/')[1];
   const section = document.querySelector<HTMLElement>('.nb-404');
   const block = document.querySelector<HTMLElement>(`[data-404="${code}"]`);

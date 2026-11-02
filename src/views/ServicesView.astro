@@ -30,7 +30,7 @@ const photos: Record<string, ImageMetadata> = {
   'asesoria-para-startups': startups,
 };
 
-/** Precio orientativo del servicio en la moneda del país (config.ts, nunca escrito a mano). */
+/** Indicative service price in the country's currency (from config.ts, never typed by hand). */
 const priceOf = (s: (typeof services)[number]) => {
   const p = s.data.pricing[0];
   const base = describePricing(p, locale);
@@ -42,7 +42,7 @@ const priceOf = (s: (typeof services)[number]) => {
   );
 };
 
-/** Textos de la versión de cada país (servicios-pais); los demás países ven la suiza. */
+/** Each country's version texts (servicios-pais); other countries see the Swiss one. */
 const variantsOf = await Promise.all(services.map((s) => getServiceVariants(s, locale)));
 const rows = services.map((s, i) => ({
   key: entryKey(s),
@@ -58,13 +58,13 @@ const rows = services.map((s, i) => ({
   photo: photos[entryKey(s)] ?? contabilidad,
   price: priceOf(s),
 }));
-/** Para cada grupo de países, sus textos. */
+/** Texts for each group of countries. */
 function textIn(groups: Awaited<ReturnType<typeof getServiceVariants>>, c: Country) {
   return groups.find((g) => g.countries.includes(c))!.text;
 }
 const byIcon = Object.fromEntries(rows.map((r) => [r.icon, r]));
 
-/** Por dónde empezar según el caso (docs/05): el primero es el punto de partida. */
+/** Where to start depending on the case: the first one is the starting point. */
 const profiles = [
   { key: 'autonomo', icons: ['contabilidad', 'iva', 'nominas', 'constitucion'] },
   { key: 'startup', icons: ['startups', 'constitucion', 'contabilidad', 'iva'] },
@@ -77,7 +77,7 @@ const profiles = [
   description={t('services.index.seoDescription')}
   overlayHeader
 >
-  <!-- 1 · Cabecera -->
+  <!-- Header -->
   <header class="nb-si" data-surface="dark">
     <div class="nb-container nb-si__inner">
       <Breadcrumbs items={[{ label: t('nav.services') }]} tone="dark" />
@@ -88,7 +88,7 @@ const profiles = [
     </div>
   </header>
 
-  <!-- 2 · El índice: cinco filas y, al lado, la foto y lo que incluye el servicio señalado -->
+  <!-- The index: five rows and, beside them, the photo and what the highlighted service includes -->
   <section class="nb-index" aria-labelledby="index-title" data-index>
     <h2 id="index-title" class="sr-only">
       {t('services.index.title')}
@@ -164,7 +164,7 @@ const profiles = [
     />
   </section>
 
-  <!-- 3 · Por dónde empiezo: elige tu caso y ves tu camino -->
+  <!-- Where to start: pick your case and see your path -->
   <section class="nb-path" aria-labelledby="path-title" data-path>
     <div class="nb-container">
       <div class="nb-path__head">
@@ -233,7 +233,7 @@ const profiles = [
 </BaseLayout>
 
 <script>
-  // Índice: la foto del panel sigue a la fila señalada (ratón o teclado).
+  // Index: the panel photo follows the highlighted row (mouse or keyboard).
   const index = document.querySelector<HTMLElement>('[data-index]');
   if (index) {
     const rows = Array.from(index.querySelectorAll<HTMLElement>('[data-index-row]'));
@@ -249,7 +249,7 @@ const profiles = [
     });
   }
 
-  // Por dónde empiezo: pestañas accesibles (flechas, Inicio y Fin). Sin JS se ven los tres caminos.
+  // Where to start: accessible tabs (arrow keys, Home and End). Without JS, all three paths are shown.
   const path = document.querySelector<HTMLElement>('[data-path]');
   const tablist = path?.querySelector<HTMLElement>('[data-path-tabs]');
   if (path && tablist) {
@@ -293,7 +293,7 @@ const profiles = [
 </script>
 
 <style is:global>
-  /* ── 1 · Cabecera ── */
+  /* ── Header ── */
   .nb-si {
     background: var(--navy-800);
     color: var(--navy-100);
@@ -325,7 +325,7 @@ const profiles = [
     text-wrap: balance;
   }
 
-  /* ── 2 · El índice ── */
+  /* ── The index ── */
   .nb-index {
     padding-block: clamp(48px, 6vw, 96px) var(--section-y);
     background: var(--white);
@@ -413,7 +413,7 @@ const profiles = [
     color: var(--navy-800);
     white-space: nowrap;
   }
-  /* Fila señalada: el icono en navy, el título se desplaza y la flecha se completa. */
+  /* Highlighted row: navy icon, the title shifts and the arrow completes. */
   .nb-index__row.is-active .nb-index__icon {
     color: var(--navy-800);
   }
@@ -431,7 +431,7 @@ const profiles = [
     color: var(--piedra-600);
   }
 
-  /* Miniatura en cada fila (móvil y tableta); en escritorio la sustituye el panel. */
+  /* Thumbnail in each row (mobile and tablet); on desktop the panel replaces it. */
   .nb-index__thumb {
     display: block;
     aspect-ratio: 16 / 9;
@@ -453,7 +453,7 @@ const profiles = [
     }
   }
 
-  /* Panel: la foto del servicio señalado, en arco, con lo que incluye. */
+  /* Panel: the highlighted service's photo, in an arch, with what it includes. */
   .nb-index__pane {
     display: none;
   }
@@ -545,7 +545,7 @@ const profiles = [
     transform: rotate(-45deg);
   }
 
-  /* ── 3 · Por dónde empiezo ── */
+  /* ── Where to start ── */
   .nb-path {
     padding-block: var(--section-y);
     background: var(--piedra-100);
@@ -621,7 +621,7 @@ const profiles = [
   .nb-path__panel[hidden] {
     display: none;
   }
-  /* Con pestañas, el título del panel ya está en la pestaña. */
+  /* With tabs, the panel title is already in the tab. */
   .nb-path.is-tabbed .nb-path__panel-title {
     position: absolute;
     width: 1px;
@@ -637,7 +637,7 @@ const profiles = [
     font-weight: 300;
     color: var(--navy-800);
   }
-  /* El camino: los servicios en orden, unidos por una línea; el primero, «empieza por aquí». */
+  /* The path: services in order, joined by a line; the first one says "start here". */
   .nb-path__steps {
     position: relative;
     display: grid;
@@ -709,7 +709,7 @@ const profiles = [
   .nb-path__step.is-first .nb-path__step-text {
     color: var(--navy-100);
   }
-  /* Conector entre pasos (escritorio): una flecha fina hacia el siguiente. */
+  /* Connector between steps (desktop): a thin arrow to the next one. */
   @media (min-width: 900px) {
     .nb-path__step:not(:last-child) .nb-path__link::after {
       content: '';

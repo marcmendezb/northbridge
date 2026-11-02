@@ -7,12 +7,12 @@ import { site } from './site';
 const hhmm = (minutes: number) =>
   `${String(Math.floor(minutes / 60)).padStart(2, '0')}:${String(minutes % 60).padStart(2, '0')}`;
 
-/** Imagen para compartir de cada idioma (`npm run og` la genera en public/og). */
+/** Sharing image for each language (generated into public/og by `npm run og`). */
 export const ogImage = (locale: Locale, base: URL | string) => new URL(`/og/${locale}.png`, base);
 
 /**
- * Datos estructurados de la empresa (schema.org `AccountingService`): la sede de Zúrich y una
- * oficina por país (`department`), con el horario de la web. Empresa ficticia (docs/01).
+ * Organisation structured data (schema.org `AccountingService`): the Zurich head office and one
+ * office per country (`department`), with the site's opening hours. Fictional company.
  */
 export function organizationJsonLd(locale: Locale, base: URL | string) {
   const url = new URL(localizedPath('/', locale), base).toString();

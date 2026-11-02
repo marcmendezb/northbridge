@@ -25,11 +25,11 @@ export type IconName = keyof typeof icons;
 
 interface Props {
   name: IconName;
-  /** Tamaño en px; el trazo escala con el icono. */
+  /** Size in px; the stroke scales with the icon. */
   size?: number;
-  /** Salvia 600 solo para icono activo o seleccionado. */
+  /** Sage 600 only for an active or selected icon. */
   active?: boolean;
-  /** Si se indica, el icono es informativo; si no, decorativo. */
+  /** If provided, the icon is informative; otherwise it is decorative. */
   label?: string;
   class?: string;
 }

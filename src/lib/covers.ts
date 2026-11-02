@@ -3,7 +3,7 @@ import gmbh from '../assets/img/about/resources/nb-blog-gmbh-01.jpeg';
 import calendario from '../assets/img/about/resources/nb-blog-calendario-01.jpeg';
 import errores from '../assets/img/about/resources/nb-blog-errores-startups-01.jpeg';
 
-/** Portada de cada guía por su tema (la misma en todas las versiones por país). */
+/** Cover image for each guide topic (the same across all country versions). */
 export const topicCovers: Record<string, ImageMetadata> = {
   constitucion: gmbh,
   calendario,

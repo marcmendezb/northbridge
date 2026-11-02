@@ -1,8 +1,8 @@
 /* global document, console */
 /**
- * Imágenes para compartir (Open Graph, 1200 × 630), una por idioma, en public/og/{idioma}.png.
- * Se generan con Playwright a partir de la foto del hero, las fuentes autoalojadas y el claim de
- * src/i18n. Uso: `npm run og` (solo hace falta repetirlo si cambian el claim o la marca).
+ * Social sharing images (Open Graph, 1200 × 630), one per language, in public/og/{language}.png.
+ * Rendered with Playwright from the hero photo, the self-hosted fonts and the claim in
+ * src/i18n. Usage: `npm run og` (only needed again if the claim or the brand changes).
  */
 import { mkdirSync, readFileSync, writeFileSync } from 'node:fs';
 import { tmpdir } from 'node:os';
@@ -14,7 +14,7 @@ const root = resolve(import.meta.dirname, '..');
 const file = (p) => pathToFileURL(join(root, p)).href;
 const locales = ['es', 'en', 'de', 'fr', 'it'];
 
-// Colores de src/styles/tokens.css (la imagen es un PNG: no hay variables CSS que heredar).
+// Colours from src/styles/tokens.css (the image is a PNG, so there are no CSS variables to inherit).
 const tokens = Object.fromEntries(
   [
     ...readFileSync(join(root, 'src/styles/tokens.css'), 'utf8').matchAll(
@@ -23,7 +23,7 @@ const tokens = Object.fromEntries(
   ].map((m) => [m[1], m[2]]),
 );
 
-// El descriptor sin la ciudad: la oficina depende del país elegido.
+// Descriptor without the city: the office depends on the selected country.
 const withoutCity = (text) => text.replace(/\s+(en|in|à|a)\s+Z\S+?\.$/, '.');
 
 const html = (m) => `<!doctype html>

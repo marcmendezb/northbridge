@@ -1,6 +1,6 @@
 /**
- * La regla del año: posición de cada plazo, su aviso y el próximo vencimiento.
- * La usan el servidor (año de compilación, sin JS) y el navegador (año en curso, en hora de Zúrich).
+ * The yearly chart: each deadline's position, its reminder and the next due date.
+ * Used by the server (build year, without JS) and the browser (current year, in Zurich time).
  */
 import { addDays, type CivilDate } from '../contact/office';
 import {
@@ -11,7 +11,7 @@ import {
   type HolidayCalendar,
 } from './deadlines';
 
-/** Días de antelación del aviso (docs/08: «te avisamos 10 días antes»). */
+/** How many days ahead the reminder goes out ("we remind you 10 days before"). */
 export const REMINDER_DAYS = 10;
 
 export interface RuledEvent {
@@ -26,11 +26,11 @@ export interface TimelineItem {
   shifted: boolean;
   window: boolean;
   remind: CivilDate;
-  /** Posiciones en la regla, de 0 a 1. */
+  /** Positions on the chart, from 0 to 1. */
   at: number;
   startAt: number;
   remindAt: number;
-  /** Fila (0 = sobre la línea) para que dos plazos cercanos no se pisen. */
+  /** Row (0 = on the line) so two nearby deadlines don't overlap. */
   row: number;
 }
 
@@ -57,13 +57,13 @@ export function timeline(
       };
     })
     .sort((a, b) => a.at - b.at);
-  // Plazos a menos de ~3 semanas entre sí: se apilan.
+  // Deadlines less than ~3 weeks apart are stacked.
   const points = items.filter((t) => !t.window);
   points.forEach((item, i) => {
     const prev = points[i - 1];
     if (prev && item.at - prev.at < 0.06) item.row = prev.row + 1;
   });
-  // Una ventana (barra) va en la fila libre por encima de los plazos que cruza.
+  // A window (bar) goes in the free row above the deadlines it spans.
   items
     .filter((t) => t.window)
     .forEach((w) => {
@@ -73,7 +73,7 @@ export function timeline(
   return items;
 }
 
-/** Inicio de cada mes en la regla y su ancho (los meses no miden lo mismo). */
+/** Start of each month on the chart and its width (months differ in length). */
 export function monthMarks(year: number): { m: number; at: number; w: number }[] {
   return Array.from({ length: 12 }, (_, i) => {
     const at = yearFraction({ y: year, m: i + 1, d: 1 });
@@ -82,7 +82,7 @@ export function monthMarks(year: number): { m: number; at: number; w: number }[]
   });
 }
 
-/** El primer plazo que aún no ha vencido (puede ser del año siguiente) y los días que quedan. */
+/** The first deadline not yet passed (may be next year) and the days left. */
 export function nextDeadline(events: RuledEvent[], today: CivilDate, holidays?: HolidayCalendar) {
   for (const year of [today.y, today.y + 1]) {
     const found = timeline(events, year, holidays).find((t) => daysBetween(today, t.due) >= 0);

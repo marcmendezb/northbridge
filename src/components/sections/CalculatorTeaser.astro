@@ -1,9 +1,9 @@
 ---
 /**
- * Teaser de la calculadora: dos tarjetas como el footer. A la izquierda (navy), el mensaje y el CTA;
- * a la derecha (Piedra), una vista previa con las tres preguntas reales y un ejemplo de docs/07
- * calculado con calculate.ts (ningún importe escrito a mano). Al entrar en pantalla la vista previa
- * «se rellena» sola (calcPreview.ts).
+ * Calculator teaser: two cards like the footer. On the left (navy), the message and the CTA;
+ * on the right (stone), a preview with the three real questions and an example
+ * computed with calculate.ts (no amount typed by hand). On entering the viewport the preview
+ * "fills itself in" (calcPreview.ts).
  */
 import Button from '../ui/Button.astro';
 import { useI18n, type MessageKey } from '../../i18n';
@@ -16,19 +16,19 @@ import { priceUnit } from '../../lib/pricing/display';
 import { vatFor } from '../../lib/vat';
 const { t, lp, locale } = useI18n(Astro.currentLocale);
 
-// Ejemplo de docs/07: Pyme (GmbH), 60 facturas, 5 empleados.
+// Sample case: SME (GmbH), 60 invoices, 5 employees.
 const example = { type: 'gmbh' as CompanyType, invoices: 60, employees: 5 };
 const result = calculate(example);
 const types: CompanyType[] = ['autonomo', 'startup', 'gmbh', 'ag'];
 const active = types.indexOf(example.type);
 const [min, max] = result.custom ? [0, 0] : result.range;
 const pkgName = result.custom ? '' : PACKAGES[result.package].name;
-/** Autónomo y startup se traducen; la GmbH y la AG son las formas jurídicas del país elegido. */
+/** Freelancer and startup are translated; GmbH and AG are the legal forms of the selected country. */
 const typeLabel = (ty: CompanyType) =>
   ty === 'gmbh' || ty === 'ag'
     ? byCountry((c) => legalForm(c, ty))
     : byCountry(() => t(`home.calculator.preview.types.${ty}` as MessageKey));
-/** El rango, convertido desde el euro: una variante por moneda (las cifras cuentan al entrar). */
+/** The range, converted from euros: one variant per currency (the figures count up on entry). */
 const currencies = [...new Set(COUNTRIES.map(currencyOf))].map((currency) => ({
   currency,
   countries: COUNTRIES.filter((c) => currencyOf(c) === currency).join(' '),
@@ -169,7 +169,7 @@ const unit = byCountry((c) => priceUnit(currencyOf(c), locale));
     max-width: 34rem;
   }
 
-  /* Vista previa: Piedra, controles de línea y el resultado como protagonista. */
+  /* Preview: stone background, line controls and the result as the focal point. */
   .nb-calc__card--preview {
     display: grid;
     align-content: space-between;
@@ -303,7 +303,7 @@ const unit = byCountry((c) => priceUnit(currencyOf(c), locale));
 </style>
 
 <script>
-  // El pomo se coloca en píxeles (transform) según el ancho real de la pista.
+  // The handle is positioned in pixels (transform) based on the track's actual width.
   const setTracks = () =>
     document.querySelectorAll<HTMLElement>('[data-calc-track]').forEach((track) => {
       track.style.setProperty('--track-w', `${track.clientWidth}px`);

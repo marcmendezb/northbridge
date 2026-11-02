@@ -1,8 +1,8 @@
 ---
 /**
- * Pasos como viaducto: el tablero y un arco por paso, el motivo del símbolo repetido.
- * Cada paso vive dentro de su arco. Con el scroll se traza el tablero y después cada arco (drawViaduct).
- * Sin JS o con movimiento reducido, todo está dibujado.
+ * Steps as a viaduct: the deck and one arch per step, the symbol's motif repeated.
+ * Each step lives inside its arch. On scroll the deck draws, then each arch (drawViaduct).
+ * Without JS or with reduced motion, everything is drawn.
  */
 interface Step {
   title: string;
@@ -10,12 +10,12 @@ interface Step {
 }
 interface Props {
   steps: Step[];
-  /** Fondo de la sección: cambia el color del trazo. */
+  /** Section background: changes the stroke colour. */
   tone?: 'light' | 'dark';
 }
 const { steps, tone = 'light' } = Astro.props;
 const four = steps.length === 4;
-// Arco alto (escritorio) y bajo (móvil): mismo radio relativo, círculo perfecto con trazo uniforme.
+// Tall arch (desktop) and short arch (mobile): same relative radius, a perfect circle with an even stroke.
 const tall = 'M1 520V200A199 199 0 0 1 399 200V520';
 const low = 'M1 300V200A199 199 0 0 1 399 200V300';
 ---
@@ -69,7 +69,7 @@ const low = 'M1 300V200A199 199 0 0 1 399 200V300';
     margin: 0;
     padding: 0;
     list-style: none;
-    /* Los tramos del tablero sobresalen medio hueco: en cada fila se unen y aquí se recortan. */
+    /* The deck segments overhang by half a gap: they join on each row and are trimmed here. */
     overflow: clip;
     overflow-clip-margin: 2px;
   }

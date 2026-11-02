@@ -1,5 +1,5 @@
 ---
-/** Tabla del calendario fiscal (src/data/fiscal-calendar.ts) en el idioma de la página. */
+/** Tax calendar table (src/data/fiscal-calendar/) in the page's language. */
 import { FISCAL_CALENDARS } from '../../data/fiscal-calendar';
 import type { Country } from '../../lib/country';
 import { useI18n } from '../../i18n';
@@ -8,12 +8,12 @@ interface Props {
   what: string;
   need: string;
   caption: string;
-  /** País del calendario (por defecto, Suiza). */
+  /** Calendar country (defaults to Switzerland). */
   country?: Country;
 }
 const { when, what, need, caption, country = 'CH' } = Astro.props;
 const { locale } = useI18n(Astro.currentLocale);
-/** Por mes; los plazos de cada mes (cotizaciones), al final. */
+/** By month; the monthly deadlines (contributions) go last. */
 const rows = [...(FISCAL_CALENDARS[country] ?? [])].sort(
   (a, b) => Number(Boolean(a.recurring)) - Number(Boolean(b.recurring)) || a.month - b.month,
 );

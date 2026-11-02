@@ -1,8 +1,8 @@
 ---
 /**
- * Cierre de Recursos: «¿Tu caso no está en ninguna guía?». La persona escribe su pregunta aquí
- * y llega ya escrita al formulario de contacto (`/contacto?mensaje=…`). Sin JS es un formulario
- * normal (GET); con JS, los ejemplos rotan en el campo y las etiquetas lo rellenan.
+ * Resources closing section: "Your case isn't in any guide?". The person types the question here
+ * and it arrives prefilled in the contact form (`/contacto?mensaje=…`). Without JS it is a regular
+ * form (GET); with JS, the examples rotate in the field and the chips fill it in.
  */
 import { Picture } from 'astro:assets';
 import type { ImageMetadata } from 'astro';
@@ -19,7 +19,7 @@ import { vatFor } from '../../lib/vat';
 const { t, tRaw, lp, locale } = useI18n(Astro.currentLocale);
 const bookingCta = getBookingCta(locale);
 const examples = tRaw<string[]>('resources.askExamples');
-/** Cada ejemplo con su nombre del IVA por país: una etiqueta por variante, con `data-cc` si varía. */
+/** Each example with the VAT name for each country: one chip per variant, with `data-cc` if it varies. */
 const chips = examples.flatMap((q) => {
   const groups = new Map<string, Country[]>();
   for (const c of COUNTRIES) {
@@ -163,7 +163,7 @@ const team: { name: string; src: ImageMetadata }[] = [
   .nb-ask__faces {
     display: flex;
   }
-  /* Retratos en arco pequeños, solapados: el equipo que contesta. */
+  /* Small overlapping arch portraits: the team that answers. */
   .nb-ask__face {
     width: 40px;
     height: 52px;
@@ -188,7 +188,7 @@ const team: { name: string; src: ImageMetadata }[] = [
     color: var(--white);
   }
 
-  /* El campo: escribes como en una hoja, con la tipografía de los titulares. */
+  /* The field: you write as if on paper, in the headline typeface. */
   .nb-ask__form {
     display: grid;
     gap: 20px;
@@ -230,7 +230,7 @@ const team: { name: string; src: ImageMetadata }[] = [
   .nb-ask__field textarea:focus {
     outline: none;
   }
-  /* Con JS, el ejemplo vive en una capa que cambia con un fundido (el placeholder no se anima). */
+  /* With JS, the example lives in a layer that crossfades (the placeholder can't be animated). */
   .js .nb-ask__field textarea::placeholder {
     color: transparent;
   }
@@ -315,13 +315,13 @@ const team: { name: string; src: ImageMetadata }[] = [
 </style>
 
 <script>
-  // Ejemplos que rotan en el campo (sin movimiento reducido) y etiquetas que lo rellenan.
+  // Examples rotating in the field (without reduced motion) and chips that fill it in.
   document.querySelectorAll<HTMLElement>('[data-ask]').forEach((root) => {
     const input = root.querySelector<HTMLTextAreaElement>('[data-ask-input]');
     const hint = root.querySelector<HTMLElement>('[data-ask-hint]');
     const chips = [...root.querySelectorAll<HTMLButtonElement>('[data-ask-chip]')];
     if (!input || !hint) return;
-    // Solo las etiquetas del país activo (las demás están ocultas con `data-cc`).
+    // Only the active country's chips (the others are hidden with `data-cc`).
     const visible = () => chips.filter((c) => c.offsetParent !== null);
     const examples = () => visible().map((c) => c.textContent?.trim() ?? '');
     input.placeholder = examples()[0] ?? input.placeholder;
@@ -347,7 +347,7 @@ const team: { name: string; src: ImageMetadata }[] = [
         hint.removeAttribute('data-hidden');
       }, 500);
     };
-    // Solo rota mientras la sección está en pantalla.
+    // Only rotates while the section is on screen.
     new IntersectionObserver(([entry]) => {
       window.clearInterval(timer);
       if (entry.isIntersecting) timer = window.setInterval(next, 3200);

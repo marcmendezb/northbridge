@@ -1,10 +1,10 @@
 ---
 import PhoneLink from '../ui/PhoneLink.astro';
 /**
- * Cierre «20 minutos para ordenar tus números» (servicios, artículos, calculadora).
- * Los 20 minutos dibujados: una regla de la llamada, de 0 a 20, con lo que pasa en cada mitad y,
- * después, el precio por escrito en 24 horas. Con el scroll, un cabezal recorre la llamada y el
- * reloj corre (clockScene.ts). Sin JS o con movimiento reducido: la regla completa y «20:00».
+ * Closing section "20 minutes to sort out your numbers" (services, articles, calculator).
+ * The 20 minutes, drawn: a ruler for the call from 0 to 20, with what happens in each half and,
+ * afterwards, the written price within 24 hours. On scroll, a playhead runs through the call and the
+ * clock runs (clockScene.ts). Without JS or with reduced motion: the full ruler and "20:00".
  */
 import Button from '../ui/Button.astro';
 import { getBookingCta } from '../../lib/site';
@@ -165,7 +165,7 @@ const ticks = Array.from({ length: 21 }, (_, i) => i);
     text-decoration-color: currentColor;
   }
 
-  /* La llamada: reloj, regla de 20 minutos y lo que pasa en ella. */
+  /* The call: clock, 20-minute ruler and what happens during it. */
   .nb-clock__call {
     display: grid;
     gap: 20px;
@@ -198,7 +198,7 @@ const ticks = Array.from({ length: 21 }, (_, i) => i);
     position: relative;
     height: 56px;
     margin: 12px 0 0;
-    /* Hueco a la derecha para el «+24 h». */
+    /* Space on the right for the "+24 h". */
     margin-right: clamp(56px, 8vw, 88px);
   }
   .nb-clock__rail,
@@ -246,7 +246,7 @@ const ticks = Array.from({ length: 21 }, (_, i) => i);
     margin-left: -1px;
     background: var(--salvia-300);
   }
-  /* Después de colgar: el precio por escrito, en las 24 horas siguientes. */
+  /* After the call: the written price, within the next 24 hours. */
   .nb-clock__after {
     position: absolute;
     top: 12px;

@@ -3,7 +3,7 @@ import { dictionaries, locales } from './index';
 import { alternates, localizedPath, parsePath } from './routes';
 
 type Node = unknown;
-/** Lista de rutas de hojas («a.b.0.c») con su valor. */
+/** List of leaf paths ("a.b.0.c") with their values. */
 function leaves(node: Node, prefix = ''): [string, string][] {
   if (typeof node === 'string') return [[prefix, node]];
   if (Array.isArray(node)) return node.flatMap((v, i) => leaves(v, `${prefix}${i}.`));

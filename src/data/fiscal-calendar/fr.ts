@@ -1,13 +1,13 @@
 import type { FiscalEvent } from './types';
 
 /**
- * Francia: sociedad sujeta al IS (SAS, SARL) con ejercicio igual al año natural, en París. Plazos
- * comprobados el 01-11-2026: acomptes de IS el 15 de marzo, junio, septiembre y diciembre, y solde el
- * 15 del cuarto mes tras el cierre (BOI-IS-DECLA-20-10, art. 1668 CGI); liasse fiscale el 2.º día
- * hábil tras el 1 de mayo, 15 días más por vía telemática (impots.gouv.fr); CA3 entre el 15 y el 24
- * según la empresa (impots.gouv.fr, calendrier fiscal); CFE el 15 de diciembre; DSN el 5 o el 15. Si un
- * pago vence en sábado, domingo o festivo, pasa al siguiente día hábil (art. 199-0 anexo IV CGI). El
- * régimen simplificado de IVA desaparece el 1 de enero de 2027 (art. 38 Ley de Finanzas 2025).
+ * France: company subject to corporate tax (SAS, SARL) with a calendar financial year, in Paris.
+ * Deadlines checked on 01-11-2026: corporate tax instalments on 15 March, June, September and December, and the balance on the
+ * 15th of the fourth month after year end (BOI-IS-DECLA-20-10, art. 1668 CGI); liasse fiscale on the 2nd working
+ * day after 1 May, plus 15 days if filed online (impots.gouv.fr); CA3 between the 15th and the 24th
+ * depending on the company (impots.gouv.fr, calendrier fiscal); CFE on 15 December; DSN on the 5th or 15th. If a
+ * payment falls on a Saturday, Sunday or holiday, it moves to the next working day (art. 199-0 annex IV CGI). The
+ * simplified VAT regime ends on 1 January 2027 (art. 38, 2025 Finance Act).
  */
 type T5 = { es: string; en: string; de: string; fr: string; it: string };
 const T = (es: string, en: string, de: string, fr: string, it: string): T5 => ({
@@ -61,7 +61,7 @@ const advance = (id: string, m: number): FiscalEvent => ({
 });
 
 export const events: FiscalEvent[] = [
-  // IVA: CA3 mensual (o trimestral) entre el 15 y el 24; el día exacto depende de cada empresa.
+  // VAT: monthly (or quarterly) CA3 between the 15th and the 24th; the exact day depends on each company.
   {
     id: 'fr-vat',
     cat: 'vat',
@@ -91,7 +91,7 @@ export const events: FiscalEvent[] = [
     ),
   },
 
-  // Impuestos: liasse fiscale (con su prórroga telemática) y aprobación de las cuentas.
+  // Taxes: liasse fiscale (with its online extension) and approval of the accounts.
   {
     id: 'fr-return',
     cat: 'tax',
@@ -190,7 +190,7 @@ export const events: FiscalEvent[] = [
     ),
   },
 
-  // Pagos: acomptes y solde del IS, y la CFE.
+  // Payments: corporate tax instalments and balance, and the CFE.
   advance('fr-is-mar', 3),
   {
     id: 'fr-is-balance',
@@ -226,7 +226,7 @@ export const events: FiscalEvent[] = [
   {
     id: 'fr-cfe',
     cat: 'pay',
-    // Mismo día que el último acompte de IS: marca menor para que las etiquetas no se pisen.
+    // Same day as the last corporate tax instalment: a minor mark so the labels don't overlap.
     minor: true,
     month: 12,
     rule: { type: 'fixed', m: 12, d: 15, shift: true },
@@ -248,7 +248,7 @@ export const events: FiscalEvent[] = [
     ),
   },
 
-  // Nóminas: DSN mensual con el pago de las cotizaciones.
+  // Payroll: monthly DSN with the payment of contributions.
   {
     id: 'fr-dsn',
     cat: 'payroll',

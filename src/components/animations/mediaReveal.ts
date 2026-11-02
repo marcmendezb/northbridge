@@ -1,8 +1,8 @@
 import type { AnimationKit } from './types';
 
 /**
- * `[data-reveal-media]`: la foto se descubre de abajo arriba (clip-path, solo pintado) y su imagen
- * interior se desplaza un poco más despacio que la página (parallax suave, scrub).
+ * `[data-reveal-media]`: the photo is revealed from the bottom up (clip-path, paint only) and the
+ * image inside moves a little slower than the page (subtle parallax, scrub).
  */
 export function mediaReveal({ gsap }: AnimationKit, root: ParentNode = document) {
   root.querySelectorAll<HTMLElement>('[data-reveal-media]').forEach((el) => {

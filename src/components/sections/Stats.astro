@@ -2,7 +2,7 @@
 import Section from '../ui/Section.astro';
 import { useI18n } from '../../i18n';
 const { t } = useI18n(Astro.currentLocale);
-/** «Años en Zúrich» en Suiza; «de experiencia» en los demás países. */
+/** "Years in Zurich" in Switzerland; "of experience" in other countries. */
 const yearsLabel = byCountry((c) => t(c === 'CH' ? 'home.stats.years' : 'home.stats.yearsIntl'));
 
 const stats = [

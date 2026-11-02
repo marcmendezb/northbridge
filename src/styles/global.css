@@ -4,7 +4,7 @@
 @import './prose.css';
 
 @layer base {
-  /* Sin JS todo es visible. Los estados iniciales ocultos cuelgan de .js y de no-preference. */
+  /* Without JS everything is visible. Hidden initial states depend on .js and no-preference. */
   @media (prefers-reduced-motion: reduce) {
     html {
       scroll-behavior: auto;
@@ -33,7 +33,7 @@
   white-space: nowrap;
 }
 
-/* Estados iniciales ocultos: solo con JS, sin fallo de animación y con movimiento permitido. */
+/* Hidden initial states: only with JS, no animation failure and motion allowed. */
 @media (prefers-reduced-motion: no-preference) {
   .js:not(.anim-fail) [data-reveal] {
     opacity: 0;
@@ -68,7 +68,7 @@
   }
 }
 
-/* Icono que se traza al pasar el ratón por una tarjeta enlace (400 ms). Los trazos de los iconos miden < 80. */
+/* Icon stroke drawn on hovering a card link (400 ms). Icon strokes are under 80 long. */
 .nb-trace .nb-icon :is(path, rect, circle, line, polyline) {
   stroke-dasharray: 80;
   stroke-dashoffset: 0;
@@ -87,10 +87,10 @@
   }
 }
 
-/* Máscaras de texto (SplitText y las de cada sección): con interlineados por debajo de 1, acentos,
-   mayúsculas y descendentes salen de la caja de línea. Se amplía la zona visible arriba y abajo
-   y se compensa con márgenes negativos para que la composición no se mueva. Los márgenes entre
-   líneas vecinas colapsan en bloque, así que todo el ajuste va abajo y la primera/última lo reparten. */
+/* Text masks (SplitText and section masks): with line heights below 1, accents,
+   capitals and descenders spill out of the line box. The visible area is extended top and bottom
+   and offset with negative margins so the layout doesn't move. Margins between
+   adjacent lines collapse, so the whole adjustment goes at the bottom and the first/last line share it. */
 .nb-split-line-mask,
 .hero__mask,
 .nb-crew__line,
@@ -125,14 +125,14 @@ html.lenis body {
   overflow: clip;
 }
 
-/* Contenedor: mismos bordes que la barra del header (y que las tarjetas del footer). */
+/* Container: same edges as the header bar (and the footer cards). */
 .nb-container {
   width: 100%;
   padding-inline: max(var(--header-gutter), (100% - var(--header-max)) / 2);
 }
 
-/* ── País (src/lib/country.ts): el HTML trae una variante por país y solo se ve la del activo.
-   Sin elección guardada (o sin JS) se muestra Suiza, el país por defecto. ── */
+/* ── Country (src/lib/country.ts): the HTML ships one variant per country and only the active one shows.
+   Without a saved choice (or without JS), Switzerland is shown as the default. ── */
 :root:not([data-country]) [data-cc]:not([data-cc~='CH']),
 :root[data-country='CH'] [data-cc]:not([data-cc~='CH']),
 :root[data-country='ES'] [data-cc]:not([data-cc~='ES']),
@@ -142,7 +142,7 @@ html.lenis body {
   display: none !important;
 }
 
-/* Precios (pricingScene.ts): estados iniciales solo con JS y movimiento permitido. */
+/* Pricing (pricingScene.ts): initial states only with JS and motion allowed. */
 @media (prefers-reduced-motion: no-preference) {
   .js.motion:not(.anim-fail) [data-pr-stagger] > *,
   .js.motion:not(.anim-fail) [data-pr-row] :is(dt, dd),
@@ -175,7 +175,7 @@ html.lenis body {
   }
 }
 
-/* Contacto (contactScene.ts): estados iniciales solo con JS y movimiento permitido. */
+/* Contact (contactScene.ts): initial states only with JS and motion allowed. */
 @media (prefers-reduced-motion: no-preference) {
   .js.motion:not(.anim-fail) [data-map-route] {
     stroke-dasharray: 1;
@@ -198,7 +198,7 @@ html.lenis body {
   }
 }
 
-/* Servicio (serviceScene.ts): estados iniciales solo con JS y movimiento permitido. */
+/* Service (serviceScene.ts): initial states only with JS and motion allowed. */
 @media (prefers-reduced-motion: no-preference) {
   .js.motion:not(.anim-fail) [data-sx-photo] {
     clip-path: inset(0 9% 0 9% round 8px);
@@ -222,7 +222,7 @@ html.lenis body {
   }
 }
 
-/* Nosotros (aboutScene.ts): estados iniciales solo con JS y movimiento permitido. */
+/* About (aboutScene.ts): initial states only with JS and motion allowed. */
 @media (prefers-reduced-motion: no-preference) {
   .js.motion:not(.anim-fail) [data-year] .nb-hist__digit > span,
   .js.motion:not(.anim-fail) [data-crew-arch] .nb-crew__line > span {
@@ -242,7 +242,7 @@ html.lenis body {
   }
 }
 
-/* Aviso de web ficticia (isla DemoNotice): `<dialog>` nativo, compartido por Contacto y Consulta. */
+/* Fictional site notice (DemoNotice island): native `<dialog>`, shared by Contact and Booking. */
 .nb-demo {
   width: min(100% - 32px, 34rem);
   max-height: calc(100% - 32px);
@@ -356,9 +356,9 @@ html.lenis body {
 }
 
 /*
- * Entrada de la primera pantalla (`data-enter`): solo CSS, sin esperar a GSAP, para que el texto
- * de cabecera (a menudo el LCP) se pinte con el primer fotograma. Sin JS o con movimiento
- * reducido, visible desde el principio.
+ * First-screen entrance (`data-enter`): CSS only, without waiting for GSAP, so header text
+ * (often the LCP) paints on the first frame. Without JS or with reduced
+ * motion, it is visible from the start.
  */
 @media (prefers-reduced-motion: no-preference) {
   .js.motion:not(.anim-fail) [data-enter] {
@@ -373,9 +373,9 @@ html.lenis body {
 }
 
 /*
- * Transiciones entre páginas: View Transitions nativas entre documentos (sin router). La página
- * saliente sube y se desvanece; la nueva entra desde abajo con la frenada de la marca. El header se
- * queda en su sitio. Navegadores sin soporte navegan como siempre; con movimiento reducido, nada.
+ * Page transitions: native cross-document View Transitions (no router). The outgoing page
+ * rises and fades; the new one comes in from below with the brand's easing. The header
+ * stays in place. Unsupported browsers navigate normally; with reduced motion, nothing happens.
  */
 @media (prefers-reduced-motion: no-preference) {
   @view-transition {

@@ -1,8 +1,8 @@
 import { defaultLocale, isLocale, locales, type Locale } from './locales';
 
 /**
- * Rutas públicas traducidas. La ruta canónica es la española (`/servicios/iva-y-fiscalidad`);
- * cada idioma traduce cada segmento. Un segmento sin entrada se mantiene igual.
+ * Translated public routes. The canonical path is the Spanish one (`/servicios/iva-y-fiscalidad`);
+ * each language translates each segment. A segment without an entry stays the same.
  */
 const segments: Record<string, Partial<Record<Locale, string>>> = {
   servicios: { en: 'services', de: 'leistungen', fr: 'services', it: 'servizi' },
@@ -21,7 +21,7 @@ const segments: Record<string, Partial<Record<Locale, string>>> = {
   'aviso-legal': { en: 'legal-notice', de: 'impressum', fr: 'mentions-legales', it: 'note-legali' },
   cookies: { it: 'cookie' },
   gracias: { en: 'thank-you', de: 'danke', fr: 'merci', it: 'grazie' },
-  // Servicios
+  // Services
   'contabilidad-y-cierres': {
     en: 'accounting-and-year-end',
     de: 'buchhaltung-und-abschluss',
@@ -52,7 +52,7 @@ const segments: Record<string, Partial<Record<Locale, string>>> = {
     fr: 'conseil-aux-startups',
     it: 'consulenza-per-startup',
   },
-  // Recursos (blog)
+  // Resources (blog)
   'como-constituir-una-gmbh-en-zurich': {
     en: 'how-to-set-up-a-gmbh-in-zurich',
     de: 'gmbh-in-zuerich-gruenden',
@@ -71,7 +71,7 @@ const segments: Record<string, Partial<Record<Locale, string>>> = {
     fr: '5-erreurs-comptables-des-startups',
     it: '5-errori-contabili-delle-startup',
   },
-  // Guías de España
+  // Spain guides
   'como-constituir-una-sl-en-espana': {
     en: 'how-to-set-up-an-sl-in-spain',
     de: 'sl-in-spanien-gruenden',
@@ -90,7 +90,7 @@ const segments: Record<string, Partial<Record<Locale, string>>> = {
     fr: '5-erreurs-comptables-des-startups-en-espagne',
     it: '5-errori-contabili-delle-startup-in-spagna',
   },
-  // Guías de Alemania
+  // Germany guides
   'como-constituir-una-gmbh-en-alemania': {
     en: 'how-to-set-up-a-gmbh-in-germany',
     de: 'gmbh-in-deutschland-gruenden',
@@ -109,7 +109,7 @@ const segments: Record<string, Partial<Record<Locale, string>>> = {
     fr: '5-erreurs-comptables-des-startups-en-allemagne',
     it: '5-errori-contabili-delle-startup-in-germania',
   },
-  // Guías de Francia
+  // France guides
   'como-constituir-una-sas-en-francia': {
     en: 'how-to-set-up-an-sas-in-france',
     de: 'sas-in-frankreich-gruenden',
@@ -128,7 +128,7 @@ const segments: Record<string, Partial<Record<Locale, string>>> = {
     fr: '5-erreurs-comptables-des-start-up-en-france',
     it: '5-errori-contabili-delle-startup-in-francia',
   },
-  // Guías de Italia
+  // Italy guides
   'como-constituir-una-srl-en-italia': {
     en: 'how-to-set-up-an-srl-in-italy',
     de: 'srl-in-italien-gruenden',
@@ -161,7 +161,7 @@ const reverseMaps = Object.fromEntries(
   ]),
 ) as Record<Locale, Record<string, string>>;
 
-/** Ruta pública de una ruta canónica (española) en un idioma: `/servicios` → `/en/services`. */
+/** Public path for a canonical (Spanish) path in a language: `/servicios` → `/en/services`. */
 export function localizedPath(path: string, locale: Locale = defaultLocale): string {
   const [pathname, hash = ''] = path.split('#');
   const clean = (pathname.startsWith('/') ? pathname : `/${pathname}`).replace(/\/$/, '') || '/';
@@ -174,7 +174,7 @@ export function localizedPath(path: string, locale: Locale = defaultLocale): str
   return hash ? `${out}#${hash}` : out;
 }
 
-/** Idioma y ruta canónica (española) de una URL pública. */
+/** Language and canonical (Spanish) path of a public URL. */
 export function parsePath(pathname: string): { locale: Locale; canonical: string } {
   const parts = pathname.split('/').filter(Boolean);
   const locale: Locale =
@@ -184,7 +184,7 @@ export function parsePath(pathname: string): { locale: Locale; canonical: string
   return { locale, canonical: `/${canonical.join('/')}` };
 }
 
-/** Misma página en todos los idiomas, a partir de la ruta canónica. */
+/** The same page in every language, from the canonical path. */
 export function alternates(canonical: string): { locale: Locale; path: string }[] {
   return locales.map((locale) => ({ locale, path: localizedPath(canonical, locale) }));
 }

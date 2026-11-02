@@ -19,12 +19,12 @@ interface Props {
   title?: string;
   description?: string;
   noindex?: boolean;
-  /** El contenido empieza bajo el header flotante (hero a sangre). */
+  /** Content starts under the floating header (full-bleed hero). */
   overlayHeader?: boolean;
   minimalHeader?: boolean;
-  /** Pantallas sin pie (p. ej. herramientas internas). */
+  /** Pages without a footer. */
   hideFooter?: boolean;
-  /** Datos estructurados propios de la página (p. ej. la empresa en Home y Contacto). */
+  /** Page-specific structured data (e.g. the organisation on Home and Contact). */
   jsonLd?: object;
 }
 const {
@@ -55,15 +55,15 @@ const alternateLinks = alternates(parsePath(Astro.url.pathname).canonical).map((
       document.documentElement.classList.add('js');
       if (!matchMedia('(prefers-reduced-motion: reduce)').matches)
         document.documentElement.classList.add('motion');
-      // País (moneda y formas jurídicas), antes de pintar: el elegido en el header o, si no hay,
-      // el que sugiere el navegador (zona horaria y región del idioma). Sin servicios externos.
+      // Country (currency and legal forms), set before first paint: the one chosen in the header or, if none,
+      // the one suggested by the browser (time zone and language region). No external services.
       (() => {
         const valid = /^(CH|ES|DE|FR|IT)$/;
         let country = null;
         try {
           country = localStorage.getItem('nb-country');
         } catch {
-          // Sin almacenamiento: se deduce.
+          // No storage available: infer it.
         }
         if (!valid.test(country || '')) {
           const zones = {
@@ -108,9 +108,9 @@ const alternateLinks = alternates(parsePath(Astro.url.pathname).canonical).map((
     ))}
     <link rel="alternate" hreflang="x-default" href={alternateLinks[0].href} />
     <script is:inline>
-      // Idioma al entrar desde fuera: el del lugar (zona horaria), y si no es uno de los cinco países,
-      // el del navegador. Nunca si ya se eligió uno en el selector, ni para robots o navegadores
-      // automatizados (SEO y tests). DECISIONES.md.
+      // Language on arrival from another site: the one for the location (time zone), or the browser's
+      // if it isn't one of the five countries. Never if one was already picked in the selector, and never for bots or
+      // automated browsers (SEO and tests).
       (() => {
         try {
           if (localStorage.getItem('nb-lang')) return;
@@ -121,7 +121,7 @@ const alternateLinks = alternates(parsePath(Astro.url.pathname).canonical).map((
           const prefs = (navigator.languages || [navigator.language]).map((l) =>
             l.split('-')[0].toLowerCase(),
           );
-          // Suiza tiene tres idiomas: el primero de ellos que prefiera el navegador, si no, alemán.
+          // Switzerland has three languages: the first one the browser prefers, otherwise German.
           const local = {
             'Europe/Zurich': ['de', 'fr', 'it'],
             'Europe/Madrid': ['es'],
@@ -145,7 +145,7 @@ const alternateLinks = alternates(parsePath(Astro.url.pathname).canonical).map((
           if (target !== location.pathname + location.search + location.hash)
             location.replace(target);
         } catch {
-          // Sin almacenamiento o sin URL: se queda el idioma de la página.
+          // No storage or URL support: keep the page language.
         }
       })();
     </script>
@@ -174,9 +174,9 @@ const alternateLinks = alternates(parsePath(Astro.url.pathname).canonical).map((
     </main>
     {!hideFooter && <Footer />}
     <script>
-      // Smooth scroll en todas las páginas; GSAP solo donde hay escenas. Nada de esto con reduced-motion.
+      // Smooth scroll on every page; GSAP only where there are scenes. None of it with reduced motion.
       if (!matchMedia('(prefers-reduced-motion: reduce)').matches) {
-        // Ambos módulos se piden a la vez: el hero no espera a que llegue el scroll suave.
+        // Both modules are requested together so the hero doesn't wait for smooth scroll.
         const hasScenes = document.querySelector(
           '[data-hero],[data-reveal],[data-count],[data-split],[data-viaduct],[data-reveal-media],[data-journey],[data-calc-preview],[data-final],[data-price-deck],[data-pricing],[data-about-hero],[data-contact-hero],[data-service-hero],[data-clock]',
         );

@@ -1,12 +1,12 @@
 import type { AnimationKit } from './types';
 
 /**
- * Nosotros (`[data-about-hero]`): coreografía de la página.
- * - Cabecera: la foto se acerca despacio y el texto se aleja al salir (scrub).
- * - Historia: las cifras del año suben una a una desde su máscara.
- * - Principios: la fila que pasa por el centro de la pantalla se ilumina (clase `is-lit`).
- * - Equipo: cada retrato se descubre en arco y su nombre sube, línea a línea.
- * Solo transform, opacity, clip-path y trazos. Con movimiento reducido no se registra.
+ * About page (`[data-about-hero]`): page choreography.
+ * - Header: the photo slowly zooms in and the text drifts away on the way out (scrub).
+ * - Story: the year's digits rise one by one from their mask.
+ * - Principles: the row crossing the middle of the screen lights up (`is-lit` class).
+ * - Team: each portrait is revealed in an arch and the name rises, line by line.
+ * Only transform, opacity, clip-path and strokes. Not registered with reduced motion.
  */
 export function aboutScene({ gsap, ScrollTrigger }: AnimationKit) {
   const hero = document.querySelector<HTMLElement>('[data-about-hero]');
@@ -18,12 +18,12 @@ export function aboutScene({ gsap, ScrollTrigger }: AnimationKit) {
   if (img) gsap.fromTo(img, { scale: 1.02 }, { scale: 1.12, ease: 'none', scrollTrigger: out });
   if (content) gsap.to(content, { yPercent: -14, opacity: 0.2, ease: 'none', scrollTrigger: out });
 
-  // Año de fundación: cifra a cifra.
+  // Founding year: digit by digit.
   const digits = document.querySelectorAll('[data-year] .nb-hist__digit > span');
   if (digits.length)
     gsap.fromTo(
       digits,
-      // y: 0 anula el translateY del CSS inicial (GSAP lo leería como desplazamiento en px).
+      // y: 0 cancels the translateY from the initial CSS (GSAP would read it as a pixel offset).
       { yPercent: 135, y: 0 },
       {
         yPercent: 0,
@@ -34,7 +34,7 @@ export function aboutScene({ gsap, ScrollTrigger }: AnimationKit) {
       },
     );
 
-  // Principios: foco en la fila del centro.
+  // Principles: focus on the middle row.
   document.querySelectorAll<HTMLElement>('[data-focus-row]').forEach((row) => {
     ScrollTrigger.create({
       trigger: row,
@@ -44,7 +44,7 @@ export function aboutScene({ gsap, ScrollTrigger }: AnimationKit) {
     });
   });
 
-  // Equipo: arco que se descubre de abajo arriba; después, el nombre.
+  // Team: arch revealed from the bottom up, then the name.
   document.querySelectorAll<HTMLElement>('[data-crew-arch]').forEach((arch, i) => {
     const lines = arch.querySelectorAll('.nb-crew__line > span');
     const photo = arch.querySelector('img');
@@ -71,7 +71,7 @@ export function aboutScene({ gsap, ScrollTrigger }: AnimationKit) {
     );
   });
 
-  // Cierre: la línea de base se traza y el equipo se levanta sobre ella, pilar a pilar.
+  // Closing: the baseline draws and the team rises on top of it, pillar by pillar.
   const meet = document.querySelector<HTMLElement>('[data-meet]');
   if (meet) {
     const base = meet.querySelector('[data-meet-base]');

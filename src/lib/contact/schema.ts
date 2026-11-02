@@ -2,10 +2,10 @@ import { z } from 'zod';
 
 export const companyTypes = ['autonomo', 'startup', 'pyme', 'otra'] as const;
 
-/** Mensajes de error: claves de `form.errors` en el diccionario. */
+/** Error messages: keys of `form.errors` in the dictionary. */
 export type ContactErrorKey = 'name' | 'email' | 'phone' | 'company' | 'message' | 'privacy';
 
-/** Formulario de contacto (docs/04): validación compartida por la isla y por un futuro endpoint. */
+/** Contact form schema, shared by the island and any future endpoint. */
 export const contactSchema = z.object({
   name: z.string().trim().min(2, 'name'),
   email: z.string().trim().pipe(z.email('email')),

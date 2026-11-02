@@ -1,6 +1,6 @@
 import { defaultLocale, localizedPath, t, type Locale } from '../i18n';
 
-/** Datos de empresa. Provisionales (empresa ficticia): docs/01-proyecto.md. */
+/** Company details (fictional company). */
 export const site = {
   name: 'Northbridge Advisory',
   legalName: 'Northbridge Advisory',

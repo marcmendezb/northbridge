@@ -1,9 +1,9 @@
 import type { AnimationKit } from './types';
 
 /**
- * Cierre «20 minutos» (`[data-clock]`): con el scroll, el cabezal recorre la llamada de 0 a 20,
- * la regla se rellena, el reloj corre y cada momento se enciende al alcanzarlo; al final aparece
- * el «+24 h». Solo transform, opacity y texto. Con movimiento reducido no se registra.
+ * "20 minutes" closing section (`[data-clock]`): on scroll, the playhead runs the call from 0 to 20,
+ * the ruler fills, the clock runs and each moment lights up as it is reached; at the end the
+ * "+24 h" appears. Only transform, opacity and text. Not registered with reduced motion.
  */
 export function clockScene({ gsap }: AnimationKit) {
   document.querySelectorAll<HTMLElement>('[data-clock]').forEach((clock) => {

@@ -1,7 +1,7 @@
 ---
 /**
- * Bandera plana de un país del selector (sin emojis: SVG con los colores de tokens.css).
- * Suiza es cuadrada; el resto, 3:2. Un filete de 1 px la separa del fondo blanco.
+ * Flat flag for a country in the selector (no emojis: SVG using the colours in tokens.css).
+ * Switzerland is square; the rest are 3:2. A 1 px rule separates it from the white background.
  */
 import type { Country } from '../../lib/country';
 interface Props {
@@ -67,7 +67,7 @@ const square = country === 'CH';
     height: 100%;
     display: block;
   }
-  /* Filete interior: las franjas blancas no se funden con el panel. */
+  /* Inner rule: keeps the white stripes from blending into the panel. */
   .nb-flag::after {
     content: '';
     position: absolute;

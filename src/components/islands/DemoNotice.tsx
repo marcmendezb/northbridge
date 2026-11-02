@@ -3,17 +3,17 @@ import type { Messages } from '../../i18n/es';
 
 interface Props {
   s: Messages['demo'];
-  /** Qué se ha intentado enviar: cambia la segunda frase. */
+  /** What the user tried to send: changes the second sentence. */
   kind: 'form' | 'booking';
   open: boolean;
   onClose: () => void;
-  /** Página de confirmación, para ver cómo seguiría el recorrido. */
+  /** Confirmation page, to see how the journey would continue. */
   nextHref: string;
 }
 
 /**
- * Aviso de web ficticia (proyecto de portfolio): nada se envía ni se guarda.
- * `<dialog>` nativo: atrapa el foco, se cierra con Esc y devuelve el foco al botón de enviar.
+ * Fictional site notice (portfolio project): nothing is sent or stored.
+ * Native `<dialog>`: traps focus, closes with Esc and returns focus to the submit button.
  */
 export default function DemoNotice({ s, kind, open, onClose, nextHref }: Props) {
   const ref = useRef<HTMLDialogElement>(null);
@@ -34,7 +34,7 @@ export default function DemoNotice({ s, kind, open, onClose, nextHref }: Props) 
       aria-describedby={`${id}-text`}
       onClose={onClose}
       onClick={(e) => {
-        // Un clic en el fondo (fuera del panel) también cierra.
+        // Clicking the backdrop (outside the panel) also closes it.
         if (e.target === e.currentTarget) onClose();
       }}
     >

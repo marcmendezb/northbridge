@@ -1,14 +1,14 @@
 ---
 import { uid as makeUid } from '../../lib/uid';
 
-/** Acordeón accesible. Sin JS, todo el contenido queda visible; con JS se pliega con grid-template-rows (0fr → 1fr). */
+/** Accessible accordion. Without JS, all content is visible; with JS it collapses with grid-template-rows (0fr → 1fr). */
 interface Item {
   q: string;
   a: string;
 }
 interface Props {
   items: Item[];
-  /** Nivel del encabezado de cada pregunta. */
+  /** Heading level for each question. */
   level?: 'h3' | 'h4';
   openFirst?: boolean;
   class?: string;

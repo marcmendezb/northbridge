@@ -3,9 +3,9 @@ import { HOLIDAYS } from '../fiscal/deadlines';
 import { type ClosedDays, zurichHolidays } from './office';
 
 /**
- * Días de cierre de la oficina de cada país: Zúrich (festivos legales y Berchtoldstag), Madrid
- * (festivos nacionales; sin los autonómicos ni locales, que cambian cada año), Berlín, París y Roma
- * (nacionales y San Pedro y San Pablo, patrón de la ciudad, el 29 de junio).
+ * Days each country's office is closed: Zurich (legal holidays and Berchtoldstag), Madrid
+ * (national holidays only; regional and local ones change every year), Berlin, Paris and Rome
+ * (national holidays plus Saints Peter and Paul, the city's patron saints, on 29 June).
  */
 export const OFFICE_CLOSED: Record<Country, ClosedDays> = {
   CH: zurichHolidays,

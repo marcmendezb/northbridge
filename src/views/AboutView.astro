@@ -29,7 +29,7 @@ const portraits: Record<string, ImageMetadata> = {
   'nora-steiner': nora,
   'marc-bernasconi': marc,
 };
-/** Encuadre de cada retrato: Tobias tiene una franja oscura a la izquierda. */
+/** Crop for each portrait: Tobias's photo has a dark strip on the left. */
 const focus: Record<string, string> = { 'tobias-vogel': '72% 50%' };
 const story = tRaw<string[]>('about.story');
 const method = tRaw<{ title: string; text: string }[]>('about.method');
@@ -38,7 +38,7 @@ const facts = tRaw<{ value: string; label: string }[]>('about.facts');
 const bookingCta = getBookingCta(locale);
 const guarantees = tRaw<string[]>('booking.guarantees');
 const yearDigits = String(site.founded).split('');
-/** «200+» → cifra animable y sufijo. */
+/** "200+" → animatable number and suffix. */
 const splitFact = (v: string) => {
   const m = v.match(/^(\d+)(.*)$/);
   return m ? { n: Number(m[1]), suffix: m[2] } : { n: null, suffix: v };
@@ -46,7 +46,7 @@ const splitFact = (v: string) => {
 ---
 
 <BaseLayout title={t('about.seoTitle')} description={t('about.seoDescription')} overlayHeader>
-  <!-- 1 · Cabecera: la oficina a sangre y las cifras de la firma al pie -->
+  <!-- Header: the office, full bleed, with the firm's figures at the bottom -->
   <header class="nb-ah" data-surface="dark" data-about-hero>
     <div class="nb-ah__media" aria-hidden="true">
       <Picture
@@ -90,7 +90,7 @@ const splitFact = (v: string) => {
     </div>
   </header>
 
-  <!-- 2 · Historia: el año de fundación, monumental -->
+  <!-- Story: the founding year, monumental -->
   <section class="nb-hist" aria-labelledby="story-title">
     <div class="nb-container nb-hist__grid">
       <div class="nb-hist__year" aria-hidden="true">
@@ -117,7 +117,7 @@ const splitFact = (v: string) => {
     </div>
   </section>
 
-  <!-- 3 · Principios: cada palabra se ilumina al pasar por el centro de la pantalla -->
+  <!-- Principles: each word lights up as it crosses the middle of the screen -->
   <section class="nb-prin" aria-labelledby="principles-title">
     <div class="nb-container">
       <div class="nb-prin__head">
@@ -137,7 +137,7 @@ const splitFact = (v: string) => {
     </div>
   </section>
 
-  <!-- 4 · Método: el símbolo se construye mientras recorres los cuatro puntos -->
+  <!-- Method: the symbol builds up as you go through the four points -->
   <section class="nb-meth" data-surface="dark" aria-labelledby="method-title">
     <div class="nb-container nb-meth__grid">
       <div class="nb-meth__aside">
@@ -167,7 +167,7 @@ const splitFact = (v: string) => {
     </div>
   </section>
 
-  <!-- 5 · Equipo: el nombre, escrito en la pared de cada retrato -->
+  <!-- Team: each name written on the wall of its portrait -->
   <section class="nb-crew" aria-labelledby="team-title">
     <div class="nb-container">
       <div class="nb-crew__head">
@@ -224,12 +224,12 @@ const splitFact = (v: string) => {
     </div>
   </section>
 
-  <!-- 6 · Oficina -->
+  <!-- Office -->
   <section class="nb-office" aria-labelledby="office-title">
     <div class="nb-container nb-office__grid">
       <div class="nb-office__text">
         <p class="nb-office__label">{t('about.officeLabel')}</p>
-        <!-- La oficina depende del país (src/data/offices.ts): una variante por país. -->
+        <!-- The office depends on the country (src/data/offices.ts): one variant per country. -->
         <h2
           class="nb-office__title"
           id="office-title"
@@ -276,7 +276,7 @@ const splitFact = (v: string) => {
     </div>
   </section>
 
-  <!-- 7 · Cierre: el equipo, en pie como los pilares de un puente, y la consulta -->
+  <!-- Closing: the team standing like the pillars of a bridge, and the consultation -->
   <section class="nb-meet" data-surface="dark" aria-labelledby="meet-title" data-meet>
     <div class="nb-container nb-meet__grid">
       <div class="nb-meet__text">
@@ -343,7 +343,7 @@ const splitFact = (v: string) => {
 </BaseLayout>
 
 <style is:global>
-  /* ── 1 · Cabecera ── */
+  /* ── Header ── */
   .nb-ah {
     position: relative;
     display: flex;
@@ -437,7 +437,7 @@ const splitFact = (v: string) => {
     }
   }
 
-  /* ── 2 · Historia ── */
+  /* ── Story ── */
   .nb-hist {
     padding-block: var(--section-y);
     background: var(--white);
@@ -471,7 +471,7 @@ const splitFact = (v: string) => {
     letter-spacing: -0.05em;
     color: var(--navy-800);
   }
-  /* Cada cifra sube desde su propia máscara (aboutScene.ts). */
+  /* Each digit rises from its own mask (aboutScene.ts). */
   .nb-hist__digit {
     display: inline-block;
     overflow: hidden;
@@ -523,7 +523,7 @@ const splitFact = (v: string) => {
     color: var(--navy-800);
   }
 
-  /* ── 3 · Principios ── */
+  /* ── Principles ── */
   .nb-prin {
     padding-block: var(--section-y);
     background: var(--piedra-100);
@@ -574,9 +574,9 @@ const splitFact = (v: string) => {
     color: var(--piedra-700);
     transition: color var(--dur-slow) var(--ease-out);
   }
-  /* Con movimiento: solo la fila del centro de la pantalla tiene todo su color. */
+  /* With motion: only the row in the middle of the screen gets full colour. */
   @media (prefers-reduced-motion: no-preference) {
-    /* Atenuado con contraste AA: 3:1 en el titular grande, 4,5:1 en el texto. */
+    /* Dimmed with AA contrast: 3:1 for the large heading, 4.5:1 for the text. */
     .js.motion:not(.anim-fail) .nb-prin__word {
       color: var(--piedra-500);
     }
@@ -592,7 +592,7 @@ const splitFact = (v: string) => {
     }
   }
 
-  /* ── 4 · Método ── */
+  /* ── Method ── */
   .nb-meth {
     padding-block: var(--section-y);
     background: var(--navy-800);
@@ -632,7 +632,7 @@ const splitFact = (v: string) => {
     font-weight: 300;
     color: var(--white);
   }
-  /* Símbolo en negativo (blanco sobre Navy 800, docs/02), grande: el PNG navy pasa a blanco puro. */
+  /* Large negative symbol (white on Navy 800): the navy PNG becomes pure white. */
   .nb-meth__symbol {
     display: block;
     width: clamp(180px, 22vw, 340px);
@@ -666,7 +666,7 @@ const splitFact = (v: string) => {
     line-height: 1.65;
   }
 
-  /* ── 5 · Equipo ── */
+  /* ── Team ── */
   .nb-crew {
     padding-block: var(--section-y);
     background: var(--white);
@@ -703,7 +703,7 @@ const splitFact = (v: string) => {
     .nb-crew__grid {
       grid-template-columns: repeat(4, minmax(0, 1fr));
     }
-    /* Escalonado suave: la fila de arcos respira como un viaducto. */
+    /* Gentle stagger: the row of arches breathes like a viaduct. */
     .nb-crew__member:nth-child(even) {
       margin-top: 72px;
     }
@@ -713,7 +713,7 @@ const splitFact = (v: string) => {
     align-content: start;
     gap: 24px;
   }
-  /* Marco de arco (docs/02) con el nombre escrito en la pared, sobre la cabeza. */
+  /* Arch frame with the name written on the wall, above the head. */
   .nb-crew__arch {
     position: relative;
     margin: 0;
@@ -796,7 +796,7 @@ const splitFact = (v: string) => {
     margin: 0;
   }
 
-  /* ── 7 · Cierre ── */
+  /* ── Closing ── */
   .nb-meet {
     position: relative;
     padding-block: var(--section-y);
@@ -888,7 +888,7 @@ const splitFact = (v: string) => {
     stroke-width: 1.5;
   }
 
-  /* El equipo en pie sobre una línea de base: cuatro arcos de alturas distintas, como pilares. */
+  /* The team standing on a baseline: four arches of different heights, like pillars. */
   .nb-meet__team {
     position: relative;
     margin: 0;
@@ -958,7 +958,7 @@ const splitFact = (v: string) => {
     color: var(--navy-100);
   }
 
-  /* ── 6 · Oficina ── */
+  /* ── Office ── */
   .nb-office {
     padding-block: clamp(24px, 4vw, 64px) var(--section-y);
     background: var(--white);

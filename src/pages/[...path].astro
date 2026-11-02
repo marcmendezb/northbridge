@@ -16,8 +16,8 @@ import { locales, localizedPath, type Locale } from '../i18n';
 import { entryKey, getArticles, getLegalPages, getServices } from '../lib/content';
 
 /**
- * Todas las páginas en todos los idiomas. La ruta pública sale de la ruta canónica (española)
- * traducida con `localizedPath` (src/i18n/routes.ts): `/servicios` → `/en/services`.
+ * Every page in every language. The public path is the canonical (Spanish) path
+ * translated with `localizedPath` (src/i18n/routes.ts): `/servicios` → `/en/services`.
  */
 export async function getStaticPaths() {
   const toParam = (canonical: string, locale: Locale) =>
@@ -57,7 +57,7 @@ export async function getStaticPaths() {
         props: {
           view: 'article' as const,
           entry,
-          // Sigue leyendo: otras guías del mismo país.
+          // Keep reading: other guides for the same country.
           related: articles
             .filter((a) => a.id !== entry.id && a.data.country === entry.data.country)
             .slice(0, 2),

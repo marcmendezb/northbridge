@@ -1,9 +1,9 @@
 ---
 /**
- * «Tres pasos, sin burocracia»: recorrido horizontal anclado (escritorio con movimiento).
- * Los pasos cruzan la pantalla sobre un tablero que se traza de punta a punta, y cada uno tiene su escena:
- * reloj de 20 minutos, el símbolo que se cierra (precio cerrado) y un libro de cuentas que se completa.
- * En móvil, sin JS o con movimiento reducido: pasos apilados con las escenas ya dibujadas.
+ * "Three steps, no red tape": pinned horizontal journey (desktop with motion).
+ * The steps cross the screen over a deck that draws from end to end, and each has its own scene:
+ * a 20-minute clock, the symbol closing (fixed price) and a ledger that fills up.
+ * On mobile, without JS or with reduced motion: stacked steps with the scenes already drawn.
  */
 import { useI18n } from '../../i18n';
 const { t, tRaw } = useI18n(Astro.currentLocale);
@@ -168,7 +168,7 @@ const rows = [62, 104, 146, 188];
     color: var(--piedra-700);
   }
 
-  /* Escenas: trazo uniforme y terminales rectos, como el símbolo. */
+  /* Scenes: even stroke and square ends, like the symbol. */
   .nb-journey__visual :is(path, line, circle) {
     stroke-linecap: butt;
     stroke-linejoin: miter;
@@ -209,7 +209,7 @@ const rows = [62, 104, 146, 188];
     stroke-width: 2;
   }
 
-  /* ── Escritorio con movimiento: recorrido horizontal anclado ── */
+  /* ── Desktop with motion: pinned horizontal journey ── */
   @media (min-width: 1024px) {
     .js.motion:not(.anim-fail) .nb-journey__pin {
       display: flex;

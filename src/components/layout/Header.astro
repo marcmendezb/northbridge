@@ -19,13 +19,13 @@ const { t, lp, locale } = useI18n(Astro.currentLocale);
 const bookingCta = getBookingCta(locale);
 const mainNav = getMainNav(locale);
 const serviceLinks = getServiceLinks(locale);
-/** La misma página en cada idioma. */
+/** The same page in every language. */
 const langOptions = alternates(parsePath(Astro.url.pathname).canonical).map((a) => ({
   ...a,
   ...localeMeta[a.locale],
   current: a.locale === locale,
 }));
-/** País: moneda y formas jurídicas (independiente del idioma). Lo marca el script del header. */
+/** Country: currency and legal forms (independent of language). Set by the header script. */
 const countryOptions = COUNTRIES.map((code) => ({
   code,
   name: countryName(code, locale),
@@ -34,7 +34,7 @@ const countryOptions = COUNTRIES.map((code) => ({
 }));
 
 interface Props {
-  /** Cabecera reducida (landing de consulta): solo logo y CTA. */
+  /** Reduced header: logo and CTA only. */
   minimal?: boolean;
 }
 const { minimal = false } = Astro.props;
@@ -78,8 +78,8 @@ import { vatFor } from '../../lib/vat';
                 >
                   {hasMega ? (
                     <>
-                      {/* El nombre lleva a todos los servicios; la flecha abre el desplegable
-                          (también se abre al pasar el ratón). */}
+                      {/* The label links to all services; the arrow opens the dropdown
+                          (it also opens on hover). */}
                       <a
                         href={l.href}
                         class="nb-nav__link nb-nav__split"
@@ -409,7 +409,7 @@ import { vatFor } from '../../lib/vat';
     --header-h: 96px;
   }
 
-  /* Barra flotante: superficie elevada blanca, pegada arriba, esquinas inferiores de tarjeta (8 px). */
+  /* Floating bar: elevated white surface, stuck to the top, with card-style bottom corners (8 px). */
   .nb-header {
     position: fixed;
     inset: 0 0 auto 0;
@@ -455,7 +455,7 @@ import { vatFor } from '../../lib/vat';
     min-height: 44px;
     padding: 4px 0;
   }
-  /* Lockup horizontal (docs/02): símbolo ≈ 1,09 × el cuerpo de «Northbridge», separación 0,3 ×. */
+  /* Horizontal lockup: symbol ≈ 1.09 × the "Northbridge" type size, 0.3 × gap. */
   .nb-bar__logo {
     --wm: 29px;
     gap: calc(var(--wm) * 0.34);
@@ -494,7 +494,7 @@ import { vatFor } from '../../lib/vat';
       --wm: 24px;
     }
   }
-  /* Escritorio estrecho: el lockup y la navegación se compactan para que quepa el alemán. */
+  /* Narrow desktop: the lockup and navigation tighten so German fits. */
   @media (min-width: 1200px) and (max-width: 1439px) {
     .nb-bar__logo {
       --wm: 24px;
@@ -536,7 +536,7 @@ import { vatFor } from '../../lib/vat';
     text-decoration: none;
     transition: color var(--dur-fast) var(--ease-out);
   }
-  /* Hover: el mismo color que los enlaces de los desplegables (Salvia 600), sin desplazamiento. */
+  /* Hover: the same colour as the dropdown links (Sage 600), no movement. */
   .nb-nav__link[aria-current='page'] {
     color: var(--navy-800);
   }
@@ -546,8 +546,8 @@ import { vatFor } from '../../lib/vat';
     color: var(--salvia-600);
   }
 
-  /* CTA: botón primario con icono sobre Salvia 400 (Navy sobre Salvia, nunca blanco). */
-  /* ── Desplegable de Servicios (solo escritorio): la barra crece hacia abajo ── */
+  /* CTA: primary button with an icon on Sage 400 (navy on sage, never white). */
+  /* ── Services dropdown (desktop only): the bar grows downwards ── */
   .nb-nav__trigger {
     display: none;
     align-items: center;
@@ -559,7 +559,7 @@ import { vatFor } from '../../lib/vat';
     font-size: 1rem;
     font-weight: 500;
   }
-  /* Con JS, el enlace «Servicios» queda pegado a su flecha, que es un botón aparte. */
+  /* With JS, the "Services" link sits right next to its arrow, which is a separate button. */
   .js .nb-nav__trigger {
     display: inline-flex;
     margin-left: -0.75rem;
@@ -661,7 +661,7 @@ import { vatFor } from '../../lib/vat';
   .nb-mega__all:hover {
     color: var(--salvia-600);
   }
-  /* Tarjeta de la derecha: foto provisional; aquí irá la calculadora. */
+  /* Right-hand card: photo and a shortcut to the calculator. */
   .nb-mega__promo {
     position: relative;
     display: flex;
@@ -688,7 +688,7 @@ import { vatFor } from '../../lib/vat';
     position: absolute;
     inset: 0;
     z-index: -1;
-    /* Velo verde de acento (Salvia 700): el texto blanco cumple AA también sobre la zona clara de la foto. */
+    /* Accent green overlay (Sage 700): white text passes AA even over the light part of the photo. */
     background: color-mix(in srgb, var(--salvia-700) 80%, transparent);
   }
   .nb-mega__promo:hover .nb-mega__promo-img {
@@ -719,7 +719,7 @@ import { vatFor } from '../../lib/vat';
     font-size: 0.9375rem;
     font-weight: 600;
   }
-  /* Idiomas: mismo desplegable que Servicios; el código del idioma ocupa el sitio del icono. */
+  /* Languages: same dropdown as Services; the language code takes the icon's place. */
   .nb-mega__code {
     display: inline-flex;
     align-items: center;
@@ -742,7 +742,7 @@ import { vatFor } from '../../lib/vat';
     border-color: var(--salvia-600);
     color: var(--salvia-600);
   }
-  /* País: botón con el mismo aspecto que los enlaces del desplegable; debajo, moneda y formas. */
+  /* Country: a button styled like the dropdown links; currency and legal forms below. */
   .nb-country {
     padding: 4px 0;
     border: 0;
@@ -761,11 +761,11 @@ import { vatFor } from '../../lib/vat';
     letter-spacing: 0.02em;
     color: var(--piedra-600);
   }
-  /* La bandera ocupa el sitio del código; la elegida lleva un anillo Navy. */
+  /* The flag takes the code's place; the selected one gets a navy ring. */
   .nb-country {
     align-items: flex-start;
   }
-  /* Bandera pequeña, alineada con la primera línea del nombre. */
+  /* Small flag, aligned with the first line of the name. */
   .nb-country__flag {
     display: inline-flex;
     justify-content: center;
@@ -850,7 +850,7 @@ import { vatFor } from '../../lib/vat';
     background: none;
     cursor: pointer;
   }
-  /* Elegir país necesita JS; sin JS se queda el de por defecto. */
+  /* Choosing a country needs JS; without it, the default stays. */
   html:not(.js) .nb-mobile__countries {
     display: none;
   }
@@ -876,7 +876,7 @@ import { vatFor } from '../../lib/vat';
     box-shadow: 0 10px 32px rgb(21 39 66 / 0.1);
   }
 
-  /* CTA: botón primario Navy, texto blanco y la flecha de la marca. */
+  /* CTA: primary navy button, white text and the brand arrow. */
   .nb-cta {
     display: inline-flex;
     align-items: center;
@@ -907,7 +907,7 @@ import { vatFor } from '../../lib/vat';
       gap: 12px;
     }
   }
-  /* Cabecera reducida (consulta gratuita): logo a la izquierda y el CTA, que baja al calendario. */
+  /* Reduced header: logo on the left and the CTA, which scrolls down to the calendar. */
   .nb-header[data-minimal] .nb-bar__row {
     display: flex;
     justify-content: space-between;
@@ -921,7 +921,7 @@ import { vatFor } from '../../lib/vat';
     justify-content: center;
   }
 
-  /* Menú móvil: sin JS, los enlaces quedan visibles dentro de la barra; con JS se abre y se cierra. */
+  /* Mobile menu: without JS, the links stay visible inside the bar; with JS it opens and closes. */
   .nb-menu-btn {
     display: none;
     width: 44px;
@@ -991,12 +991,12 @@ import { vatFor } from '../../lib/vat';
     const btn = header.querySelector<HTMLButtonElement>('.nb-menu-btn');
     const panel = header.querySelector<HTMLElement>('#mobile-menu');
 
-    // La sombra aparece tras 24 px de scroll.
+    // The shadow appears after 24 px of scroll.
     const onScroll = () => header.toggleAttribute('data-scrolled', window.scrollY > 24);
     onScroll();
     window.addEventListener('scroll', onScroll, { passive: true });
 
-    // ── Desplegables (Servicios e Idiomas): la barra crece hacia abajo; solo uno abierto a la vez ──
+    // ── Dropdowns (Services and Languages): the bar grows downwards; only one open at a time ──
     const desktop = window.matchMedia('(min-width: 1200px)');
     const hoverable = () => desktop.matches && window.matchMedia('(hover: hover)').matches;
     const megas = [...header.querySelectorAll<HTMLButtonElement>('[data-mega-trigger]')]
@@ -1033,7 +1033,7 @@ import { vatFor } from '../../lib/vat';
         m.trigger.addEventListener('click', (e) => {
           const open = current !== m;
           setMega(open ? m : null);
-          // Con teclado (Enter o Espacio), el foco pasa al primer enlace del panel.
+          // With the keyboard (Enter or Space), focus moves to the first link in the panel.
           if (open && (e as MouseEvent).detail === 0)
             m.panel.querySelector<HTMLElement>('a[href], button')?.focus();
         });
@@ -1045,7 +1045,7 @@ import { vatFor } from '../../lib/vat';
       document.addEventListener('keydown', (e) => {
         if (e.key === 'Escape' && current) {
           e.preventDefault();
-          // Si el foco estaba dentro, vuelve al botón; si solo había ratón, no se roba el foco.
+          // If focus was inside, it returns to the button; with a mouse only, focus isn't stolen.
           setMega(null, header.contains(document.activeElement));
         }
       });
@@ -1060,18 +1060,18 @@ import { vatFor } from '../../lib/vat';
       desktop.addEventListener('change', () => setMega(null));
     }
 
-    // ── Idioma elegido a mano: se recuerda y ya no se sigue el del navegador ──
+    // ── Language chosen manually: it is remembered and the browser language is no longer followed ──
     document.querySelectorAll<HTMLAnchorElement>('.nb-header a[hreflang]').forEach((a) =>
       a.addEventListener('click', () => {
         try {
           localStorage.setItem('nb-lang', (a.getAttribute('hreflang') ?? '').split('-')[0]);
         } catch {
-          // Sin almacenamiento: la elección vale para esta visita.
+          // No storage available: the choice applies to this visit only.
         }
       }),
     );
 
-    // ── País: cambia moneda y formas jurídicas en toda la página (CSS de [data-cc]) y se recuerda ──
+    // ── Country: updates currency and legal forms across the page (CSS on [data-cc]) and is remembered ──
     const root = document.documentElement;
     const countryButtons = [
       ...document.querySelectorAll<HTMLButtonElement>('[data-country-option]'),
@@ -1089,7 +1089,7 @@ import { vatFor } from '../../lib/vat';
         try {
           localStorage.setItem('nb-country', code);
         } catch {
-          // Sin almacenamiento: el país vale para esta página.
+          // No storage available: the country applies to this page only.
         }
         syncCountry();
       });
@@ -1141,7 +1141,7 @@ import { vatFor } from '../../lib/vat';
         }
       });
 
-      // Al pasar a escritorio, cerrar el menú.
+      // Close the menu when switching to desktop.
       window.matchMedia('(min-width: 1200px)').addEventListener('change', (m) => {
         if (m.matches) setOpen(false, false);
       });

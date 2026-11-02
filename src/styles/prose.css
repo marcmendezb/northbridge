@@ -1,4 +1,4 @@
-/* Lectura: artículos y páginas legales (índice lateral + cuerpo de 680 px). */
+/* Reading layout: articles and legal pages (side table of contents + 680 px body). */
 .nb-art {
   display: grid;
   gap: 40px;
@@ -63,7 +63,7 @@
   font-weight: 600;
 }
 
-/* Tipografía de lectura: 680 px de ancho máximo (docs/05). */
+/* Reading typography: 680 px maximum width. */
 .nb-prose {
   max-width: 680px;
   font-size: 1.125rem;

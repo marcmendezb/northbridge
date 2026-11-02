@@ -1,4 +1,4 @@
-/** Utilidades WCAG 2.x. Los colores se leen de tokens.css: no hay hex duplicados. */
+/** WCAG 2.x helpers. Colours are read from tokens.css, so no hex values are duplicated. */
 import tokensCss from '../styles/tokens.css?raw';
 
 export function readTokens(css: string = tokensCss): Record<string, string> {
@@ -25,7 +25,7 @@ export function contrastRatio(a: string, b: string): number {
   return (hi + 0.05) / (lo + 0.05);
 }
 
-/** Parejas del brand book (docs/02-marca.md · Reglas de contraste). */
+/** Text and background pairs allowed by the brand guide. */
 export const contrastPairs = [
   { fg: 'navy-800', bg: 'piedra-50', use: 'Texto principal', min: 4.5 },
   { fg: 'white', bg: 'navy-800', use: 'Texto invertido, botón primario', min: 4.5 },

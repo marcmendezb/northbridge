@@ -25,20 +25,20 @@ const { t, lp, locale } = useI18n(Astro.currentLocale);
 const articles = await getArticles(locale);
 const team = await getTeam(locale);
 const authorName = (key: string) => team.find((m) => entryKey(m) === key)?.data.name ?? '';
-/** Solo las categorías que tienen artículos (docs/09). */
+/** Only categories that have articles. */
 const categories = blogCategories.filter((c) => articles.some((a) => a.data.category === c));
 const catLabel = (c: string) => t(`resources.categories.${c}` as MessageKey);
-/** Países en los que se muestra cada guía (la propia o, si falta, la suiza). */
+/** Countries each guide is shown in (its own, or the Swiss one as a fallback). */
 const shownIn = guideCountries(articles);
 const lastChecked = new Date(Math.max(...articles.map((a) => a.data.checkedAt.getTime())));
-/** «Lo que viene»: calendario de cada país (si aún no tiene, el suizo) y su guía completa. */
+/** "Coming up": each country's calendar (the Swiss one as a fallback) and its full guide. */
 const monthName = new Intl.DateTimeFormat(localeMeta[locale].intl, { month: 'long' });
 const upcoming = COUNTRIES.map((c) => {
   const country = FISCAL_CALENDARS[c] ? c : 'CH';
   const guide = guideFor(articles, 'calendario', country);
   return {
     c,
-    // Sin los plazos de cada mes ni las cuotas menores: aquí solo los vencimientos principales.
+    // Without monthly deadlines or minor instalments: only the main due dates here.
     events: (FISCAL_CALENDARS[country] ?? [])
       .filter((e) => !e.recurring && !e.minor)
       .sort((a, b) => a.month - b.month),
@@ -175,7 +175,7 @@ const upcoming = COUNTRIES.map((c) => {
 </BaseLayout>
 
 <style is:global>
-  /* ── Cabecera editorial ── */
+  /* ── Editorial header ── */
   .nb-rh {
     background: var(--white);
     border-bottom: 1px solid var(--piedra-200);
@@ -220,7 +220,7 @@ const upcoming = COUNTRIES.map((c) => {
     line-height: 1.55;
     color: var(--piedra-800);
   }
-  /* El país activo: bandera y nombre, como en el selector del header. */
+  /* Active country: flag and name, as in the header selector. */
   .nb-rh__country {
     display: grid;
     gap: 8px;
@@ -258,7 +258,7 @@ const upcoming = COUNTRIES.map((c) => {
     color: var(--piedra-600);
   }
 
-  /* ── Lo que viene ── */
+  /* ── Coming up ── */
   .nb-next {
     padding-block: var(--section-y);
     background: var(--piedra-100);
@@ -351,7 +351,7 @@ const upcoming = COUNTRIES.map((c) => {
     gap: 32px;
     padding-block: clamp(32px, 5vw, 64px) var(--section-y);
   }
-  /* Sin JS no hay filtro: se ven todas las guías. */
+  /* Without JS there's no filter: all guides are shown. */
   .nb-res__filters {
     display: none;
     flex-wrap: wrap;
@@ -429,7 +429,7 @@ const upcoming = COUNTRIES.map((c) => {
     gap: 16px;
     padding: clamp(24px, 3vw, 40px);
   }
-  /* Portada: la foto entra con un zoom muy lento al pasar el ratón. */
+  /* Cover: the photo zooms in very slowly on hover. */
   .nb-res__cover {
     display: block;
     aspect-ratio: 16 / 9;
@@ -544,7 +544,7 @@ const upcoming = COUNTRIES.map((c) => {
 </style>
 
 <script>
-  // Filtro por tema con JS mínimo. Sin JS, los botones no se muestran y se ven todas las guías.
+  // Topic filter with minimal JS. Without JS the buttons are hidden and all guides are shown.
   document.querySelectorAll<HTMLElement>('[data-filter-scope]').forEach((scope) => {
     const buttons = [...scope.querySelectorAll<HTMLButtonElement>('[data-filter]')];
     const items = [...scope.querySelectorAll<HTMLElement>('[data-category]')];
@@ -555,14 +555,14 @@ const upcoming = COUNTRIES.map((c) => {
         for (const b of buttons) b.setAttribute('aria-pressed', String(b === btn));
         for (const item of items)
           item.hidden = !(value === 'all' || item.dataset.category === value);
-        // Solo cuentan las guías del país activo (las demás están ocultas por CSS).
+        // Only the active country's guides count (the rest are hidden by CSS).
         const shown = items.filter((item) => item.offsetParent !== null).length;
         if (status) status.textContent = `${btn.textContent?.trim()}: ${shown}`;
       });
     }
   });
 
-  // «Lo que viene»: los cuatro próximos vencimientos a partir del mes actual (con vuelta al año).
+  // "Coming up": the next four due dates from the current month (wrapping into next year).
   const month = new Date().getMonth() + 1;
   document.querySelectorAll<HTMLElement>('[data-upcoming]').forEach((block) => {
     const list = block.querySelector('ol');

@@ -6,12 +6,12 @@ const { t, lp } = useI18n(Astro.currentLocale);
 interface Crumb {
   label: string;
   href?: string;
-  /** Variante por país (HTML de byCountry); los datos estructurados usan `label`. */
+  /** Per-country variant (HTML from byCountry); structured data uses `label`. */
   html?: string;
 }
 interface Props {
   items: Crumb[];
-  /** Sobre fondo oscuro (cabeceras con foto). */
+  /** On a dark background (headers with a photo). */
   tone?: 'light' | 'dark';
   class?: string;
 }

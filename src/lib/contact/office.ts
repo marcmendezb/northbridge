@@ -1,21 +1,21 @@
 /**
- * Horario de la oficina y plazo de respuesta («antes de las 12:00 del siguiente día laborable»).
- * Todo se calcula en hora de Zúrich, sea cual sea la zona horaria del visitante.
- * Festivos: los nueve legales del cantón de Zúrich (§ 1 Ruhetags- und Ladenöffnungsgesetz) y el
- * Berchtoldstag, festivo local que la ciudad y el cantón dan libre (ver docs/DECISIONES.md).
+ * Office hours and reply time ("before 12:00 on the next working day").
+ * Everything is computed in Zurich time, whatever the visitor's time zone.
+ * Holidays: the nine legal ones in the canton of Zurich (§ 1 Ruhetags- und Ladenöffnungsgesetz) plus
+ * Berchtoldstag, a local holiday the city and canton give off.
  */
 export const OFFICE_TZ = 'Europe/Zurich';
 export const OPEN_MINUTES = 8 * 60 + 30;
 export const CLOSE_MINUTES = 17 * 60 + 30;
 
-/** Fecha civil sin hora (mes 1–12). */
+/** Civil date without time (month 1–12). */
 export interface CivilDate {
   y: number;
   m: number;
   d: number;
 }
 
-/** Fecha, día de la semana (0 = domingo) y minuto del día en Zúrich. */
+/** Date, weekday (0 = Sunday) and minute of the day in Zurich. */
 export function zurichNow(now: Date): CivilDate & { weekday: number; minutes: number } {
   const parts = Object.fromEntries(
     new Intl.DateTimeFormat('en-GB', {
@@ -47,7 +47,7 @@ export function addDays({ y, m, d }: CivilDate, days: number): CivilDate {
   return { y: t.getUTCFullYear(), m: t.getUTCMonth() + 1, d: t.getUTCDate() };
 }
 
-/** Domingo de Pascua (algoritmo gregoriano anónimo). */
+/** Easter Sunday (anonymous Gregorian algorithm). */
 export function easterSunday(y: number): CivilDate {
   const a = y % 19;
   const b = Math.floor(y / 100);
@@ -68,26 +68,26 @@ export function easterSunday(y: number): CivilDate {
 
 const key = ({ y, m, d }: CivilDate) => `${y}-${m}-${d}`;
 
-/** Días en que la oficina cierra en un año: festivos legales de Zúrich y el Berchtoldstag. */
+/** Days the office is closed in a year: Zurich legal holidays and Berchtoldstag. */
 export function zurichHolidays(y: number): Set<string> {
   const easter = easterSunday(y);
   return new Set(
     [
-      { y, m: 1, d: 1 }, // Año Nuevo
-      { y, m: 1, d: 2 }, // Berchtoldstag (local, no legal)
-      addDays(easter, -2), // Viernes Santo
-      addDays(easter, 1), // Lunes de Pascua
-      { y, m: 5, d: 1 }, // Día del Trabajo
-      addDays(easter, 39), // Ascensión
-      addDays(easter, 50), // Lunes de Pentecostés
-      { y, m: 8, d: 1 }, // Fiesta nacional
-      { y, m: 12, d: 25 }, // Navidad
-      { y, m: 12, d: 26 }, // San Esteban
+      { y, m: 1, d: 1 }, // New Year's Day
+      { y, m: 1, d: 2 }, // Berchtoldstag (local, not a legal holiday)
+      addDays(easter, -2), // Good Friday
+      addDays(easter, 1), // Easter Monday
+      { y, m: 5, d: 1 }, // Labour Day
+      addDays(easter, 39), // Ascension Day
+      addDays(easter, 50), // Whit Monday
+      { y, m: 8, d: 1 }, // Swiss National Day
+      { y, m: 12, d: 25 }, // Christmas Day
+      { y, m: 12, d: 26 }, // St Stephen's Day
     ].map(key),
   );
 }
 
-/** Días de cierre de una oficina en un año (por defecto, la de Zúrich). */
+/** Days an office is closed in a year (defaults to Zurich). */
 export type ClosedDays = (y: number) => Set<string>;
 
 export function isWorkingDay(date: CivilDate, closed: ClosedDays = zurichHolidays): boolean {
@@ -95,7 +95,7 @@ export function isWorkingDay(date: CivilDate, closed: ClosedDays = zurichHoliday
   return wd !== 0 && wd !== 6 && !closed(date.y).has(key(date));
 }
 
-/** Primer día laborable estrictamente posterior a `date`. */
+/** First working day strictly after `date`. */
 export function nextWorkingDay(date: CivilDate, closed: ClosedDays = zurichHolidays): CivilDate {
   let next = addDays(date, 1);
   while (!isWorkingDay(next, closed)) next = addDays(next, 1);
@@ -103,14 +103,14 @@ export function nextWorkingDay(date: CivilDate, closed: ClosedDays = zurichHolid
 }
 
 /**
- * Día antes de cuyas 12:00 respondemos a un mensaje enviado en `now`. Las cinco oficinas comparten
- * la hora de Europa central, así que basta la de Zúrich; los cierres son los de cada oficina.
+ * Day before whose 12:00 we reply to a message sent at `now`. All five offices share
+ * Central European Time, so Zurich time is enough; the closing days are each office's own.
  */
 export function replyDay(now: Date, closed: ClosedDays = zurichHolidays): CivilDate {
   return nextWorkingDay(zurichNow(now), closed);
 }
 
-/** Estado de la oficina: abierta ahora, o el día en que vuelve a abrir. */
+/** Office status: open now, or the day it opens again. */
 export function officeStatus(
   now: Date,
   closed: ClosedDays = zurichHolidays,
@@ -123,8 +123,8 @@ export function officeStatus(
 }
 
 /**
- * «jueves 29 de octubre» / «Donnerstag, 29. Oktober»: fecha larga sin año, en el idioma dado.
- * Solo el alemán conserva la coma tras el día de la semana.
+ * "jueves 29 de octubre" / "Donnerstag, 29. Oktober": long date without year, in the given language.
+ * Only German keeps the comma after the weekday.
  */
 export function formatDay(date: CivilDate, locale: string, withDate = true): string {
   const tag = locale === 'en' ? 'en-GB' : locale;

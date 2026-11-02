@@ -1,22 +1,22 @@
 import type { AnimationKit } from './types';
 
 /**
- * Contacto (`[data-contact-hero]`): «la puerta abierta».
- * - Cabecera: la foto se descubre en arco y su filete se dibuja; al bajar, la cámara se acerca
- *   a la puerta (scrub) y el texto se aleja.
- * - Caminos: cada fila entra y su filete se traza de izquierda a derecha.
- * - Carta: el papel se posa, el membrete se subraya y la línea de tiempo baja con el scroll,
- *   encendiendo cada paso al alcanzarlo.
- * - Oficina: el camino desde Stadelhofen se dibuja con el scroll y el símbolo marca la llegada.
- * Solo transform, opacity, clip-path y trazos. Con movimiento reducido no se registra.
+ * Contact (`[data-contact-hero]`): "the open door".
+ * - Header: the photo is revealed in an arch and its outline draws; scrolling down, the camera moves
+ *   towards the door (scrub) and the text drifts away.
+ * - Ways to reach us: each row enters and its rule draws from left to right.
+ * - Letter: the paper settles, the letterhead is underlined and the timeline grows with the scroll,
+ *   lighting up each step as it is reached.
+ * - Office: the walk from the station draws with the scroll and the symbol marks the arrival.
+ * Only transform, opacity, clip-path and strokes. Not registered with reduced motion.
  */
 export function contactScene({ gsap, ScrollTrigger }: AnimationKit) {
   const hero = document.querySelector<HTMLElement>('[data-contact-hero]');
   if (!hero) return;
   const ease = 'expo.out';
 
-  // 1 · Puerta: la foto se asienta dentro del arco y el filete la contornea. El arco se ve desde
-  // el primer momento (sin recorte de entrada): es el LCP de la página y no debe esperar.
+  // 1 · Door: the photo settles inside the arch and the outline traces it. The arch is visible from
+  // the very first frame (no clip-in): it is the page's LCP and must not wait.
   const arch = hero.querySelector<HTMLElement>('[data-cx-arch]');
   const img = arch?.querySelector('img');
   const outline = hero.querySelector('[data-cx-outline]');
@@ -30,7 +30,7 @@ export function contactScene({ gsap, ScrollTrigger }: AnimationKit) {
         { opacity: 1, scale: 1, duration: 1.8 },
         0.9,
       );
-    // Al salir: se cruza la puerta.
+    // On the way out: walking through the door.
     const out = { trigger: hero, start: 'top top', end: 'bottom top', scrub: 0.6 };
     if (img)
       gsap.to(img, {
@@ -49,7 +49,7 @@ export function contactScene({ gsap, ScrollTrigger }: AnimationKit) {
       scrollTrigger: { trigger: hero, start: 'top top', end: 'bottom top', scrub: 0.6 },
     });
 
-  // 2 · Caminos.
+  // Ways to reach us.
   document.querySelectorAll<HTMLElement>('[data-way]').forEach((row, i) => {
     const rule = row.querySelector('[data-way-rule]');
     const link = row.querySelector('a');
@@ -67,7 +67,7 @@ export function contactScene({ gsap, ScrollTrigger }: AnimationKit) {
       );
   });
 
-  // 3 · Carta y línea de tiempo.
+  // 3 · Letter and timeline.
   const sheet = document.querySelector<HTMLElement>('[data-sheet]');
   if (sheet) {
     const rule = sheet.querySelector('[data-sheet-rule]');
@@ -98,7 +98,7 @@ export function contactScene({ gsap, ScrollTrigger }: AnimationKit) {
     });
   }
 
-  // 4 · Mapa: calles, camino que se traza con el scroll y llegada.
+  // 4 · Map: streets, a path drawn with the scroll, and the arrival.
   const map = document.querySelector<HTMLElement>('[data-map]');
   if (map) {
     const route = map.querySelector('[data-map-route]');

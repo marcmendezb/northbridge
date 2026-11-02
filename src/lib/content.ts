@@ -2,7 +2,7 @@ import { getCollection, type CollectionEntry } from 'astro:content';
 import type { Locale } from '../i18n';
 import { COUNTRIES, type Country } from './country';
 
-/** Clave estable de una entrada (nombre del archivo, igual en todos los idiomas). */
+/** Stable key for an entry (file name, the same in every language). */
 export const entryKey = (entry: { id: string }) => entry.id.split('/').slice(1).join('/');
 
 const ofLocale = (entry: { id: string }, locale: Locale) => entry.id.startsWith(`${locale}/`);
@@ -13,15 +13,14 @@ export async function getServices(locale: Locale): Promise<CollectionEntry<'serv
   );
 }
 
-/** Textos de un servicio que cambian con el país. */
 export type ServiceText = Pick<
   CollectionEntry<'servicios'>['data'],
   'title' | 'summary' | 'includes' | 'forWhom' | 'process' | 'faq'
 >;
 
 /**
- * Lo que ve cada país de un servicio: su versión (servicios-pais) o, si aún no la tiene, la suiza.
- * Devuelve los países agrupados por texto idéntico, para pintar una variante por grupo (`data-cc`).
+ * What each country sees for a service: its own version (servicios-pais) or, if it has none yet, the Swiss one.
+ * Returns countries grouped by identical text, to render one variant per group (`data-cc`).
  */
 export async function getServiceVariants(
   service: CollectionEntry<'servicios'>,
@@ -74,7 +73,7 @@ export async function getTeam(locale: Locale): Promise<CollectionEntry<'equipo'>
   );
 }
 
-/** Artículos publicados del idioma, el destacado primero y después por fecha (más reciente antes). */
+/** Published articles for the language: the featured one first, then by date (newest first). */
 export async function getArticles(locale: Locale): Promise<CollectionEntry<'blog'>[]> {
   return (await getCollection('blog', (e) => ofLocale(e, locale) && !e.data.draft)).sort(
     (a, b) =>
@@ -87,13 +86,13 @@ export async function getLegalPages(locale: Locale): Promise<CollectionEntry<'le
   return getCollection('legal', (e) => ofLocale(e, locale));
 }
 
-/** Minutos de lectura (230 palabras por minuto, mínimo 1). */
+/** Reading time in minutes (230 words per minute, minimum 1). */
 export const readingMinutes = (body = '') =>
   Math.max(1, Math.round(body.split(/\s+/).filter(Boolean).length / 230));
 
 /**
- * Guías por país: cada país ve las suyas y, si aún no tiene versión propia de un tema, la de Suiza.
- * Devuelve, para cada guía, los países en los que se muestra (para `data-cc`).
+ * Guides per country: each country sees its own and, where it has no version of a topic yet, the Swiss one.
+ * Returns, for each guide, the countries it is shown in (for `data-cc`).
  */
 export function guideCountries(articles: CollectionEntry<'blog'>[]): Map<string, Country[]> {
   const shown = new Map<string, Country[]>();
@@ -106,6 +105,5 @@ export function guideCountries(articles: CollectionEntry<'blog'>[]): Map<string,
   return shown;
 }
 
-/** La versión de una guía (mismo tema) para otro país, si existe. */
 export const guideFor = (articles: CollectionEntry<'blog'>[], topic: string, country: Country) =>
   articles.find((a) => a.data.topic === topic && a.data.country === country);

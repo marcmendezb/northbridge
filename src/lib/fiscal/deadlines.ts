@@ -1,22 +1,21 @@
 /**
- * Fechas exactas de los plazos fiscales, calculadas para cualquier año a partir de su regla legal.
- * Así el calendario se actualiza solo cada año (bisiestos y fines de semana incluidos).
- * Fuentes y decisiones: docs/DECISIONES.md («Calendario fiscal con fechas exactas»).
+ * Exact tax deadlines, computed for any year from their legal rule.
+ * This way the calendar updates itself every year (leap years and weekends included).
  */
 import { addDays, type CivilDate, weekdayOf, easterSunday } from '../contact/office';
 
 /**
- * - `fixed`: un día fijo del año (31 de marzo).
- * - `monthEnd`: el último día de un mes (IVA suizo: la ESTV fija el 1.er trimestre «fällig am
- *   31. Mai»; los demás, 31 de agosto, 30 de noviembre y finales de febrero).
- * - `afterPeriod`: N días tras el fin de un periodo (IVA: 60 días tras el trimestre). Si el periodo
- *   termina el 31 de diciembre, es el del año anterior.
- * - `range`: una ventana de práctica, sin fecha legal (certificados de salario en enero o febrero).
- * - `nthWorkdayAfter`: el n-ésimo día hábil posterior a una fecha, más `plusDays` naturales (Francia:
- *   la liasse fiscale vence el 2.º día hábil tras el 1 de mayo, con 15 días más por vía telemática).
- * `shift`: si el último día es sábado, domingo o festivo, el plazo pasa al siguiente día hábil del
- * país (Suiza: art. 38.3 ATSG para la AVS; España: art. 30 Ley 39/2015 y LGT). Los festivos de cada
- * país están en `HOLIDAYS`.
+ * - `fixed`: a fixed day of the year (31 March).
+ * - `monthEnd`: the last day of a month (Swiss VAT: the federal tax administration sets Q1 as "fällig am
+ *   31. Mai"; the others are 31 August, 30 November and the end of February).
+ * - `afterPeriod`: N days after the end of a period (e.g. 60 days after the quarter). If the period
+ *   ends on 31 December, it is the previous year's.
+ * - `range`: a customary window with no legal date (salary certificates in January or February).
+ * - `nthWorkdayAfter`: the nth working day after a date, plus `plusDays` calendar days (France:
+ *   the liasse fiscale is due on the 2nd working day after 1 May, plus 15 days if filed online).
+ * `shift`: if the last day is a Saturday, Sunday or holiday, the deadline moves to the country's next working
+ * day (Switzerland: art. 38(3) ATSG for AHV; Spain: art. 30 Law 39/2015 and the General Tax Law). Each
+ * country's holidays are in `HOLIDAYS`.
  */
 export type DeadlineRule =
   | { type: 'fixed'; m: number; d: number; shift: boolean }
@@ -33,17 +32,17 @@ export type DeadlineRule =
     };
 
 export interface Deadline {
-  /** Inicio de la ventana (igual a `due` salvo en `range`). */
+  /** Start of the window (same as `due` except for `range`). */
   start: CivilDate;
-  /** Último día del plazo. */
+  /** Last day of the deadline. */
   due: CivilDate;
-  /** True si la fecha legal cayó en fin de semana o festivo y se ha movido. */
+  /** True if the legal date fell on a weekend or holiday and was moved. */
   shifted: boolean;
 }
 
 const key = ({ y, m, d }: CivilDate) => `${y}-${m}-${d}`;
 
-/** Festivos legales del cantón de Zúrich (§ 1 Ruhetags- und Ladenöffnungsgesetz): sin Berchtoldstag. */
+/** Legal holidays in the canton of Zurich (§ 1 Ruhetags- und Ladenöffnungsgesetz), without Berchtoldstag. */
 export function zurichLegalHolidays(y: number): Set<string> {
   const easter = easterSunday(y);
   return new Set(
@@ -61,14 +60,14 @@ export function zurichLegalHolidays(y: number): Set<string> {
   );
 }
 
-/** Festivos nacionales de España (BOE, fiestas laborales de ámbito nacional no sustituibles). */
+/** Spanish national holidays (BOE, nationwide public holidays that cannot be replaced). */
 export function spainNationalHolidays(y: number): Set<string> {
   const easter = easterSunday(y);
   return new Set(
     [
       { y, m: 1, d: 1 },
       { y, m: 1, d: 6 },
-      addDays(easter, -2), // Viernes Santo
+      addDays(easter, -2), // Good Friday
       { y, m: 5, d: 1 },
       { y, m: 8, d: 15 },
       { y, m: 10, d: 12 },
@@ -80,13 +79,13 @@ export function spainNationalHolidays(y: number): Set<string> {
   );
 }
 
-/** Festivos legales en Berlín (los nueve federales y el 8 de marzo); la oficina alemana está allí. */
+/** Legal holidays in Berlin (the nine federal ones plus 8 March); the German office is there. */
 export function berlinHolidays(y: number): Set<string> {
   const easter = easterSunday(y);
   return new Set(
     [
       { y, m: 1, d: 1 },
-      { y, m: 3, d: 8 }, // Internationaler Frauentag (Berlín)
+      { y, m: 3, d: 8 }, // International Women's Day (Berlin)
       addDays(easter, -2),
       addDays(easter, 1),
       { y, m: 5, d: 1 },
@@ -99,17 +98,17 @@ export function berlinHolidays(y: number): Set<string> {
   );
 }
 
-/** Festivos legales de Francia (art. L3133-1 del Code du travail); la oficina está en París. */
+/** French legal holidays (art. L3133-1 Code du travail); the office is in Paris. */
 export function franceHolidays(y: number): Set<string> {
   const easter = easterSunday(y);
   return new Set(
     [
       { y, m: 1, d: 1 },
-      addDays(easter, 1), // Lundi de Pâques
+      addDays(easter, 1), // Easter Monday
       { y, m: 5, d: 1 },
       { y, m: 5, d: 8 },
       addDays(easter, 39), // Ascension
-      addDays(easter, 50), // Lundi de Pentecôte
+      addDays(easter, 50), // Whit Monday
       { y, m: 7, d: 14 },
       { y, m: 8, d: 15 },
       { y, m: 11, d: 1 },
@@ -120,8 +119,8 @@ export function franceHolidays(y: number): Set<string> {
 }
 
 /**
- * Festivos nacionales de Italia (Ley 260/1949 y DPR 792/1985); el 4 de octubre, San Francisco,
- * desde 2026 (Ley 151/2025). Los plazos fiscales usan los nacionales, no el patrón local.
+ * Italian national holidays (Law 260/1949 and DPR 792/1985); 4 October, St Francis,
+ * from 2026 (Law 151/2025). Tax deadlines use national holidays, not the local patron saint's day.
  */
 export function italyHolidays(y: number): Set<string> {
   const easter = easterSunday(y);
@@ -129,7 +128,7 @@ export function italyHolidays(y: number): Set<string> {
     [
       { y, m: 1, d: 1 },
       { y, m: 1, d: 6 },
-      addDays(easter, 1), // Lunedì dell'Angelo
+      addDays(easter, 1), // Easter Monday
       { y, m: 4, d: 25 },
       { y, m: 5, d: 1 },
       { y, m: 6, d: 2 },
@@ -157,7 +156,7 @@ export function isLegalWorkday(date: CivilDate, holidays: HolidayCalendar = zuri
   return wd !== 0 && wd !== 6 && !holidays(date.y).has(key(date));
 }
 
-/** El mismo día si es hábil; si no, el siguiente hábil. */
+/** The same day if it is a working day; otherwise the next one. */
 export function onOrNextWorkday(
   date: CivilDate,
   holidays: HolidayCalendar = zurichLegalHolidays,
@@ -169,7 +168,7 @@ export function onOrNextWorkday(
 
 const isLeap = (y: number) => (y % 4 === 0 && y % 100 !== 0) || y % 400 === 0;
 
-/** Plazo de la regla dentro del año `year` (el año en que vence). */
+/** The rule's deadline within `year` (the year it falls due). */
 export function deadlineIn(
   rule: DeadlineRule,
   year: number,
@@ -204,14 +203,14 @@ export function deadlineIn(
   return { start: due, due, shifted: key(due) !== key(legal) };
 }
 
-/** Día del año (0 = 1 de enero) y su fracción del año, para colocar una fecha en la regla. */
+/** Day of the year (0 = 1 January) as a fraction of the year, to place a date on the chart. */
 export function yearFraction({ y, m, d }: CivilDate): number {
   const start = Date.UTC(y, 0, 1);
   const days = isLeap(y) ? 366 : 365;
   return (Date.UTC(y, m - 1, d) - start) / 86_400_000 / days;
 }
 
-/** Días naturales de `from` a `to` (negativo si `to` ya pasó). */
+/** Calendar days from `from` to `to` (negative if `to` has passed). */
 export function daysBetween(from: CivilDate, to: CivilDate): number {
   return Math.round(
     (Date.UTC(to.y, to.m - 1, to.d) - Date.UTC(from.y, from.m - 1, from.d)) / 86_400_000,

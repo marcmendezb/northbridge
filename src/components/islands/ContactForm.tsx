@@ -18,7 +18,7 @@ interface Props {
   thanksHref: string;
 }
 
-/** Resolver de Zod para React Hook Form, sin dependencias extra: cada error trae su clave. */
+/** Zod resolver for React Hook Form without extra dependencies: each error carries its key. */
 const resolver: Resolver<ContactData> = async (values) => {
   const r = contactSchema.safeParse(values);
   if (r.success) return { values: r.data, errors: {} };
@@ -32,7 +32,7 @@ const resolver: Resolver<ContactData> = async (values) => {
 
 export default function ContactForm({ s, demo, privacyHref, thanksHref }: Props) {
   const id = useId();
-  // Web ficticia (portfolio): nada se envía; con los datos válidos se abre el aviso.
+  // Fictional site (portfolio): nothing is sent; with valid data the notice opens.
   const [demoOpen, setDemoOpen] = useState(false);
   const {
     register,
@@ -45,7 +45,7 @@ export default function ContactForm({ s, demo, privacyHref, thanksHref }: Props)
     defaultValues: { name: '', email: '', phone: '', message: '', privacy: false as never },
   });
 
-  // Pregunta que llega desde Recursos (`?mensaje=…`): ya escrita en el mensaje.
+  // A question coming from Resources (`?mensaje=…`) is prefilled in the message.
   useEffect(() => {
     const message = new URLSearchParams(window.location.search).get('mensaje');
     if (message) setValue('message', message.slice(0, 600));
@@ -54,7 +54,7 @@ export default function ContactForm({ s, demo, privacyHref, thanksHref }: Props)
   const onSubmit = handleSubmit(
     () => setDemoOpen(true),
     () => {
-      // Con errores, el foco va al primer campo marcado (lo hace RHF) y se anuncia el resumen.
+      // With errors, focus moves to the first flagged field (RHF does this) and the summary is announced.
     },
   );
 

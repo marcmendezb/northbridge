@@ -1,8 +1,8 @@
 import type { AnimationKit } from './types';
 
 /**
- * `[data-viaduct]`: el tablero se traza de izquierda a derecha y después cada arco,
- * uno tras otro; el texto de cada paso aparece cuando su arco se cierra. Scrub suave.
+ * `[data-viaduct]`: the deck draws from left to right, then each arch,
+ * one after another; each step's text appears when its arch closes. Gentle scrub.
  */
 export function drawViaduct({ gsap }: AnimationKit, root: ParentNode = document) {
   root.querySelectorAll<HTMLElement>('[data-viaduct]').forEach((el) => {

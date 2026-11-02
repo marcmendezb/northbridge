@@ -6,7 +6,7 @@ import Container from '../ui/Container.astro';
 import { useI18n } from '../../i18n';
 import { getBookingCta } from '../../lib/site';
 const { t, lp, locale } = useI18n(Astro.currentLocale);
-/** Credenciales: «+10 años en Zúrich» en Suiza; «de experiencia» en los demás países. */
+/** Credentials: "10+ years in Zurich" in Switzerland; "of experience" in other countries. */
 const proofOf = (c: Country) =>
   t(c === 'CH' ? 'home.hero.proof' : 'home.hero.proofIntl').split(' / ');
 const facts = proofOf('CH').map((_, i) => byCountry((c) => proofOf(c)[i] ?? ''));
@@ -18,7 +18,7 @@ import { withCity } from '../../data/offices';
 
 <section data-hero class="hero" aria-labelledby="hero-title">
   <div class="hero__stage">
-    <!-- Foto a sangre. Al hacer scroll se encoge hasta quedar enmarcada en el arco de la marca. -->
+    <!-- Full-bleed photo. On scroll it shrinks until it is framed by the brand's arch. -->
     <div class="hero__photo" data-hero-photo>
       <div class="hero__media" data-hero-media>
         <Picture
@@ -33,7 +33,7 @@ import { withCity } from '../../data/offices';
           quality={74}
           class="hero__img"
         />
-        <!-- Vídeo sin sonido en ida y vuelta: el archivo ya contiene la secuencia hacia delante y hacia atrás, y loop la repite sin costura. Sin JS o con reduced-motion se queda el fotograma inicial. -->
+        <!-- Muted video that plays forwards and backwards: the file already contains both directions, so loop repeats it seamlessly. Without JS or with reduced motion the first frame stays. -->
         <video
           class="hero__video"
           data-hero-video
@@ -52,7 +52,7 @@ import { withCity } from '../../data/offices';
         </video>
       </div>
 
-      <!-- Pie de la imagen: credenciales e indicador de scroll. Se encoge con la foto y queda como base del arco. -->
+      <!-- Image footer: credentials and scroll cue. It shrinks with the photo and becomes the base of the arch. -->
       <div class="hero__band" data-hero-band data-hero-fade="0.85">
         <div class="hero__band-inner">
           <ul class="hero__facts">
@@ -106,7 +106,7 @@ import { withCity } from '../../data/offices';
       </div>
     </div>
 
-    <!-- La promesa: aparece cuando la foto ya es un arco. Sin JS o con reduced-motion, es el bloque que sigue al hero. -->
+    <!-- The promise: appears once the photo has become an arch. Without JS or with reduced motion, it is the block after the hero. -->
     <div class="hero__promise" data-hero-promise data-surface="dark">
       <Container class="hero__promise-inner">
         <p class="hero__eyebrow t-eyebrow m-0 !text-salvia-300">{t('home.proposal.label')}</p>
@@ -140,7 +140,7 @@ import { withCity } from '../../data/offices';
 </section>
 
 <style is:global>
-  /* ── Base (sin JS, reduced-motion y móvil): foto con el texto sobre la mitad navy y la promesa debajo ── */
+  /* ── Base (no JS, reduced motion and mobile): photo with the text over the navy half and the promise below ── */
   .hero {
     --band-h: 64px;
     --band-gap: 24px;
@@ -185,7 +185,7 @@ import { withCity } from '../../data/offices';
     padding-top: calc(var(--header-h) + 24px);
     padding-bottom: calc(var(--band-h) + var(--band-gap) + 32px);
   }
-  /* Todo alineado a la izquierda, en el mismo margen que el logo del header (.nb-container). */
+  /* Everything aligned left, on the same margin as the header logo (.nb-container). */
   .hero__intro-inner {
     --hero-title: clamp(2.75rem, 0.5rem + 5.2vw, 5.25rem);
     display: flex;
@@ -210,13 +210,13 @@ import { withCity } from '../../data/offices';
     margin-top: clamp(24px, 4svh, 40px);
   }
   @media (min-width: 768px) {
-    /* La columna de texto no invade la pared clara del vídeo. */
+    /* The text column stays clear of the video's light wall. */
     .hero__aside {
       max-width: 36vw;
     }
   }
-  /* ── Banda inferior ── */
-  /* Barra flotante al pie, espejo del header: mismo ancho, aire inferior y esquinas de tarjeta. */
+  /* ── Bottom band ── */
+  /* Floating bar at the bottom, mirroring the header: same width, bottom spacing and card corners. */
   .hero__band {
     --band-x: max(var(--header-gutter), (100% - var(--header-max)) / 2);
     position: absolute;
@@ -266,7 +266,7 @@ import { withCity } from '../../data/offices';
     height: 100%;
     animation: hero-down 2.4s var(--ease-in-out) infinite;
   }
-  /* Impulso corto hacia abajo y vuelta: la flecha siempre está visible y la dirección se entiende. */
+  /* A short nudge down and back: the arrow is always visible and the direction is clear. */
   @keyframes hero-down {
     0%,
     55%,
@@ -326,7 +326,7 @@ import { withCity } from '../../data/offices';
       grid-column: 1 / -1;
     }
   }
-  /* En móvil la foto ocupa la parte superior y el texto va sobre navy liso, para que siempre se lea. */
+  /* On mobile the photo takes the top part and the text sits on plain navy, so it is always readable. */
   @media (max-width: 767px) {
     .hero__photo {
       height: 54svh;
@@ -365,7 +365,7 @@ import { withCity } from '../../data/offices';
     }
   }
 
-  /* ── Escena de scroll (solo escritorio con movimiento): el hero se ancla y la foto se transforma en arco ── */
+  /* ── Scroll scene (desktop with motion only): the hero pins and the photo turns into an arch ── */
   @media (min-width: 768px) {
     .js.motion:not(.anim-fail) .hero {
       height: 250svh;
@@ -390,7 +390,7 @@ import { withCity } from '../../data/offices';
       inset: 0;
       min-height: 0;
     }
-    /* Orden de capas: promesa (abajo, sobre Piedra 50), foto, texto de entrada. */
+    /* Layer order: promise (bottom, on Stone 50), photo, intro text. */
     .js.motion:not(.anim-fail) .hero__promise {
       position: absolute;
       inset: 0;
@@ -422,7 +422,7 @@ import { withCity } from '../../data/offices';
     .js.motion:not(.anim-fail) .hero__promise-cta {
       margin-top: 36px;
     }
-    /* La capa de entrada, ya invisible, no debe tapar el texto de la promesa (selección y clics). */
+    /* The intro layer, now invisible, must not cover the promise text (selection and clicks). */
     .js.motion:not(.anim-fail) .hero__intro {
       pointer-events: none;
     }
@@ -436,8 +436,8 @@ import { withCity } from '../../data/offices';
 </style>
 
 <script>
-  // Vídeo decorativo sin sonido: siempre en reproducción (en bucle) mientras el hero está en pantalla.
-  // Solo se detiene si el usuario pide movimiento reducido en su sistema, o fuera de pantalla para ahorrar CPU.
+  // Muted decorative video: always playing (looped) while the hero is on screen.
+  // It only stops if the user asks for reduced motion, or when off screen to save CPU.
   const video = document.querySelector<HTMLVideoElement>('[data-hero-video]');
   if (video && !matchMedia('(prefers-reduced-motion: reduce)').matches) {
     video.addEventListener(
@@ -458,7 +458,7 @@ import { withCity } from '../../data/offices';
       { threshold: 0 },
     ).observe(document.querySelector('[data-hero]')!);
 
-    // Algunos navegadores detienen el vídeo al volver a la pestaña o con ahorro de batería: se reanuda.
+    // Some browsers pause the video when returning to the tab or in battery saver mode: it resumes.
     document.addEventListener('visibilitychange', () => {
       if (!document.hidden) play();
     });
@@ -474,8 +474,8 @@ import { withCity } from '../../data/offices';
       }
     });
 
-    // El vídeo no compite con el póster (LCP): empieza a cargarse cuando la página ya ha terminado de cargar.
-    // El póster va por JS: en HTML descargaría una segunda imagen, tapada por la foto, antes del LCP.
+    // The video doesn't compete with the poster (LCP): it starts loading once the page has finished loading.
+    // The poster is set from JS: in the HTML it would download a second image, hidden behind the photo, before the LCP.
     const start = () => {
       if (video.dataset.poster) video.poster = video.dataset.poster;
       video.preload = 'auto';

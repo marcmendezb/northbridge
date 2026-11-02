@@ -30,10 +30,10 @@ const ids = Object.keys(PACKAGES) as PackageId[];
 const rowLabel = (id: string) => t(`pricing.rows.${id}` as MessageKey);
 const cellText = (c: ComparisonRow[PackageId]) =>
   typeof c === 'object' ? t(`pricing.cells.${'note' in c ? c.note : c.text}` as MessageKey) : '';
-/** En alemán los sustantivos van en mayúscula: no se fuerza la minúscula tras los dos puntos. */
+/** German nouns are capitalised: don't force lowercase after the colon. */
 const lowerFirst = (s: string) =>
   locale === 'de' ? s : `${s.charAt(0).toLowerCase()}${s.slice(1)}`;
-/** Lo que incluye cada paquete, tomado de la tabla comparativa. */
+/** What each package includes, taken from the comparison table. */
 const highlights = (id: PackageId) =>
   COMPARISON.filter((r) => r[id] !== false).map((r) => {
     const note = cellText(r[id]);
@@ -42,7 +42,7 @@ const highlights = (id: PackageId) =>
 const forWhom = (id: PackageId) =>
   byCountry((c) => t(`pricing.packages.${id}.forWhom` as MessageKey, { ag: legalForm(c, 'ag') }));
 
-/** Grupos de la comparativa (las filas salen de config.ts). */
+/** Comparison groups (rows come from config.ts). */
 const groups: { key: string; rows: ComparisonRow['id'][] }[] = [
   { key: 'books', rows: ['accounting', 'vat', 'report'] },
   { key: 'team', rows: ['payroll'] },
@@ -54,7 +54,7 @@ const rowById = Object.fromEntries(COMPARISON.map((r) => [r.id, r])) as Record<
   ComparisonRow
 >;
 
-/** Perfil → paquete que le encaja (las mismas reglas que la calculadora, simplificadas). */
+/** Profile → matching package (the calculator's rules, simplified). */
 const profiles = [
   { key: 'autonomo', pkg: 'essential' },
   { key: 'startup', pkg: 'growth' },
@@ -282,7 +282,7 @@ const faq = tRaw<{ q: string; a: string }[]>('pricing.faq');
 </BaseLayout>
 
 <style is:global>
-  /* ── Cabecera navy ── */
+  /* ── Navy header ── */
   .nb-ph {
     background: var(--navy-800);
     color: var(--navy-100);
@@ -290,7 +290,7 @@ const faq = tRaw<{ q: string; a: string }[]>('pricing.faq');
   .nb-ph__inner {
     display: grid;
     gap: 32px;
-    /* El fondo navy sube por detrás del header flotante, como en el hero de la Home. */
+    /* The navy background extends behind the floating header, like the home page hero. */
     padding-block: calc(var(--header-h) + clamp(40px, 6vw, 88px)) clamp(56px, 8vw, 120px);
   }
   @media (min-width: 1024px) {
@@ -351,7 +351,7 @@ const faq = tRaw<{ q: string; a: string }[]>('pricing.faq');
     gap: 12px 24px;
   }
 
-  /* ── Paquetes colgados del tablero (el viaducto de la marca) ── */
+  /* ── Packages hanging from the deck (the brand viaduct) ── */
   .nb-pk-sec {
     padding-block: clamp(40px, 6vw, 80px) var(--section-y);
     background: var(--white);
@@ -409,7 +409,7 @@ const faq = tRaw<{ q: string; a: string }[]>('pricing.faq');
   .nb-deck {
     position: relative;
   }
-  /* Tablero: filete navy de 1,5 px del que cuelgan los paquetes. */
+  /* Deck: a 1.5 px navy rule the packages hang from. */
   .nb-deck__line {
     position: absolute;
     inset: 0 0 auto;
@@ -441,7 +441,7 @@ const faq = tRaw<{ q: string; a: string }[]>('pricing.faq');
     background: var(--navy-800);
     transform-origin: top;
   }
-  /* El destacado cuelga más arriba, con el pilar corto, y llega más abajo: el centro del arco. */
+  /* The featured package hangs higher, on a shorter pillar, and reaches lower: the centre of the arch. */
   @media (min-width: 1024px) {
     .nb-pk__pillar {
       height: 56px;
@@ -629,7 +629,7 @@ const faq = tRaw<{ q: string; a: string }[]>('pricing.faq');
     color: var(--piedra-600);
   }
 
-  /* Perfil elegido: el tratamiento navy pasa del recomendado al paquete que encaja. */
+  /* Selected profile: the navy treatment moves from the recommended package to the matching one. */
   .nb-pk__card :is(h3, p, span, li, a, svg) {
     transition:
       color var(--dur-base) var(--ease-out),
@@ -650,7 +650,7 @@ const faq = tRaw<{ q: string; a: string }[]>('pricing.faq');
     display: none;
   }
 
-  /* ── Comparativa: cabecera fija mientras recorres las filas ── */
+  /* ── Comparison: sticky header while scrolling the rows ── */
   .nb-cmp-wrap {
     border: 1px solid var(--piedra-200);
     border-radius: var(--radius-card, 8px);
@@ -660,7 +660,7 @@ const faq = tRaw<{ q: string; a: string }[]>('pricing.faq');
     .nb-cmp-wrap {
       overflow-x: auto;
     }
-    /* Móvil: la columna de servicios se queda fija al desplazar la tabla. */
+    /* Mobile: the services column stays fixed while the table scrolls. */
     .nb-cmp tbody th[scope='row'],
     .nb-cmp__corner {
       position: sticky;
@@ -755,7 +755,7 @@ const faq = tRaw<{ q: string; a: string }[]>('pricing.faq');
     color: var(--piedra-600);
   }
 
-  /* ── Garantías ── */
+  /* ── Guarantees ── */
   .nb-guar {
     display: grid;
     gap: 40px;
@@ -793,7 +793,7 @@ const faq = tRaw<{ q: string; a: string }[]>('pricing.faq');
     color: var(--piedra-700);
   }
 
-  /* ── Aparte: como un libro de cuentas ── */
+  /* ── Extras: like a ledger ── */
   .nb-ledger {
     margin: 0;
     border-top: 1.5px solid var(--navy-800);
@@ -804,7 +804,7 @@ const faq = tRaw<{ q: string; a: string }[]>('pricing.faq');
     gap: 6px 40px;
     padding-block: 22px;
   }
-  /* El filete de cada fila se dibuja de izquierda a derecha (pricingScene.ts). */
+  /* Each row's rule draws from left to right (pricingScene.ts). */
   .nb-ledger__rule {
     position: absolute;
     inset: auto 0 0;
@@ -844,7 +844,7 @@ const faq = tRaw<{ q: string; a: string }[]>('pricing.faq');
 </style>
 
 <script>
-  // «¿Qué te describe mejor?»: marca el paquete que encaja. Solo con JS (sin JS no se muestra).
+  // "What describes you best?": highlights the matching package. JS only (hidden without JS).
   const chooser = document.querySelector<HTMLElement>('[data-chooser]');
   const list = document.querySelector<HTMLElement>('.nb-pk');
   if (chooser && list) {

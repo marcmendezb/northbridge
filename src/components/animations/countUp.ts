@@ -1,6 +1,6 @@
 import type { AnimationKit } from './types';
 
-/** `[data-count="200"]`: cuenta de 0 al valor al entrar en pantalla (una vez, 1,6 s, power2.out). */
+/** `[data-count="200"]`: counts from 0 to the value on entering the viewport (once, 1.6 s, power2.out). */
 export function countUp({ gsap, ScrollTrigger }: AnimationKit, root: ParentNode = document) {
   root.querySelectorAll<HTMLElement>('[data-count]').forEach((el) => {
     const target = Number(el.dataset.count);

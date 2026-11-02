@@ -6,11 +6,11 @@ import { site } from '../../lib/site';
 interface Props {
   variant?: 'horizontal' | 'vertical' | 'symbol';
   tone?: 'positive' | 'negative' | 'mono';
-  /** Horizontal/vertical: tamaño de fuente de «Northbridge» en px. Símbolo: altura en px. */
+  /** Horizontal/vertical: font size of "Northbridge" in px. Symbol: height in px. */
   size?: number;
-  /** Aplica la zona de seguridad (x = altura del símbolo). */
+  /** Applies the clear space (x = symbol height). */
   safeZone?: boolean;
-  /** Símbolo en imagen (PNG del brand) en lugar del SVG inline. Solo variante horizontal. */
+  /** Symbol as an image (brand PNG) instead of the inline SVG. Horizontal variant only. */
   markImage?: ImageMetadata;
   class?: string;
 }
@@ -28,7 +28,7 @@ const minSize = { horizontal: 18, vertical: 14, symbol: 16 }[variant]; // 120 px
 const defaults = { horizontal: 28, vertical: 28, symbol: 32 }[variant];
 const px = Math.max(size ?? defaults, minSize);
 const toneClass = { positive: 'text-navy-800', negative: 'text-white', mono: 'text-black' }[tone];
-// Por debajo de 24 px de altura se usa la versión optimizada (retícula 16, trazo 2).
+// Below 24 px in height, the optimised version is used (16 grid, 2 stroke).
 const symbolHeight = variant === 'symbol' ? px : px * 1.09;
 const useFavicon = symbolHeight < 24;
 ---

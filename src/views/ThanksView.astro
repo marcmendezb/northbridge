@@ -1,9 +1,9 @@
 ---
 /**
- * Confirmación: tu mensaje cruza el puente. El símbolo a escala de pantalla; un punto sale de la
- * pata izquierda (tú, ahora) y recorre el arco hasta la derecha (quien lo lee). Bajo el arco, un
- * reloj con el tiempo real que falta para la respuesta, o para la consulta si se ha reservado.
- * Sin JS se ve completo y quieto, con textos generales.
+ * Confirmation: your message crosses the bridge. The symbol at screen scale; a dot leaves the
+ * left leg (you, now) and travels along the arch to the right one (the person who reads it). Under the arch, a
+ * clock with the actual time left until the reply, or until the consultation if one was booked.
+ * Without JS it is complete and static, with generic texts.
  */
 import { Picture } from 'astro:assets';
 import BaseLayout from '../layouts/BaseLayout.astro';
@@ -18,12 +18,12 @@ const reader = (await getTeam(locale))[0];
 const readerName = reader?.data.name ?? 'Lea Brunner';
 const [readerBefore = '', readerAfter = ''] = s.reader.split('{name}');
 const [bookedBefore = '', bookedAfter = ''] = s.readerBooked.split('{name}');
-/** El calendario fiscal del país activo (o el suizo si aún no tiene). */
+/** The active country's tax calendar (the Swiss one as a fallback). */
 const guides = await getArticles(locale);
 const shownIn = guideCountries(guides);
 const calendars = guides.filter((g) => g.data.topic === 'calendario');
 
-/** Geometría del símbolo (tablero y arco tangente), en unidades del viewBox. */
+/** Symbol geometry (deck and tangent arch), in viewBox units. */
 const W = 1200;
 const H = 500;
 const LEG = 150;
@@ -60,7 +60,7 @@ const ROUTE = `M${LEG} ${H} V${8 + R} A${R} ${R} 0 0 1 ${W - LEG} ${8 + R} V${H}
             </g>
           </svg>
 
-          <!-- El reloj, bajo el arco: solo con JS (sin él, las fechas de las patas lo dicen todo). -->
+          <!-- The clock under the arch: JS only (without it, the dates under each leg say it all). -->
           <div class="nb-tyclock" data-clock hidden>
             <p class="nb-tyclock__label" data-booked-text={s.countdownBooked}>
               {s.countdown}
@@ -186,8 +186,8 @@ const ROUTE = `M${LEG} ${H} V${8 + R} A${R} ${R} 0 0 1 ${W - LEG} ${8 + R} V${H}
     text-wrap: balance;
   }
 
-  /* ── El puente: el símbolo a escala de pantalla. En móvil, titular encima y reloj debajo;
-     en escritorio, los dos bajo el arco. ── */
+  /* ── The bridge: the symbol at screen scale. On mobile, headline above and clock below;
+     on desktop, both under the arch. ── */
   .nb-cross__stage {
     position: relative;
     display: grid;
@@ -220,7 +220,7 @@ const ROUTE = `M${LEG} ${H} V${8 + R} A${R} ${R} 0 0 1 ${W - LEG} ${8 + R} V${H}
   .nb-cross__arch {
     stroke: var(--navy-600);
   }
-  /* El recorrido del mensaje: salvia, trazado detrás del punto. */
+  /* The message's path: sage, drawn behind the dot. */
   .nb-cross__trace {
     stroke: var(--salvia-300);
     stroke-width: 2;
@@ -233,7 +233,7 @@ const ROUTE = `M${LEG} ${H} V${8 + R} A${R} ${R} 0 0 1 ${W - LEG} ${8 + R} V${H}
     vector-effect: non-scaling-stroke;
   }
 
-  /* ── El reloj, bajo el arco ── */
+  /* ── The clock, under the arch ── */
   .nb-tyclock {
     display: grid;
     justify-items: center;
@@ -289,7 +289,7 @@ const ROUTE = `M${LEG} ${H} V${8 + R} A${R} ${R} 0 0 1 ${W - LEG} ${8 + R} V${H}
     color: var(--navy-200);
   }
 
-  /* ── Las patas: tú y quien lo lee; después, en la línea del suelo ── */
+  /* ── The legs: you and the person who reads it; "afterwards" on the ground line ── */
   .nb-cross__feet {
     display: grid;
     gap: 28px;
@@ -353,7 +353,7 @@ const ROUTE = `M${LEG} ${H} V${8 + R} A${R} ${R} 0 0 1 ${W - LEG} ${8 + R} V${H}
     height: 100%;
     object-fit: cover;
   }
-  /* Escritorio: cada pata bajo su arco (12,5 % y 87,5 % del ancho), después en el centro. */
+  /* Desktop: each leg under its side of the arch (12.5% and 87.5% of the width), "afterwards" in the middle. */
   @media (min-width: 760px) {
     .nb-cross__feet {
       grid-template-columns: 25% 1fr 25%;
@@ -385,7 +385,7 @@ const ROUTE = `M${LEG} ${H} V${8 + R} A${R} ${R} 0 0 1 ${W - LEG} ${8 + R} V${H}
     }
   }
 
-  /* ── Pie ── */
+  /* ── Footer ── */
   .nb-ty__foot {
     display: grid;
     gap: 24px;
@@ -434,7 +434,7 @@ const ROUTE = `M${LEG} ${H} V${8 + R} A${R} ${R} 0 0 1 ${W - LEG} ${8 + R} V${H}
     color: var(--navy-200);
   }
 
-  /* ── Entrada: titular, tablero y arco; el mensaje cruza con JS ── */
+  /* ── Entrance: headline, deck and arch; the message crosses with JS ── */
   @media (prefers-reduced-motion: no-preference) {
     .js.motion .nb-ty__title {
       animation: nb-ty-rise var(--dur-slow) var(--ease-out) both;
@@ -482,7 +482,7 @@ const ROUTE = `M${LEG} ${H} V${8 + R} A${R} ${R} 0 0 1 ${W - LEG} ${8 + R} V${H}
   const root = document.documentElement;
   const section = document.querySelector<HTMLElement>('[data-thanks]');
 
-  /** Hora civil de Zúrich (las cinco oficinas comparten huso) a instante real. */
+  /** Zurich civil time (all five offices share the time zone) to an actual instant. */
   const zurich = ({ y, m, d }: CivilDate, h: number, min: number) => {
     const guess = Date.UTC(y, m - 1, d, h, min);
     const parts = Object.fromEntries(
@@ -509,18 +509,17 @@ const ROUTE = `M${LEG} ${H} V${8 + R} A${R} ${R} 0 0 1 ${W - LEG} ${8 + R} V${H}
     const cap = (text: string) => text.charAt(0).toLocaleUpperCase(intl) + text.slice(1);
     const pad = (n: number) => String(n).padStart(2, '0');
 
-    // Tú, ahora.
     const nowEl = section.querySelector<HTMLElement>('[data-now]');
     const time = new Intl.DateTimeFormat(intl, { hour: '2-digit', minute: '2-digit' }).format(now);
     if (nowEl) nowEl.textContent = (nowEl.dataset.template ?? '').replace('{time}', time);
 
-    // ¿Viene de la reserva? Entonces el segundo tramo es la consulta.
+    // Coming from the booking page? Then the second leg is the consultation.
     const q = new URLSearchParams(location.search);
     const fecha = q.get('fecha') ?? '';
     const hora = q.get('hora') ?? '';
     const booked = /^\d{4}-\d{2}-\d{2}$/.test(fecha) && /^\d{2}:\d{2}$/.test(hora);
     const reply = section.querySelector<HTMLElement>('[data-reply]');
-    /** Momento al que cuenta el reloj (se rehace si cambia el país). */
+    /** Moment the clock counts down to (recomputed if the country changes). */
     const goal: { at: Date | null } = { at: null };
 
     if (booked) {
@@ -546,7 +545,7 @@ const ROUTE = `M${LEG} ${H} V${8 + R} A${R} ${R} 0 0 1 ${W - LEG} ${8 + R} V${H}
         );
       goal.at = zurich({ y, m, d }, hh, mm);
     } else if (reply) {
-      // Antes de las 12:00 del siguiente día laborable de la oficina del país elegido.
+      // Before 12:00 on the next working day of the selected country's office.
       const render = () => {
         const country = (root.dataset.country ?? 'CH') as Country;
         const day = replyDay(now, OFFICE_CLOSED[country] ?? OFFICE_CLOSED.CH);
@@ -559,7 +558,7 @@ const ROUTE = `M${LEG} ${H} V${8 + R} A${R} ${R} 0 0 1 ${W - LEG} ${8 + R} V${H}
       new MutationObserver(render).observe(root, { attributeFilter: ['data-country'] });
     }
 
-    // El reloj: horas, minutos y segundos reales hasta ese momento.
+    // The clock: actual hours, minutes and seconds until then.
     const clock = section.querySelector<HTMLElement>('[data-clock]');
     if (clock && goal.at) {
       const [h, m, sEl] = (['[data-h]', '[data-m]', '[data-s]'] as const).map((sel) =>
@@ -575,7 +574,7 @@ const ROUTE = `M${LEG} ${H} V${8 + R} A${R} ${R} 0 0 1 ${W - LEG} ${8 + R} V${H}
         return left;
       };
       const left = tick();
-      // «14 horas y 30 minutos» / «1 hour and 1 minute»: plural y conjunción de cada idioma.
+      // "14 horas y 30 minutos" / "1 hour and 1 minute": each language's plural and conjunction.
       if (sr) {
         const unit = (n: number, u: 'hour' | 'minute') =>
           new Intl.NumberFormat(intl, { style: 'unit', unit: u, unitDisplay: 'long' }).format(n);
@@ -591,7 +590,7 @@ const ROUTE = `M${LEG} ${H} V${8 + R} A${R} ${R} 0 0 1 ${W - LEG} ${8 + R} V${H}
       }, 1000);
     }
 
-    // El mensaje cruza el puente: el punto recorre el arco y deja el trazo salvia detrás.
+    // The message crosses the bridge: the dot travels along the arch, leaving the sage stroke behind.
     const svg = section.querySelector<SVGSVGElement>('[data-cross]');
     const route = svg?.querySelector<SVGPathElement>('[data-route]');
     const dot = svg?.querySelector<SVGGElement>('[data-dot]');
@@ -600,7 +599,7 @@ const ROUTE = `M${LEG} ${H} V${8 + R} A${R} ${R} 0 0 1 ${W - LEG} ${8 + R} V${H}
       const place = (t: number) => {
         const p = route.getPointAtLength(total * t);
         dot.setAttribute('transform', `translate(${p.x} ${p.y})`);
-        // Con non-scaling-stroke, el guion se mide en píxeles de pantalla: se escala la longitud.
+        // With non-scaling-stroke, dashes are measured in screen pixels, so the length is scaled.
         const screen = total * (svg.getBoundingClientRect().width / svg.viewBox.baseVal.width);
         route.style.strokeDasharray = `${screen} ${screen}`;
         route.style.strokeDashoffset = `${screen * (1 - t)}`;

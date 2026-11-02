@@ -88,6 +88,7 @@ Copy `.env.example` to `.env` if you want to set the site URL or a real Cal.com 
 
 - The company, team, clients and prices are made up. The photos are AI-generated.
 - The tax and legal facts are real and sourced. They were current when I checked them in late 2026, but this isn't tax advice.
+- Code, comments and tests are in English. Spanish is the site's default language, so URLs and content keys use Spanish slugs (`/servicios`, `servicios-pais`).
 
 ## License
 

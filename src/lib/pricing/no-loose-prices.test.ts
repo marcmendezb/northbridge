@@ -17,7 +17,7 @@ describe('brand rule: prices live only in lib/pricing/config.ts', () => {
     const offenders = walk(root)
       .filter((f) => /\.(astro|ts|tsx)$/.test(f) && !f.endsWith('.test.ts'))
       .filter((f) => relative(root, f) !== 'lib/pricing/config.ts' && !f.includes('/dev/'))
-      // Umbrales legales verificados (no son precios), como en el contenido.
+      // Verified legal thresholds (not prices), as in the content.
       .filter((f) => !relative(root, f).startsWith('data/fiscal-calendar/'))
       .filter((f) => amount.test(readFileSync(f, 'utf8')))
       .map((f) => relative(root, f));

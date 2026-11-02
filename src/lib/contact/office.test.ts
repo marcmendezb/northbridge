@@ -2,7 +2,7 @@ import { describe, expect, it } from 'vitest';
 import { easterSunday, formatDay, isWorkingDay, officeStatus, replyDay, zurichNow } from './office';
 import { OFFICE_CLOSED } from './closed-days';
 
-/** Instante a partir de la hora de Zúrich (CET +01:00 / CEST +02:00). */
+/** Instant from a Zurich local time (CET +01:00 / CEST +02:00). */
 const at = (iso: string) => new Date(iso);
 
 describe('easterSunday', () => {
@@ -15,19 +15,19 @@ describe('easterSunday', () => {
 
 describe('isWorkingDay', () => {
   it('skips weekends and Zurich public holidays', () => {
-    expect(isWorkingDay({ y: 2026, m: 10, d: 27 })).toBe(true); // martes
-    expect(isWorkingDay({ y: 2026, m: 10, d: 31 })).toBe(false); // sábado
+    expect(isWorkingDay({ y: 2026, m: 10, d: 27 })).toBe(true); // Tuesday
+    expect(isWorkingDay({ y: 2026, m: 10, d: 31 })).toBe(false); // Saturday
     expect(isWorkingDay({ y: 2026, m: 1, d: 2 })).toBe(false); // Berchtoldstag
-    expect(isWorkingDay({ y: 2026, m: 4, d: 3 })).toBe(false); // Viernes Santo
-    expect(isWorkingDay({ y: 2026, m: 5, d: 14 })).toBe(false); // Ascensión
-    expect(isWorkingDay({ y: 2026, m: 5, d: 25 })).toBe(false); // Lunes de Pentecostés
+    expect(isWorkingDay({ y: 2026, m: 4, d: 3 })).toBe(false); // Good Friday
+    expect(isWorkingDay({ y: 2026, m: 5, d: 14 })).toBe(false); // Ascension Day
+    expect(isWorkingDay({ y: 2026, m: 5, d: 25 })).toBe(false); // Whit Monday
     expect(isWorkingDay({ y: 2026, m: 12, d: 28 })).toBe(true);
   });
 });
 
 describe('zurichNow', () => {
   it('reads the Zurich wall clock, not the visitor one', () => {
-    const z = zurichNow(at('2026-10-27T23:30:00Z')); // 00:30 del 28 en Zúrich
+    const z = zurichNow(at('2026-10-27T23:30:00Z')); // 00:30 on the 28th in Zurich
     expect(z).toMatchObject({ y: 2026, m: 10, d: 28, weekday: 3, minutes: 30 });
   });
 });
@@ -40,7 +40,7 @@ describe('replyDay', () => {
     expect(replyDay(at('2026-10-30T16:00:00+01:00'))).toEqual({ y: 2026, m: 11, d: 2 });
   });
   it('jumps holidays', () => {
-    // Jueves 24 de diciembre → viernes 25 y sábado 26 festivos → lunes 28.
+    // Thursday 24 December → Friday 25 and Saturday 26 are holidays → Monday 28.
     expect(replyDay(at('2026-12-24T09:00:00+01:00'))).toEqual({ y: 2026, m: 12, d: 28 });
   });
 });
@@ -77,8 +77,8 @@ describe('formatDay', () => {
   });
 });
 
-describe('cierres por país (OFFICE_CLOSED)', () => {
-  it('Roma cierra el 29 de junio y Madrid el 12 de octubre; Zúrich no', () => {
+describe('closing days per country (OFFICE_CLOSED)', () => {
+  it('Rome closes on 29 June and Madrid on 12 October; Zurich does not', () => {
     const friday = at('2026-06-26T16:00:00+02:00');
     expect(replyDay(friday, OFFICE_CLOSED.IT)).toEqual({ y: 2026, m: 6, d: 30 });
     expect(replyDay(friday, OFFICE_CLOSED.CH)).toEqual({ y: 2026, m: 6, d: 29 });

@@ -15,7 +15,7 @@ export const dictionaries: Record<Locale, Messages> = { es, en, de, fr, it };
 const lookup = (dict: Messages, key: string): unknown =>
   key.split('.').reduce<unknown>((node, part) => (node as Record<string, unknown>)[part], dict);
 
-/** Devuelve un texto de interfaz por clave (`nav.services`). `{nombre}` se sustituye con `vars`. */
+/** Returns a UI string by key (`nav.services`). `{name}` placeholders are filled from `vars`. */
 export function t(
   key: MessageKey,
   locale: Locale = defaultLocale,
@@ -25,14 +25,14 @@ export function t(
   return vars ? value.replace(/\{(\w+)\}/g, (_, k) => String(vars[k] ?? `{${k}}`)) : value;
 }
 
-/** Valor estructurado del diccionario (listas, como las preguntas frecuentes). */
+/** Structured dictionary value (lists, such as the FAQ). */
 export function tRaw<T>(key: string, locale: Locale = defaultLocale): T {
   return lookup(dictionaries[locale], key) as T;
 }
 
 export const localizedPath = localizePath;
 
-/** Traductor y generador de rutas ligados a un idioma. Se usa con `Astro.currentLocale`. */
+/** Translator and route builder bound to a language. Used with `Astro.currentLocale`. */
 export function useI18n(current?: string) {
   const locale: Locale = isLocale(current) ? current : defaultLocale;
   return {

@@ -11,7 +11,7 @@ const { t, lp, locale } = useI18n(Astro.currentLocale);
 const bookingCta = getBookingCta(locale);
 const mainNav = getMainNav(locale);
 const serviceLinks = getServiceLinks(locale);
-/** Las guías del país activo (o las suizas si aún no tiene): una variante por país con `data-cc`. */
+/** Guides for the active country (or the Swiss ones if it has none yet): one variant per country with `data-cc`. */
 const guides = await getArticles(locale);
 const shownIn = guideCountries(guides);
 const resourceLinks = guides.map((g) => ({
@@ -78,7 +78,7 @@ import { byCountry } from '../../lib/country';
         <div>
           <h2 class="nb-footer__title">{t('footer.contact')}</h2>
           <address class="m-0 flex flex-col gap-1 text-[0.9375rem] not-italic leading-relaxed text-piedra-700">
-            {/* Oficina del país activo (src/data/offices.ts). */}
+            {/* Office of the active country (src/data/offices.ts). */}
             {COUNTRIES.map((cc) => (
               <span data-cc={cc}>
                 {OFFICES[cc].street}

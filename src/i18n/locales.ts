@@ -1,4 +1,4 @@
-/** Idiomas del sitio. `es` es el idioma por defecto y no lleva prefijo en la URL. */
+/** Site languages. `es` is the default and has no URL prefix. */
 export const locales = ['es', 'en', 'de', 'fr', 'it'] as const;
 export type Locale = (typeof locales)[number];
 export const defaultLocale: Locale = 'es';
@@ -6,17 +6,17 @@ export const defaultLocale: Locale = 'es';
 export const localeMeta: Record<
   Locale,
   {
-    /** Nombre del idioma en su propio idioma. */
+    /** Language name in its own language. */
     name: string;
-    /** Código corto para el selector. */
+    /** Short code for the selector. */
     short: string;
-    /** Valor de `lang` y `hreflang`. */
+    /** Value for `lang` and `hreflang`. */
     htmlLang: string;
-    /** Valor de `og:locale`. */
+    /** Value for `og:locale`. */
     og: string;
-    /** Configuración regional para formatear fechas. */
+    /** Locale used to format dates. */
     intl: string;
-    /** Comillas de cita: apertura y cierre. */
+    /** Quotation marks: opening and closing. */
     quotes: [string, string];
   }
 > = {

@@ -1,9 +1,9 @@
 ---
 import PhoneLink from '../ui/PhoneLink.astro';
 /**
- * Cierre de la Home: el reverso del hero. El vídeo asoma dentro del arco y, con el scroll,
- * el arco se abre hasta volver a pantalla completa (escritorio con movimiento: finalScene.ts).
- * En móvil, sin JS o con movimiento reducido: titular, CTA y la foto dentro del arco.
+ * Home page closing section: the hero in reverse. The video peeks through the arch and, on scroll,
+ * the arch opens back to full screen (desktop with motion: finalScene.ts).
+ * On mobile, without JS or with reduced motion: headline, CTA and the photo inside the arch.
  */
 import { Picture, getImage } from 'astro:assets';
 import poster from '../../assets/img/home/hero-poster.jpg';
@@ -128,7 +128,7 @@ const posterFile = await getImage({ src: poster, format: 'webp', width: 1920, qu
   .nb-final__direct span {
     color: var(--navy-400);
   }
-  /* Base: la foto dentro del arco, después del texto. */
+  /* Base: the photo inside the arch, after the text. */
   .nb-final__media {
     position: relative;
     order: 2;
@@ -146,14 +146,14 @@ const posterFile = await getImage({ src: poster, format: 'webp', width: 1920, qu
     width: 100%;
     height: 100%;
     object-fit: cover;
-    /* En el arco solo se ve la pared iluminada, sin el borde oscuro del vídeo. */
+    /* Only the lit wall shows inside the arch, without the video's dark edge. */
     object-position: 82% 50%;
   }
   .nb-final__video {
     display: none;
   }
 
-  /* ── Escritorio con movimiento: el arco se abre hasta el vídeo a pantalla completa ── */
+  /* ── Desktop with motion: the arch opens up to the full-screen video ── */
   @media (min-width: 768px) {
     .js.motion:not(.anim-fail) .nb-final {
       height: 220svh;
@@ -180,7 +180,7 @@ const posterFile = await getImage({ src: poster, format: 'webp', width: 1920, qu
     .js.motion:not(.anim-fail) .nb-final__img,
     .js.motion:not(.anim-fail) .nb-final__video {
       object-position: 18% 50%;
-      /* Escala anclada a la izquierda: el borde navy del vídeo se aleja del titular al abrirse. */
+      /* Scale anchored to the left: the video's navy edge moves away from the headline as it opens. */
       transform-origin: 0% 50%;
     }
     .js.motion:not(.anim-fail) .nb-final__video {
@@ -195,8 +195,8 @@ const posterFile = await getImage({ src: poster, format: 'webp', width: 1920, qu
       opacity: 0;
     }
   }
-  /* Escritorio sin movimiento (o sin JS): texto a la izquierda y el arco a la derecha, ambos
-     alineados con los bordes de la barra del header. */
+  /* Desktop without motion (or without JS): text on the left and the arch on the right, both
+     aligned with the edges of the header bar. */
   @media (min-width: 768px) {
     html:not(.motion) .nb-final__stage,
     .anim-fail .nb-final__stage {
@@ -218,7 +218,7 @@ const posterFile = await getImage({ src: poster, format: 'webp', width: 1920, qu
 </style>
 
 <script>
-  // El vídeo solo se reproduce con movimiento permitido, en escritorio y mientras la sección está en pantalla.
+  // The video only plays with motion allowed, on desktop and while the section is on screen.
   const video = document.querySelector<HTMLVideoElement>('[data-final-video]');
   const section = document.querySelector<HTMLElement>('[data-final]');
   if (

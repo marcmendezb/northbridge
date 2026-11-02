@@ -24,7 +24,7 @@ const reader = (await getTeam(locale))[0];
 const readerName = reader?.data.name ?? 'Lea Brunner';
 const [readerBefore, readerAfter] = c.readerText.split('{name}');
 
-/** Tres caminos: escribir (ancla al formulario), llamar y reservar la consulta. */
+/** Three ways: write (anchor to the form), call, or book the consultation. */
 const ways = c.ways.map((w, i) => ({
   ...w,
   href: [`#escribir`, tel, bookingCta.href][i],
@@ -32,7 +32,7 @@ const ways = c.ways.map((w, i) => ({
   sub: [t('contact.lead'), t('footer.hours'), t('booking.label')][i],
 }));
 
-/** Semana de lunes a domingo con su nombre corto en el idioma; laborables de 08:30 a 17:30. */
+/** Monday-to-Sunday week with short day names in the language; working days 08:30 to 17:30. */
 const week = Array.from({ length: 7 }, (_, i) => {
   const day = new Date(Date.UTC(2026, 9, 26 + i, 12));
   return {
@@ -45,7 +45,6 @@ const week = Array.from({ length: 7 }, (_, i) => {
   };
 });
 
-/** Símbolo de la marca (tablero y arco), el mismo trazo que el logo. */
 const deck = 'M4 13H44';
 const arch = 'M10 37V29A14 14 0 0 1 38 29V37';
 ---
@@ -56,7 +55,7 @@ const arch = 'M10 37V29A14 14 0 0 1 38 29V37';
   overlayHeader
   jsonLd={organizationJsonLd(locale, Astro.site ?? site.url)}
 >
-  <!-- 1 · Cabecera: la puerta de la oficina, en arco, y el plazo real de respuesta -->
+  <!-- Header: the office door, in an arch, and the actual reply time -->
   <header class="nb-cx" data-surface="dark" data-contact-hero>
     <div class="nb-container nb-cx__grid">
       <div class="nb-cx__text" data-cx-drift>
@@ -109,7 +108,7 @@ const arch = 'M10 37V29A14 14 0 0 1 38 29V37';
     </div>
   </header>
 
-  <!-- 2 · Tres caminos: índice editorial, cada fila se llena de azul al pasar -->
+  <!-- Three ways to reach us: an editorial index, each row fills with blue on hover -->
   <section class="nb-ways" aria-labelledby="ways-title">
     <div class="nb-container">
       <div class="nb-ways__head">
@@ -122,7 +121,6 @@ const arch = 'M10 37V29A14 14 0 0 1 38 29V37';
           <li class="nb-way" data-way>
             <span class="nb-way__rule" data-way-rule aria-hidden="true" />
             <a class="nb-way__link" href={w.href}>
-              {/* Sin numeración: el símbolo, pequeño, marca cada camino. */}
               <span class="nb-way__n" aria-hidden="true">
                 <svg viewBox="4 11 40 26" fill="none" stroke="currentColor" stroke-width="4">
                   <path d="M4 13H44" />
@@ -147,7 +145,7 @@ const arch = 'M10 37V29A14 14 0 0 1 38 29V37';
     </div>
   </section>
 
-  <!-- 3 · La carta: quién la lee y qué pasa después, junto al formulario en papel -->
+  <!-- The letter: who reads it and what happens next, next to the paper-style form -->
   <section id="escribir" class="nb-letter" aria-labelledby="letter-title">
     <div class="nb-container nb-letter__grid">
       <aside class="nb-letter__side">
@@ -231,12 +229,11 @@ const arch = 'M10 37V29A14 14 0 0 1 38 29V37';
     </div>
   </section>
 
-  <!-- 4 · La oficina del país: dirección, horario con el día de hoy y el camino desde su estación -->
+  <!-- The country's office: address, opening hours with today highlighted and the walk from the station -->
   <section class="nb-visit" data-surface="dark" aria-labelledby="visit-title">
     <div class="nb-container nb-visit__grid">
       <div class="nb-visit__info">
         <p class="nb-visit__eyebrow">{c.visitLabel}</p>
-        <!-- Oficina del país activo (src/data/offices.ts). -->
         <h2
           id="visit-title"
           class="nb-visit__title"
@@ -385,7 +382,7 @@ const arch = 'M10 37V29A14 14 0 0 1 38 29V37';
   import { OFFICE_CLOSED } from '../lib/contact/closed-days';
   import type { Country } from '../lib/country';
 
-  // Plazo y estado reales (hora de Europa central). Sin JS queda el texto general del servidor.
+  // Actual reply time and office status (Central European Time). Without JS, the server's generic text stays.
   const now = new Date();
   const root = document.documentElement;
   const promise = document.querySelector<HTMLElement>('[data-promise]');
@@ -397,7 +394,7 @@ const arch = 'M10 37V29A14 14 0 0 1 38 29V37';
     const line = promise.querySelector<HTMLElement>('[data-status]');
     const text = promise.querySelector('[data-status-text]');
 
-    // Con los cierres de la oficina del país elegido; se rehace si cambia el país en el header.
+    // Uses the closing days of the selected country's office; recomputed if the country changes.
     const render = () => {
       const country = (root.dataset.country ?? 'CH') as Country;
       const closedDays = OFFICE_CLOSED[country] ?? OFFICE_CLOSED.CH;
@@ -418,7 +415,7 @@ const arch = 'M10 37V29A14 14 0 0 1 38 29V37';
     render();
     new MutationObserver(render).observe(root, { attributeFilter: ['data-country'] });
 
-    // Fecha de la carta y día de hoy en el horario.
+    // Letter date and today in the opening hours.
     const date = document.querySelector<HTMLElement>('[data-letter-date]');
     const dateText = date?.querySelector('[data-letter-date-text]');
     if (date && dateText) {
@@ -442,7 +439,7 @@ const arch = 'M10 37V29A14 14 0 0 1 38 29V37';
 </script>
 
 <style is:global>
-  /* ── 1 · Cabecera ── */
+  /* ── Header ── */
   .nb-cx {
     position: relative;
     overflow: clip;
@@ -525,7 +522,7 @@ const arch = 'M10 37V29A14 14 0 0 1 38 29V37';
   .nb-cx__status[data-open='true'] .nb-cx__dot {
     background: var(--salvia-300);
   }
-  /* Abierta: un halo lento, casi imperceptible (solo transform/opacity). */
+  /* Open: a slow, barely visible halo (transform/opacity only). */
   @media (prefers-reduced-motion: no-preference) {
     .nb-cx__status[data-open='true'] .nb-cx__dot::after {
       content: '';
@@ -565,7 +562,7 @@ const arch = 'M10 37V29A14 14 0 0 1 38 29V37';
     text-decoration-color: currentColor;
   }
 
-  /* La puerta: foto en arco (docs/02, «el arco») con un filete que la dibuja. */
+  /* The door: an arch photo with an outline that traces it. */
   .nb-cx__door {
     position: relative;
     margin: 0;
@@ -596,7 +593,7 @@ const arch = 'M10 37V29A14 14 0 0 1 38 29V37';
     object-position: 54% 50%;
     transform-origin: 54% 42%;
   }
-  /* Filete concéntrico: el mismo arco, 14 px más amplio. */
+  /* Concentric outline: the same arch, 14 px wider. */
   .nb-cx__outline {
     position: absolute;
     inset: -14px -14px 0;
@@ -606,7 +603,7 @@ const arch = 'M10 37V29A14 14 0 0 1 38 29V37';
     pointer-events: none;
   }
 
-  /* ── 2 · Tres caminos ── */
+  /* ── Three ways ── */
   .nb-ways {
     padding-block: var(--section-y);
     background: var(--white);
@@ -655,7 +652,7 @@ const arch = 'M10 37V29A14 14 0 0 1 38 29V37';
       grid-template-columns: 56px minmax(0, 1.4fr) minmax(0, 1fr) auto;
     }
   }
-  /* Relleno azul que sube desde la base (transform), el texto pasa a blanco. */
+  /* Blue fill rising from the bottom (transform); the text turns white. */
   .nb-way__link::before {
     content: '';
     position: absolute;
@@ -752,7 +749,7 @@ const arch = 'M10 37V29A14 14 0 0 1 38 29V37';
     transform: translateX(10px);
   }
 
-  /* ── 3 · La carta ── */
+  /* ── The letter ── */
   .nb-letter {
     padding-block: var(--section-y);
     background: var(--piedra-100);
@@ -831,7 +828,7 @@ const arch = 'M10 37V29A14 14 0 0 1 38 29V37';
     color: var(--navy-800);
   }
 
-  /* Línea de tiempo: el filete baja con el scroll y cada paso se enciende al alcanzarlo. */
+  /* Timeline: the rule grows with the scroll and each step lights up as it is reached. */
   .nb-steps {
     position: relative;
     display: grid;
@@ -887,7 +884,7 @@ const arch = 'M10 37V29A14 14 0 0 1 38 29V37';
     color: var(--piedra-800);
   }
 
-  /* El papel: membrete con destinatario, fecha y el símbolo; campos como líneas de carta. */
+  /* The paper: letterhead with recipient, date and the symbol; fields drawn as letter lines. */
   .nb-sheet {
     display: grid;
     gap: 28px;
@@ -961,7 +958,7 @@ const arch = 'M10 37V29A14 14 0 0 1 38 29V37';
     color: var(--info-text);
   }
 
-  /* ── 4 · La oficina ── */
+  /* ── The office ── */
   .nb-visit {
     padding-block: var(--section-y);
     overflow: clip;
@@ -1036,7 +1033,7 @@ const arch = 'M10 37V29A14 14 0 0 1 38 29V37';
     color: var(--salvia-300);
   }
 
-  /* Semana: siete columnas; la de hoy, marcada. */
+  /* Week: seven columns, with today highlighted. */
   .nb-week {
     display: grid;
     gap: 12px;
@@ -1092,7 +1089,7 @@ const arch = 'M10 37V29A14 14 0 0 1 38 29V37';
     }
   }
 
-  /* Mapa estático estilizado (sin proveedores externos) con el camino desde Stadelhofen. */
+  /* Static stylised map (no external providers) with the walk from the station. */
   .nb-map {
     margin: 0;
   }
@@ -1167,7 +1164,7 @@ const arch = 'M10 37V29A14 14 0 0 1 38 29V37';
     stroke: var(--navy-800);
     stroke-width: 4;
   }
-  /* En móvil el mapa se encoge: rótulos, etiqueta y símbolo crecen para seguir legibles. */
+  /* On mobile the map shrinks: labels, tag and symbol grow to stay readable. */
   @media (max-width: 639px) {
     .nb-map__label {
       font-size: 22px;
@@ -1185,7 +1182,7 @@ const arch = 'M10 37V29A14 14 0 0 1 38 29V37';
     color: var(--navy-200);
   }
 
-  /* Formulario (isla ContactForm) con aspecto de carta: líneas en lugar de cajas. */
+  /* Form (ContactForm island) styled as a letter: lines instead of boxes. */
   .nb-form {
     display: grid;
     gap: 28px;
@@ -1249,7 +1246,7 @@ const arch = 'M10 37V29A14 14 0 0 1 38 29V37';
     background-size: 6px 6px;
     background-repeat: no-repeat;
   }
-  /* Mensaje: papel pautado, una línea por renglón. */
+  /* Message: ruled paper, one line per row. */
   .nb-form textarea {
     min-height: calc(2.1em * 5);
     padding: 0;

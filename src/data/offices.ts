@@ -2,24 +2,24 @@ import type { Country } from '../lib/country';
 import type { Text } from './fiscal-calendar/types';
 
 /**
- * Oficina por país, en su ciudad más grande (empresa ficticia). Calles reales y céntricas; sin
- * minutos a pie concretos salvo en Zúrich, donde ya los da la web (docs/01).
+ * One office per country, in its largest city (fictional company). Real central streets; no
+ * specific walking times except in Zurich, where the site already gives them.
  */
 export interface Office {
   street: string;
   postalCode: string;
-  /** Ciudad tal como se escribe en la dirección postal del país. */
+  /** City as written in the country's postal address. */
   city: string;
   title: Text;
   text: Text;
-  /** Nombre de la ciudad en cada idioma («Visítanos en Zúrich.»). */
+  /** City name in each language ("Visit us in Zurich."). */
   cityName: Text;
-  /** Mapa estilizado: estación, calle de la oficina y la referencia (lago, río o parque). */
+  /** Stylised map: station, office street and a landmark (lake, river or park). */
   station: string;
   streetLabel: string;
   landmark: Text;
   landmarkKind: 'water' | 'park';
-  /** Minutos a pie desde la estación, solo donde los damos (Zúrich). */
+  /** Walking minutes from the station, only where we give them (Zurich). */
   walkMinutes?: number;
   directions: Text;
 }
@@ -201,6 +201,6 @@ export const OFFICES: Record<Country, Office> = {
   },
 };
 
-/** Cambia la ciudad suiza de un texto por la de la oficina del país («en Zúrich» → «en Madrid»). */
+/** Replaces the Swiss city in a text with the country's office city ("in Zurich" → "in Madrid"). */
 export const withCity = (text: string, country: Country, locale: keyof Text): string =>
   text.replace(OFFICES.CH.cityName[locale], OFFICES[country].cityName[locale]);

@@ -20,7 +20,7 @@ const services = await Promise.all(
   (await getServices(locale))
     .filter((s) => featured.includes(s.data.icon))
     .map(async (s) => {
-      // Título y resumen de la versión de cada país (servicios-pais).
+      // Title and summary from each country's version (servicios-pais).
       const v = await getServiceVariants(s, locale);
       const of = (c: Country) => v.find((g) => g.countries.includes(c))!.text;
       return Object.assign(s, {
@@ -29,7 +29,7 @@ const services = await Promise.all(
       });
     }),
 );
-/** Foto de cada servicio: aparece sobre el cursor al pasar por su fila (solo con ratón). */
+/** Photo for each service: appears above the cursor when hovering its row (mouse only). */
 const photos: Record<string, ImageMetadata> = {
   contabilidad,
   iva,
@@ -117,7 +117,7 @@ const photos: Record<string, ImageMetadata> = {
     text-decoration: none;
     isolation: isolate;
   }
-  /* Relleno navy que sube desde abajo (transform), con el texto invertido. */
+  /* Navy fill rising from the bottom (transform), with inverted text. */
   .nb-row__link::before {
     content: '';
     position: absolute;
@@ -192,7 +192,7 @@ const photos: Record<string, ImageMetadata> = {
     }
   }
 
-  /* Foto flotante: sigue al cursor por encima, con un leve retraso (solo transform y opacity). */
+  /* Floating photo: follows the cursor from above, with a slight lag (transform and opacity only). */
   .nb-rows__float {
     position: fixed;
     top: 0;
@@ -218,7 +218,7 @@ const photos: Record<string, ImageMetadata> = {
     width: 100%;
     height: 100%;
     object-fit: cover;
-    /* Las fotos dejan la mitad izquierda en navy: se encuadra el motivo. */
+    /* The photos leave the left half navy: the subject is framed. */
     object-position: 78% 50%;
     opacity: 0;
     transform: scale(1.08);
@@ -230,7 +230,7 @@ const photos: Record<string, ImageMetadata> = {
     opacity: 1;
     transform: scale(1);
   }
-  /* «Ver los 5 servicios»: las cinco fotos como cartas apiladas que se abren en abanico. */
+  /* "See all 5 services": the five photos as a stack of cards that fans out. */
   .nb-fan {
     width: clamp(130px, 10vw, 160px);
     aspect-ratio: 3 / 4;
@@ -248,13 +248,13 @@ const photos: Record<string, ImageMetadata> = {
     box-shadow:
       0 0 0 1px rgb(255 255 255 / 0.7),
       0 12px 28px rgb(21 39 66 / 0.18);
-    /* Apiladas: casi superpuestas, con un leve desfase. */
+    /* Stacked: almost on top of each other, slightly offset. */
     transform: translate(calc(var(--i) * 3px), calc(var(--i) * -2px))
       rotate(calc(var(--i) * 1.5deg));
     transition: transform 650ms var(--ease-out);
     transition-delay: calc((var(--i) + 2) * 35ms);
   }
-  /* Abiertas en abanico, desde el centro. */
+  /* Fanned out from the centre. */
   .nb-fan[data-open] .nb-fan__card {
     transform: translate(calc(var(--i) * 32%), calc(var(--i) * var(--i) * 3px))
       rotate(calc(var(--i) * 4deg));
@@ -276,16 +276,16 @@ const photos: Record<string, ImageMetadata> = {
 </style>
 
 <script>
-  // Fotos que siguen al cursor en «Cómo te ayudamos». Solo con ratón fino; sin JS no aparecen.
+  // Photos following the cursor in "How we help". Fine pointer only; without JS they don't appear.
   const fine = matchMedia('(hover: hover) and (pointer: fine)');
   const reduce = matchMedia('(prefers-reduced-motion: reduce)').matches;
 
-  /** Borde inferior del header flotante: por encima de él no se ve nada. */
+  /** Bottom edge of the floating header: nothing shows above it. */
   const headerBottom = () => document.querySelector('.nb-bar')?.getBoundingClientRect().bottom ?? 0;
 
   /**
-   * Capa flotante que sigue al cursor, con un leve retraso (transform y opacidad). Va encima del
-   * cursor; si ahí chocaría con el header, pasa debajo.
+   * Floating layer that follows the cursor with a slight lag (transform and opacity). It sits above the
+   * cursor; if that would collide with the header, it moves below.
    */
   function follower(float: HTMLElement, lift = 20) {
     const pos = { x: 0, y: 0 };
@@ -293,7 +293,7 @@ const photos: Record<string, ImageMetadata> = {
     let shown = 0;
     let visible = false;
     let frame = 0;
-    /** Desplazamiento vertical respecto al cursor: negativo = encima. */
+    /** Vertical offset from the cursor: negative means above. */
     let offset = 0;
     const wanted = () => {
       const h = float.offsetHeight + lift;
@@ -327,7 +327,7 @@ const photos: Record<string, ImageMetadata> = {
       },
       show(e: PointerEvent) {
         if (!visible) {
-          // Aparece justo donde está el cursor, sin viajar desde la posición anterior.
+          // Appears right where the cursor is, without travelling from the previous position.
           pos.x = target.x = e.clientX;
           pos.y = target.y = e.clientY;
           offset = wanted();
@@ -348,7 +348,7 @@ const photos: Record<string, ImageMetadata> = {
     };
   }
 
-  /** Esconde la capa si la página se desplaza bajo el cursor quieto y este ya no está encima. */
+  /** Hides the layer if the page scrolls under a still cursor that is no longer over the row. */
   const hideOnScroll = (area: Element, f: ReturnType<typeof follower>) =>
     window.addEventListener(
       'scroll',
@@ -376,14 +376,14 @@ const photos: Record<string, ImageMetadata> = {
     hideOnScroll(rows, f);
   }
 
-  // «Ver los 5 servicios»: las cinco cartas siguen al cursor y se abren en abanico.
+  // "See all 5 services": the five cards follow the cursor and fan out.
   const trigger = document.querySelector<HTMLElement>('[data-fan-trigger]');
   const fan = document.querySelector<HTMLElement>('[data-fan-float]');
   if (trigger && fan && fine.matches) {
     const f = follower(fan, 40);
     trigger.addEventListener('pointerenter', (e) => {
       f.show(e);
-      // Un fotograma después, para que el abanico parta de la pila.
+      // One frame later, so the fan starts from the stack.
       requestAnimationFrame(() => fan.setAttribute('data-open', ''));
     });
     trigger.addEventListener('pointermove', (e) => f.move(e));

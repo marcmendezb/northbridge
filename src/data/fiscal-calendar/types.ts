@@ -1,27 +1,27 @@
 import type { Locale } from '../../i18n/locales';
 import type { DeadlineRule } from '../../lib/fiscal/deadlines';
 
-/** Texto en los cinco idiomas de la web. */
+/** Text in the site's five languages. */
 export type Text = Record<Locale, string>;
 
-/** Un vencimiento del calendario fiscal de una pyme con el ejercicio igual al año natural. */
+/** A deadline in the tax calendar of an SME whose financial year is the calendar year. */
 export interface FiscalEvent {
   id: string;
-  /** Mes (1–12) en que vence, para ordenar y para mostrar «lo que viene». */
+  /** Month (1–12) it falls due, for sorting and for "coming up". */
   month: number;
-  /** Nombre corto para la regla del año («4.º trimestre», «Sociedades»). */
+  /** Short name for the yearly chart ("Q4", "Corporate tax"). */
   short?: Text;
   when: Text;
   what: Text;
   need: Text;
-  /** Regla legal para calcular la fecha exacta de cada año (src/lib/fiscal/deadlines.ts). */
+  /** Legal rule used to compute the exact date each year (src/lib/fiscal/deadlines.ts). */
   rule?: DeadlineRule;
-  /** Prórroga de otro plazo (id): se dibuja como su continuación. */
+  /** Extension of another deadline (id): drawn as its continuation. */
   extends?: string;
-  /** Plazo menor y recurrente (cuotas a cuenta): marca pequeña, sin etiqueta, en el gráfico. */
+  /** Minor recurring deadline (instalments): a small mark without a label in the chart. */
   minor?: boolean;
-  /** Carril del gráfico (si falta, se deduce del id). */
+  /** Chart lane (inferred from the id if missing). */
   cat?: 'vat' | 'tax' | 'pay' | 'payroll';
-  /** Plazo que se repite cada mes: va solo en la lista, sin fecha concreta. */
+  /** Deadline that repeats every month: list only, without a specific date. */
   recurring?: boolean;
 }

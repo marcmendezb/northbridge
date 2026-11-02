@@ -1,8 +1,8 @@
 import type { AnimationKit } from './types';
 
 /**
- * `[data-final]`: reverso del hero. El vídeo empieza dentro del arco (a la derecha, como terminó el
- * hero) y el arco se abre hasta la pantalla completa; después entra el bloque con el CTA.
+ * `[data-final]`: the hero in reverse. The video starts inside the arch (on the right, where the hero
+ * ended) and the arch opens to full screen; then the CTA block comes in.
  */
 export function finalScene({ gsap }: AnimationKit) {
   const el = document.querySelector<HTMLElement>('[data-final]');
@@ -12,7 +12,7 @@ export function finalScene({ gsap }: AnimationKit) {
 
   const mm = gsap.matchMedia();
   mm.add('(min-width: 768px)', () => {
-    /** El arco: a la derecha, alineado con el borde de la barra del header, como al final del hero. */
+    /** The arch: on the right, aligned with the edge of the header bar, as at the end of the hero. */
     const arch = () => {
       const w = window.innerWidth;
       const h = window.innerHeight;

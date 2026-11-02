@@ -3,7 +3,7 @@ import Icon from '../brand/Icon.astro';
 import { useI18n } from '../../i18n';
 const { t } = useI18n(Astro.currentLocale);
 
-/** Alerta semántica: texto en la columna «Texto» (AA); icono y filete en la columna «Icono / borde». */
+/** Semantic alert: text uses the "Text" column colours (AA); icon and border use the "Icon / border" column. */
 interface Props {
   variant?: 'success' | 'warning' | 'error' | 'info';
   title?: string;

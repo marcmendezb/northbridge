@@ -1,19 +1,19 @@
 import type { AnimationKit } from './types';
 
 /**
- * Precios (`[data-pricing]`): la página entera se anima con la misma coreografía sobria.
- * - Cabecera: los checks se trazan uno a uno y el titular se aleja suavemente con el scroll.
- * - Grupos `[data-pr-stagger]`: sus hijos entran en cascada (y sus checks se trazan).
- * - Precios de los paquetes: cuentan hasta su valor cuando la tarjeta se descuelga.
- * - Garantías `[data-pr-draw]`: el símbolo se traza (tablero y después arco).
- * - «Aparte» `[data-pr-row]`: el filete de cada fila se dibuja de izquierda a derecha.
- * Solo transform, opacity y el trazo de los SVG. Con movimiento reducido no se registra.
+ * Pricing (`[data-pricing]`): the whole page uses the same restrained choreography.
+ * - Header: the checkmarks draw one by one and the headline drifts away gently on scroll.
+ * - `[data-pr-stagger]` groups: their children enter in sequence (and their checkmarks draw).
+ * - Package prices: count up to their value as the card drops in.
+ * - Guarantees `[data-pr-draw]`: the symbol draws (deck first, then the arch).
+ * - "Extras" `[data-pr-row]`: each row's rule draws from left to right.
+ * Only transform, opacity and SVG strokes. Not registered with reduced motion.
  */
 export function pricingScene({ gsap, ScrollTrigger }: AnimationKit) {
   if (!document.querySelector('[data-pricing]')) return;
   const ease = 'power3.out';
 
-  // Titular de la cabecera: se aleja y pierde algo de presencia al salir (scrub, sin rebote).
+  // Header headline: drifts away and fades slightly on the way out (scrub, no bounce).
   const drift = document.querySelector('[data-pr-drift]');
   if (drift)
     gsap.to(drift, {
@@ -28,7 +28,7 @@ export function pricingScene({ gsap, ScrollTrigger }: AnimationKit) {
       },
     });
 
-  // Cascadas: cada grupo entra al llegar; los checks de sus elementos se dibujan a la vez.
+  // Sequences: each group enters on arrival; the checkmarks of its items draw at the same time.
   document.querySelectorAll<HTMLElement>('[data-pr-stagger]').forEach((group) => {
     const items = Array.from(group.children);
     const checks = group.querySelectorAll('[data-pr-check]');
@@ -50,7 +50,7 @@ export function pricingScene({ gsap, ScrollTrigger }: AnimationKit) {
       );
   });
 
-  // Precios: cuentan desde un 60 % de su valor (sin parpadeos; el valor final queda en el DOM).
+  // Prices: count up from 60% of their value (no flicker; the final value is already in the DOM).
   document.querySelectorAll<HTMLElement>('.nb-pk .t-price').forEach((price) => {
     const nodes = price.querySelectorAll<HTMLElement>('[data-cc]');
     const targets = nodes.length ? Array.from(nodes) : [price];
@@ -77,7 +77,7 @@ export function pricingScene({ gsap, ScrollTrigger }: AnimationKit) {
     });
   });
 
-  // Garantías: tablero primero y después el arco, como el símbolo de la marca.
+  // Guarantees: deck first and then the arch, like the brand symbol.
   document.querySelectorAll<SVGElement>('[data-pr-draw]').forEach((svg) => {
     const [deck, arch] = Array.from(svg.querySelectorAll('path'));
     gsap.set([deck, arch], { strokeDasharray: 1, strokeDashoffset: 1 });
@@ -87,7 +87,7 @@ export function pricingScene({ gsap, ScrollTrigger }: AnimationKit) {
       .to(arch, { strokeDashoffset: 0, duration: 0.9, ease: 'power2.inOut' }, 0.35);
   });
 
-  // «Aparte»: cada fila aparece y su filete se dibuja.
+  // "Extras": each row appears and its rule draws.
   document.querySelectorAll<HTMLElement>('[data-pr-row]').forEach((row, i) => {
     const rule = row.querySelector('[data-pr-rule]');
     const tl = gsap.timeline({
@@ -104,7 +104,7 @@ export function pricingScene({ gsap, ScrollTrigger }: AnimationKit) {
       tl.fromTo(rule, { scaleX: 0 }, { scaleX: 1, duration: 1.1, ease: 'power2.inOut' }, 0.1);
   });
 
-  // Cierre: la propuesta se posa, se escribe línea a línea, el precio cuenta y se firma.
+  // Closing: the proposal settles, writes itself line by line, the price counts up and it gets signed.
   const doc = document.querySelector<HTMLElement>('[data-doc]');
   if (doc) {
     const rows = doc.querySelectorAll('[data-doc-row]');

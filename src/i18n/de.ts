@@ -1,6 +1,6 @@
 import type { Messages } from './es';
 
-/** UI-Texte auf Deutsch (Schweiz). Gleiche Struktur wie es.ts. */
+/** UI strings in German (Switzerland). Same shape as es.ts. */
 export const de: Messages = {
   brand: {
     name: 'Northbridge Advisory',
@@ -547,7 +547,7 @@ export const de: Messages = {
     countryNotice: 'Dieser Ratgeber ist für ein anderes Land geschrieben.',
     countryOther: 'Die Version für dein Land',
   },
-  /** Aviso de web ficticia al enviar el formulario o la reserva de demostración. */
+  /** Fictional site notice shown when submitting the form or the demo booking. */
   demo: {
     label: 'Portfolio-Projekt',
     title: 'Diese Website ist eine Demonstration.',

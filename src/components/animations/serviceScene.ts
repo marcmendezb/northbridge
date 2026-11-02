@@ -1,25 +1,25 @@
 import type { AnimationKit } from './types';
 
 /**
- * Ficha de servicio (`[data-service-hero]`).
- * - Cabecera: la foto se abre de los márgenes al ancho completo y se asienta (scrub).
- * - Qué incluye: cada línea del libro mayor traza su filete y entra.
- * - Para quién: las tres frases entran en cascada y su símbolo se dibuja.
- * - IVA: en el gráfico del año, las banderas se levantan por orden de fecha, las pistas de aviso
- *   se tienden y la línea de hoy baja.
- * - Proceso: la línea entre pasos se rellena y cada arco se enciende al alcanzarlo.
- * - Precio: el recibo se posa y sus conceptos entran uno a uno.
- * Solo transform, opacity, clip-path y trazos. Con movimiento reducido no se registra.
+ * Service page (`[data-service-hero]`).
+ * - Header: the photo opens from the margins to full width and settles (scrub).
+ * - What's included: each ledger line draws its rule and slides in.
+ * - Who it's for: the three statements enter in sequence and their symbol draws.
+ * - VAT: in the yearly chart, the flags rise in date order, the reminder tracks
+ *   extend and the today line drops in.
+ * - Process: the line between steps fills and each arch lights up as it is reached.
+ * - Price: the receipt settles and its lines enter one by one.
+ * Only transform, opacity, clip-path and strokes. Not registered with reduced motion.
  */
 export function serviceScene({ gsap, ScrollTrigger }: AnimationKit) {
   const hero = document.querySelector<HTMLElement>('[data-service-hero]');
   if (!hero) return;
   const ease = 'expo.out';
   /**
-   * Variantes de otros países (ocultas con `data-cc`): sin ScrollTrigger, que cuesta mucho con
-   * cinco calendarios en la página; se dejan en su estado final por si se cambia de país.
+   * Variants for other countries (hidden with `data-cc`): no ScrollTrigger, which is expensive with
+   * five calendars on the page; they are left in their final state in case the country changes.
    */
-  // Una sola pasada de lectura (sin alternar con escrituras, que forzarían maquetación).
+  // A single read pass (not interleaved with writes, which would force layout).
   const off = new Set(
     Array.from(
       document.querySelectorAll('[data-incl-row], [data-who], [data-yr-ruler], [data-steps-path]'),
@@ -31,7 +31,7 @@ export function serviceScene({ gsap, ScrollTrigger }: AnimationKit) {
     scale.forEach((sel) => gsap.set(root.querySelectorAll(sel), { scaleX: 1, scaleY: 1 }));
   };
 
-  // Cabecera: la foto se abre.
+  // Header: the photo opens.
   const photo = hero.querySelector<HTMLElement>('[data-sx-photo]');
   const img = photo?.querySelector('img');
   if (photo) {
@@ -44,7 +44,7 @@ export function serviceScene({ gsap, ScrollTrigger }: AnimationKit) {
     if (img) gsap.fromTo(img, { scale: 1.2 }, { scale: 1, ease: 'none', scrollTrigger: open });
   }
 
-  // Qué incluye.
+  // What's included.
   document.querySelectorAll<HTMLElement>('[data-incl-row]').forEach((row) => {
     if (hidden(row)) return settle(row, '.nb-incl__text', ['[data-incl-rule]']);
     const rule = row.querySelector('[data-incl-rule]');
@@ -58,7 +58,7 @@ export function serviceScene({ gsap, ScrollTrigger }: AnimationKit) {
     );
   });
 
-  // Para quién.
+  // Who it's for.
   document.querySelectorAll<HTMLElement>('[data-who]').forEach((who) => {
     if (hidden(who)) return settle(who, '.nb-who__item', []);
     const items = who.querySelectorAll('.nb-who__item');
@@ -75,8 +75,8 @@ export function serviceScene({ gsap, ScrollTrigger }: AnimationKit) {
       .to(marks, { strokeDashoffset: 0, duration: 0.8, stagger: 0.08, ease: 'power2.inOut' }, 0.3);
   });
 
-  // IVA: el gráfico del año. Las banderas se levantan por orden de fecha, cada pista de aviso se
-  // tiende hacia su plazo y la línea de hoy baja al final.
+  // VAT: the yearly chart. Flags rise in date order, each reminder track
+  // extends towards its deadline and the today line drops in at the end.
   document.querySelectorAll<HTMLElement>('[data-yr-ruler]').forEach((ruler) => {
     if (hidden(ruler))
       return settle(ruler, '[data-yr-dot], [data-yr-span]', ['[data-yr-alert]', '[data-yr-today]']);
@@ -118,7 +118,7 @@ export function serviceScene({ gsap, ScrollTrigger }: AnimationKit) {
     tl.to({}, { duration: 0.001 }, 1);
   });
 
-  // Precio: el recibo.
+  // Price: the receipt.
   const receipt = document.querySelector<HTMLElement>('[data-receipt]');
   if (receipt) {
     gsap
@@ -132,7 +132,7 @@ export function serviceScene({ gsap, ScrollTrigger }: AnimationKit) {
       );
   }
 
-  // Proceso: cada tramo entre arcos se rellena con el scroll y cada paso se enciende al alcanzarlo.
+  // Process: each segment between arches fills with the scroll and each step lights up as it is reached.
   document.querySelectorAll<HTMLElement>('[data-steps-path]').forEach((path) => {
     if (hidden(path)) {
       settle(path, '', ['[data-steps-fill]']);

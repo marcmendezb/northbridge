@@ -16,13 +16,13 @@ const servicios = defineCollection({
     title: z.string(),
     order: z.number(),
     icon: z.enum(serviceIconNames),
-    /** 1–2 frases, lenguaje claro. */
+    /** 1–2 sentences, plain language. */
     summary: z.string(),
     includes: z.array(z.string()),
     forWhom: z.array(z.string()),
     process: z.array(z.object({ title: z.string(), text: z.string() })).length(4),
     faq: z.array(z.object({ q: z.string(), a: z.string() })).length(4),
-    /** Referencias a src/lib/pricing/config.ts: los importes no se escriben aquí. */
+    /** References to src/lib/pricing/config.ts: amounts are never written here. */
     pricing: z
       .array(
         z.object({
@@ -38,9 +38,9 @@ const servicios = defineCollection({
 });
 
 /**
- * Versión de un servicio para otro país (España, Alemania, Francia, Italia): mismos campos de texto,
- * con su normativa, sus impuestos y su moneda. El servicio suizo (`servicios`) es la base y la versión
- * de los países que aún no tienen la suya. Ruta: idioma/país/servicio.md.
+ * A service's version for another country (Spain, Germany, France, Italy): same text fields,
+ * with its own rules, taxes and currency. The Swiss service (`servicios`) is the base and the version
+ * used by countries that don't have their own yet. Path: language/country/service.md.
  */
 const serviciosPais = defineCollection({
   loader: glob({ pattern: '*/*/*.{md,mdx}', base: './src/content/servicios-pais' }),
@@ -52,7 +52,7 @@ const serviciosPais = defineCollection({
     forWhom: z.array(z.string()),
     process: z.array(z.object({ title: z.string(), text: z.string() })).length(4),
     faq: z.array(z.object({ q: z.string(), a: z.string() })).length(4),
-    /** Fecha en que se comprobaron sus datos legales y fuentes (docs/DECISIONES.md). */
+    /** Date its legal facts and sources were last checked. */
     checkedAt: z.coerce.date(),
   }),
 });
@@ -67,12 +67,12 @@ const testimonios = defineCollection({
     service: z.string().optional(),
     order: z.number(),
     fictional: z.literal(true),
-    /** País cuyo carrusel lo muestra (clientes de cada oficina); por defecto, Suiza. */
+    /** Country whose carousel shows it (clients of each office); defaults to Switzerland. */
     country: z.enum(['CH', 'ES', 'DE', 'FR', 'IT']).default('CH'),
   }),
 });
 
-/** Equipo (docs/09): ficticio. La clave del archivo es la misma en todos los idiomas y nombra la foto. */
+/** Team (fictional). The file key is the same in every language and names the photo. */
 const equipo = defineCollection({
   loader: glob({ pattern: '*/*.json', base: './src/content/equipo' }),
   schema: z.object({
@@ -87,23 +87,23 @@ const equipo = defineCollection({
 });
 
 export const blogCategories = ['constitucion', 'fiscal', 'startups', 'contabilidad'] as const;
-/** Tema común a las versiones de una guía en cada país (enlaza las equivalentes). */
+/** Topic shared by a guide's versions in each country (links the equivalent ones). */
 export const blogTopics = ['constitucion', 'calendario', 'errores'] as const;
 export const blogCountries = ['CH', 'ES', 'DE', 'FR', 'IT'] as const;
 
-/** Artículos de Recursos (docs/09). `author` es la clave del archivo de equipo (sin idioma). */
+/** Resources articles. `author` is the team file key (without language). */
 const blog = defineCollection({
   loader: glob({ pattern: '*/*.{md,mdx}', base: './src/content/blog' }),
   schema: z.object({
     title: z.string(),
     description: z.string(),
     category: z.enum(blogCategories),
-    /** País al que se refiere la guía: cada guía existe en una versión por país. */
+    /** Country the guide refers to: each guide exists in one version per country. */
     country: z.enum(blogCountries),
     topic: z.enum(blogTopics),
     publishedAt: z.coerce.date(),
     updatedAt: z.coerce.date().optional(),
-    /** Fecha en que se comprobaron los datos legales y fiscales (DECISIONES.md). */
+    /** Date the legal and tax facts were last checked. */
     checkedAt: z.coerce.date(),
     author: z.string(),
     featured: z.boolean().default(false),
@@ -112,7 +112,7 @@ const blog = defineCollection({
   }),
 });
 
-/** Páginas legales: plantillas ficticias, ver src/content/legal/README.md. */
+/** Legal pages: placeholder templates, see src/content/legal/README.md. */
 const legal = defineCollection({
   loader: glob({ pattern: '*/*.md', base: './src/content/legal' }),
   schema: z.object({

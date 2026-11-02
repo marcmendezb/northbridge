@@ -2,15 +2,15 @@ import type { ReactNode } from 'react';
 import { COUNTRIES, type Country } from '../../lib/country';
 
 /**
- * Versión React de `byCountry` (src/lib/country.ts): una variante por cada resultado distinto,
- * en `<span data-cc>`; el CSS global muestra solo la del país activo, sin esperar a hidratar.
+ * React version of `byCountry` (src/lib/country.ts): one variant per distinct result,
+ * in `<span data-cc>`; global CSS shows only the active country, without waiting for hydration.
  */
 export function ByCountry({
   render,
   keyOf = (node) => String(node),
 }: {
   render: (country: Country) => ReactNode;
-  /** Clave para agrupar países con el mismo resultado (por defecto, el texto). */
+  /** Key used to group countries with the same result (defaults to the text). */
   keyOf?: (node: ReactNode, country: Country) => string;
 }) {
   const groups = new Map<string, { node: ReactNode; countries: Country[] }>();

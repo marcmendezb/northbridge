@@ -1,10 +1,10 @@
 import type { FiscalEvent } from './types';
 
 /**
- * España: sociedad o autónomo con ejercicio igual al año natural. Plazos comprobados el 29-10-2026 en
- * el Calendario del contribuyente 2026 de la Agencia Tributaria (sede.agenciatributaria.gob.es) y en
- * el Reglamento General de Recaudación de la Seguridad Social (art. 56). Si el último día es inhábil
- * (sábado, domingo o festivo nacional), el plazo pasa al siguiente día hábil (`shift`). Ver DECISIONES.md.
+ * Spain: company or self-employed with a calendar financial year. Deadlines checked on 29-10-2026 in
+ * the Tax Agency's 2026 taxpayer calendar (sede.agenciatributaria.gob.es) and in
+ * the Social Security collection regulation (art. 56). If the last day is not a working day
+ * (Saturday, Sunday or national holiday), the deadline moves to the next working day (`shift`).
  */
 const T = (es: string, en: string, de: string, fr: string, it: string) => ({ es, en, de, fr, it });
 
@@ -153,7 +153,7 @@ const SELF = (q: ReturnType<typeof T>) =>
   );
 
 export const events: FiscalEvent[] = [
-  // IVA (modelo 303): del 1 al 20 del mes siguiente al trimestre; el 4.º, hasta el 30 de enero.
+  // VAT (form 303): from the 1st to the 20th of the month after the quarter; Q4 until 30 January.
   vat(
     'es-vat-q4',
     1,
@@ -216,7 +216,7 @@ export const events: FiscalEvent[] = [
     ),
   ),
 
-  // Impuestos: operaciones con terceros, renta y sociedades.
+  // Taxes: third-party transactions, income tax and corporate tax.
   {
     id: 'es-347',
     cat: 'tax',
@@ -302,7 +302,7 @@ export const events: FiscalEvent[] = [
     ),
   },
 
-  // Pagos fraccionados: sociedades (202, abril, octubre y diciembre) y autónomos (130, cada trimestre).
+  // Instalments: companies (202, April, October and December) and self-employed (130, every quarter).
   instalment('es-pay-jan', 1, 30, JAN30, SELF(Q4)),
   instalment('es-pay-apr', 4, 20, APR, BOTH(Q1)),
   instalment('es-pay-jul', 7, 20, JUL, SELF(Q2)),
@@ -321,7 +321,7 @@ export const events: FiscalEvent[] = [
     ),
   ),
 
-  // Nóminas: retenciones trimestrales (111 y 115), resúmenes anuales y Seguridad Social.
+  // Payroll: quarterly withholding (111 and 115), annual summaries and Social Security.
   withholding('es-wh-q4', 1, Q4, JAN20),
   withholding('es-wh-q1', 4, Q1, APR),
   withholding('es-wh-q2', 7, Q2, JUL),

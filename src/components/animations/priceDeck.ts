@@ -1,8 +1,8 @@
 import type { AnimationKit } from './types';
 
 /**
- * `[data-price-deck]` (Precios): el tablero se traza de izquierda a derecha, los pilares bajan
- * uno a uno y de cada uno se descuelga su paquete. Una sola vez, al entrar en pantalla.
+ * `[data-price-deck]` (Pricing): the deck draws from left to right, the pillars drop
+ * one by one and each package hangs from its pillar. Once, on entering the viewport.
  */
 export function priceDeck({ gsap }: AnimationKit) {
   const deck = document.querySelector<HTMLElement>('[data-price-deck]');

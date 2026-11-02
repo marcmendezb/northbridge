@@ -1,15 +1,15 @@
 /**
- * Única fuente de importes y reglas de precio (en EUR, sin IVA). En los países con otra moneda
- * (Suiza: CHF) el importe se convierte desde el euro con `convert()` (currency.ts).
- * Todos los valores son ficticios y provisionales: docs/07-calculadora-y-precios.md.
+ * Single source of amounts and pricing rules (in EUR, excl. VAT). For countries with another currency
+ * (Switzerland: CHF) the amount is converted from euros with `convert()` (currency.ts).
+ * All values are fictional.
  */
 
 export type Currency = 'EUR' | 'CHF';
-/** Moneda en la que están escritos todos los importes de este archivo. */
+/** Currency all amounts in this file are written in. */
 export const BASE_CURRENCY = 'EUR' satisfies Currency;
 /**
- * Unidades de cada moneda por 1 EUR. CHF: tipo de referencia del BCE del 23-10-2026
- * (ecb.europa.eu, euro foreign exchange reference rates). Revisar antes de publicar: DECISIONES.md.
+ * Units of each currency per 1 EUR. CHF: ECB reference rate on 23-10-2026
+ * (ecb.europa.eu, euro foreign exchange reference rates). Review before using real prices.
  */
 export const EXCHANGE_RATES: Record<Currency, number> = { EUR: 1, CHF: 0.9227 };
 export const EXCHANGE_RATE_DATE = '2026-10-23';
@@ -35,16 +35,16 @@ export const PACKAGES = {
   },
 } as const satisfies Record<PackageId, { name: string; from: number; recommended: boolean }>;
 
-/** Servicios de precio cerrado, fuera de los paquetes mensuales. */
+/** Fixed-price services, outside the monthly packages. */
 export const FIXED_PRICES = {
   gmbh: { name: 'GmbH', from: 1490 },
   ag: { name: 'AG', from: 2490 },
 } as const satisfies Record<FixedId, { name: string; from: number }>;
 
-/** Permanencia de los paquetes mensuales, en meses. */
+/** Minimum term of the monthly packages, in months. */
 export const COMMITMENT_MONTHS = 3;
 
-/** Identificadores de los textos de celda (`pricing.cells.*` en el diccionario). */
+/** Cell text ids (`pricing.cells.*` in the dictionary). */
 export type CellId =
   | 'upTo20Invoices'
   | 'byVolume'
@@ -61,12 +61,12 @@ export type CellId =
   | 'priority';
 
 /**
- * Celda de la tabla comparativa: true = incluido; false = no incluido;
- * `{ text }` = solo texto; `{ note }` = incluido con nota. Los textos viven en el diccionario.
+ * Comparison table cell: true = included; false = not included;
+ * `{ text }` = text only; `{ note }` = included with a note. The texts live in the dictionary.
  */
 export type Cell = boolean | { text: CellId } | { note: CellId };
 
-/** `id` es la clave de `pricing.rows.*` en el diccionario. */
+/** `id` is the key of `pricing.rows.*` in the dictionary. */
 export interface ComparisonRow {
   id:
     | 'accounting'
@@ -127,13 +127,13 @@ export const COMPARISON: readonly ComparisonRow[] = [
   },
 ];
 
-/** Se presupuesta aparte, con precio cerrado (`pricing.separate.*` en el diccionario). */
+/** Quoted separately, at a fixed price (`pricing.separate.*` in the dictionary). */
 export const SEPARATE_QUOTE = ['constitution', 'backlog', 'valuation', 'extraordinary'] as const;
 
-// ── Calculadora (fase 4) ──────────────────────────────────────────────────────
+// ── Calculator ──────────────────────────────────────────────────────
 export const BASE = { autonomo: 190, startup: 290, gmbh: 340, ag: 520 };
 
-/** Facturas/mes → recargo mensual. Por encima de 200: propuesta a medida. */
+/** Invoices per month → monthly surcharge. Above 200: custom proposal. */
 export const INVOICE_TIERS = [
   { upTo: 20, fee: 0 },
   { upTo: 50, fee: 90 },
@@ -141,7 +141,7 @@ export const INVOICE_TIERS = [
   { upTo: 200, fee: 360 },
 ];
 
-/** Por empleado y mes. */
+/** Per employee per month. */
 export const PAYROLL = [
   { upTo: 10, perEmployee: 30 },
   { upTo: 50, perEmployee: 26 },
@@ -152,6 +152,6 @@ export const FLOOR = {
   growth: PACKAGES.growth.from,
   full: PACKAGES.full.from,
 };
-/** El extremo alto del rango = precio × 1,12. */
+/** Upper end of the range = price × 1.12. */
 export const RANGE_UPLIFT = 0.12;
 export const ROUND_TO = 10;

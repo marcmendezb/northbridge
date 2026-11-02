@@ -9,7 +9,7 @@ const pages = [
 ];
 
 for (const p of pages) {
-  test(`i18n: ${p.path} declara lang=${p.lang} y enlaza sus 5 alternativas`, async ({ page }) => {
+  test(`i18n: ${p.path} declares lang=${p.lang} and links its 5 alternates`, async ({ page }) => {
     const res = await page.goto(p.path);
     expect(res?.status()).toBe(200);
     await expect(page.locator('html')).toHaveAttribute('lang', p.lang);
@@ -18,7 +18,7 @@ for (const p of pages) {
   });
 }
 
-test('i18n: el desplegable de idiomas abre como el de servicios y cambia a la misma página', async ({
+test('i18n: the language dropdown opens like the services one and switches to the same page', async ({
   page,
 }) => {
   await page.setViewportSize({ width: 1440, height: 900 });
@@ -33,7 +33,9 @@ test('i18n: el desplegable de idiomas abre como el de servicios y cambia a la mi
   await expect(page.locator('html')).toHaveAttribute('lang', 'de-CH');
 });
 
-test('i18n: con teclado, Enter abre idiomas, el foco entra y Esc lo cierra', async ({ page }) => {
+test('i18n: with the keyboard, Enter opens languages, focus moves in and Esc closes it', async ({
+  page,
+}) => {
   await page.setViewportSize({ width: 1440, height: 900 });
   await page.goto('/precios');
   await page.locator('.nb-lang__trigger').focus();
@@ -45,7 +47,7 @@ test('i18n: con teclado, Enter abre idiomas, el foco entra y Esc lo cierra', asy
   await expect(page.locator('.nb-lang__trigger')).toBeFocused();
 });
 
-test('i18n: en móvil los idiomas están en el menú', async ({ page }) => {
+test('i18n: on mobile the languages are in the menu', async ({ page }) => {
   await page.setViewportSize({ width: 390, height: 844 });
   await page.goto('/en');
   await page.locator('.nb-menu-btn').click();
@@ -54,9 +56,9 @@ test('i18n: en móvil los idiomas están en el menú', async ({ page }) => {
   await expect(page.locator('.nb-mobile__langs a[aria-current]')).toHaveText('EN');
 });
 
-test.describe('sin JS', () => {
+test.describe('without JS', () => {
   test.use({ javaScriptEnabled: false });
-  test('i18n: los códigos de idioma son enlaces visibles en escritorio', async ({ page }) => {
+  test('i18n: language codes are visible links on desktop', async ({ page }) => {
     await page.setViewportSize({ width: 1440, height: 900 });
     await page.goto('/fr');
     await expect(page.locator('.nb-lang__nojs a')).toHaveCount(5);
@@ -64,7 +66,7 @@ test.describe('sin JS', () => {
   });
 });
 
-test('país: cambia moneda y formas jurídicas, independiente del idioma, y se recuerda', async ({
+test('country: changes currency and legal forms, independent of language, and is remembered', async ({
   page,
 }) => {
   await page.setViewportSize({ width: 1440, height: 900 });
@@ -73,7 +75,7 @@ test('país: cambia moneda y formas jurídicas, independiente del idioma, y se r
   const constitution = page
     .locator('.nb-ledger__row')
     .filter({ hasText: 'Constitución de empresa' });
-  // Por defecto, Suiza: francos convertidos desde el euro, GmbH y AG.
+  // Switzerland by default: francs converted from euros, GmbH and AG.
   await expect(
     page.locator('.nb-pk .font-sans').filter({ hasText: 'CHF/mes' }).first(),
   ).toBeVisible();
@@ -90,62 +92,62 @@ test('país: cambia moneda y formas jurídicas, independiente del idioma, y se r
   await expect(constitution).not.toContainText('GmbH', { useInnerText: true });
   await expect(page.locator('html')).toHaveAttribute('lang', 'es');
 
-  // Al cambiar de idioma se mantiene el país.
+  // The country is kept when switching language.
   await page.goto('/en/pricing');
   await expect(page.locator('html')).toHaveAttribute('data-country', 'ES');
   await expect(page.locator('.nb-pk .t-price').nth(1)).toHaveText('490', { useInnerText: true });
 });
 
-test.describe('país e idioma del lugar', () => {
+test.describe('country and language from location', () => {
   test.use({ locale: 'de-CH', timezoneId: 'Europe/Zurich' });
-  test('al entrar desde Zúrich, Suiza y alemán; una elección a mano se respeta', async ({
+  test('arriving from Zurich gives Switzerland and German; a manual choice is respected', async ({
     page,
   }) => {
-    // Playwright marca navigator.webdriver; aquí se simula una visita normal.
+    // Playwright sets navigator.webdriver; here a normal visit is simulated.
     await page.addInitScript(() =>
       Object.defineProperty(Navigator.prototype, 'webdriver', { get: () => false }),
     );
     await page.goto('/precios');
     await expect(page).toHaveURL(/\/de\/preise$/);
     await expect(page.locator('html')).toHaveAttribute('data-country', 'CH');
-    // Elegido a mano otro idioma, se respeta.
+    // A language picked manually is respected.
     await page.evaluate(() => localStorage.setItem('nb-lang', 'es'));
     await page.goto('/precios');
     await expect(page).toHaveURL(/\/precios$/);
   });
 });
 
-test.describe('país por zona horaria', () => {
+test.describe('country from time zone', () => {
   test.use({ locale: 'es-ES', timezoneId: 'Europe/Madrid' });
-  test('Madrid → España: euros y SL', async ({ page }) => {
+  test('Madrid → Spain: euros and SL', async ({ page }) => {
     await page.goto('/precios');
     await expect(page.locator('html')).toHaveAttribute('data-country', 'ES');
     await expect(page.locator('.nb-pk .t-price').nth(1)).toHaveText('490', { useInnerText: true });
   });
 });
 
-/** Visita normal (sin webdriver) desde una zona horaria y con un idioma de navegador concretos. */
+/** Normal visit (no webdriver) from a given time zone and browser language. */
 const visit = (locale: string, timezoneId: string, expected: RegExp, country: string) =>
-  test.describe(`${timezoneId} con navegador ${locale}`, () => {
+  test.describe(`${timezoneId} with a ${locale} browser`, () => {
     test.use({ locale, timezoneId });
-    test(`abre en ${expected} con país ${country || 'por defecto'}`, async ({ page }) => {
+    test(`opens ${expected} with country ${country || 'default'}`, async ({ page }) => {
       await page.addInitScript(() =>
         Object.defineProperty(Navigator.prototype, 'webdriver', { get: () => false }),
       );
       await page.goto('/precios');
       await expect(page).toHaveURL(expected);
-      // Sin país detectado no hay atributo: la web usa Suiza por defecto.
+      // Without a detected country there's no attribute: the site falls back to Switzerland.
       if (country) await expect(page.locator('html')).toHaveAttribute('data-country', country);
       else await expect(page.locator('html')).not.toHaveAttribute('data-country', /.+/);
     });
   });
 
-// El idioma sigue al lugar, aunque el navegador esté en otro idioma.
+// The language follows the location, even if the browser uses another language.
 visit('es-ES', 'Europe/Zurich', /\/de\/preise$/, 'CH');
 visit('en-US', 'Europe/Paris', /\/fr\/tarifs$/, 'FR');
 visit('en-GB', 'Europe/Rome', /\/it\/prezzi$/, 'IT');
 visit('de-DE', 'Europe/Madrid', /\/precios$/, 'ES');
-// En Suiza, si el navegador prefiere francés o italiano, ese idioma.
+// In Switzerland, if the browser prefers French or Italian, that language is used.
 visit('fr-CH', 'Europe/Zurich', /\/fr\/tarifs$/, 'CH');
-// Fuera de los cinco países, el idioma del navegador.
+// Outside the five countries, the browser language.
 visit('en-US', 'America/New_York', /\/en\/pricing$/, '');

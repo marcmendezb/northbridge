@@ -1,9 +1,9 @@
 ---
 /**
- * «Cómo lo hacemos» de la ficha de servicio. Banda navy: el titular fijo a la izquierda y, a la
- * derecha, los pasos en grande unidos por una línea que se rellena con el scroll; el arco de la
- * marca de cada paso se enciende al alcanzarlo (serviceScene.ts). Sin JS o con movimiento
- * reducido, todo encendido. Sin numeraciones.
+ * "How we work" on the service page. A navy band: the headline is sticky on the left and, on the
+ * right, large steps joined by a line that fills with the scroll; each step's brand arch
+ * lights up as it is reached (serviceScene.ts). Without JS or with reduced
+ * motion, everything is lit. No numbering.
  */
 interface Step {
   title: string;
@@ -13,7 +13,7 @@ interface Props {
   steps: Step[];
   label: string;
   title: string;
-  /** Países que ven esta versión (`data-cc`); sin valor, todos. */
+  /** Countries that see this version (`data-cc`); empty means all. */
   countries?: string;
   uid?: string;
 }
@@ -103,8 +103,8 @@ const { steps, label, title, countries, uid = '0' } = Astro.props;
     color: var(--white);
   }
 
-  /* Pasos: cada arco se une al siguiente con un tramo que se rellena en blanco.
-     Arco y tramo comparten --mark para quedar siempre centrados. */
+  /* Steps: each arch joins the next with a segment that fills in white.
+     The arch and the segment share --mark so they always stay centred. */
   .nb-way-steps__list {
     --mark: 48px;
     --gutter: 72px;
@@ -164,7 +164,7 @@ const { steps, label, title, countries, uid = '0' } = Astro.props;
     color: var(--navy-200);
     transition: color var(--dur-base) var(--ease-out);
   }
-  /* Encendido (alcanzado con el scroll; sin JS o con movimiento reducido, siempre). */
+  /* Lit (reached on scroll; always without JS or with reduced motion). */
   .nb-way-steps__step.is-on .nb-way-steps__mark,
   :root:not(.motion) .nb-way-steps__mark {
     stroke: var(--salvia-300);
