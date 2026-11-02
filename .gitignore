@@ -7,13 +7,4 @@ playwright-report
 test-results
 /screenshots
 
-# Local working notes (kept out of the public repo)
-CLAUDE.md
-PRODUCT.md
-DESIGN.md
-docs/0*.md
-docs/1*.md
-docs/DECISIONES.md
-docs/README.md
-docs/referencia-marca/
 .wrangler
