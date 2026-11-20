@@ -471,17 +471,22 @@ import { vatFor } from '../../lib/vat';
 <style is:global>
   :root {
     --header-h: 96px;
+    /* What the header covers right now: 0 while it is tucked away on phones. */
+    --header-offset: var(--header-h);
   }
   @media (max-width: 767px) {
     :root {
-      --header-h: 64px;
+      --header-h: 56px;
     }
   }
   /* Phone in landscape: every pixel of height counts. */
   @media (max-height: 500px) and (orientation: landscape) {
     :root {
-      --header-h: 60px;
+      --header-h: 52px;
     }
+  }
+  html[data-header-hidden] {
+    --header-offset: 0px;
   }
 
   /* Floating bar: elevated white surface, stuck to the top, with card-style bottom corners (8 px). */
@@ -491,6 +496,16 @@ import { vatFor } from '../../lib/vat';
     z-index: 40;
     padding-inline: var(--header-gutter);
     pointer-events: none;
+    transition: transform var(--dur-base) var(--ease-out);
+  }
+  /* Phones: tucked away while scrolling down, back on scrolling up or when the scroll stops. */
+  html[data-header-hidden] .nb-header {
+    transform: translateY(-100%);
+  }
+  @media (prefers-reduced-motion: reduce) {
+    .nb-header {
+      transition: none;
+    }
   }
   .nb-bar {
     pointer-events: auto;
@@ -564,14 +579,9 @@ import { vatFor } from '../../lib/vat';
     letter-spacing: 0.36em;
     text-transform: uppercase;
   }
-  @media (max-width: 479px) {
+  @media (max-width: 767px), (max-height: 500px) and (orientation: landscape) {
     .nb-bar__logo {
-      --wm: 24px;
-    }
-  }
-  @media (max-height: 500px) and (orientation: landscape) {
-    .nb-bar__logo {
-      --wm: 22px;
+      --wm: 20px;
     }
   }
   /* Narrow desktop: the lockup and navigation tighten so German fits. */
@@ -1275,6 +1285,36 @@ import { vatFor } from '../../lib/vat';
     const onScroll = () => header.toggleAttribute('data-scrolled', window.scrollY > 24);
     onScroll();
     window.addEventListener('scroll', onScroll, { passive: true });
+
+    // Phones: the header tucks away while scrolling down and comes back on scrolling up, when the
+    // scroll stops or near the top. It stays while the menu is open or focus is inside it.
+    const phone = window.matchMedia(
+      '(max-width: 767px), (max-height: 500px) and (orientation: landscape)',
+    );
+    let lastY = window.scrollY;
+    let idle = 0;
+    const setHidden = (hidden: boolean) =>
+      document.documentElement.toggleAttribute('data-header-hidden', hidden);
+    const onPhoneScroll = () => {
+      const y = window.scrollY;
+      const delta = y - lastY;
+      lastY = y;
+      window.clearTimeout(idle);
+      if (
+        !phone.matches ||
+        header.hasAttribute('data-menu-open') ||
+        header.contains(document.activeElement)
+      ) {
+        setHidden(false);
+        return;
+      }
+      if (y < header.offsetHeight * 2 || delta < -4) setHidden(false);
+      else if (delta > 4) setHidden(true);
+      idle = window.setTimeout(() => setHidden(false), 500);
+    };
+    window.addEventListener('scroll', onPhoneScroll, { passive: true });
+    phone.addEventListener('change', () => setHidden(false));
+    header.addEventListener('focusin', () => setHidden(false));
 
     // ── Dropdowns (Services and Languages): the bar grows downwards; only one open at a time ──
     const desktop = window.matchMedia('(min-width: 1200px)');
