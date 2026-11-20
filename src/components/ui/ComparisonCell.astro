@@ -3,6 +3,8 @@ import { useI18n, type MessageKey } from '../../i18n';
 import type { Cell } from '../../lib/pricing/config';
 const { t } = useI18n(Astro.currentLocale);
 const cellText = (id: string) => t(`pricing.cells.${id}` as MessageKey);
+const escape = (text: string) =>
+  text.replace(/&/g, '&amp;').replace(/</g, '&lt;').replace(/>/g, '&gt;');
 
 interface Props {
   cell: Cell;
@@ -40,6 +42,7 @@ const note =
         {note ? ': ' : ''}
       </span>
     )}
-    {note && <span>{note}</span>}
+    {/* "invoices/month" may break after the slash in narrow columns. */}
+    {note && <span set:html={escape(note).replace(/\//g, '/<wbr>')} />}
   </span>
 )}

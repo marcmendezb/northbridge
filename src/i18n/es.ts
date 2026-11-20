@@ -139,6 +139,7 @@ export const es = {
         leftOne: 'Vence mañana',
         leftMany: 'Quedan {n} días',
         minor: 'Cuota AVS trimestral',
+        swipe: 'Desliza para ver todo el año',
         cats: { vat: 'IVA', tax: 'Impuestos', payroll: 'Nóminas', pay: 'Pagos' },
       },
     },

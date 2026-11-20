@@ -4,6 +4,8 @@ import react from '@astrojs/react';
 import mdx from '@astrojs/mdx';
 import sitemap from '@astrojs/sitemap';
 import tailwindcss from '@tailwindcss/vite';
+import { satteri } from '@astrojs/markdown-satteri';
+import { amountsPlugin } from './src/lib/amounts.ts';
 
 /** Internal /_brand route (living style guide): dev only; Astro ignores files prefixed with _ in pages/. */
 /** @type {import('astro').AstroIntegration} */
@@ -20,6 +22,7 @@ const brandGuide = {
 export default defineConfig({
   site: process.env.PUBLIC_SITE_URL ?? 'https://northbridge.ch',
   output: 'static',
+  markdown: { processor: satteri({ hastPlugins: [amountsPlugin] }) },
   integrations: [
     react(),
     mdx(),

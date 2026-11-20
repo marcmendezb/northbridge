@@ -214,8 +214,7 @@ const chevron = (dir: 'prev' | 'next') => (dir === 'prev' ? 'M15 5l-7 7 7 7' : '
   .nb-tst__lines {
     display: flex;
     align-items: center;
-    gap: 10px;
-    margin: 0;
+    margin: 0 0 0 -10px;
     padding: 0;
     list-style: none;
   }
@@ -223,7 +222,7 @@ const chevron = (dir: 'prev' | 'next') => (dir === 'prev' ? 'M15 5l-7 7 7 7' : '
     display: inline-flex;
     align-items: center;
     min-height: 44px;
-    padding: 0;
+    padding: 0 10px;
     background: none;
     border: 0;
     cursor: pointer;

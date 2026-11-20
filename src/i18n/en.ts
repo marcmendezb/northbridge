@@ -142,6 +142,7 @@ export const en: Messages = {
         leftOne: 'Due tomorrow',
         leftMany: '{n} days left',
         minor: 'Quarterly AHV contribution',
+        swipe: 'Swipe to see the whole year',
         cats: { vat: 'VAT', tax: 'Taxes', payroll: 'Payroll', pay: 'Payments' },
       },
     },

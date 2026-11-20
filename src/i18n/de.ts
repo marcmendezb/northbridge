@@ -142,6 +142,7 @@ export const de: Messages = {
         leftOne: 'Morgen fällig',
         leftMany: 'Noch {n} Tage',
         minor: 'AHV-Akonto pro Quartal',
+        swipe: 'Wische, um das ganze Jahr zu sehen',
         cats: { vat: 'MWST', tax: 'Steuern', payroll: 'Lohn', pay: 'Zahlungen' },
       },
     },

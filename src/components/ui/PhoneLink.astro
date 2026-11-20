@@ -16,6 +16,6 @@ const note = byCountry((c) => (c === 'CH' ? '' : ` (${t('contact.phoneCentral')}
 ---
 
 <a class={className} href={`tel:${site.phone.replace(/\s/g, '')}`}>
-  {site.phone}
+  <span class="whitespace-nowrap">{site.phone}</span>
   <Fragment set:html={note} />
 </a>

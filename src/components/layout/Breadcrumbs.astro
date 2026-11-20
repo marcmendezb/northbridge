@@ -42,7 +42,9 @@ const jsonLd = {
           </span>
         )}
         {c.href && i < all.length - 1 ? (
-          <a href={c.href}>{c.label}</a>
+          <a class="nb-tap" href={c.href}>
+            {c.label}
+          </a>
         ) : (
           <span aria-current="page" class="text-navy-800">
             {c.html ? <Fragment set:html={c.html} /> : c.label}

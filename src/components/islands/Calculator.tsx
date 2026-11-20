@@ -109,6 +109,19 @@ export default function Calculator({
   const id = useId();
   /** The URL is only updated and the result only announced once the person changes something. */
   const touched = useRef(false);
+  const resultRef = useRef<HTMLElement>(null);
+  /** The mobile summary bar only shows while the result is still below the screen. */
+  const [resultAhead, setResultAhead] = useState(false);
+
+  useEffect(() => {
+    const el = resultRef.current;
+    if (!el) return;
+    const io = new IntersectionObserver(([e]) =>
+      setResultAhead(!e.isIntersecting && e.boundingClientRect.top > 0),
+    );
+    io.observe(el);
+    return () => io.disconnect();
+  }, []);
 
   // On hydration: answers from the URL (if any).
   useEffect(() => {
@@ -286,7 +299,12 @@ export default function Calculator({
         <p className="nb-calcx__share">{s.shareNote}</p>
       </form>
 
-      <section className="nb-calcx__result" aria-labelledby={`${id}-result`} id="resultado">
+      <section
+        ref={resultRef}
+        className="nb-calcx__result"
+        aria-labelledby={`${id}-result`}
+        id="resultado"
+      >
         <p className="nb-calcx__result-label" id={`${id}-result`}>
           {s.result}
         </p>
@@ -381,7 +399,13 @@ export default function Calculator({
       </section>
 
       {!result.custom && (
-        <a className="nb-calcx__bar" href="#resultado" aria-hidden="true" tabIndex={-1}>
+        <a
+          className="nb-calcx__bar"
+          href="#resultado"
+          aria-hidden="true"
+          tabIndex={-1}
+          data-shown={resultAhead || undefined}
+        >
           <span className="nb-calcx__bar-price">
             {money(result.range[0])}–{money(result.range[1])}
           </span>

@@ -57,6 +57,11 @@
 .nb-art__toc a:hover {
   color: var(--salvia-600);
 }
+@media (max-width: 1023px) {
+  .nb-art__toc a {
+    padding-block: 12px;
+  }
+}
 .nb-art__toc a[aria-current='true'] {
   border-color: var(--navy-800);
   color: var(--navy-800);
@@ -106,6 +111,9 @@
 .nb-prose ul,
 .nb-prose ol {
   padding-left: 1.25em;
+}
+.nb-prose ul {
+  list-style-type: square;
 }
 .nb-prose li {
   margin-bottom: 0.4em;

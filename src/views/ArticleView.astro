@@ -170,7 +170,7 @@ const jsonLd = {
           <ul>
             {d.sources.map((src) => (
               <li>
-                <a href={src.url} rel="noopener" target="_blank">
+                <a class="nb-tap" href={src.url} rel="noopener" target="_blank">
                   {src.label}
                 </a>
               </li>
@@ -186,7 +186,7 @@ const jsonLd = {
       <div class="nb-container">
         <div class="nb-art-related__head">
           <h2 id="related-title">{t('article.related')}</h2>
-          <a href={lp('/recursos')} class="nb-art-related__all">
+          <a href={lp('/recursos')} class="nb-art-related__all nb-tap">
             {t('article.allGuides')} <Arrow />
           </a>
         </div>
@@ -356,7 +356,7 @@ const jsonLd = {
     line-height: 1.55;
     color: var(--piedra-600);
   }
-  .nb-art__sources h2 {
+  .nb-prose .nb-art__sources h2 {
     margin-top: 24px;
     font-family: var(--font-sans);
     font-size: 0.75rem;
@@ -423,7 +423,7 @@ const jsonLd = {
     border-color: var(--navy-800);
   }
   .nb-art-related__cat {
-    font-size: 0.6875rem;
+    font-size: 0.75rem;
     font-weight: 600;
     letter-spacing: 0.14em;
     text-transform: uppercase;

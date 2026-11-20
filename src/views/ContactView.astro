@@ -83,9 +83,11 @@ const arch = 'M10 37V29A14 14 0 0 1 38 29V37';
           </p>
         </div>
         <p class="nb-cx__direct" data-reveal>
-          <PhoneLink />
+          <PhoneLink class="nb-tap" />
           <span aria-hidden="true">/</span>
-          <a href={`mailto:${site.email}`}>{site.email}</a>
+          <a class="nb-tap" href={`mailto:${site.email}`}>
+            {site.email}
+          </a>
         </p>
       </div>
 
@@ -255,13 +257,15 @@ const arch = 'M10 37V29A14 14 0 0 1 38 29V37';
           <div>
             <dt>{c.phone}</dt>
             <dd>
-              <PhoneLink />
+              <PhoneLink class="nb-tap" />
             </dd>
           </div>
           <div>
             <dt>{c.email}</dt>
             <dd>
-              <a href={`mailto:${site.email}`}>{site.email}</a>
+              <a class="nb-tap" href={`mailto:${site.email}`}>
+                {site.email}
+              </a>
             </dd>
           </div>
         </dl>
@@ -923,6 +927,7 @@ const arch = 'M10 37V29A14 14 0 0 1 38 29V37';
   }
   .nb-sheet__meta dd {
     margin: 0;
+    overflow-wrap: break-word;
     font-size: 0.9375rem;
     color: var(--navy-800);
   }
@@ -1021,6 +1026,11 @@ const arch = 'M10 37V29A14 14 0 0 1 38 29V37';
     text-transform: uppercase;
     color: var(--navy-200);
   }
+  @media (max-width: 479px) {
+    .nb-visit__data {
+      grid-template-columns: minmax(0, 1fr);
+    }
+  }
   .nb-visit__data dd {
     margin: 6px 0 0;
     font-size: 1.0625rem;
@@ -1077,15 +1087,30 @@ const arch = 'M10 37V29A14 14 0 0 1 38 29V37';
     background: var(--salvia-300);
   }
   .nb-week__today {
-    font-size: 0.6875rem;
+    font-size: 0.75rem;
     font-weight: 600;
     letter-spacing: 0.12em;
     text-transform: uppercase;
     color: var(--salvia-300);
   }
+  /* Narrow phones: the week as a list, one day per row. */
   @media (max-width: 479px) {
+    .nb-week__days {
+      grid-template-columns: minmax(0, 1fr);
+    }
+    .nb-week__day {
+      grid-template-columns: 3.5rem minmax(0, 1fr) auto;
+      align-items: baseline;
+      padding: 12px 0;
+    }
+    .nb-week__day + .nb-week__day {
+      border-top: 1px solid var(--navy-700);
+    }
     .nb-week__hours {
-      font-size: 0.625rem;
+      font-size: 0.9375rem;
+    }
+    .nb-week__hours br {
+      display: none;
     }
   }
 
@@ -1303,9 +1328,9 @@ const arch = 'M10 37V29A14 14 0 0 1 38 29V37';
   }
   .nb-form__check input {
     flex: none;
-    width: 20px;
-    height: 20px;
-    margin-top: 2px;
+    width: 24px;
+    height: 24px;
+    margin-top: 0;
     accent-color: var(--navy-800);
   }
   .nb-form__check a {

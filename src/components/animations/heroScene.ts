@@ -45,7 +45,7 @@ export function heroScene({ gsap, ScrollTrigger }: AnimationKit) {
   if (!photo || !introLayer) return;
 
   const mm = gsap.matchMedia();
-  mm.add('(min-width: 768px)', () => {
+  mm.add('(min-width: 768px) and (min-height: 560px)', () => {
     const promiseParts = q('.hero__promise-inner > *');
 
     /** Geometry of the final arch, computed from the current viewport. */

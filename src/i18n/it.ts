@@ -142,6 +142,7 @@ export const it: Messages = {
         leftOne: 'Scade domani',
         leftMany: 'Mancano {n} giorni',
         minor: 'Acconto AVS trimestrale',
+        swipe: 'Scorri per vedere tutto l’anno',
         cats: { vat: 'IVA', tax: 'Imposte', payroll: 'Stipendi', pay: 'Pagamenti' },
       },
     },

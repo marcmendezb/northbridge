@@ -160,6 +160,20 @@ const rows = [62, 104, 146, 188];
     text-wrap: balance;
     color: var(--navy-800);
   }
+  /* From tablet (and on desktop without motion): the scene beside the text. */
+  @media (min-width: 640px) {
+    .nb-journey__track {
+      gap: 56px;
+    }
+    .nb-journey__panel {
+      grid-template-columns: auto minmax(0, 1fr);
+      align-items: center;
+      gap: clamp(28px, 4vw, 56px);
+    }
+    .nb-journey__visual {
+      width: clamp(140px, 22vw, 240px);
+    }
+  }
   .nb-journey__body {
     max-width: 30ch;
     margin: 20px 0 0;
@@ -210,7 +224,7 @@ const rows = [62, 104, 146, 188];
   }
 
   /* ── Desktop with motion: pinned horizontal journey ── */
-  @media (min-width: 1024px) {
+  @media (min-width: 1024px) and (min-height: 560px) {
     .js.motion:not(.anim-fail) .nb-journey__pin {
       display: flex;
       flex-direction: column;

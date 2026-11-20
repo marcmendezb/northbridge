@@ -408,6 +408,17 @@ import { vatFor } from '../../lib/vat';
   :root {
     --header-h: 96px;
   }
+  @media (max-width: 767px) {
+    :root {
+      --header-h: 72px;
+    }
+  }
+  /* Phone in landscape: every pixel of height counts. */
+  @media (max-height: 500px) and (orientation: landscape) {
+    :root {
+      --header-h: 60px;
+    }
+  }
 
   /* Floating bar: elevated white surface, stuck to the top, with card-style bottom corners (8 px). */
   .nb-header {
@@ -492,6 +503,11 @@ import { vatFor } from '../../lib/vat';
   @media (max-width: 479px) {
     .nb-bar__logo {
       --wm: 24px;
+    }
+  }
+  @media (max-height: 500px) and (orientation: landscape) {
+    .nb-bar__logo {
+      --wm: 22px;
     }
   }
   /* Narrow desktop: the lockup and navigation tighten so German fits. */

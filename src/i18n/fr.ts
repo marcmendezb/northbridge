@@ -142,6 +142,7 @@ export const fr: Messages = {
         leftOne: 'Échéance demain',
         leftMany: 'Encore {n} jours',
         minor: 'Acompte AVS trimestriel',
+        swipe: 'Faites glisser pour voir toute l’année',
         cats: { vat: 'TVA', tax: 'Impôts', payroll: 'Salaires', pay: 'Paiements' },
       },
     },

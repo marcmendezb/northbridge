@@ -235,6 +235,20 @@ const unit = byCountry((c) => priceUnit(currencyOf(c), locale));
   .nb-calc__chip[data-active] {
     color: var(--white);
   }
+  /* Narrow phones: two rows, so no option is cut short; the active one carries its own fill. */
+  @media (max-width: 479px) {
+    .nb-calc__chips {
+      grid-template-columns: repeat(2, minmax(0, 1fr));
+      gap: 4px;
+    }
+    .nb-calc__chip-bg {
+      display: none;
+    }
+    .nb-calc__chip[data-active] {
+      border-radius: var(--radius-tag, 2px);
+      background: var(--navy-800);
+    }
+  }
   .nb-calc__track {
     position: relative;
     display: block;

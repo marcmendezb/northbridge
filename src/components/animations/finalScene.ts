@@ -11,7 +11,7 @@ export function finalScene({ gsap }: AnimationKit) {
   if (!el || !media) return;
 
   const mm = gsap.matchMedia();
-  mm.add('(min-width: 768px)', () => {
+  mm.add('(min-width: 768px) and (min-height: 560px)', () => {
     /** The arch: on the right, aligned with the edge of the header bar, as at the end of the hero. */
     const arch = () => {
       const w = window.innerWidth;

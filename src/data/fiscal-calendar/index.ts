@@ -1,4 +1,5 @@
 import type { Country } from '../../lib/country';
+import { keepAmountsDeep } from '../../lib/amounts';
 import type { FiscalEvent } from './types';
 import { events as CH } from './ch';
 import { events as ES } from './es';
@@ -14,7 +15,13 @@ export type { FiscalEvent, Text } from './types';
  * Tax calendar per country.
  * Each country lives in its own file; new ones are added here.
  */
-export const FISCAL_CALENDARS: Partial<Record<Country, FiscalEvent[]>> = { CH, ES, DE, FR, IT };
+export const FISCAL_CALENDARS: Partial<Record<Country, FiscalEvent[]>> = keepAmountsDeep({
+  CH,
+  ES,
+  DE,
+  FR,
+  IT,
+});
 
 /** Countries with their own calendar; the rest see the Swiss one until they have theirs. */
 export type CalendarCountry = 'CH' | 'ES' | 'DE' | 'FR' | 'IT';

@@ -56,9 +56,11 @@ const posterFile = await getImage({ src: poster, format: 'webp', width: 1920, qu
           {bookingCta.label}
         </Button>
         <p class="nb-final__direct">
-          <PhoneLink />
+          <PhoneLink class="nb-tap" />
           <span aria-hidden="true">/</span>
-          <a href={`mailto:${site.email}`}>{site.email}</a>
+          <a class="nb-tap" href={`mailto:${site.email}`}>
+            {site.email}
+          </a>
         </p>
       </div>
     </div>
@@ -154,7 +156,7 @@ const posterFile = await getImage({ src: poster, format: 'webp', width: 1920, qu
   }
 
   /* ── Desktop with motion: the arch opens up to the full-screen video ── */
-  @media (min-width: 768px) {
+  @media (min-width: 768px) and (min-height: 560px) {
     .js.motion:not(.anim-fail) .nb-final {
       height: 220svh;
     }
@@ -225,7 +227,7 @@ const posterFile = await getImage({ src: poster, format: 'webp', width: 1920, qu
     video &&
     section &&
     !matchMedia('(prefers-reduced-motion: reduce)').matches &&
-    matchMedia('(min-width: 768px)').matches
+    matchMedia('(min-width: 768px) and (min-height: 560px)').matches
   ) {
     new IntersectionObserver(
       ([entry]) => {

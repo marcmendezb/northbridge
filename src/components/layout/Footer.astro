@@ -164,6 +164,24 @@ import { byCountry } from '../../lib/country';
     grid-template-columns: repeat(2, minmax(0, 1fr));
     gap: 40px 32px;
   }
+  @media (max-width: 1023px) {
+    .nb-footer__brand {
+      min-height: 0;
+      gap: 40px;
+    }
+  }
+  @media (min-width: 900px) and (max-width: 1023px) {
+    .nb-footer__cols {
+      grid-template-columns: repeat(4, minmax(0, 1fr));
+      gap: 32px 24px;
+    }
+  }
+  @media (max-width: 519px) {
+    .nb-footer__cols {
+      grid-template-columns: minmax(0, 1fr);
+      gap: 32px;
+    }
+  }
   @media (min-width: 1280px) {
     .nb-footer__cols {
       grid-template-columns: repeat(4, minmax(0, 1fr));
@@ -190,6 +208,15 @@ import { byCountry } from '../../lib/country';
   }
   .nb-footer__link:hover {
     color: var(--navy-800);
+  }
+  @media (max-width: 1023px) {
+    .nb-footer__link {
+      padding-block: 0.625rem;
+    }
+    .nb-footer__cols ul,
+    .nb-footer__cols address {
+      gap: 0;
+    }
   }
   .nb-footer__brand .nb-footer__link {
     color: var(--navy-100);

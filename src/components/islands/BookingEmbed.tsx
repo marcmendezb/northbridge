@@ -60,6 +60,11 @@ function DemoScheduler({ s, demo, intl, thanksHref }: Omit<Props, 'calLink'>) {
       <fieldset className="nb-book__set">
         <legend className="nb-book__legend">{s.day}</legend>
         <div className="nb-book__days">
+          {/* Until the dates are known in the browser, five empty slots hold the row in place. */}
+          {days.length === 0 &&
+            [0, 1, 2, 3, 4].map((i) => (
+              <span key={i} className="nb-book__day nb-book__day--pending" aria-hidden="true" />
+            ))}
           {days.map((d) => (
             <label key={isoDay(d)} className="nb-book__day">
               <input

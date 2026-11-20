@@ -50,6 +50,16 @@ Lighthouse in the high 80s on a few pages turned out to have very specific cause
 - **One italic font file was 144 KB.** It was only used by a testimonial quote on the home page and a date on the VAT page. Setting both upright removed the download and brought the home page from 94 to 98.
 - **Islands hydrate when visible**, not on load, so form scripts don't compete with the first paint.
 
+## Responsive means adapting, not shrinking
+
+The site was checked at thirteen sizes, from a 320 px phone to a 2560 px screen, including phones in landscape, with an automated audit (overflow, touch targets, text size, clipped text) and a page-by-page visual review. A few rules came out of it:
+
+- **Full-screen scroll scenes need height, not just width.** The hero, the closing arch and the three-step journey only pin when the screen is at least 560 px tall. A phone in landscape gets the stacked layout instead of a scene that clips its own text.
+- **Data keeps its shape on a phone.** The pricing comparison keeps the three packages side by side and puts each service on its own line above its values, instead of a table you have to scroll sideways. The tax-year chart does scroll, but it opens on the current month, keeps the lane names in view and says it can be swiped.
+- **Components respond to their own width.** Cards that sit beside text on a laptop and alone on a tablet (the 20-minute call, the calculator result) use container queries, so they lay out for the space they actually have.
+- **Tablets get their own layouts.** Between 640 and 1023 px, photos sit beside their text and the pricing cards split into two columns, so nothing is a phone layout stretched to 768 px.
+- **Small details that add up.** Text links get a 44 px tall hit area without moving the layout, amounts never break across lines, German compounds hyphenate, and the fixed header is shorter on phones and shorter still in landscape.
+
 ## Page transitions without a router
 
 Astro's client-side router would have meant rewriting every page script to survive navigation. Native cross-document View Transitions give a smooth fade between pages with a few lines of CSS and no JavaScript. Browsers without support just navigate normally.

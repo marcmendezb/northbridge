@@ -49,7 +49,22 @@ import { byCountry } from '../../lib/country';
     font-size: clamp(4.5rem, 2rem + 11vw, 11rem);
     line-height: 0.9;
     color: var(--salvia-300);
-    min-width: 2.4ch;
+  }
+  /* One column for the figures, so every label starts on the same line; on phones it sits below. */
+  @media (min-width: 640px) {
+    .nb-stat dd {
+      flex-wrap: nowrap;
+    }
+    .nb-stat__num {
+      flex: none;
+      min-width: 4.2ch;
+    }
+  }
+  @media (max-width: 639px) {
+    .nb-stat dd {
+      flex-direction: column;
+      gap: 8px;
+    }
   }
   .nb-stat__label {
     font-family: var(--font-display);

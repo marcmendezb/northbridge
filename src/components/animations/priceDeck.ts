@@ -21,5 +21,11 @@ export function priceDeck({ gsap }: AnimationKit) {
     { scaleY: 0 },
     { scaleY: 1, duration: 0.6, stagger: 0.14, ease: 'power2.inOut' },
     0.45,
-  ).fromTo(cards, { opacity: 0, y: -24 }, { opacity: 1, y: 0, duration: 1, stagger: 0.14 }, 0.75);
+  ).fromTo(
+    cards,
+    { opacity: 0, y: -24 },
+    { opacity: 1, y: 0, duration: 1, stagger: 0.14 },
+    // Stacked cards (below desktop) don't wait for the whole bridge to be drawn.
+    window.innerWidth >= 1024 ? 0.75 : 0.15,
+  );
 }

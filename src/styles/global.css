@@ -22,6 +22,13 @@
       scroll-behavior: smooth;
     }
   }
+  body {
+    overflow-wrap: break-word;
+  }
+  /* German compounds ("Sozialversicherungen") need hyphenation in narrow columns. */
+  :lang(de) :is(p, li, dd, td, th, figcaption) {
+    hyphens: auto;
+  }
 }
 
 .sr-only-focusable:not(:focus):not(:focus-within) {
@@ -129,6 +136,12 @@ html.lenis body {
 .nb-container {
   width: 100%;
   padding-inline: max(var(--header-gutter), (100% - var(--header-max)) / 2);
+}
+
+/* Small text links get a 44px tall hit area without moving the layout (WCAG 2.5.8). */
+.nb-tap {
+  padding-block: 0.75rem;
+  margin-block: -0.75rem;
 }
 
 /* ── Country (src/lib/country.ts): the HTML ships one variant per country and only the active one shows.

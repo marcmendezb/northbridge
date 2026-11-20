@@ -195,16 +195,18 @@ const faq = tRaw<{ q: string; a: string }[]>('pricing.faq');
     id="comparativa"
   >
     <div class="nb-cmp-wrap">
-      <table class="nb-cmp">
+      {/* Explicit roles: on phones the table is laid out with CSS grid, which drops native semantics. */}
+      <table class="nb-cmp" role="table">
         <caption class="sr-only">{t('pricing.compareCaption')}</caption>
-        <thead>
-          <tr>
-            <th scope="col" class="nb-cmp__corner">
+        <thead role="rowgroup">
+          <tr role="row">
+            <th scope="col" role="columnheader" class="nb-cmp__corner">
               <span class="sr-only">{t('pricing.feature')}</span>
             </th>
             {ids.map((id) => (
               <th
                 scope="col"
+                role="columnheader"
                 class:list={['nb-cmp__pkg', PACKAGES[id].recommended && 'nb-cmp__pkg--featured']}
               >
                 <span class="nb-cmp__pkg-name">{PACKAGES[id].name}</span>
@@ -214,17 +216,24 @@ const faq = tRaw<{ q: string; a: string }[]>('pricing.faq');
           </tr>
         </thead>
         {groups.map((g) => (
-          <tbody data-pr-stagger>
-            <tr class="nb-cmp__group">
-              <th scope="colgroup" colspan={ids.length + 1}>
+          <tbody role="rowgroup" data-pr-stagger>
+            <tr role="row" class="nb-cmp__group">
+              <th scope="colgroup" role="columnheader" colspan={ids.length + 1}>
                 {t(`pricing.groups.${g.key}` as MessageKey)}
               </th>
             </tr>
             {g.rows.map((rid) => (
-              <tr>
-                <th scope="row" set:html={byCountry((c) => vatFor(rowLabel(rid), c, locale))} />
+              <tr role="row">
+                <th
+                  scope="row"
+                  role="rowheader"
+                  set:html={byCountry((c) => vatFor(rowLabel(rid), c, locale))}
+                />
                 {ids.map((id) => (
-                  <td class:list={[PACKAGES[id].recommended && 'nb-cmp__cell--featured']}>
+                  <td
+                    role="cell"
+                    class:list={[PACKAGES[id].recommended && 'nb-cmp__cell--featured']}
+                  >
                     <ComparisonCell cell={rowById[rid][id]} />
                   </td>
                 ))}
@@ -464,6 +473,39 @@ const faq = tRaw<{ q: string; a: string }[]>('pricing.faq');
       background-color var(--dur-base) var(--ease-out),
       color var(--dur-base) var(--ease-out);
   }
+  /* Tablet and phone in landscape: each card in two columns (price and action / what it includes). */
+  @media (min-width: 640px) and (max-width: 1023px) {
+    .nb-pk__card {
+      grid-template-columns: minmax(0, 1fr) minmax(0, 1.15fr);
+      grid-template-rows: auto auto auto 1fr;
+      grid-template-areas:
+        'head title'
+        'for inc'
+        'price inc'
+        'cta inc';
+      gap: 16px 36px;
+    }
+    .nb-pk__head {
+      grid-area: head;
+    }
+    .nb-pk__for {
+      grid-area: for;
+    }
+    .nb-pk__price {
+      grid-area: price;
+    }
+    .nb-pk__inc-title {
+      grid-area: title;
+      align-self: end;
+    }
+    .nb-pk__inc {
+      grid-area: inc;
+    }
+    .nb-pk__cta {
+      grid-area: cta;
+      align-self: end;
+    }
+  }
   .nb-pk__item:hover .nb-pk__card {
     border-color: var(--navy-800);
   }
@@ -500,7 +542,7 @@ const faq = tRaw<{ q: string; a: string }[]>('pricing.faq');
     padding: 4px 8px;
     border-radius: var(--radius-tag, 2px);
     background: var(--salvia-400);
-    font-size: 0.6875rem;
+    font-size: 0.75rem;
     font-weight: 600;
     letter-spacing: 0.12em;
     text-transform: uppercase;
@@ -520,7 +562,7 @@ const faq = tRaw<{ q: string; a: string }[]>('pricing.faq');
   .nb-pk__for-label {
     display: block;
     margin-bottom: 2px;
-    font-size: 0.6875rem;
+    font-size: 0.75rem;
     font-weight: 600;
     letter-spacing: 0.14em;
     text-transform: uppercase;
@@ -656,29 +698,8 @@ const faq = tRaw<{ q: string; a: string }[]>('pricing.faq');
     border-radius: var(--radius-card, 8px);
     background: var(--white);
   }
-  @media (max-width: 1023px) {
-    .nb-cmp-wrap {
-      overflow-x: auto;
-    }
-    /* Mobile: the services column stays fixed while the table scrolls. */
-    .nb-cmp tbody th[scope='row'],
-    .nb-cmp__corner {
-      position: sticky;
-      left: 0;
-      z-index: 1;
-      background: var(--white);
-      box-shadow: 1px 0 0 var(--piedra-200);
-    }
-    .nb-cmp .nb-cmp__corner {
-      width: 150px;
-    }
-    .nb-cmp {
-      min-width: 680px;
-    }
-  }
   .nb-cmp {
     width: 100%;
-    min-width: 760px;
     border-collapse: separate;
     border-spacing: 0;
     font-size: 0.9375rem;
@@ -690,7 +711,7 @@ const faq = tRaw<{ q: string; a: string }[]>('pricing.faq');
     background: var(--white);
     vertical-align: bottom;
   }
-  @media (min-width: 1024px) {
+  @media (min-width: 768px) {
     .nb-cmp thead th {
       position: sticky;
       top: calc(var(--header-h) - 1px);
@@ -748,6 +769,69 @@ const faq = tRaw<{ q: string; a: string }[]>('pricing.faq');
   }
   .nb-cmp tbody:last-of-type tr:last-child > * {
     border-bottom: 0;
+  }
+  /* Phone: the three packages side by side, each service on its own line above its three values. */
+  @media (max-width: 767px) {
+    .nb-cmp,
+    .nb-cmp thead,
+    .nb-cmp tbody {
+      display: block;
+    }
+    .nb-cmp thead {
+      position: sticky;
+      top: calc(var(--header-h) - 1px);
+      z-index: 2;
+      overflow: hidden;
+      border-bottom: 1.5px solid var(--navy-800);
+      border-radius: var(--radius-card, 8px) var(--radius-card, 8px) 0 0;
+      background: var(--white);
+    }
+    .nb-cmp tr {
+      display: grid;
+      grid-template-columns: repeat(3, minmax(0, 1fr));
+    }
+    .nb-cmp .nb-cmp__corner {
+      position: absolute;
+      width: 1px;
+      height: 1px;
+      padding: 0;
+      overflow: hidden;
+      clip-path: inset(50%);
+    }
+    .nb-cmp thead th {
+      padding: 14px 10px 12px;
+      border-bottom: 0;
+    }
+    .nb-cmp__pkg-name {
+      font-size: 1.0625rem;
+    }
+    .nb-cmp__price .t-price {
+      font-size: 1.375rem !important;
+    }
+    .nb-cmp tbody th[scope='row'],
+    .nb-cmp .nb-cmp__group th {
+      grid-column: 1 / -1;
+    }
+    .nb-cmp tbody th[scope='row'] {
+      padding: 14px 10px 4px;
+      border-bottom: 0;
+    }
+    .nb-cmp tbody td {
+      padding: 4px 10px 14px;
+      overflow-wrap: break-word;
+      hyphens: auto;
+      font-size: 0.875rem;
+    }
+    .nb-cmp .nb-cmp__group th {
+      padding: 24px 10px 10px;
+    }
+  }
+  /* Phone in landscape: no room for a sticky header under the site header. */
+  @media (max-height: 500px) and (orientation: landscape) {
+    .nb-cmp thead,
+    .nb-cmp thead th {
+      position: static;
+    }
   }
   .nb-cmp__note {
     margin: 16px 0 0;

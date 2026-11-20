@@ -203,7 +203,7 @@ const rows = [
     padding: 3px 8px;
     border: 1px solid var(--piedra-300);
     border-radius: var(--radius-tag, 2px);
-    font-size: 0.6875rem;
+    font-size: 0.75rem;
     font-weight: 600;
     letter-spacing: 0.12em;
     text-transform: uppercase;
@@ -237,6 +237,16 @@ const rows = [
     font-size: 0.9375rem;
     line-height: 1.45;
     color: var(--navy-800);
+  }
+  /* Narrow phones: the sheet stays inside the gutter and each label sits above its value. */
+  @media (max-width: 519px) {
+    .nb-doc {
+      width: calc(100% - 12px);
+      transform: rotate(-1deg);
+    }
+    .nb-doc__row {
+      grid-template-columns: minmax(0, 1fr);
+    }
   }
   .nb-doc__rule {
     position: absolute;
@@ -297,7 +307,7 @@ const rows = [
     min-width: 0;
   }
   .nb-doc__sign-label {
-    font-size: 0.6875rem;
+    font-size: 0.75rem;
     font-weight: 600;
     letter-spacing: 0.12em;
     text-transform: uppercase;

@@ -48,17 +48,18 @@ export function aboutScene({ gsap, ScrollTrigger }: AnimationKit) {
   document.querySelectorAll<HTMLElement>('[data-crew-arch]').forEach((arch, i) => {
     const lines = arch.querySelectorAll('.nb-crew__line > span');
     const photo = arch.querySelector('img');
+    // The stagger only reads as such when the four arches share a row (desktop).
     const tl = gsap.timeline({
-      delay: (i % 4) * 0.12,
-      scrollTrigger: { trigger: arch, start: 'top 85%', once: true },
+      delay: window.innerWidth >= 1024 ? (i % 4) * 0.12 : 0,
+      scrollTrigger: { trigger: arch, start: 'top 90%', once: true },
     });
     tl.fromTo(
       arch,
       { clipPath: 'inset(100% 0% 0% 0% round 9999px 9999px 0px 0px)' },
       {
         clipPath: 'inset(0% 0% 0% 0% round 9999px 9999px 0px 0px)',
-        duration: 1.4,
-        ease: 'expo.inOut',
+        duration: 1.1,
+        ease: 'expo.out',
       },
       0,
     );
@@ -67,7 +68,7 @@ export function aboutScene({ gsap, ScrollTrigger }: AnimationKit) {
       lines,
       { yPercent: 135, y: 0 },
       { yPercent: 0, duration: 1, stagger: 0.1, ease: 'expo.out' },
-      0.75,
+      0.4,
     );
   });
 

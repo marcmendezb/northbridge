@@ -86,7 +86,7 @@ export function journeyScene({ gsap, ScrollTrigger }: AnimationKit) {
   };
 
   const mm = gsap.matchMedia();
-  mm.add('(min-width: 1024px)', () => {
+  mm.add('(min-width: 1024px) and (min-height: 560px)', () => {
     const distance = () => Math.max(0, track.scrollWidth - pin.clientWidth);
     const move = gsap.to(track, {
       x: () => -distance(),

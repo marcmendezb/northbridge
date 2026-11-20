@@ -67,6 +67,18 @@ const blocks = locales.map((locale) => ({
     stroke: var(--white);
     stroke-width: 2.5;
   }
+  /* Phone in landscape: the mark beside the message, so everything fits on one screen. */
+  @media (max-height: 500px) and (orientation: landscape) {
+    .nb-404__inner {
+      grid-template-columns: auto minmax(0, 1fr);
+      align-items: center;
+      gap: 24px 48px;
+      padding-block: 24px;
+    }
+    .nb-404__mark {
+      width: 120px;
+    }
+  }
   /* The arch doesn't fit at first (offset and rotated), then settles tangent to the deck. */
   .nb-404__arch {
     transform-box: fill-box;

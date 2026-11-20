@@ -118,12 +118,21 @@ export function pricingScene({ gsap, ScrollTrigger }: AnimationKit) {
     gsap.set(stamp, { strokeDasharray: 1, strokeDashoffset: 1 });
     const tl = gsap.timeline({
       defaults: { ease },
-      scrollTrigger: { trigger: doc, start: 'top 78%', once: true },
+      scrollTrigger: { trigger: doc, start: 'top 85%', once: true },
     });
+    // The sheet writes itself in about two seconds, before a normal scroll moves past it.
+    tl.timeScale(1.5);
     tl.fromTo(
       doc,
       { y: 80, rotation: -6, opacity: 0 },
-      { y: 0, rotation: -1.5, opacity: 1, duration: 1.3, ease: 'expo.out' },
+      // Ends on the angle set in CSS (smaller on narrow phones).
+      {
+        y: 0,
+        rotation: () => (window.innerWidth < 520 ? -1 : -1.5),
+        opacity: 1,
+        duration: 1.3,
+        ease: 'expo.out',
+      },
       0,
     )
       .fromTo(rows, { opacity: 0, x: -14 }, { opacity: 1, x: 0, duration: 0.7, stagger: 0.14 }, 0.5)

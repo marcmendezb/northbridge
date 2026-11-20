@@ -134,6 +134,25 @@ import { OFFICES } from '../data/offices';
     display: grid;
     gap: 24px;
   }
+  /* Below desktop the calendar comes right after the promise, before the photo and the details. */
+  @media (max-width: 1023px) {
+    .nb-bk {
+      gap: 24px;
+    }
+    .nb-bk__intro {
+      display: contents;
+    }
+    .nb-bk__panel {
+      order: 1;
+      margin-block: 8px 16px;
+    }
+    .nb-bk__photo,
+    .nb-bk__h,
+    .nb-bk__expect,
+    .nb-bk__meet {
+      order: 2;
+    }
+  }
   .nb-bk__label {
     margin: 0;
     font-size: 0.75rem;
@@ -341,6 +360,11 @@ import { OFFICES } from '../data/offices';
   .nb-book__time {
     font-variant-numeric: tabular-nums;
     font-weight: 600;
+  }
+  .nb-book__day--pending {
+    border-style: dashed;
+    border-color: var(--navy-600);
+    cursor: default;
   }
   .nb-book__day input,
   .nb-book__time input {
