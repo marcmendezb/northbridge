@@ -1221,6 +1221,23 @@ import { vatFor } from '../../lib/vat';
     background: var(--white);
     color: var(--navy-800);
   }
+  /* Shorter screens (a phone with the browser bars showing): the whole menu still fits. */
+  @media (max-height: 760px) {
+    .nb-mobile__inner {
+      gap: 24px;
+    }
+    .nb-mobile__link {
+      padding-block: 9px;
+      font-size: 1.75rem;
+    }
+    .nb-mobile__foot {
+      gap: 14px;
+    }
+    .nb-mobile__settings {
+      gap: 12px;
+      padding-top: 14px;
+    }
+  }
   @keyframes nb-sheet-in {
     from {
       opacity: 0;
