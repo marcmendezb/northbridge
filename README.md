@@ -34,9 +34,11 @@ A few places worth a direct look in the codebase:
 - **Static first:** Astro renders all 161 pages to HTML at build time. React hydrates only the calculator, the contact form and the booking calendar, and only when they scroll into view. Everything works without JavaScript.
 - **Language and country are separate settings:** a French speaker in Zurich sees Swiss prices, legal forms and tax dates in French. The HTML ships one variant per country and CSS shows the active one, so switching is instant and there is no flash on load. Heavy variants (five tax calendars on one page) wait in `<template>` elements until needed.
 - **Rules, not dates:** the tax calendar is computed from legal rules for the current year, in Zurich time, both at build time and in the browser. Next January it updates itself.
-- **Responsive by context:** checked at thirteen sizes from 320 to 2560 px, phones in landscape included. Full-screen scroll scenes only pin on screens tall enough for them, the pricing comparison keeps three columns on a phone without sideways scrolling, and cards respond to their own width through container queries.
+- **Responsive by context:** checked at thirteen sizes from 320 to 2560 px, phones in landscape included. On phones the header tucks away while scrolling and the menu opens as a full-screen sheet with the booking button within thumb reach. Full-screen scroll scenes only pin on screens tall enough for them, the pricing comparison keeps three columns on a phone without sideways scrolling, and cards respond to their own width through container queries.
 - **Accessibility and performance:** WCAG 2.2 AA, axe in the browser tests, keyboard and screen reader checked, `prefers-reduced-motion` respected everywhere. Lighthouse on mobile scores 100 for accessibility, best practices and SEO on every page measured, and 93 to 100 for performance.
 - **Privacy by default:** no tracking cookies, no third-party scripts, self-hosted fonts. The Cal.com booking embed only loads after explicit consent.
+
+![The site on a phone: hero, menu and tax calendar](docs/screenshots/mobile.jpg)
 
 ---
 
