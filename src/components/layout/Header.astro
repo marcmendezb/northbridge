@@ -4,6 +4,7 @@ import promoPhoto from '../../assets/img/home/hero-poster.jpg';
 import Icon from '../brand/Icon.astro';
 import Arrow from '../brand/Arrow.astro';
 import Flag from '../brand/Flag.astro';
+import PhoneLink from '../ui/PhoneLink.astro';
 import logoMark from '../../assets/brand/logo-header.png';
 import { alternates, localeMeta, parsePath, useI18n } from '../../i18n';
 import { getBookingCta, getMainNav, getServiceLinks, site } from '../../lib/site';
@@ -192,6 +193,10 @@ import { vatFor } from '../../lib/vat';
             data-label-open={t('nav.openMenu')}
             data-label-close={t('nav.closeMenu')}
           >
+            <span class="nb-menu-btn__text" aria-hidden="true">
+              <span class="nb-menu-btn__open">{t('nav.menu')}</span>
+              <span class="nb-menu-btn__close">{t('nav.close')}</span>
+            </span>
             <svg
               viewBox="0 0 24 24"
               width="24"
@@ -352,53 +357,112 @@ import { vatFor } from '../../lib/vat';
 
     {!minimal && (
       <div id="mobile-menu" class="nb-mobile" data-open="false" data-lenis-prevent>
-        <nav aria-label={t('nav.main')} class="px-5 pt-2 pb-6">
-          <ul class="m-0 flex list-none flex-col p-0">
-            {mainNav.map((l) => (
-              <li class="border-t border-piedra-200">
-                <a
-                  href={l.href}
-                  class="nb-mobile__link"
-                  aria-current={isCurrent(l.href) ? 'page' : undefined}
-                >
-                  <Fragment set:html={byCountry((c) => vatFor(l.label, c, locale))} />
-                </a>
-              </li>
-            ))}
-          </ul>
-          <a href={bookingCta.href} class="nb-cta nb-cta--block mt-5">
-            <span>{bookingCta.label}</span>
-            <Arrow />
-          </a>
-          <ul class="nb-mobile__langs nb-mobile__countries" aria-label={t('lang.country')}>
-            {countryOptions.map((o) => (
-              <li>
-                <button
-                  type="button"
-                  data-country-option={o.code}
-                  aria-pressed={o.current ? 'true' : 'false'}
-                  aria-label={`${o.name} (${o.meta})`}
-                >
-                  <Flag country={o.code} />
-                </button>
-              </li>
-            ))}
-          </ul>
-          <ul class="nb-mobile__langs" aria-label={t('lang.label')}>
-            {langOptions.map((o) => (
-              <li>
-                <a
-                  href={o.path}
-                  lang={o.htmlLang}
-                  hreflang={o.htmlLang}
-                  aria-current={o.current ? 'true' : undefined}
-                >
-                  {o.short}
-                </a>
-              </li>
-            ))}
-          </ul>
-        </nav>
+        <div class="nb-mobile__inner">
+          <nav aria-label={t('nav.main')} class="nb-mobile__nav">
+            <ul class="nb-mobile__list" role="list">
+              {mainNav.map((l, i) => {
+                const hasSub = l.href === lp('/servicios');
+                const label = byCountry((c) => vatFor(l.label, c, locale));
+                return (
+                  <li class="nb-mobile__item" data-mobile-item style={`--i:${i}`}>
+                    <div class="nb-mobile__row">
+                      <a
+                        href={l.href}
+                        class="nb-mobile__link"
+                        aria-current={isCurrent(l.href) ? 'page' : undefined}
+                      >
+                        <Fragment set:html={label} />
+                      </a>
+                      {hasSub && (
+                        <button
+                          type="button"
+                          class="nb-mobile__toggle"
+                          aria-expanded="false"
+                          aria-controls="mobile-services"
+                          data-mobile-toggle
+                        >
+                          <span class="sr-only">
+                            {l.label}: {t('nav.openMenu').toLowerCase()}
+                          </span>
+                          <svg viewBox="0 0 16 16" width="18" height="18" aria-hidden="true">
+                            <path d="M3 6l5 5 5-5" />
+                          </svg>
+                        </button>
+                      )}
+                    </div>
+                    {hasSub && (
+                      <div id="mobile-services" class="nb-mobile__sub" data-mobile-sub>
+                        <ul role="list">
+                          {serviceLinks.map((sl) => (
+                            <li>
+                              <a href={sl.href} class="nb-mobile__sublink">
+                                <Fragment
+                                  set:html={byCountry((c) => vatFor(sl.label, c, locale))}
+                                />
+                              </a>
+                            </li>
+                          ))}
+                        </ul>
+                      </div>
+                    )}
+                  </li>
+                );
+              })}
+            </ul>
+          </nav>
+
+          <div class="nb-mobile__foot" data-mobile-item style={`--i:${mainNav.length}`}>
+            <a href={bookingCta.href} class="nb-mobile__cta">
+              <span>{bookingCta.label}</span>
+              <Arrow />
+            </a>
+            <p class="nb-mobile__call">
+              {t('home.cta.orCall').split('{phone}')[0]}
+              <PhoneLink class="nb-tap" />
+            </p>
+            <div class="nb-mobile__settings">
+              <div class="nb-mobile__setting nb-mobile__setting--country">
+                <p class="nb-mobile__setting-label" id="mobile-country">
+                  {t('lang.country')}
+                </p>
+                <ul class="nb-mobile__seg" role="list" aria-labelledby="mobile-country">
+                  {countryOptions.map((o) => (
+                    <li>
+                      <button
+                        type="button"
+                        data-country-option={o.code}
+                        aria-pressed={o.current ? 'true' : 'false'}
+                        aria-label={`${o.name} (${o.meta})`}
+                      >
+                        <Flag country={o.code} />
+                        <span aria-hidden="true">{o.code}</span>
+                      </button>
+                    </li>
+                  ))}
+                </ul>
+              </div>
+              <div class="nb-mobile__setting">
+                <p class="nb-mobile__setting-label" id="mobile-lang">
+                  {t('lang.label')}
+                </p>
+                <ul class="nb-mobile__seg" role="list" aria-labelledby="mobile-lang">
+                  {langOptions.map((o) => (
+                    <li>
+                      <a
+                        href={o.path}
+                        lang={o.htmlLang}
+                        hreflang={o.htmlLang}
+                        aria-current={o.current ? 'true' : undefined}
+                      >
+                        {o.short}
+                      </a>
+                    </li>
+                  ))}
+                </ul>
+              </div>
+            </div>
+          </div>
+        </div>
       </div>
     )}
   </div>
@@ -410,7 +474,7 @@ import { vatFor } from '../../lib/vat';
   }
   @media (max-width: 767px) {
     :root {
-      --header-h: 72px;
+      --header-h: 64px;
     }
   }
   /* Phone in landscape: every pixel of height counts. */
@@ -828,17 +892,14 @@ import { vatFor } from '../../lib/vat';
   .nb-lang__trigger[aria-expanded='true'] .nb-nav__chev {
     transform: rotate(180deg);
   }
-  .nb-lang__nojs,
-  .nb-mobile__langs {
+  .nb-lang__nojs {
     display: flex;
     gap: 4px;
     margin: 0;
     padding: 0;
     list-style: none;
   }
-  .nb-lang__nojs a,
-  .nb-mobile__langs a,
-  .nb-mobile__langs button {
+  .nb-lang__nojs a {
     display: inline-flex;
     align-items: center;
     justify-content: center;
@@ -850,30 +911,12 @@ import { vatFor } from '../../lib/vat';
     color: var(--piedra-700);
     text-decoration: none;
   }
-  .nb-lang__nojs a[aria-current],
-  .nb-mobile__langs a[aria-current],
-  .nb-mobile__langs button[aria-pressed='true'] {
+  .nb-lang__nojs a[aria-current] {
     color: var(--salvia-600);
   }
-  .nb-mobile__langs {
-    margin-top: 20px;
-    padding-top: 12px;
-    border-top: 1px solid var(--piedra-200);
-  }
-  .nb-mobile__langs button {
-    padding: 0;
-    border: 0;
-    background: none;
-    cursor: pointer;
-  }
   /* Choosing a country needs JS; without it, the default stays. */
-  html:not(.js) .nb-mobile__countries {
+  html:not(.js) .nb-mobile__setting--country {
     display: none;
-  }
-  .js .nb-mobile__countries + .nb-mobile__langs {
-    margin-top: 0;
-    padding-top: 0;
-    border-top: 0;
   }
   .nb-lang__nojs {
     display: none;
@@ -931,20 +974,21 @@ import { vatFor } from '../../lib/vat';
   .nb-bar__end > .nb-cta--always {
     display: inline-flex;
   }
-  .nb-cta--block {
-    display: flex;
-    width: 100%;
-    justify-content: center;
-  }
-
-  /* Mobile menu: without JS, the links stay visible inside the bar; with JS it opens and closes. */
+  /* ── Mobile and tablet menu ──
+     Without JS the links stay visible inside the bar. With JS the button opens a full-screen navy
+     sheet under the bar: large links, Services unfolding in place, and the booking button, phone,
+     country and language at the bottom, within thumb reach. */
   .nb-menu-btn {
     display: none;
-    width: 44px;
-    height: 44px;
     align-items: center;
-    justify-content: center;
-    margin-right: -6px;
+    gap: 10px;
+    min-width: 44px;
+    height: 44px;
+    margin-right: -8px;
+    padding-inline: 8px;
+    font-size: 0.9375rem;
+    font-weight: 600;
+    color: var(--navy-800);
   }
   .nb-menu-btn__close {
     display: none;
@@ -966,37 +1010,240 @@ import { vatFor } from '../../lib/vat';
   .nb-menu-btn[aria-expanded='true'] .nb-menu-btn__close {
     display: inline;
   }
-  .js .nb-mobile {
-    display: none;
-  }
-  .js .nb-mobile[data-open='true'] {
-    display: block;
-    animation: nb-menu-in var(--dur-base) var(--ease-out);
-  }
+
   .nb-mobile {
     max-height: calc(100svh - var(--header-h) - 12px);
     overflow-y: auto;
+    background: var(--navy-800);
+    color: var(--navy-100);
+  }
+  .js .nb-mobile {
+    position: fixed;
+    inset: 0;
+    z-index: -1;
+    display: none;
+    max-height: none;
+    padding-top: var(--header-h);
+    overscroll-behavior: contain;
+  }
+  .js .nb-mobile[data-open='true'] {
+    display: block;
+    animation: nb-sheet-in var(--dur-base) var(--ease-out);
+  }
+  .js .nb-mobile[data-open='true'] [data-mobile-item] {
+    animation: nb-sheet-item 700ms var(--ease-out) both;
+    animation-delay: calc(var(--i, 0) * 40ms + 60ms);
+  }
+  .nb-header[data-menu-open] .nb-bar {
+    border-color: transparent;
+    box-shadow: none;
+  }
+  .nb-mobile__inner {
+    display: flex;
+    flex-direction: column;
+    gap: 40px;
+    min-height: 100%;
+    max-width: 640px;
+    margin-inline: auto;
+    padding: 16px var(--header-gutter) calc(24px + env(safe-area-inset-bottom));
+  }
+  .nb-mobile__list {
+    margin: 0;
+    padding: 0;
+    list-style: none;
+  }
+  .nb-mobile__item {
+    border-bottom: 1px solid var(--navy-600);
+  }
+  .nb-mobile__row {
+    display: flex;
+    align-items: center;
+    gap: 12px;
   }
   .nb-mobile__link {
+    flex: 1;
     display: block;
-    padding: 0.875rem 0;
-    min-height: 44px;
+    padding-block: 14px;
     font-family: var(--font-display);
-    font-size: 1.5rem;
-    color: inherit;
+    font-optical-sizing: auto;
+    font-size: clamp(1.875rem, 1.3rem + 2.4vw, 2.375rem);
+    font-weight: 300;
+    line-height: 1.15;
+    letter-spacing: -0.01em;
+    color: var(--white);
     text-decoration: none;
   }
   .nb-mobile__link[aria-current='page'] {
-    color: var(--salvia-600);
+    color: var(--salvia-300);
   }
-  @keyframes nb-menu-in {
+  .nb-mobile__toggle {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    width: 48px;
+    height: 48px;
+    margin-right: -12px;
+    border: 0;
+    background: none;
+    color: var(--navy-100);
+    cursor: pointer;
+  }
+  .nb-mobile__toggle svg {
+    fill: none;
+    stroke: currentColor;
+    stroke-width: 1.5;
+    transition: transform var(--dur-base) var(--ease-out);
+  }
+  .nb-mobile__toggle[aria-expanded='true'] svg {
+    transform: rotate(180deg);
+  }
+  .nb-mobile__toggle:focus-visible,
+  .nb-mobile :is(a, button):focus-visible {
+    outline: 2px solid var(--salvia-300);
+    outline-offset: 2px;
+  }
+  .nb-mobile__sub {
+    display: grid;
+    grid-template-rows: 1fr;
+    transition: grid-template-rows var(--dur-base) var(--ease-out);
+  }
+  .nb-mobile__sub > ul {
+    min-height: 0;
+    overflow: hidden;
+    margin: 0;
+    padding: 0;
+    list-style: none;
+  }
+  .nb-mobile__sub li:last-child {
+    padding-bottom: 12px;
+  }
+  .js .nb-mobile__sub:not(.is-open) {
+    grid-template-rows: 0fr;
+  }
+  .js .nb-mobile__sub:not(.is-open) > ul {
+    visibility: hidden;
+    transition: visibility 0s linear var(--dur-base);
+  }
+  .nb-mobile__sublink {
+    display: flex;
+    align-items: center;
+    min-height: 44px;
+    padding-block: 6px;
+    font-size: 1.0625rem;
+    color: var(--navy-100);
+    text-decoration: none;
+  }
+  .nb-mobile__sublink:hover {
+    color: var(--white);
+  }
+  .nb-mobile__foot {
+    display: grid;
+    gap: 20px;
+    margin-top: auto;
+  }
+  .nb-mobile__cta {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    gap: 8px;
+    min-height: 52px;
+    padding: 14px 20px;
+    border-radius: var(--radius-button, 4px);
+    background: var(--white);
+    font-weight: 600;
+    line-height: 1.25;
+    text-align: center;
+    color: var(--navy-800);
+    text-decoration: none;
+  }
+  .nb-mobile__cta:hover {
+    background: var(--piedra-100);
+  }
+  .nb-mobile__call {
+    margin: 0;
+    font-size: 0.9375rem;
+    text-align: center;
+    color: var(--navy-200);
+  }
+  .nb-mobile__call a {
+    font-weight: 600;
+    color: var(--white);
+  }
+  .nb-mobile__settings {
+    display: grid;
+    gap: 16px;
+    padding-top: 20px;
+    border-top: 1px solid var(--navy-600);
+  }
+  .nb-mobile__setting {
+    display: grid;
+    gap: 8px;
+  }
+  .nb-mobile__setting-label {
+    margin: 0;
+    font-size: 0.75rem;
+    font-weight: 600;
+    letter-spacing: 0.14em;
+    text-transform: uppercase;
+    color: var(--navy-200);
+  }
+  .nb-mobile__seg {
+    display: grid;
+    grid-template-columns: repeat(5, minmax(0, 1fr));
+    margin: 0;
+    padding: 0;
+    overflow: hidden;
+    list-style: none;
+    border: 1px solid var(--navy-600);
+    border-radius: var(--radius-button, 4px);
+  }
+  .nb-mobile__seg li + li {
+    border-left: 1px solid var(--navy-600);
+  }
+  .nb-mobile__seg :is(a, button) {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    gap: 6px;
+    width: 100%;
+    min-height: 44px;
+    border: 0;
+    background: none;
+    font: inherit;
+    font-size: 0.8125rem;
+    font-weight: 600;
+    letter-spacing: 0.06em;
+    color: var(--navy-100);
+    text-decoration: none;
+    cursor: pointer;
+  }
+  .nb-mobile__seg :is([aria-pressed='true'], [aria-current='true']) {
+    background: var(--white);
+    color: var(--navy-800);
+  }
+  @keyframes nb-sheet-in {
     from {
       opacity: 0;
-      transform: translateY(-8px);
     }
-    to {
-      opacity: 1;
-      transform: none;
+  }
+  @keyframes nb-sheet-item {
+    from {
+      opacity: 0;
+      transform: translateY(12px);
+    }
+  }
+
+  /* Phones: a flat bar across the full width, aligned with the page edge. */
+  @media (max-width: 767px) {
+    .nb-header {
+      padding-inline: 0;
+    }
+    .nb-bar {
+      border-inline: 0;
+      border-radius: 0;
+    }
+    .nb-bar__row {
+      padding-inline: var(--header-gutter);
     }
   }
 </style>
@@ -1133,6 +1380,15 @@ import { vatFor } from '../../lib/vat';
       };
 
       btn.addEventListener('click', () => setOpen(btn.getAttribute('aria-expanded') !== 'true'));
+
+      // Services unfold inside the menu.
+      const toggle = panel.querySelector<HTMLButtonElement>('[data-mobile-toggle]');
+      const sub = panel.querySelector<HTMLElement>('[data-mobile-sub]');
+      toggle?.addEventListener('click', () => {
+        const open = toggle.getAttribute('aria-expanded') !== 'true';
+        toggle.setAttribute('aria-expanded', String(open));
+        sub?.classList.toggle('is-open', open);
+      });
       panel.addEventListener('click', (e) => {
         if ((e.target as HTMLElement).closest('a')) setOpen(false, false);
       });

@@ -18,6 +18,8 @@ export const de: Messages = {
     freeConsultation: 'Gratis-Erstgespräch',
     openMenu: 'Menü öffnen',
     closeMenu: 'Menü schliessen',
+    menu: 'Menü',
+    close: 'Schliessen',
     breadcrumbs: 'Navigationspfad',
     home: 'Startseite',
     skipToContent: 'Zum Inhalt springen',

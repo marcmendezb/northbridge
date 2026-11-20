@@ -18,6 +18,8 @@ export const fr: Messages = {
     freeConsultation: 'Consultation gratuite',
     openMenu: 'Ouvrir le menu',
     closeMenu: 'Fermer le menu',
+    menu: 'Menu',
+    close: 'Fermer',
     breadcrumbs: 'Fil d’Ariane',
     home: 'Accueil',
     skipToContent: 'Aller au contenu',

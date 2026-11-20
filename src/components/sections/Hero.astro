@@ -94,7 +94,7 @@ import { withCity } from '../../data/offices';
           <p data-hero-fade="0.5" class="hero__sub m-0 font-serif font-light text-navy-100">
             <Fragment set:html={byCountry((c) => withCity(t('brand.descriptor'), c, locale))} />
           </p>
-          <div data-hero-fade="0.62" class="flex flex-wrap items-center gap-4">
+          <div data-hero-fade="0.62" class="hero__ctas flex flex-wrap items-center gap-4">
             <Button href={bookingCta.href} on="dark" arrow>
               {t('cta.book')}
             </Button>
@@ -327,41 +327,93 @@ import { withCity } from '../../data/offices';
       grid-column: 1 / -1;
     }
   }
-  /* On mobile the photo takes the top part and the text sits on plain navy, so it is always readable. */
+  /* ── Phones: the photo already stands inside the brand's arch (the shape the desktop scene ends on),
+     the credentials form its base, and the text sits below on plain navy, always readable. ── */
   @media (max-width: 767px), (max-height: 559px) {
-    .hero__photo {
-      height: 54svh;
-      min-height: 0;
-    }
-    .hero__img,
-    .hero__video {
-      object-position: 80% 50%;
+    .hero {
+      --arch-top: calc(var(--header-h) + 16px);
+      --arch-h: clamp(220px, 44svh - 24px, 420px);
     }
     .hero__stage {
       background: var(--navy-800);
     }
-    .hero__intro {
-      min-height: 0;
-      padding-top: calc(54svh + 32px);
-    }
     .hero__photo {
+      inset: var(--arch-top) var(--header-gutter) auto;
       z-index: 0;
+      height: var(--arch-h);
+      min-height: 0;
+      border-radius: 9999px 9999px 0 0;
+    }
+    .hero__img,
+    .hero__video {
+      object-position: 88% 50%;
+    }
+    /* The credentials: the deck under the arch, not a floating card. */
+    .hero__band {
+      inset: auto 0 0;
+      height: auto;
+      padding-block: 12px;
+      border: 0;
+      border-top: 1.5px solid var(--piedra-50);
+      border-radius: 0;
+      background: var(--navy-800);
+    }
+    .hero__band-inner {
+      justify-content: center;
+      padding-inline: 0;
+    }
+    .hero__scroll {
+      display: none;
+    }
+    .hero__intro {
+      flex-direction: column;
+      align-items: stretch;
+      min-height: 0;
+      padding-top: calc(var(--arch-top) + var(--arch-h) + 28px);
+      padding-bottom: 8px;
     }
     .hero__intro-inner {
       position: relative;
       z-index: 1;
     }
+    .hero__sub {
+      font-size: 1.125rem;
+    }
+    /* Two equal, full-width buttons within thumb reach. */
+    .hero__aside,
+    .hero__ctas {
+      align-self: stretch;
+    }
+    .hero__ctas {
+      display: grid;
+      gap: 10px;
+    }
+    .hero__ctas > * {
+      min-height: 52px;
+    }
+  }
+  /* Phone in landscape: text on the left, the arch on the right, all on one screen. */
+  @media (max-height: 559px) and (orientation: landscape) and (min-width: 560px) {
+    .hero {
+      --arch-top: calc(var(--header-h) + 12px);
+    }
+    .hero__photo {
+      inset: var(--arch-top) var(--header-gutter) 16px auto;
+      width: 36%;
+      height: auto;
+    }
     .hero__intro {
-      flex-direction: column;
-      align-items: stretch;
-      padding-bottom: 0;
+      min-height: 100svh;
+      padding-top: calc(var(--header-h) + 20px);
+      padding-bottom: 20px;
+    }
+    .hero__intro-inner {
+      padding-right: calc(36% + 2 * var(--header-gutter));
+    }
+    .hero__ctas {
+      grid-template-columns: repeat(2, minmax(0, max-content));
     }
     .hero__band {
-      --band-gap: 12px;
-      height: auto;
-      padding-block: 14px;
-    }
-    .hero__scroll {
       display: none;
     }
   }

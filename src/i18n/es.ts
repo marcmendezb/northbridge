@@ -16,6 +16,8 @@ export const es = {
     freeConsultation: 'Consulta gratuita',
     openMenu: 'Abrir menú',
     closeMenu: 'Cerrar menú',
+    menu: 'Menú',
+    close: 'Cerrar',
     breadcrumbs: 'Ruta de navegación',
     home: 'Inicio',
     skipToContent: 'Saltar al contenido',

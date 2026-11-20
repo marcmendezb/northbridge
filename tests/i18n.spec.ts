@@ -47,13 +47,23 @@ test('i18n: with the keyboard, Enter opens languages, focus moves in and Esc clo
   await expect(page.locator('.nb-lang__trigger')).toBeFocused();
 });
 
-test('i18n: on mobile the languages are in the menu', async ({ page }) => {
+test('i18n: on mobile the full-screen menu has the languages and countries', async ({ page }) => {
   await page.setViewportSize({ width: 390, height: 844 });
   await page.goto('/en');
   await page.locator('.nb-menu-btn').click();
-  const langs = page.locator('.nb-mobile__langs a');
+  const menu = page.locator('#mobile-menu');
+  await expect(menu).toBeVisible();
+  const box = await menu.boundingBox();
+  expect(box?.height).toBe(844);
+  const langs = page.getByRole('list', { name: 'Language' }).getByRole('link');
   await expect(langs).toHaveCount(5);
-  await expect(page.locator('.nb-mobile__langs a[aria-current]')).toHaveText('EN');
+  await expect(langs.and(page.locator('[aria-current]'))).toHaveText('EN');
+  await expect(page.getByRole('list', { name: 'Country' }).getByRole('button')).toHaveCount(5);
+
+  const toggle = menu.locator('[data-mobile-toggle]');
+  await toggle.click();
+  await expect(toggle).toHaveAttribute('aria-expanded', 'true');
+  await expect(menu.locator('.nb-mobile__sublink').first()).toBeVisible();
 });
 
 test.describe('without JS', () => {

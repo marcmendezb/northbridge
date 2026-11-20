@@ -18,6 +18,8 @@ export const en: Messages = {
     freeConsultation: 'Free consultation',
     openMenu: 'Open menu',
     closeMenu: 'Close menu',
+    menu: 'Menu',
+    close: 'Close',
     breadcrumbs: 'Breadcrumb',
     home: 'Home',
     skipToContent: 'Skip to content',
