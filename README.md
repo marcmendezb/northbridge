@@ -199,10 +199,9 @@ Cloudflare Pages builds and deploys every push to `master`.
 
 ---
 
-## Author
+## About me
 
-**Marc Mendez**  
-Full-stack developer & MarTech specialist. Seven years in marketing, three building products. Based near Zürich, Switzerland.
+I'm Marc Mendez, a full-stack developer and MarTech specialist: seven years in marketing, three building products. I live near Zürich, Switzerland.
 
 - Portfolio: [marcmendezb.com](https://marcmendezb.com)
 - GitHub: [@marcmendezb](https://github.com/marcmendezb)

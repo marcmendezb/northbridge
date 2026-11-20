@@ -1,6 +1,6 @@
 # Decisions
 
-The choices that shaped the project and why I made them. The full working log was kept in Spanish; this is the short version.
+The choices that shaped the project and why I made them.
 
 ## Static first, React only where it earns its place
 
@@ -25,7 +25,7 @@ Hard-coding dates would make the calendar wrong every January. Instead each dead
 - Italy brought back 4 October as a national holiday from 2026, and France drops its simplified VAT regime from 2027. Both are handled by year.
 - Where the law leaves the exact day to each company (French VAT is due "between the 15th and the 24th"), the calendar says so instead of inventing a date.
 
-Every calendar was checked against official sources, noted in the data files, and the 2026 dates are pinned in unit tests.
+I checked every calendar against official sources and noted them in the data files, and the unit tests pin the 2026 dates.
 
 ## Honest about being a demo
 
@@ -52,7 +52,7 @@ Lighthouse in the high 80s on a few pages turned out to have very specific cause
 
 ## Responsive means adapting, not shrinking
 
-The site was checked at thirteen sizes, from a 320 px phone to a 2560 px screen, including phones in landscape, with an automated audit (overflow, touch targets, text size, clipped text) and a page-by-page visual review. A few rules came out of it:
+I checked the site at thirteen sizes, from a 320 px phone to a 2560 px screen, including phones in landscape, with an automated audit (overflow, touch targets, text size, clipped text) and a page-by-page visual review. A few rules came out of it:
 
 - **Full-screen scroll scenes need height, not just width.** The hero, the closing arch and the three-step journey only pin when the screen is at least 560 px tall. A phone in landscape gets the stacked layout instead of a scene that clips its own text.
 - **Data keeps its shape on a phone.** The pricing comparison keeps the three packages side by side and puts each service on its own line above its values, instead of a table you have to scroll sideways. The tax-year chart does scroll, but it opens on the current month, keeps the lane names in view and says it can be swiped.
